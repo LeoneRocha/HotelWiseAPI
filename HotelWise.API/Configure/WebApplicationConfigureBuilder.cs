@@ -18,11 +18,9 @@ namespace HotelWise.API.Configure
 
             _logger = LogAppHelper.CreateLogger(builder.Configuration);
 
-
             //Service Collections.
-            WebApplicationConfigureServiceCollections.Configure(builder.Services, builder.Configuration);
+            WebApplicationConfigureServiceCollections.Configure(builder.Services, builder.Configuration, _logger);
              
-
             return (builder, _logger);
         }
 
@@ -32,17 +30,21 @@ namespace HotelWise.API.Configure
             {
                 try
                 {
+                    LogAppHelper.Set_ASPNETCORE_ENVIRONMENT(builder.Configuration);
 
                     var app = builder.Build();
 
                     //Application Builder
                     Configure(app, builder.Environment, builder.Configuration);
 
+                    LogAppHelper.PrintLogInformationVersionProduct(_logger);
 
+                    _logger.Information("Web API Loading at: {time}", DateTime.UtcNow);
                     app.Run();
                 }
                 catch (Exception ex)
                 {
+                    _logger.Error(ex, "Web API Error Loading at: {Message} at: {time}", ex.Message, DateTime.UtcNow);
                 }
             }
         }
@@ -97,7 +99,7 @@ namespace HotelWise.API.Configure
             // Migrate latest database changes during startup
             using (var serviceScope = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>().CreateScope())
             {
-                using (var context = serviceScope.ServiceProvider.GetService<HotelWiseDbContext>())
+                using (var context = serviceScope.ServiceProvider.GetService<HotelWiseDbContextMysql>())
                 {
                     context?.Database.Migrate();
                 }

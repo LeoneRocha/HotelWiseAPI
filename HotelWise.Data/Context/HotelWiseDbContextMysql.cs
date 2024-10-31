@@ -1,18 +1,13 @@
 ﻿using HotelWise.Domain.Model;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace HotelWise.Data.Context
 {
-    public class HotelWiseDbContext  :  DbContext
+    public class HotelWiseDbContextMysql  :  DbContext
     {
         public DbSet<Hotel> Hotels { get; set; }
 
-        public HotelWiseDbContext(DbContextOptions<HotelWiseDbContext> options) : base(options) { }
+        public HotelWiseDbContextMysql(DbContextOptions<HotelWiseDbContextMysql> options) : base(options) { }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

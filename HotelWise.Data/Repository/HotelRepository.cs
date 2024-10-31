@@ -7,9 +7,9 @@ namespace HotelWise.Data.Repository
 {
     public class HotelRepository : IHotelRepository
     {
-        private readonly HotelWiseDbContext _context;
+        private readonly HotelWiseDbContextMysql _context;
 
-        public HotelRepository(HotelWiseDbContext context)
+        public HotelRepository(HotelWiseDbContextMysql context)
         {
             _context = context;
         }

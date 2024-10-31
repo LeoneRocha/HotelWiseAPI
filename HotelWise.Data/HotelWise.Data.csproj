@@ -34,7 +34,7 @@
   <ItemGroup>
     <Folder Include="Context\Configure\Entity\" />
     <Folder Include="Context\Configure\Mock\" />
-    <Folder Include="Migrations\" />
+    <Folder Include="Migrations\MySql\" />
   </ItemGroup>
 
   <ItemGroup>

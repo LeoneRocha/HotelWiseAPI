@@ -23,3 +23,7 @@ public class Hotel
 
 >>>>>>>>>>>>>> ALVO ESTUDO 
 https://learn.microsoft.com/en-us/semantic-kernel/concepts/vector-store-connectors/?pivots=programming-language-csharp
+
+
+
+Add-Migration InitialCreate -Context HotelWiseDbContextMysql -OutputDir Migrations\MySql -Project HotelWise.Data
