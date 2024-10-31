@@ -1,3 +1,4 @@
+using Google.Protobuf.WellKnownTypes;
 using HotelWise.API.Configure;
 
 public static class Program

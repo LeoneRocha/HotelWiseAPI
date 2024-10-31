@@ -2,6 +2,7 @@
 using HotelWise.Domain.Helpers;
 using Microsoft.AspNetCore.Rewrite;
 using Microsoft.EntityFrameworkCore;
+using Serilog;
 
 namespace HotelWise.API.Configure
 {
@@ -20,7 +21,8 @@ namespace HotelWise.API.Configure
 
             //Service Collections.
             WebApplicationConfigureServiceCollections.Configure(builder.Services, builder.Configuration, _logger);
-             
+
+            builder.Host.UseSerilog();
             return (builder, _logger);
         }
 
@@ -40,6 +42,7 @@ namespace HotelWise.API.Configure
                     LogAppHelper.PrintLogInformationVersionProduct(_logger);
 
                     _logger.Information("Web API Loading at: {time}", DateTime.UtcNow);
+                      
                     app.Run();
                 }
                 catch (Exception ex)
@@ -60,9 +63,7 @@ namespace HotelWise.API.Configure
             addAutoMigrate(app);
 
             app.UseHttpsRedirection();
-
-            app.UseStaticFiles();
-             
+              
             app.UseRouting();
 
             app.UseCors();
@@ -71,7 +72,7 @@ namespace HotelWise.API.Configure
             app.UseSwaggerUI(c =>
             {
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "HotelWise.API v1");
-                c.RoutePrefix = string.Empty; // Para acessar o Swagger na raiz do aplicativo
+                //c.RoutePrefix = string.Empty; // Para acessar o Swagger na raiz do aplicativo
             }
             );
 
@@ -80,10 +81,8 @@ namespace HotelWise.API.Configure
 
             app.UseRewriter(option);
 
-            app.UseAuthentication();
-
             app.UseAuthorization();
-              
+
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();

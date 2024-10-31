@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace HotelWise.API.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/[controller]/v1")]
     public class HotelsController : ControllerBase
     {
         private readonly IHotelService _hotelService;
@@ -63,7 +63,7 @@ namespace HotelWise.API.Controllers
         [HttpPut("{id}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> Update(ulong id, [FromBody] Hotel hotel)
+        public async Task<IActionResult> Update(long id, [FromBody] Hotel hotel)
         {
             if (id != hotel.HotelId)
             {
