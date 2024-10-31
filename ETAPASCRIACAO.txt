@@ -1,0 +1,25 @@
+--- EM EF CORE 
+
+-- C# .net core 8 e CODEFRIST com uso de bogus para gerar 1000 hoteis 
+
+
+Em C# .net core 8 e CODEFRIST com uso de padroes de projeto e clean code e repository pattern gere um crud completo usando camada de repositorio , service e da api usando injecao de dependencia e que pode ser testado facilmente. Use o codigo abaixo para usar como refenrencia o projeto deve tanto rodar em sql server como mysql Usando Entity Framework core e usando fluent api e que ja seja possivel usanddo Hasdata carregar um array de hotel , e tambem FluentValidation 
+
+
+Acrestente no hotel todas caracteristicas possivels como estrelas do hotel preco inicial dos quartos , cep localizacao etc gere todas caracteristicas possiveis
+
+
+public class Hotel
+{ 
+    public ulong HotelId { get; set; }
+ 
+    public string HotelName { get; set; }
+ 
+    public string Description { get; set; }
+ 
+ 
+    public string[] Tags { get; set; }
+}
+
+>>>>>>>>>>>>>> ALVO ESTUDO 
+https://learn.microsoft.com/en-us/semantic-kernel/concepts/vector-store-connectors/?pivots=programming-language-csharp
