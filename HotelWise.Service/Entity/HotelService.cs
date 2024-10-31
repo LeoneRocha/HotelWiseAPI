@@ -12,12 +12,12 @@ namespace HotelWise.Service.Entity
             _hotelRepository = hotelRepository;
         }
 
-        public async Task<IEnumerable<Hotel>> GetAllHotelsAsync()
+        public async Task<Hotel[]> GetAllHotelsAsync()
         {
             return await _hotelRepository.GetAllAsync();
         }
 
-        public async Task<Hotel?> GetHotelByIdAsync(ulong id)
+        public async Task<Hotel?> GetHotelByIdAsync(long id)
         {
             return await _hotelRepository.GetByIdAsync(id);
         }
@@ -32,7 +32,7 @@ namespace HotelWise.Service.Entity
             await _hotelRepository.UpdateAsync(hotel);
         }
 
-        public async Task DeleteHotelAsync(ulong id)
+        public async Task DeleteHotelAsync(long id)
         {
             await _hotelRepository.DeleteAsync(id);
         }

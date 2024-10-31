@@ -5,9 +5,9 @@ namespace HotelWise.Domain.Interfaces
     public interface IHotelService
     {
         Task AddHotelAsync(Hotel hotel);
-        Task DeleteHotelAsync(ulong id);
-        Task<IEnumerable<Hotel>> GetAllHotelsAsync();
-        Task<Hotel?> GetHotelByIdAsync(ulong id);
+        Task DeleteHotelAsync(long id);
+        Task<Hotel[]> GetAllHotelsAsync();
+        Task<Hotel?> GetHotelByIdAsync(long id);
         Task UpdateHotelAsync(Hotel hotel);
     }
 }

@@ -5,7 +5,7 @@ using System.Text;
 
 namespace HotelWise.Data.Context.Configure.Mock
 {
-    public static class HotelData
+    public static class HotelsMockData
     {
         public static Hotel[] GetHotels()
         {
@@ -28,6 +28,16 @@ namespace HotelWise.Data.Context.Configure.Mock
 
             return hotels.ToArray();
         }
+        public static async Task<Hotel[]> GetHotelsAsync()
+        {
+            var faker = new Faker("pt_BR");
+            var hotels = new List<Hotel>();
+              
+            await GetHotelsGenerateAi(faker, hotels);
+
+            return hotels.ToArray();
+        }
+
 
         private static void GetHotelsGenerateFromBogus(Faker faker, List<Hotel> hotels)
         {
@@ -78,7 +88,8 @@ namespace HotelWise.Data.Context.Configure.Mock
 
         public static async Task<string> GenerateDescriptionAndTags(string prompt)
         {
-            var apiKey = "YOUR_OPENAI_API_KEY";
+            //https://github.com/jgravelle/GroqApiLibrary
+            var apiKey = "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";
             var requestBody = new
             {
                 prompt = prompt,
@@ -96,8 +107,5 @@ namespace HotelWise.Data.Context.Configure.Mock
 
             return openAIResponse!.Choices[0].Text;
         }
-
-
-
     }
 }

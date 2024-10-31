@@ -38,7 +38,7 @@ namespace HotelWise.Data.Context
                 entity.Property(e => e.ZipCode).HasMaxLength(10).HasColumnType("varchar(10)");
                 entity.Property(e => e.Location).HasMaxLength(200).HasColumnType("varchar(200)");
 
-                entity.HasData(HotelData.GetHotels());
+                entity.HasData(HotelsMockData.GetHotels());
             });
         }
     }

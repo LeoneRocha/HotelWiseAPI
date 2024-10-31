@@ -1,4 +1,5 @@
-﻿using HotelWise.Domain.Interfaces;
+﻿using HotelWise.Data.Context.Configure.Mock;
+using HotelWise.Domain.Interfaces;
 using HotelWise.Domain.Model;
 using Microsoft.AspNetCore.Mvc;
 
@@ -22,8 +23,14 @@ namespace HotelWise.API.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> GetAll()
         {
+            var result = new List<Hotel>();
             var hotels = await _hotelService.GetAllHotelsAsync();
-            return Ok(hotels);
+            result.AddRange(hotels);
+
+            //var testeIA = await HotelsMockData.GetHotelsAsync(); 
+            //result.AddRange(testeIA); 
+
+            return Ok(result);
         }
 
         /// <summary>
@@ -33,7 +40,7 @@ namespace HotelWise.API.Controllers
         [HttpGet("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> GetById(ulong id)
+        public async Task<IActionResult> GetById(long id)
         {
             var hotel = await _hotelService.GetHotelByIdAsync(id);
             if (hotel == null)
@@ -79,7 +86,7 @@ namespace HotelWise.API.Controllers
         /// <param name="id">ID do hotel</param>
         [HttpDelete("{id}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
-        public async Task<IActionResult> Delete(ulong id)
+        public async Task<IActionResult> Delete(long id)
         {
             await _hotelService.DeleteHotelAsync(id);
             return NoContent();

@@ -4,11 +4,11 @@ namespace HotelWise.Domain.Interfaces
 {
     public interface IHotelRepository
     {
-        Task<IEnumerable<Hotel>> GetAllAsync();
-        Task<Hotel?> GetByIdAsync(ulong id);
+        Task<Hotel[]> GetAllAsync();
+        Task<Hotel?> GetByIdAsync(long id);
         Task AddAsync(Hotel hotel);
         Task UpdateAsync(Hotel hotel);
-        Task DeleteAsync(ulong id);
+        Task DeleteAsync(long id);
     }
 
 }
