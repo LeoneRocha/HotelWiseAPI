@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HotelWise.Data.Migrations.MySql
 {
     [DbContext(typeof(HotelWiseDbContextMysql))]
-    [Migration("20241031222710_InitialCreate")]
+    [Migration("20241101234012_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -55,8 +55,8 @@ namespace HotelWise.Data.Migrations.MySql
 
                     b.Property<string>("Tags")
                         .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("varchar(255)");
+                        .HasMaxLength(500)
+                        .HasColumnType("varchar(500)");
 
                     b.Property<string>("ZipCode")
                         .IsRequired()

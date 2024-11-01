@@ -9,5 +9,6 @@ namespace HotelWise.Domain.Interfaces
         Task<Hotel[]> GetAllHotelsAsync();
         Task<Hotel?> GetHotelByIdAsync(long id);
         Task UpdateHotelAsync(Hotel hotel);
+        Task<Hotel[]> GenerateHotelsByIA(int numberGerate);
     }
 }

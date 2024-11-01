@@ -5,16 +5,18 @@ VisualStudioVersion = 17.11.35303.130
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HotelWise.Data", "HotelWise.Data\HotelWise.Data.csproj", "{A6F2E0B6-DE62-47AF-8A6D-4765002D316F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HotelWise.API", "HotelWise.API\HotelWise.API.csproj", "{7E967F02-3360-4422-89DD-1773436E7A8D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HotelWise.API", "HotelWise.API\HotelWise.API.csproj", "{7E967F02-3360-4422-89DD-1773436E7A8D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HotelWise.Domain", "HotelWise.Domain\HotelWise.Domain.csproj", "{D9CA06F5-CF5D-45F9-9727-230E5818F640}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HotelWise.Domain", "HotelWise.Domain\HotelWise.Domain.csproj", "{D9CA06F5-CF5D-45F9-9727-230E5818F640}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HotelWise.Service", "HotelWise.Service\HotelWise.Service.csproj", "{98F80701-8717-44D2-A0FF-51B6E2C985FE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HotelWise.Service", "HotelWise.Service\HotelWise.Service.csproj", "{98F80701-8717-44D2-A0FF-51B6E2C985FE}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{8D53F5F1-A558-4613-9072-BB8F0AD7E331}"
 	ProjectSection(SolutionItems) = preProject
 		ETAPASCRIACAO.txt = ETAPASCRIACAO.txt
 	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GroqApiLibrary", "GroqApiLibrary\GroqApiLibrary.csproj", "{B6E7F0C9-8217-405B-AA68-9DED3E128602}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -38,6 +40,10 @@ Global
 		{98F80701-8717-44D2-A0FF-51B6E2C985FE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{98F80701-8717-44D2-A0FF-51B6E2C985FE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{98F80701-8717-44D2-A0FF-51B6E2C985FE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B6E7F0C9-8217-405B-AA68-9DED3E128602}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B6E7F0C9-8217-405B-AA68-9DED3E128602}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B6E7F0C9-8217-405B-AA68-9DED3E128602}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B6E7F0C9-8217-405B-AA68-9DED3E128602}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

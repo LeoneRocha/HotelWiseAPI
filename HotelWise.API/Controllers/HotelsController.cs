@@ -1,4 +1,5 @@
-﻿using HotelWise.Domain.Interfaces;
+﻿using HotelWise.Data.Context.Configure.Mock;
+using HotelWise.Domain.Interfaces;
 using HotelWise.Domain.Model;
 using Microsoft.AspNetCore.Mvc;
 
@@ -21,15 +22,9 @@ namespace HotelWise.API.Controllers
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> GetAll()
-        {
-            var result = new List<Hotel>();
-            var hotels = await _hotelService.GetAllHotelsAsync();
-            result.AddRange(hotels);
-
-            //var testeIA = await HotelsMockData.GetHotelsAsync(); 
-            //result.AddRange(testeIA); 
-
-            return Ok(result);
+        { 
+            var hotels = await _hotelService.GetAllHotelsAsync(); 
+            return Ok(hotels);
         }
 
         /// <summary>
@@ -48,6 +43,17 @@ namespace HotelWise.API.Controllers
             }
             return Ok(hotel);
         }
+
+
+        [HttpGet("generate/{numberGerate}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> Generate(int numberGerate)
+        {
+            var hotels = await _hotelService.GenerateHotelsByIA(numberGerate);
+            return Ok(hotels); 
+        }
+
 
         /// <summary>
         /// Cria um novo hotel.

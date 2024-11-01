@@ -1,7 +1,6 @@
 ﻿using HotelWise.Data.Context.Configure.Mock;
 using HotelWise.Domain.Model;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.ChangeTracking;
 
 namespace HotelWise.Data.Context
 {
@@ -23,8 +22,8 @@ namespace HotelWise.Data.Context
                 .HasConversion(v => string.Join(',', v), v => v.Split(',', StringSplitOptions.RemoveEmptyEntries));
 
                 entity.Property(e => e.Tags)
-                .HasMaxLength(255)
-                .HasColumnType("varchar(255)")
+                .HasMaxLength(500)
+                .HasColumnType("varchar(500)")
                 .IsRequired()
                 .HasConversion(v => string.Join(',', v), v => v.Split(',', StringSplitOptions.RemoveEmptyEntries))
                 //.Metadata.SetValueComparer(new ValueComparer<string[]>((c1, c2) => c1!.SequenceEqual(c2!), c => c.Aggregate(0, (a, v) => HashCode.Combine(a, v.GetHashCode())), c => c.ToArray()))

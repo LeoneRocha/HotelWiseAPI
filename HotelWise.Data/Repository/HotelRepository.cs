@@ -29,6 +29,12 @@ namespace HotelWise.Data.Repository
             await _context.Hotels.AddAsync(hotel);
             await _context.SaveChangesAsync();
         }
+        public async Task AddRangeAsync(Hotel[] hotels)
+        {
+            await _context.Hotels.AddRangeAsync(hotels);
+            await _context.SaveChangesAsync();
+        }
+
 
         public async Task UpdateAsync(Hotel hotel)
         {

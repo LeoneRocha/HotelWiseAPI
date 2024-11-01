@@ -1,4 +1,5 @@
-﻿using HotelWise.Domain.Interfaces;
+﻿using HotelWise.Data.Context.Configure.Mock;
+using HotelWise.Domain.Interfaces;
 using HotelWise.Domain.Model;
 
 namespace HotelWise.Service.Entity
@@ -22,6 +23,23 @@ namespace HotelWise.Service.Entity
             return await _hotelRepository.GetByIdAsync(id);
         }
 
+        public async Task<Hotel[]> GenerateHotelsByIA(int numberGerate)
+        {
+            var hotelsExists = await _hotelRepository.GetAllAsync();
+
+            if (hotelsExists.Length < numberGerate)
+            {
+                var hotels = await HotelsMockData.GetHotelsAsync(numberGerate - hotelsExists.Length);
+
+                await _hotelRepository.AddRangeAsync(hotels);
+                List<Hotel> result = new List<Hotel>();
+                result.AddRange(hotels);
+                result.AddRange(hotelsExists);
+                return result.ToArray();
+            }
+
+            return hotelsExists;
+        }
         public async Task AddHotelAsync(Hotel hotel)
         {
             await _hotelRepository.AddAsync(hotel);

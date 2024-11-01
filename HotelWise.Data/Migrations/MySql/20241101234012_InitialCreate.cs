@@ -24,7 +24,7 @@ namespace HotelWise.Data.Migrations.MySql
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     Description = table.Column<string>(type: "varchar(500)", maxLength: 500, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    Tags = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: false)
+                    Tags = table.Column<string>(type: "varchar(500)", maxLength: 500, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     Stars = table.Column<byte>(type: "tinyint unsigned", nullable: false),
                     InitialRoomPrice = table.Column<decimal>(type: "decimal(65,30)", nullable: false),
