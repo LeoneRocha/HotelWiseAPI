@@ -2,6 +2,7 @@
 using GroqApiLibrary;
 using HotelWise.Domain.Model;
 using System.Text.Json.Nodes;
+using System.Text.RegularExpressions;
 
 namespace HotelWise.Data.Context.Configure.Mock
 {
@@ -87,7 +88,7 @@ namespace HotelWise.Data.Context.Configure.Mock
                     Console.WriteLine($"Dados insuficientes na resposta: {descriptionAndTags}");
                     continue;
                 }
-                 
+
                 var hotelAdd = new Hotel
                 {
                     HotelName = hotelName,
@@ -104,17 +105,22 @@ namespace HotelWise.Data.Context.Configure.Mock
             }
         }
 
+
         public static string[] ProcessTags(string[] tags)
         {
             var processedTags = new List<string>();
+            var regex = new Regex(@"\d"); // Expressão regular para detectar números
+            var pattern = new Regex(@"^[a-zA-Z]+(_[a-zA-Z]+)+$"); // Expressão regular para detectar o padrão sigla_valida
 
             foreach (string tagCurrent in tags)
             {
                 // Remove quebras de linha e espaços extras
-                var tagActual = tagCurrent.Replace("\n", "").Replace("\r", "").Trim().ToLower();
+                var tagActual = tagCurrent.Replace("\n", "").Replace("\r", "").Trim();
 
                 // Separar palavras e eliminar tags com mais de três palavras
-                var words = tagActual.Split(' ').Where(word => !string.IsNullOrEmpty(word) && word.Length > 2).ToArray();
+                var words = tagActual.Split(' ')
+                                     .Where(word => !string.IsNullOrEmpty(word) && word.Length > 2 && !regex.IsMatch(word) && !pattern.IsMatch(word))
+                                     .ToArray();
                 if (words.Length <= 3)
                 {
                     processedTags.AddRange(words);
@@ -124,6 +130,7 @@ namespace HotelWise.Data.Context.Configure.Mock
             // Eliminar tags vazias e duplicadas
             return processedTags.Distinct().Where(tag => !string.IsNullOrEmpty(tag)).ToArray();
         }
+
 
 
 
