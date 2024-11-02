@@ -46,7 +46,7 @@ namespace HotelWise.Data.Context.Configure.Mock
                 var hotelAddress = faker.Address;
                 var cityAdd = faker.Address.City();
 
-                var prompt = $"Gere um nome de hotel, somente 1 hotel, uma descrição e de 5 a 10 tags para um hotel localizado em {cityAdd} com {faker.Random.Int(1, 5)} estrelas. Separe por |. Exemplo: Hotel Nome|Descriçao|tag 1|tag 2. A descrição nao pode passar de 500 caracteres.";
+                var prompt = $"Gere um nome de hotel, uma descrição, Nome da cidade, sigla do estado de 2 carateres, CEP (codigo postal brasileiro) e de 5 a 10 tags  com {faker.Random.Int(1, 5)} estrelas. Separe por |. Siga o Exemplo: Hotel Nome|Descriçao|Cidade|sigla estado|CEP|tag 1|tag 2. A descrição nao pode passar de 500 caracteres. O CEP e nome da cidade e sigla do estado devem ter coerencia. Responda apenas com o que foi solicitado.";
 
                 var descriptionAndTags = await GenerateDescriptionAndTags(prompt);
 
@@ -60,7 +60,11 @@ namespace HotelWise.Data.Context.Configure.Mock
 
                 var hotelName = splitResult[0].Trim();
                 var description = splitResult[1].Trim();
-                var tags = splitResult.Skip(2).Select(tag => tag.Trim()).ToArray();
+                var cityName = splitResult[2].Trim();
+                var stateCode = splitResult[3].Trim();
+                var cepCode = splitResult[4].Trim();
+
+                var tags = splitResult.Skip(5).Select(tag => tag.Trim()).ToArray();
 
                 // Verificação adicional para tratar tags separadas por vírgulas
                 if (tags.Length == 1 && tags[0].Contains(','))
@@ -81,8 +85,7 @@ namespace HotelWise.Data.Context.Configure.Mock
                     Console.WriteLine($"Dados insuficientes na resposta: {descriptionAndTags}");
                     continue;
                 }
-
-                
+                 
                 var hotelAdd = new Hotel
                 {
                     HotelName = hotelName,
@@ -90,10 +93,10 @@ namespace HotelWise.Data.Context.Configure.Mock
                     Tags = tags,
                     Stars = (byte)faker.Random.Int(1, 5),
                     InitialRoomPrice = faker.Random.Decimal(100, 1000),
-                    ZipCode = hotelAddress.ZipCode(),
+                    City = cityName,
+                    StateCode = stateCode,
+                    ZipCode = cepCode,
                     Location = $"{hotelAddress.StreetSuffix()} {hotelAddress.StreetAddress()}",
-                    City = cityAdd,
-                    StateCode = hotelAddress.StateAbbr(),
                 };
                 hotels.Add(hotelAdd);
             }

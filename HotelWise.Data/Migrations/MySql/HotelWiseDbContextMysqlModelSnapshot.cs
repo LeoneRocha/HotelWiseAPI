@@ -78,15 +78,15 @@ namespace HotelWise.Data.Migrations.MySql
                         new
                         {
                             HotelId = 1L,
-                            City = "Limeira",
+                            City = "Caucaia",
                             Description = "An example hotel",
                             HotelName = "Hotel Example",
-                            InitialRoomPrice = 734.277398347404100m,
-                            Location = "Alameda 2519 Barros Travessa",
-                            Stars = (byte)4,
-                            StateCode = "RR",
+                            InitialRoomPrice = 322.360860039722200m,
+                            Location = "Rodovia 2663 Silva Marginal",
+                            Stars = (byte)1,
+                            StateCode = "MS",
                             Tags = "Luxury,Spa",
-                            ZipCode = "83024-438"
+                            ZipCode = "77110-960"
                         });
                 });
 #pragma warning restore 612, 618

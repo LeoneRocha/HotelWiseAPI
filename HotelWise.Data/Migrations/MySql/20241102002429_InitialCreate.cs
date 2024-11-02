@@ -46,7 +46,7 @@ namespace HotelWise.Data.Migrations.MySql
             migrationBuilder.InsertData(
                 table: "Hotels",
                 columns: new[] { "HotelId", "City", "Description", "HotelName", "InitialRoomPrice", "Location", "Stars", "StateCode", "Tags", "ZipCode" },
-                values: new object[] { 1L, "Limeira", "An example hotel", "Hotel Example", 734.277398347404100m, "Alameda 2519 Barros Travessa", (byte)4, "RR", "Luxury,Spa", "83024-438" });
+                values: new object[] { 1L, "Caucaia", "An example hotel", "Hotel Example", 322.360860039722200m, "Rodovia 2663 Silva Marginal", (byte)1, "MS", "Luxury,Spa", "77110-960" });
         }
 
         /// <inheritdoc />
