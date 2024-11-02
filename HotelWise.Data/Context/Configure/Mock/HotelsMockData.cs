@@ -75,6 +75,8 @@ namespace HotelWise.Data.Context.Configure.Mock
                 {
                     tags = tags.Where(tag => !string.IsNullOrEmpty(tag)).ToArray();
                 }
+                // Processar tags para garantir que cada item não tenha mais de uma palavra
+                tags = ProcessTags(tags);
 
                 // Validação das tags para não exceder 500 caracteres
                 tags = ValidateAndAdjustTags(tags, 500);
@@ -101,6 +103,29 @@ namespace HotelWise.Data.Context.Configure.Mock
                 hotels.Add(hotelAdd);
             }
         }
+
+        public static string[] ProcessTags(string[] tags)
+        {
+            var processedTags = new List<string>();
+
+            foreach (string tagCurrent in tags)
+            {
+                // Remove quebras de linha e espaços extras
+                var tagActual = tagCurrent.Replace("\n", "").Replace("\r", "").Trim().ToLower();
+
+                // Separar palavras e eliminar tags com mais de três palavras
+                var words = tagActual.Split(' ').Where(word => !string.IsNullOrEmpty(word) && word.Length > 2).ToArray();
+                if (words.Length <= 3)
+                {
+                    processedTags.AddRange(words);
+                }
+            }
+
+            // Eliminar tags vazias e duplicadas
+            return processedTags.Distinct().Where(tag => !string.IsNullOrEmpty(tag)).ToArray();
+        }
+
+
 
         private static string[] ValidateAndAdjustTags(string[] tags, int maxLength)
         {

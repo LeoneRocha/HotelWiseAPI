@@ -15,7 +15,7 @@ namespace HotelWise.Service.Entity
 
         public async Task<Hotel[]> GetAllHotelsAsync()
         {
-            return await _hotelRepository.GetAllAsync();
+            return await _hotelRepository.GetAll();
         }
 
         public async Task<Hotel?> GetHotelByIdAsync(long id)
@@ -27,6 +27,12 @@ namespace HotelWise.Service.Entity
         {
             var hotelsExists = await _hotelRepository.GetAllAsync();
 
+            foreach (var hotel in hotelsExists)
+            {
+                hotel.Tags = HotelsMockData.ProcessTags(hotel.Tags);
+            }
+            await _hotelRepository.UpdateRangeAsync(hotelsExists);
+             
             if (hotelsExists.Length < numberGerate)
             {
                 var hotels = await HotelsMockData.GetHotelsAsync(numberGerate - hotelsExists.Length);
@@ -40,6 +46,8 @@ namespace HotelWise.Service.Entity
 
             return hotelsExists;
         }
+
+
         public async Task AddHotelAsync(Hotel hotel)
         {
             await _hotelRepository.AddAsync(hotel);
