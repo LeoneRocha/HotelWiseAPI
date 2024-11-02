@@ -15,11 +15,9 @@ namespace HotelWise.Data.Context
             modelBuilder.Entity<Hotel>(entity =>
             {
                 entity.HasKey(e => e.HotelId);
-                entity.Property(e => e.HotelName).IsRequired().HasMaxLength(100);
-                entity.Property(e => e.Description).HasMaxLength(500);
-
-                entity.Property(e => e.Tags)
-                .HasConversion(v => string.Join(',', v), v => v.Split(',', StringSplitOptions.RemoveEmptyEntries));
+                entity.Property(e => e.HotelName).IsRequired().HasMaxLength(100).HasColumnType("varchar(100)");
+               
+                entity.Property(e => e.Description).HasMaxLength(1000).HasColumnType("varchar(1000)"); 
 
                 entity.Property(e => e.Tags)
                 .HasMaxLength(500)
@@ -35,7 +33,9 @@ namespace HotelWise.Data.Context
 
                 entity.Property(e => e.InitialRoomPrice).IsRequired();
                 entity.Property(e => e.ZipCode).HasMaxLength(10).HasColumnType("varchar(10)");
+                entity.Property(e => e.StateCode).HasMaxLength(2).HasColumnType("varchar(2)");
                 entity.Property(e => e.Location).HasMaxLength(200).HasColumnType("varchar(200)");
+                entity.Property(e => e.City).HasMaxLength(200).HasColumnType("varchar(200)");
 
                 entity.HasData(HotelsMockData.GetHotels());
             });

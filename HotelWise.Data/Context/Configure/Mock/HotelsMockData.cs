@@ -12,16 +12,20 @@ namespace HotelWise.Data.Context.Configure.Mock
             var faker = new Faker("pt_BR");
             var hotels = new List<Hotel>();
 
+            var hotelAddress = faker.Address;
+
             hotels.Add(new Hotel
             {
                 HotelId = 1,
                 HotelName = "Hotel Example",
                 Description = "An example hotel",
                 Tags = new[] { "Luxury", "Spa" },
-                Stars = 5,
-                InitialRoomPrice = 200.00m,
-                ZipCode = "12345",
-                Location = "Example City"
+                Stars = (byte)faker.Random.Int(1, 5),
+                InitialRoomPrice = faker.Random.Decimal(100, 1000),
+                ZipCode = hotelAddress.ZipCode(),
+                Location = $"{hotelAddress.StreetSuffix()} {hotelAddress.StreetAddress()}",
+                City = hotelAddress.City(),
+                StateCode = hotelAddress.StateAbbr(),
             });
 
             return hotels.ToArray();
@@ -39,7 +43,10 @@ namespace HotelWise.Data.Context.Configure.Mock
         {
             for (int i = 1; i <= numberGerate; i++)
             {
-                var prompt = $"Gere um nome de hotel, somente 1 hotel, uma descrição e de 5 a 10 tags para um hotel localizado em {faker.Address.City()} com {faker.Random.Int(1, 5)} estrelas. Separe por |. Exemplo: Hotel Nome|Descriçao|tag 1|tag 2. A descrição nao pode passar de 500 caracteres.";
+                var hotelAddress = faker.Address;
+                var cityAdd = faker.Address.City();
+
+                var prompt = $"Gere um nome de hotel, somente 1 hotel, uma descrição e de 5 a 10 tags para um hotel localizado em {cityAdd} com {faker.Random.Int(1, 5)} estrelas. Separe por |. Exemplo: Hotel Nome|Descriçao|tag 1|tag 2. A descrição nao pode passar de 500 caracteres.";
 
                 var descriptionAndTags = await GenerateDescriptionAndTags(prompt);
 
@@ -74,15 +81,19 @@ namespace HotelWise.Data.Context.Configure.Mock
                     Console.WriteLine($"Dados insuficientes na resposta: {descriptionAndTags}");
                     continue;
                 }
+
+                
                 var hotelAdd = new Hotel
-                { 
+                {
                     HotelName = hotelName,
                     Description = description,
                     Tags = tags,
                     Stars = (byte)faker.Random.Int(1, 5),
                     InitialRoomPrice = faker.Random.Decimal(100, 1000),
-                    ZipCode = faker.Address.ZipCode(),
-                    Location = faker.Address.City()
+                    ZipCode = hotelAddress.ZipCode(),
+                    Location = $"{hotelAddress.StreetSuffix()} {hotelAddress.StreetAddress()}",
+                    City = cityAdd,
+                    StateCode = hotelAddress.StateAbbr(),
                 };
                 hotels.Add(hotelAdd);
             }

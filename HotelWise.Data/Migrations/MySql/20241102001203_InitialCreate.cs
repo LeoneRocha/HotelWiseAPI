@@ -22,7 +22,7 @@ namespace HotelWise.Data.Migrations.MySql
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                     HotelName = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    Description = table.Column<string>(type: "varchar(500)", maxLength: 500, nullable: false)
+                    Description = table.Column<string>(type: "varchar(1000)", maxLength: 1000, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     Tags = table.Column<string>(type: "varchar(500)", maxLength: 500, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
@@ -31,6 +31,10 @@ namespace HotelWise.Data.Migrations.MySql
                     ZipCode = table.Column<string>(type: "varchar(10)", maxLength: 10, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     Location = table.Column<string>(type: "varchar(200)", maxLength: 200, nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    City = table.Column<string>(type: "varchar(200)", maxLength: 200, nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    StateCode = table.Column<string>(type: "varchar(2)", maxLength: 2, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4")
                 },
                 constraints: table =>
@@ -41,8 +45,8 @@ namespace HotelWise.Data.Migrations.MySql
 
             migrationBuilder.InsertData(
                 table: "Hotels",
-                columns: new[] { "HotelId", "Description", "HotelName", "InitialRoomPrice", "Location", "Stars", "Tags", "ZipCode" },
-                values: new object[] { 1L, "An example hotel", "Hotel Example", 200.00m, "Example City", (byte)5, "Luxury,Spa", "12345" });
+                columns: new[] { "HotelId", "City", "Description", "HotelName", "InitialRoomPrice", "Location", "Stars", "StateCode", "Tags", "ZipCode" },
+                values: new object[] { 1L, "Limeira", "An example hotel", "Hotel Example", 734.277398347404100m, "Alameda 2519 Barros Travessa", (byte)4, "RR", "Luxury,Spa", "83024-438" });
         }
 
         /// <inheritdoc />

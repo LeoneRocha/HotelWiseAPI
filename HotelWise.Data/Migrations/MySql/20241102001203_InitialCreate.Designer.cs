@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HotelWise.Data.Migrations.MySql
 {
     [DbContext(typeof(HotelWiseDbContextMysql))]
-    [Migration("20241101234012_InitialCreate")]
+    [Migration("20241102001203_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -32,10 +32,15 @@ namespace HotelWise.Data.Migrations.MySql
 
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long>("HotelId"));
 
+                    b.Property<string>("City")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("varchar(200)");
+
                     b.Property<string>("Description")
                         .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("varchar(500)");
+                        .HasMaxLength(1000)
+                        .HasColumnType("varchar(1000)");
 
                     b.Property<string>("HotelName")
                         .IsRequired()
@@ -52,6 +57,11 @@ namespace HotelWise.Data.Migrations.MySql
 
                     b.Property<byte>("Stars")
                         .HasColumnType("tinyint unsigned");
+
+                    b.Property<string>("StateCode")
+                        .IsRequired()
+                        .HasMaxLength(2)
+                        .HasColumnType("varchar(2)");
 
                     b.Property<string>("Tags")
                         .IsRequired()
@@ -71,13 +81,15 @@ namespace HotelWise.Data.Migrations.MySql
                         new
                         {
                             HotelId = 1L,
+                            City = "Limeira",
                             Description = "An example hotel",
                             HotelName = "Hotel Example",
-                            InitialRoomPrice = 200.00m,
-                            Location = "Example City",
-                            Stars = (byte)5,
+                            InitialRoomPrice = 734.277398347404100m,
+                            Location = "Alameda 2519 Barros Travessa",
+                            Stars = (byte)4,
+                            StateCode = "RR",
                             Tags = "Luxury,Spa",
-                            ZipCode = "12345"
+                            ZipCode = "83024-438"
                         });
                 });
 #pragma warning restore 612, 618
