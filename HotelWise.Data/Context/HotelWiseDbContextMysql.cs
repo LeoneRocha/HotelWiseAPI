@@ -16,16 +16,14 @@ namespace HotelWise.Data.Context
             {
                 entity.HasKey(e => e.HotelId);
                 entity.Property(e => e.HotelName).IsRequired().HasMaxLength(100).HasColumnType("varchar(100)");
-               
-                entity.Property(e => e.Description).HasMaxLength(1000).HasColumnType("varchar(1000)"); 
+
+                entity.Property(e => e.Description).HasMaxLength(1000).HasColumnType("varchar(1000)");
 
                 entity.Property(e => e.Tags)
                 .HasMaxLength(500)
                 .HasColumnType("varchar(500)")
                 .IsRequired()
-                .HasConversion(v => string.Join(',', v), v => v.Split(',', StringSplitOptions.RemoveEmptyEntries))
-                //.Metadata.SetValueComparer(new ValueComparer<string[]>((c1, c2) => c1!.SequenceEqual(c2!), c => c.Aggregate(0, (a, v) => HashCode.Combine(a, v.GetHashCode())), c => c.ToArray()))
-                ;
+                .HasConversion(v => string.Join(',', v), v => v.Split(',', StringSplitOptions.RemoveEmptyEntries));
 
                 entity.Property(e => e.Stars)
                 .HasConversion<byte>()

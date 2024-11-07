@@ -38,7 +38,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\GroqApiLibrary\GroqApiLibrary.csproj" />
     <ProjectReference Include="..\HotelWise.Domain\HotelWise.Domain.csproj" />
   </ItemGroup>
 

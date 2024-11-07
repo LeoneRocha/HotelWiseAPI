@@ -13,5 +13,4 @@
         public string City { get; set; } = string.Empty;
         public string StateCode { get; set; } = string.Empty;
     }
-
 }

@@ -13,7 +13,6 @@ namespace HotelWise.Data.Repository
         {
             _context = context;
         }
-
         public async Task<Hotel[]> GetAll()
         {
             return await _context.Hotels.AsNoTracking().ToArrayAsync();
@@ -37,7 +36,7 @@ namespace HotelWise.Data.Repository
         {
             await _context.Hotels.AddRangeAsync(hotels);
             await _context.SaveChangesAsync();
-        } 
+        }
         public async Task UpdateAsync(Hotel hotel)
         {
             _context.Hotels.Update(hotel);
@@ -47,7 +46,7 @@ namespace HotelWise.Data.Repository
         {
             _context.Hotels.UpdateRange(hotel);
             await _context.SaveChangesAsync();
-        } 
+        }
         public async Task DeleteAsync(long id)
         {
             var hotel = await _context.Hotels.FindAsync(id);
@@ -58,5 +57,4 @@ namespace HotelWise.Data.Repository
             }
         }
     }
-
 }

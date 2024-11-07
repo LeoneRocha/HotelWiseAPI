@@ -1,10 +1,10 @@
 ﻿using FluentValidation;
-using FluentValidation.AspNetCore;
 using HotelWise.Data.Context;
 using HotelWise.Data.Repository;
 using HotelWise.Domain.Helpers;
 using HotelWise.Domain.Interfaces;
 using HotelWise.Domain.Validator;
+using HotelWise.Service.Configure;
 using HotelWise.Service.Entity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -66,6 +66,8 @@ namespace HotelWise.API
             services.AddScoped<IHotelRepository, HotelRepository>();
             services.AddScoped<IHotelService, HotelService>();
             services.AddValidatorsFromAssemblyContaining<HotelValidator>();
+            
+            ConfigureServicesAI.ConfigureServices(services);
 
             addORM(services, configuration);
         }

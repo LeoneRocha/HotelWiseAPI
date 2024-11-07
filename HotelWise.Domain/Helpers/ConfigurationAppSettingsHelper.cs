@@ -36,9 +36,7 @@ namespace HotelWise.Domain.Helpers
         }
 
 
-        #endregion GENERIC
-         
-
+        #endregion GENERIC 
         public static string GetConnectionStringMySQL(IConfiguration? configuration)
         {
             return GetConnectionStringApp(configuration, "DBConnectionMySQL");

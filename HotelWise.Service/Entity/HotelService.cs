@@ -1,5 +1,4 @@
-﻿using HotelWise.Data.Context.Configure.Mock;
-using HotelWise.Domain.Interfaces;
+﻿using HotelWise.Domain.Interfaces;
 using HotelWise.Domain.Model;
 
 namespace HotelWise.Service.Entity
@@ -7,10 +6,12 @@ namespace HotelWise.Service.Entity
     public class HotelService : IHotelService
     {
         private readonly IHotelRepository _hotelRepository;
+        private readonly IGenerateHotelService _generateHotelService;
 
-        public HotelService(IHotelRepository hotelRepository)
+        public HotelService(IHotelRepository hotelRepository, IGenerateHotelService generateHotelService)
         {
             _hotelRepository = hotelRepository;
+            _generateHotelService = generateHotelService;
         }
 
         public async Task<Hotel[]> GetAllHotelsAsync()
@@ -29,13 +30,14 @@ namespace HotelWise.Service.Entity
 
             foreach (var hotel in hotelsExists)
             {
-                hotel.Tags = HotelsMockData.ProcessTags(hotel.Tags);
+                hotel.Tags = GenerateHotelService.ProcessTags(hotel.Tags);
             }
             await _hotelRepository.UpdateRangeAsync(hotelsExists);
-             
+
             if (hotelsExists.Length < numberGerate)
             {
-                var hotels = await HotelsMockData.GetHotelsAsync(numberGerate - hotelsExists.Length);
+                var totalAdd = numberGerate - hotelsExists.Length;
+                var hotels = await _generateHotelService.GetHotelsAsync(totalAdd);
 
                 await _hotelRepository.AddRangeAsync(hotels);
                 List<Hotel> result = new List<Hotel>();
@@ -43,7 +45,6 @@ namespace HotelWise.Service.Entity
                 result.AddRange(hotelsExists);
                 return result.ToArray();
             }
-
             return hotelsExists;
         }
 
@@ -63,5 +64,4 @@ namespace HotelWise.Service.Entity
             await _hotelRepository.DeleteAsync(id);
         }
     }
-
 }

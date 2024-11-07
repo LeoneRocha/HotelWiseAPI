@@ -5,11 +5,9 @@
         public AppWarningException()
         {
         }
-
         public AppWarningException(string? message) : base(message)
         {
         }
-
         public AppWarningException(string? message, Exception? innerException) : base(message, innerException)
         {
         }

@@ -34,8 +34,7 @@ namespace HotelWise.Domain.Helpers
                       .ReadFrom.Configuration(configuration)
                       .Enrich.FromLogContext()
                       .CreateLogger();
-        }
-
+        } 
 
         public static AppInformationVersionProductDto GetInformationVersionProduct()
         {
