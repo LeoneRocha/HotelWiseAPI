@@ -14,11 +14,11 @@ namespace HotelWise.Service.AI
             _apiKey = configuration["GroqApi:ApiKey"]!;
             _adapterFactory = adapterFactory;
         }
-        public async Task<string> GenerateDescriptionAndTagsAsync(string prompt)
+        public async Task<string> GenerateChatCompletionAsync(string prompt)
         {
             var model = new MixtralModelStrategy();
             var adapter = _adapterFactory.CreateAdapter(_apiKey, model);
-            return await adapter.GenerateDescriptionAndTagsAsync(prompt);
+            return await adapter.GenerateChatCompletionAsync(prompt);
         }
     }
 }

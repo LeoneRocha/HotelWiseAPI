@@ -2,6 +2,6 @@
 {
     public interface IAIInferenceService
     {
-        Task<string> GenerateDescriptionAndTagsAsync(string prompt);
+        Task<string> GenerateChatCompletionAsync(string prompt);
     }
 }

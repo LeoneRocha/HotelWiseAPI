@@ -14,7 +14,7 @@ namespace HotelWise.Domain.AI.Adapter
             _groqApiClient = new GroqApiClient(apiKey);
             _modelStrategy = modelStrategy;
         }
-        public async Task<string> GenerateDescriptionAndTagsAsync(string prompt)
+        public async Task<string> GenerateChatCompletionAsync(string prompt)
         {
             var model = _modelStrategy.GetModel();
             var request = new JsonObject
