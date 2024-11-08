@@ -1,4 +1,5 @@
-﻿using HotelWise.Domain.Model;
+﻿using HotelWise.Domain.Dto;
+using HotelWise.Domain.Model;
 
 namespace HotelWise.Domain.Interfaces
 {
@@ -10,5 +11,7 @@ namespace HotelWise.Domain.Interfaces
         Task<Hotel?> GetHotelByIdAsync(long id);
         Task UpdateHotelAsync(Hotel hotel);
         Task<Hotel[]> GenerateHotelsByIA(int numberGerate);
+
+        Task<Hotel[]> SemanticSearch(SearchCriteria searchCriteria);
     }
 }

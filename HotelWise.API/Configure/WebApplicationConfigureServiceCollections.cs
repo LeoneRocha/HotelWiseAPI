@@ -59,23 +59,25 @@ namespace HotelWise.API
             {
                 return _logger;
             });
-            
+
             services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
 
             services.AddScoped<IHotelRepository, HotelRepository>();
             services.AddScoped<IHotelService, HotelService>();
             services.AddValidatorsFromAssemblyContaining<HotelValidator>();
-            
+
             ConfigureServicesAI.ConfigureServices(services);
 
             addORM(services, configuration);
         }
         private static void addORM(IServiceCollection services, IConfiguration configuration)
         {
-            var connection = string.Empty;
-
-            connection = ConfigurationAppSettingsHelper.GetConnectionStringMySQL(configuration);
+            var connection = ConfigurationAppSettingsHelper.GetConnectionStringMySQL(configuration);
+             
+            services.AddPooledDbContextFactory<HotelWiseDbContextMysql>(options => options.UseMySql(connection, new MySqlServerVersion(new Version(8, 0, 21))));
+             
+            
             services.AddDbContext<HotelWiseDbContextMysql>((serviceProvider, optionsBuilder) =>
             {
                 optionsBuilder.UseMySql(connection, ServerVersion.AutoDetect(connection),
@@ -84,7 +86,7 @@ namespace HotelWise.API
                     optionsMySQL.MigrationsAssembly("HotelWise.Data");
                     optionsMySQL.SchemaBehavior(MySqlSchemaBehavior.Ignore);
                 });
-            }, ServiceLifetime.Scoped, ServiceLifetime.Scoped);
+            }, ServiceLifetime.Transient, ServiceLifetime.Transient);
         }
     }
 }

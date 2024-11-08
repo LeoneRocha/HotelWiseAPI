@@ -1,5 +1,7 @@
-﻿using HotelWise.Domain.Interfaces;
+﻿using HotelWise.Domain.Dto;
+using HotelWise.Domain.Interfaces;
 using HotelWise.Domain.Model;
+using System.Collections.Concurrent;
 
 namespace HotelWise.Service.Entity
 {
@@ -40,15 +42,12 @@ namespace HotelWise.Service.Entity
                 var hotels = await _generateHotelService.GetHotelsAsync(totalAdd);
 
                 await _hotelRepository.AddRangeAsync(hotels);
-                List<Hotel> result = new List<Hotel>();
-                result.AddRange(hotels);
+                List<Hotel> result = new List<Hotel>(hotels);
                 result.AddRange(hotelsExists);
                 return result.ToArray();
             }
             return hotelsExists;
         }
-
-
         public async Task AddHotelAsync(Hotel hotel)
         {
             await _hotelRepository.AddAsync(hotel);
@@ -62,6 +61,34 @@ namespace HotelWise.Service.Entity
         public async Task DeleteHotelAsync(long id)
         {
             await _hotelRepository.DeleteAsync(id);
+        }
+
+        public async Task<Hotel[]> FetchHotelsAsync()
+        {
+            int batchSize = 10;
+            var allHotels = new ConcurrentBag<Hotel>();
+
+            int totalHotels = await _hotelRepository.GetTotalHotelsCountAsync();
+            int fromCount = 0;
+            int toCount = (totalHotels + batchSize - 1) / batchSize;
+
+            await Parallel.ForEachAsync(Enumerable.Range(fromCount, toCount - fromCount), async (index, cancellationToken) =>
+            {
+                var hotels = await _hotelRepository.FetchHotelsAsync(index * batchSize, batchSize);
+                foreach (var hotel in hotels)
+                {
+                    allHotels.Add(hotel);
+                }
+            });
+
+            return allHotels.Distinct().OrderBy(hotel => hotel.HotelId).ToArray();
+        }
+
+        public async Task<Hotel[]> SemanticSearch(SearchCriteria searchCriteria)
+        {
+            var allHotels = await FetchHotelsAsync();
+
+            return allHotels;
         }
     }
 }

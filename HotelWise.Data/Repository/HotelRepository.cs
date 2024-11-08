@@ -7,12 +7,20 @@ namespace HotelWise.Data.Repository
 {
     public class HotelRepository : IHotelRepository
     {
-        private readonly HotelWiseDbContextMysql _context;
+        private readonly HotelWiseDbContextMysql _context; 
+        private readonly DbContextOptions<HotelWiseDbContextMysql> _options;
 
-        public HotelRepository(HotelWiseDbContextMysql context)
+        public HotelRepository(HotelWiseDbContextMysql context, DbContextOptions<HotelWiseDbContextMysql> options)
         {
             _context = context;
+            _options = options;
         }
+
+        private HotelWiseDbContextMysql CreateContext()
+        {
+            return new HotelWiseDbContextMysql(_options);
+        }
+
         public async Task<Hotel[]> GetAll()
         {
             return await _context.Hotels.AsNoTracking().ToArrayAsync();
@@ -56,5 +64,19 @@ namespace HotelWise.Data.Repository
                 await _context.SaveChangesAsync();
             }
         }
+
+        public async Task<int> GetTotalHotelsCountAsync()
+        {
+            return await _context.Hotels.AsNoTracking().CountAsync();
+        }
+        public async Task<Hotel[]> FetchHotelsAsync(int offset, int limit)
+        {
+            using (var context = CreateContext())
+            {
+                var resultRange = await context.Hotels.AsNoTracking().Skip(offset).Take(limit).ToArrayAsync();
+
+                return resultRange;
+            }
+        } 
     }
 }

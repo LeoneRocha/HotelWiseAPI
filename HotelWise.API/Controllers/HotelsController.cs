@@ -1,4 +1,5 @@
-﻿using HotelWise.Domain.Interfaces;
+﻿using HotelWise.Domain.Dto;
+using HotelWise.Domain.Interfaces;
 using HotelWise.Domain.Model;
 using Microsoft.AspNetCore.Mvc;
 
@@ -51,6 +52,14 @@ namespace HotelWise.API.Controllers
         {
             var hotels = await _hotelService.GenerateHotelsByIA(numberGerate);
             return Ok(hotels); 
+        }
+         
+        [HttpPost("semanticsearch")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<IActionResult> SemanticSearch([FromBody] SearchCriteria searchCriteria)
+        {
+            var hotels = await _hotelService.SemanticSearch(searchCriteria);
+            return Ok(hotels);
         }
 
 

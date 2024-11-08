@@ -12,5 +12,7 @@ namespace HotelWise.Domain.Interfaces
         Task UpdateAsync(Hotel hotel);
         Task UpdateRangeAsync(Hotel[] hotel);
         Task DeleteAsync(long id);
+        Task<int> GetTotalHotelsCountAsync();
+        Task<Hotel[]> FetchHotelsAsync(int offset, int limit);
     }
 }
