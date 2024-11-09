@@ -1,13 +1,15 @@
-using Google.Protobuf.WellKnownTypes;
 using HotelWise.API.Configure;
 
-public static class Program
+namespace HotelWise.API
 {
-    public static void Main(string[] args)
-    { 
+    public static class Program
+    {
+        public static void Main(string[] args)
+        {
 
-        var hostBuilder = WebApplicationConfigureBuilder.CreateHostBuilder(args);
-         
-        WebApplicationConfigureBuilder.BuildAndRunAPP(hostBuilder.Item1, hostBuilder.Item2); 
+            var hostBuilder = WebApplicationConfigureBuilder.CreateHostBuilder(args);
+
+            WebApplicationConfigureBuilder.BuildAndRunAPP(hostBuilder.Item1, hostBuilder.Item2);
+        }
     }
 }
