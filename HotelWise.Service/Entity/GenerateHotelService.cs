@@ -28,8 +28,7 @@ namespace HotelWise.Service.Entity
         {
             for (int i = 1; i <= numberGerate; i++)
             {
-                var hotelAddress = faker.Address;
-                var cityAdd = faker.Address.City();
+                var hotelAddress = faker.Address; 
 
                 var prompt = $"Gere um nome de hotel, uma descrição, Nome da cidade, sigla do estado de 2 carateres, CEP (codigo postal brasileiro) e de 5 a 10 tags  com {faker.Random.Int(1, 5)} estrelas. Separe por |. Siga o Exemplo: Hotel Nome|Descriçao|Cidade|sigla estado|CEP|tag 1|tag 2. A descrição nao pode passar de 500 caracteres. O CEP e nome da cidade e sigla do estado devem ter coerencia. Responda apenas com o que foi solicitado.";
 
