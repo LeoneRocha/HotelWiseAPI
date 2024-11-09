@@ -1,5 +1,5 @@
 ﻿using GroqApiLibrary;
-using HotelWise.Domain.Interfaces;
+using HotelWise.Domain.Interfaces.IA;
 using System.Text.Json.Nodes;
 
 namespace HotelWise.Domain.AI.Adapter

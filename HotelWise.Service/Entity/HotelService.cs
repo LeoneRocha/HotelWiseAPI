@@ -1,5 +1,6 @@
 ﻿using HotelWise.Domain.Dto;
-using HotelWise.Domain.Interfaces;
+using HotelWise.Domain.Interfaces.Entity;
+using HotelWise.Domain.Interfaces.SemanticKernel;
 using HotelWise.Domain.Model;
 using System.Collections.Concurrent;
 
@@ -9,11 +10,15 @@ namespace HotelWise.Service.Entity
     {
         private readonly IHotelRepository _hotelRepository;
         private readonly IGenerateHotelService _generateHotelService;
+        private readonly IVectorStoreService _vectorStoreService;
 
-        public HotelService(IHotelRepository hotelRepository, IGenerateHotelService generateHotelService)
+        public HotelService(IHotelRepository hotelRepository
+            , IGenerateHotelService generateHotelService
+            , IVectorStoreService vectorStoreService)
         {
             _hotelRepository = hotelRepository;
             _generateHotelService = generateHotelService;
+            _vectorStoreService = vectorStoreService;
         }
 
         public async Task<Hotel[]> GetAllHotelsAsync()
@@ -87,6 +92,12 @@ namespace HotelWise.Service.Entity
         public async Task<Hotel[]> SemanticSearch(SearchCriteria searchCriteria)
         {
             var allHotels = await FetchHotelsAsync();
+
+            //Add vactor
+            await _vectorStoreService.UpsertHotelAsync(allHotels);
+
+            //Search e IA
+            var result = await _vectorStoreService.SearchHotelsAsync(searchCriteria.SearchTextCriteria);
 
             return allHotels;
         }

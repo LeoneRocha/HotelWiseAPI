@@ -11,19 +11,155 @@ Acrestente no hotel todas caracteristicas possivels como estrelas do hotel preco
 
 public class Hotel
 { 
-    public ulong HotelId { get; set; }
+public ulong HotelId { get; set; }
  
-    public string HotelName { get; set; }
+public string HotelName { get; set; }
  
-    public string Description { get; set; }
+public string Description { get; set; }
  
  
-    public string[] Tags { get; set; }
+public string[] Tags { get; set; }
 }
 
 >>>>>>>>>>>>>> ALVO ESTUDO 
     
 
 
-    https://learn.microsoft.com/en-us/semantic-kernel/concepts/vector-store-connectors/?pivots=programming-language-csharp
+https://learn.microsoft.com/en-us/semantic-kernel/concepts/vector-store-connectors/?pivots=programming-language-csharp
+
+
+https://learn.microsoft.com/en-us/training/modules/improve-search-results-vector-search/?source=recommendations
+
 Add-Migration InitialCreate -Context HotelWiseDbContextMysql -OutputDir Migrations\MySql -Project HotelWise.Data
+
+
+
+
+
+
+
+
+
+
+
+
+Claro! Vamos criar uma implementação que utiliza os padrões Factory, Adapter e Service para integrar o Semantic Kernel Vector Store. Aqui está um exemplo completo:
+
+### 1. Definição das Interfaces
+
+Primeiro, definimos as interfaces para os serviços e adaptadores:
+
+```csharp
+public interface IVectorStoreService
+{
+    Task UpsertHotelAsync(Hotel hotel);
+    Task<Hotel[]> SearchHotelsAsync(string searchText);
+}
+
+public interface IVectorStoreAdapter
+{
+    Task UpsertAsync(VectorStoreRecord<string, Hotel> record);
+    Task<IEnumerable<VectorStoreRecord<string, Hotel>>> SearchAsync(string searchText, int top);
+}
+```
+
+### 2. Implementação do Adapter
+
+Implementamos o adaptador para o Vector Store:
+
+```csharp
+public class VolatileVectorStoreAdapter : IVectorStoreAdapter
+{
+    private readonly VolatileVectorStoreRecordCollection<string, Hotel> _collection;
+
+    public VolatileVectorStoreAdapter()
+    {
+        _collection = new VolatileVectorStoreRecordCollection<string, Hotel>("hotels");
+    }
+
+    public async Task UpsertAsync(VectorStoreRecord<string, Hotel> record)
+    {
+        await _collection.UpsertAsync(record);
+    }
+
+    public async Task<IEnumerable<VectorStoreRecord<string, Hotel>>> SearchAsync(string searchText, int top)
+    {
+        return await _collection.SearchAsync(searchText, top);
+    }
+}
+```
+
+### 3. Implementação do Serviço
+
+Implementamos o serviço que utiliza o adaptador:
+
+```csharp
+public class HotelVectorStoreService : IVectorStoreService
+{
+    private readonly IVectorStoreAdapter _adapter;
+
+    public HotelVectorStoreService(IVectorStoreAdapter adapter)
+    {
+        _adapter = adapter;
+    }
+
+    public async Task UpsertHotelAsync(Hotel hotel)
+    {
+        var record = new VectorStoreRecord<string, Hotel>
+        {
+            Key = hotel.Id.ToString(),
+            Data = hotel,
+            Vector = GenerateEmbedding(hotel.Description)
+        };
+        await _adapter.UpsertAsync(record);
+    }
+
+    public async Task<Hotel[]> SearchHotelsAsync(string searchText)
+    {
+        var results = await _adapter.SearchAsync(searchText, 10);
+        return results.Select(r => r.Data).ToArray();
+    }
+
+    private ReadOnlyMemory<float> GenerateEmbedding(string text)
+    {
+        // Use um modelo de linguagem para gerar embeddings
+        return new ReadOnlyMemory<float>(new float[1536]); // Placeholder
+    }
+}
+```
+
+### 4. Implementação da Factory
+
+Implementamos a factory para criar instâncias dos serviços e adaptadores:
+
+```csharp
+public static class VectorStoreFactory
+{
+    public static IVectorStoreService CreateHotelVectorStoreService()
+    {
+        IVectorStoreAdapter adapter = new VolatileVectorStoreAdapter();
+        return new HotelVectorStoreService(adapter);
+    }
+}
+```
+
+### 5. Uso do Serviço
+
+Finalmente, usamos o serviço em nosso código:
+
+```csharp
+public async Task<Hotel[]> SemanticSearch(SearchCriteria searchCriteria)
+{
+    var vectorStoreService = VectorStoreFactory.CreateHotelVectorStoreService();
+    return await vectorStoreService.SearchHotelsAsync(searchCriteria.SearchTextCriteria);
+}
+```
+
+### Conclusão
+
+Com essa implementação, você tem uma estrutura modular e extensível para integrar o Semantic Kernel Vector Store usando os padrões Factory, Adapter e Service. Isso facilita a manutenção e a escalabilidade do código¹²³. Se precisar de mais alguma coisa, estou à disposição para ajudar!
+
+Fonte: conversa com o Copilot, 08/11/2024
+(1) Semantic Kernel Vector Store code samples (Preview). https://learn.microsoft.com/en-us/semantic-kernel/concepts/vector-store-connectors/code-samples.
+(2) What are Semantic Kernel Vector Store connectors? (Preview). https://learn.microsoft.com/en-us/semantic-kernel/concepts/vector-store-connectors/.
+(3) Using the Semantic Kernel Volatile (In-Memory) Vector Store connector .... https://learn.microsoft.com/en-us/semantic-kernel/concepts/vector-store-connectors/out-of-the-box-connectors/volatile-connector.

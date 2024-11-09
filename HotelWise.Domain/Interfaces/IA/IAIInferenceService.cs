@@ -1,4 +1,4 @@
-﻿namespace HotelWise.Domain.Interfaces
+﻿namespace HotelWise.Domain.Interfaces.IA
 {
     public interface IAIInferenceService
     {

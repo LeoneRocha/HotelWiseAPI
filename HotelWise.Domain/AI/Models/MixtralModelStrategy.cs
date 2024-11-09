@@ -1,4 +1,4 @@
-﻿using HotelWise.Domain.Interfaces;
+﻿using HotelWise.Domain.Interfaces.IA;
 
 namespace HotelWise.Domain.AI.Models
 {

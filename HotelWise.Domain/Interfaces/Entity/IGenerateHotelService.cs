@@ -1,6 +1,6 @@
 ﻿using HotelWise.Domain.Model;
 
-namespace HotelWise.Domain.Interfaces
+namespace HotelWise.Domain.Interfaces.Entity
 {
     public interface IGenerateHotelService
     {

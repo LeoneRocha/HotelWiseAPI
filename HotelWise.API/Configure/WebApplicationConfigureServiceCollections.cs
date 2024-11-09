@@ -2,7 +2,7 @@
 using HotelWise.Data.Context;
 using HotelWise.Data.Repository;
 using HotelWise.Domain.Helpers;
-using HotelWise.Domain.Interfaces;
+using HotelWise.Domain.Interfaces.Entity;
 using HotelWise.Domain.Validator;
 using HotelWise.Service.Configure;
 using HotelWise.Service.Entity;
@@ -61,11 +61,7 @@ namespace HotelWise.API
             });
 
             services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
-
-
-            services.AddScoped<IHotelRepository, HotelRepository>();
-            services.AddScoped<IHotelService, HotelService>();
-            services.AddValidatorsFromAssemblyContaining<HotelValidator>();
+             
 
             ConfigureServicesAI.ConfigureServices(services);
 

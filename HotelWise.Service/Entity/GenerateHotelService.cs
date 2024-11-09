@@ -1,5 +1,6 @@
 ﻿using Bogus;
-using HotelWise.Domain.Interfaces;
+using HotelWise.Domain.Interfaces.Entity;
+using HotelWise.Domain.Interfaces.IA;
 using HotelWise.Domain.Model;
 using System.Text.RegularExpressions;
 
