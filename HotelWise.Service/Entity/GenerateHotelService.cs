@@ -97,8 +97,8 @@ namespace HotelWise.Service.Entity
         public static string[] ProcessTags(string[] tags)
         {
             var processedTags = new List<string>();
-            var regex = new Regex(@"\d"); // Expressão regular para detectar números
-            var pattern = new Regex(@"^[a-zA-Z]+(_[a-zA-Z]+)+$"); // Expressão regular para detectar o padrão sigla_valida
+            var regex = new Regex(@"\d", RegexOptions.None, TimeSpan.FromMilliseconds(100)); // Expressão regular para detectar números
+            var pattern = new Regex(@"^[a-zA-Z]+(_[a-zA-Z]+)+$", RegexOptions.None, TimeSpan.FromMilliseconds(100)); // Expressão regular para detectar o padrão sigla_valida
 
             foreach (string tagCurrent in tags)
             {
