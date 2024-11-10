@@ -41,6 +41,10 @@ namespace HotelWise.Domain.Helpers
         {
             return GetConnectionStringApp(configuration, "DBConnectionMySQL");
         }
-         
+
+        public static IConfiguration GetVectorStoreSettingsDto(IConfiguration configuration)
+        {
+            return GetSectionApp(configuration, "VectorStoreSettings");
+        }
     }
 }

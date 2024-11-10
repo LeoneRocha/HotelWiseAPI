@@ -14,6 +14,11 @@ namespace HotelWise.Service.AI
             _adapter = adapterFactory.CreateAdapter();
         }
 
+        public async Task<ReadOnlyMemory<float>?> GenerateEmbeddingAsync(string text)
+        {
+            return await _adapter.GenerateEmbeddingAsync(text);
+        }
+
         public async Task<Hotel?> GetById(long hotelId)
         {
             var hotelVector = await _adapter.GetById((ulong)hotelId);

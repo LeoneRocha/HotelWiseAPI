@@ -1,7 +1,10 @@
 ﻿using HotelWise.Domain.Dto.SemanticKernel;
+using HotelWise.Domain.Interfaces;
 using HotelWise.Domain.Interfaces.SemanticKernel;
 using Microsoft.Extensions.VectorData;
 using Microsoft.SemanticKernel.Connectors.Qdrant;
+using Mistral.SDK.DTOs;
+using Mistral.SDK;
 using Qdrant.Client;
 
 namespace HotelWise.Domain.AI.Adapter
@@ -9,13 +12,16 @@ namespace HotelWise.Domain.AI.Adapter
     public class SemanticKernelVectorStoreAdapter : IVectorStoreAdapter
     {
         private readonly IVectorStoreRecordCollection<ulong, HotelVector> collection;
+        private readonly IVectorStoreSettingsDto _vectorStoreSettingsDto;
 
-        public SemanticKernelVectorStoreAdapter()
+
+        public SemanticKernelVectorStoreAdapter(IVectorStoreSettingsDto vectorStoreSettingsDto)
         {
+            _vectorStoreSettingsDto = vectorStoreSettingsDto;
 
 #pragma warning disable SKEXP0020
             // Create a Qdrant VectorStore object
-            var vectorStore = new QdrantVectorStore(new QdrantClient("localhost"));
+            var vectorStore = new QdrantVectorStore(new QdrantClient(_vectorStoreSettingsDto.Host, _vectorStoreSettingsDto.Port));
 
             // Choose a collection from the database and specify the type of key and record stored in it via Generic parameters.
             collection = vectorStore.GetCollection<ulong, HotelVector>("skhotels");
@@ -33,6 +39,7 @@ namespace HotelWise.Domain.AI.Adapter
             foreach (HotelVector hotelV in hotels)
             {
                 await collection.UpsertAsync(hotelV);
+                //collection.UpsertBatchAsync 
             }
         }
         public async Task<HotelVector?> GetById(ulong hotelId)
@@ -60,7 +67,19 @@ namespace HotelWise.Domain.AI.Adapter
 
         public async Task<ReadOnlyMemory<float>?> GenerateEmbeddingAsync(string text)
         {
+            var client = new MistralClient(_vectorStoreSettingsDto.ApiKeyEmbeddings);
+            var request = new EmbeddingRequest(
+                ModelDefinitions.MistralEmbed,
+                new List<string>() { "Hello world" },
+                EmbeddingRequest.EncodingFormatEnum.Float);
+            var response = await client.Embeddings.GetEmbeddingsAsync(request);
+
+            //---PRECISO CONTINUAR
             //TODO: 
+            //-- CRIAR UM ADAPTER E SERVICE SEMELHANTE AO CROC o emband nao vai ficar na classe do quadrand ele ja vei receber tudo ja embeend
+            //-- REFATORA PARA O _vectorStoreService chamar o NOVO SERVICE DO MISTRAL QUE VAI SUBSTITUIR O GROQ pára gerar o embbaeding e chamar o COmpletion 
+
+
             throw new NotImplementedException();
         }
     }

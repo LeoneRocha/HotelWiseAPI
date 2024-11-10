@@ -1,15 +1,14 @@
-﻿using FluentValidation;
-using HotelWise.Data.Context;
-using HotelWise.Data.Repository;
+﻿using HotelWise.Data.Context;
+using HotelWise.Domain.Dto;
 using HotelWise.Domain.Helpers;
-using HotelWise.Domain.Interfaces.Entity;
-using HotelWise.Domain.Validator;
+using HotelWise.Domain.Interfaces;
 using HotelWise.Service.Configure;
-using HotelWise.Service.Entity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Options;
 using Microsoft.Net.Http.Headers;
 using Microsoft.OpenApi.Models;
+using Microsoft.SemanticKernel;
 using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
 using Swashbuckle.AspNetCore.Filters;
 
@@ -61,19 +60,22 @@ namespace HotelWise.API
             });
 
             services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
-             
+
 
             ConfigureServicesAI.ConfigureServices(services);
+            addVectorStoreConfig(services, configuration);
 
             addORM(services, configuration);
+             
+
         }
         private static void addORM(IServiceCollection services, IConfiguration configuration)
         {
             var connection = ConfigurationAppSettingsHelper.GetConnectionStringMySQL(configuration);
-             
+
             services.AddPooledDbContextFactory<HotelWiseDbContextMysql>(options => options.UseMySql(connection, new MySqlServerVersion(new Version(8, 0, 21))));
-             
-            
+
+
             services.AddDbContext<HotelWiseDbContextMysql>((serviceProvider, optionsBuilder) =>
             {
                 optionsBuilder.UseMySql(connection, ServerVersion.AutoDetect(connection),
@@ -83,6 +85,18 @@ namespace HotelWise.API
                     optionsMySQL.SchemaBehavior(MySqlSchemaBehavior.Ignore);
                 });
             }, ServiceLifetime.Transient, ServiceLifetime.Transient);
+        }
+
+        private static void addVectorStoreConfig(IServiceCollection services, IConfiguration configuration)
+        {
+            // Bind the PolicyConfig section of appsettings.json to the PolicyConfig class
+            var appSettingsValue = new VectorStoreSettingsDto();
+
+            var configValue = ConfigurationAppSettingsHelper.GetVectorStoreSettingsDto(configuration);
+
+            new ConfigureFromConfigurationOptions<VectorStoreSettingsDto>(configValue).Configure(appSettingsValue);
+            // Register the PolicyConfig instance as a singleton
+            services.AddSingleton<IVectorStoreSettingsDto>(appSettingsValue);
         }
     }
 }

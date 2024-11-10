@@ -32,6 +32,53 @@ https://learn.microsoft.com/en-us/training/modules/improve-search-results-vector
 
 Add-Migration InitialCreate -Context HotelWiseDbContextMysql -OutputDir Migrations\MySql -Project HotelWise.Data
 
+https://qdrant.tech/documentation/quickstart/
+
+docker pull qdrant/qdrant
+
+docker-compose up --build
+
+
+Abra o Package Management Console: No Visual Studio, vá para View > Other Windows > Package Manager Console.
+Navegue até a pasta específica: Use o comando cd para mudar para o diretório onde seu arquivo docker-compose.yml está localizado. Por exemplo:
+cd C:\caminho\para\sua\pasta
+
+Execute o comando Docker Compose: Agora, você pode rodar o comando docker-compose up --build:
+docker-compose up --build
+
+
+localhost:6333/dashboard
+
+https://github.com/tghamm/Mistral.SDK?tab=readme-ov-file#examples,
+
+
+
+PRIMEIRO TEM QUE GERAR O CONTEUDO 
+
+
+depois para adicionar via quantrand 
+
+https://qdrant.tech/documentation/quickstart/
+
+
+MISTRAL AI 
+
+https://console.mistral.ai/usage/
+
+https://github.com/tghamm/Mistral.SDK?tab=readme-ov-file#examples
+
+
+---PRECISO CONTINUAR 
+
+
+
+
+
+
+
+
+
+
 
 
 

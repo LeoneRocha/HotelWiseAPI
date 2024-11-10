@@ -93,11 +93,15 @@ namespace HotelWise.Service.Entity
         {
             var allHotels = await FetchHotelsAsync();
 
+            var x = await _vectorStoreService.GenerateEmbeddingAsync("text");
             //Add vactor
-            await _vectorStoreService.UpsertHotelAsync(allHotels);
+            //await _vectorStoreService.UpsertHotelAsync(allHotels);
+
+
+            //            var testGetVector = await _vectorStoreService.GetById(1);
 
             //Search e IA
-            var result = await _vectorStoreService.SearchHotelsAsync(searchCriteria.SearchTextCriteria);
+            //var result = await _vectorStoreService.SearchHotelsAsync(searchCriteria.SearchTextCriteria);
 
             return allHotels;
         }

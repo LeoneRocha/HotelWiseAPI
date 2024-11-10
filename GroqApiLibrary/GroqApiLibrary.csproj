@@ -20,7 +20,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Microsoft.AspNetCore.Components" Version="8.0.7" />
+		<PackageReference Include="Microsoft.AspNetCore.Components" Version="8.0.10" />
 		<None Include="README.md" Pack="True" PackagePath="\" />
 		<None Include="g_icon.png" Pack="True" PackagePath="\" />
 	</ItemGroup>
