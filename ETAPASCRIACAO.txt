@@ -52,6 +52,8 @@ localhost:6333/dashboard
 https://github.com/tghamm/Mistral.SDK?tab=readme-ov-file#examples,
 
 
+http://localhost:6333/dashboard#/welcome
+
 
 PRIMEIRO TEM QUE GERAR O CONTEUDO 
 
@@ -67,7 +69,7 @@ https://console.mistral.ai/usage/
 
 https://github.com/tghamm/Mistral.SDK?tab=readme-ov-file#examples
 
-
+https://console.mistral.ai/usage/
 ---PRECISO CONTINUAR 
 
 

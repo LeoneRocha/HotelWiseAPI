@@ -2,21 +2,25 @@
 using HotelWise.Domain.Interfaces.IA;
 using HotelWise.Domain.Interfaces.SemanticKernel;
 using HotelWise.Domain.Model;
+using System.Runtime.InteropServices;
 
 namespace HotelWise.Service.AI
 {
     public class VectorStoreService : IVectorStoreService
     {
         private readonly IVectorStoreAdapter _adapter;
+        private readonly IAIInferenceService _aIInferenceService;
 
-        public VectorStoreService(IVectorStoreAdapterFactory adapterFactory)
+
+        public VectorStoreService(IVectorStoreAdapterFactory adapterFactory, IAIInferenceService aIInferenceService)
         {
             _adapter = adapterFactory.CreateAdapter();
+            _aIInferenceService = aIInferenceService;   
         }
 
-        public async Task<ReadOnlyMemory<float>?> GenerateEmbeddingAsync(string text)
+        public async Task<decimal[]?> GenerateEmbeddingAsync(string text)
         {
-            return await _adapter.GenerateEmbeddingAsync(text);
+            return await _aIInferenceService.GenerateEmbeddingAsync(text, Domain.Enuns.EIAInferenceAdapterType.Mistral);
         }
 
         public async Task<Hotel?> GetById(long hotelId)
@@ -66,16 +70,31 @@ namespace HotelWise.Service.AI
 
             foreach (Hotel hotel in hotels)
             {
+                var embedding = await _aIInferenceService.GenerateEmbeddingAsync(hotel.Description, Domain.Enuns.EIAInferenceAdapterType.Mistral);
+                 
                 hotelVectors.Add(new HotelVector()
                 {
                     HotelId = (ulong)hotel.HotelId,
                     HotelName = hotel.HotelName,
                     Description = hotel.Description,
                     Tags = hotel.Tags,
-                    DescriptionEmbedding = await _adapter.GenerateEmbeddingAsync(hotel.Description)
+                    DescriptionEmbedding = ConvertToReadOnlyMemory(embedding)
                 });
             }
             await _adapter.UpsertHotelAsync(hotelVectors.ToArray());
         }
+
+        private ReadOnlyMemory<float> ConvertToReadOnlyMemory(decimal[] decimalArray)
+        {
+            if (decimalArray == null)
+                throw new ArgumentNullException(nameof(decimalArray));
+
+            //float[] floatArray = decimalArray.Select(d => (float)d).ToArray(); 
+            Span<float> floatSpan = MemoryMarshal.Cast<decimal, float>(decimalArray.AsSpan());//Porque e melhor usar MemoryMarshal.Cast = performace
+            var resultMen = new ReadOnlyMemory<float>(floatSpan.ToArray());
+             
+            return resultMen;
+        }
+        
     }
 }

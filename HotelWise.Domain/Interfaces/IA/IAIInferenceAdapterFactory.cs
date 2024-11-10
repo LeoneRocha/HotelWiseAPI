@@ -1,7 +1,9 @@
-﻿namespace HotelWise.Domain.Interfaces.IA
+﻿using HotelWise.Domain.Enuns;
+
+namespace HotelWise.Domain.Interfaces.IA
 {
     public interface IAIInferenceAdapterFactory
     {
-        IAIInferenceAdapter CreateAdapter(string apiKey, IModelStrategy modelStrategy);
+        IAIInferenceAdapter CreateAdapter(EIAInferenceAdapterType eIAInferenceAdapterType, IModelStrategy modelStrategy);
     }
 }

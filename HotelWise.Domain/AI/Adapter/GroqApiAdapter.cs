@@ -1,5 +1,6 @@
 ﻿using GroqApiLibrary;
 using HotelWise.Domain.Interfaces.IA;
+using Microsoft.Extensions.Configuration;
 using System.Text.Json.Nodes;
 
 namespace HotelWise.Domain.AI.Adapter
@@ -9,8 +10,9 @@ namespace HotelWise.Domain.AI.Adapter
         private readonly GroqApiClient _groqApiClient;
         private readonly IModelStrategy _modelStrategy;
 
-        public GroqApiAdapter(string apiKey, IModelStrategy modelStrategy)
+        public GroqApiAdapter(IConfiguration configuration, IModelStrategy modelStrategy)
         {
+            var apiKey = configuration["GroqApi:ApiKey"]!;
             _groqApiClient = new GroqApiClient(apiKey);
             _modelStrategy = modelStrategy;
         }
@@ -33,6 +35,11 @@ namespace HotelWise.Domain.AI.Adapter
             var result = await _groqApiClient.CreateChatCompletionAsync(request);
             var resultOut = result?["choices"]?[0]?["message"]?["content"]?.ToString();
             return resultOut ?? string.Empty;
+        }
+
+        public Task<decimal[]> GenerateEmbeddingAsync(string text)
+        {
+            throw new NotImplementedException();
         }
     }
 }

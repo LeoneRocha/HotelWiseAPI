@@ -8,6 +8,7 @@ namespace HotelWise.Domain.Interfaces.SemanticKernel
         Task UpsertHotelAsync(Hotel[] hotels);
         Task<Hotel?> GetById(long hotelId);
         Task<Hotel[]> SearchHotelsAsync(string searchText);
-        Task<ReadOnlyMemory<float>?> GenerateEmbeddingAsync(string v);
+
+        Task<decimal[]?> GenerateEmbeddingAsync(string text);
     } 
 }

@@ -90,7 +90,7 @@ namespace HotelWise.Service.Entity
 
         private async Task<string> GenerateDescriptionAndTags(string prompt)
         {
-            return await _aIInferenceService.GenerateChatCompletionAsync(prompt);
+            return await _aIInferenceService.GenerateChatCompletionAsync(prompt, Domain.Enuns.EIAInferenceAdapterType.GroqApi);
         }
 
         public static string[] ProcessTags(string[] tags)
