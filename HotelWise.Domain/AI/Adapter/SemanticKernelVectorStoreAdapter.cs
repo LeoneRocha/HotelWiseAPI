@@ -6,6 +6,7 @@ using Microsoft.SemanticKernel.Connectors.Qdrant;
 using Mistral.SDK.DTOs;
 using Mistral.SDK;
 using Qdrant.Client;
+using HotelWise.Domain.Model;
 
 namespace HotelWise.Domain.AI.Adapter
 {
@@ -54,8 +55,8 @@ namespace HotelWise.Domain.AI.Adapter
         {
             // Generate a vector for your search text, using your chosen embedding generation implementation.
             // Just showing a placeholder method here for brevity.
-            var searchEmbedding = await GenerateEmbeddingAsync(searchText);
-
+            //var searchEmbedding = await GenerateEmbeddingAsync(searchText);
+            HotelVector? retrievedHotel = await collection.GetAsync(1);
             // Do the search.
             //var searchResult = await collection.VectorizedSearchAsync(searchEmbedding, new() { Top = 1 }).Results.ToListAsync();
 
@@ -65,22 +66,6 @@ namespace HotelWise.Domain.AI.Adapter
             return [];
         }
 
-        public async Task<ReadOnlyMemory<float>?> GenerateEmbeddingAsync(string text)
-        {
-            var client = new MistralClient(_vectorStoreSettingsDto.ApiKeyEmbeddings);
-            var request = new EmbeddingRequest(
-                ModelDefinitions.MistralEmbed,
-                new List<string>() { "Hello world" },
-                EmbeddingRequest.EncodingFormatEnum.Float);
-            var response = await client.Embeddings.GetEmbeddingsAsync(request);
-
-            //---PRECISO CONTINUAR
-            //TODO: 
-            //-- CRIAR UM ADAPTER E SERVICE SEMELHANTE AO CROC o emband nao vai ficar na classe do quadrand ele ja vei receber tudo ja embeend
-            //-- REFATORA PARA O _vectorStoreService chamar o NOVO SERVICE DO MISTRAL QUE VAI SUBSTITUIR O GROQ pára gerar o embbaeding e chamar o COmpletion 
-
-
-            throw new NotImplementedException();
-        }
+         
     }
 }
