@@ -10,8 +10,7 @@ namespace HotelWise.Service.AI
     {
         private readonly IVectorStoreAdapter _adapter;
         private readonly IAIInferenceService _aIInferenceService;
-
-
+         
         public VectorStoreService(IVectorStoreAdapterFactory adapterFactory, IAIInferenceService aIInferenceService)
         {
             _adapter = adapterFactory.CreateAdapter();
@@ -88,8 +87,7 @@ namespace HotelWise.Service.AI
         {
             if (decimalArray == null)
                 throw new ArgumentNullException(nameof(decimalArray));
-
-            //float[] floatArray = decimalArray.Select(d => (float)d).ToArray(); 
+             
             Span<float> floatSpan = MemoryMarshal.Cast<decimal, float>(decimalArray.AsSpan());//Porque e melhor usar MemoryMarshal.Cast = performace
             var resultMen = new ReadOnlyMemory<float>(floatSpan.ToArray());
              

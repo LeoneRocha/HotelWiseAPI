@@ -1,11 +1,13 @@
 ﻿using HotelWise.Data.Context;
 using HotelWise.Domain.Dto.AppConfig;
+using HotelWise.Domain.Dto.SemanticKernel;
 using HotelWise.Domain.Helpers;
 using HotelWise.Domain.Interfaces;
 using HotelWise.Service.Configure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
+using Microsoft.Identity.Client;
 using Microsoft.Net.Http.Headers;
 using Microsoft.OpenApi.Models;
 using Microsoft.SemanticKernel;
@@ -66,13 +68,20 @@ namespace HotelWise.API
 
             addRagConfig(services, configuration);
 
-            addApplicationConfig(services, configuration);
+            var appConfig  =  addApplicationConfig(services, configuration);
             addORM(services, configuration);
 
             // Register the kernel with the dependency injection container
             // and add Chat Completion and Text Embedding Generation services.
             var kernelBuilder = services.AddKernel();
-
+#pragma warning disable SKEXP0020
+            kernelBuilder.AddQdrantVectorStoreRecordCollection<ulong, HotelVector>(
+            appConfig.RagConfig.CollectionName,
+            appConfig.QdrantConfig.Host,
+            appConfig.QdrantConfig.Port,
+            appConfig.QdrantConfig.Https,
+            appConfig.QdrantConfig.ApiKey);
+#pragma warning restore SKEXP0020
         }
 
 
@@ -118,13 +127,13 @@ namespace HotelWise.API
             services.AddSingleton<IRagConfig>(appSettingsValue);
         }
          
-        private static void addApplicationConfig(IServiceCollection services, IConfiguration configuration)
+        private static ApplicationConfig addApplicationConfig(IServiceCollection services, IConfiguration configuration)
         {
             var appConfig = new ApplicationConfig(configuration);
 
             // Register the PolicyConfig instance as a singleton
             services.AddSingleton<IApplicationConfig>(appConfig);
-
+            return appConfig;
         }
     }
 }
