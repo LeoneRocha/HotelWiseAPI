@@ -1,7 +1,5 @@
-﻿using GroqApiLibrary;
-using HotelWise.Domain.Interfaces;
+﻿using HotelWise.Domain.Interfaces;
 using HotelWise.Domain.Interfaces.IA;
-using Microsoft.Extensions.Configuration;
 using Mistral.SDK;
 using Mistral.SDK.DTOs;
 
@@ -9,13 +7,13 @@ namespace HotelWise.Domain.AI.Adapter
 {
     public class MistralApiAdapter : IAIInferenceAdapter
     {
-        private readonly IVectorStoreSettingsDto _vectorStoreSettingsDto;
+        private readonly IApplicationConfig _applicationConfig;
         private readonly MistralClient _client;
 
-        public MistralApiAdapter(IVectorStoreSettingsDto vectorStoreSettingsDto)
+        public MistralApiAdapter(IApplicationConfig applicationConfig)
         {
-            _vectorStoreSettingsDto = vectorStoreSettingsDto;
-            _client = new MistralClient(_vectorStoreSettingsDto.ApiKeyEmbeddings);
+            _applicationConfig = applicationConfig;
+            _client = new MistralClient(_applicationConfig.MistralApiConfig.ApiKey);
         }
 
         public async Task<string> GenerateChatCompletionAsync(string prompt)

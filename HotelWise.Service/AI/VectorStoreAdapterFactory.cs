@@ -7,15 +7,15 @@ namespace HotelWise.Service.AI
 {
     public class VectorStoreAdapterFactory : IVectorStoreAdapterFactory
     {
-        private readonly IVectorStoreSettingsDto _vectorStoreSettingsDto;
+        private readonly IApplicationConfig _applicationConfig;
          
-        public VectorStoreAdapterFactory(IVectorStoreSettingsDto vectorStoreSettingsDto)
+        public VectorStoreAdapterFactory(IApplicationConfig applicationConfig)
         {
-                _vectorStoreSettingsDto = vectorStoreSettingsDto;   
+            _applicationConfig = applicationConfig;   
         }
         public IVectorStoreAdapter CreateAdapter()
         {
-            return new SemanticKernelVectorStoreAdapter(_vectorStoreSettingsDto);
+            return new SemanticKernelVectorStoreAdapter(_applicationConfig);
         }
     }
 }

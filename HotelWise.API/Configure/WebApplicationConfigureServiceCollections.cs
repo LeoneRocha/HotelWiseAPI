@@ -1,5 +1,5 @@
 ﻿using HotelWise.Data.Context;
-using HotelWise.Domain.Dto;
+using HotelWise.Domain.Dto.AppConfig;
 using HotelWise.Domain.Helpers;
 using HotelWise.Domain.Interfaces;
 using HotelWise.Service.Configure;
@@ -63,12 +63,19 @@ namespace HotelWise.API
 
 
             ConfigureServicesAI.ConfigureServices(services);
-            addVectorStoreConfig(services, configuration);
 
+            addRagConfig(services, configuration);
+
+            addApplicationConfig(services, configuration);
             addORM(services, configuration);
-             
+
+            // Register the kernel with the dependency injection container
+            // and add Chat Completion and Text Embedding Generation services.
+            var kernelBuilder = services.AddKernel();
 
         }
+
+
         private static void addORM(IServiceCollection services, IConfiguration configuration)
         {
             var connection = ConfigurationAppSettingsHelper.GetConnectionStringMySQL(configuration);
@@ -87,16 +94,37 @@ namespace HotelWise.API
             }, ServiceLifetime.Transient, ServiceLifetime.Transient);
         }
 
-        private static void addVectorStoreConfig(IServiceCollection services, IConfiguration configuration)
+        //private static void addVectorStoreConfig(IServiceCollection services, IConfiguration configuration)
+        //{
+        //    // Bind the PolicyConfig section of appsettings.json to the PolicyConfig class
+        //    var appSettingsValue = new VectorStoreSettingsDto();
+
+        //    var configValue = ConfigurationAppSettingsHelper.GetVectorStoreSettingsDto(configuration);
+
+        //    new ConfigureFromConfigurationOptions<VectorStoreSettingsDto>(configValue).Configure(appSettingsValue);
+        //    // Register the PolicyConfig instance as a singleton
+        //    services.AddSingleton<IVectorStoreSettingsDto>(appSettingsValue);
+        //}
+
+        private static void addRagConfig(IServiceCollection services, IConfiguration configuration)
         {
             // Bind the PolicyConfig section of appsettings.json to the PolicyConfig class
-            var appSettingsValue = new VectorStoreSettingsDto();
+            var appSettingsValue = new RagConfig();
 
             var configValue = ConfigurationAppSettingsHelper.GetVectorStoreSettingsDto(configuration);
 
-            new ConfigureFromConfigurationOptions<VectorStoreSettingsDto>(configValue).Configure(appSettingsValue);
+            new ConfigureFromConfigurationOptions<RagConfig>(configValue).Configure(appSettingsValue);
             // Register the PolicyConfig instance as a singleton
-            services.AddSingleton<IVectorStoreSettingsDto>(appSettingsValue);
+            services.AddSingleton<IRagConfig>(appSettingsValue);
+        }
+         
+        private static void addApplicationConfig(IServiceCollection services, IConfiguration configuration)
+        {
+            var appConfig = new ApplicationConfig(configuration);
+
+            // Register the PolicyConfig instance as a singleton
+            services.AddSingleton<IApplicationConfig>(appConfig);
+
         }
     }
 }

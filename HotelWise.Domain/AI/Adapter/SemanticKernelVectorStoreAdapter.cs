@@ -3,26 +3,22 @@ using HotelWise.Domain.Interfaces;
 using HotelWise.Domain.Interfaces.SemanticKernel;
 using Microsoft.Extensions.VectorData;
 using Microsoft.SemanticKernel.Connectors.Qdrant;
-using Mistral.SDK.DTOs;
-using Mistral.SDK;
 using Qdrant.Client;
-using HotelWise.Domain.Model;
 
 namespace HotelWise.Domain.AI.Adapter
 {
     public class SemanticKernelVectorStoreAdapter : IVectorStoreAdapter
     {
         private readonly IVectorStoreRecordCollection<ulong, HotelVector> collection;
-        private readonly IVectorStoreSettingsDto _vectorStoreSettingsDto;
-
-
-        public SemanticKernelVectorStoreAdapter(IVectorStoreSettingsDto vectorStoreSettingsDto)
+        private readonly IApplicationConfig _applicationConfig;
+         
+        public SemanticKernelVectorStoreAdapter(IApplicationConfig applicationConfig)
         {
-            _vectorStoreSettingsDto = vectorStoreSettingsDto;
+            _applicationConfig = applicationConfig;
 
 #pragma warning disable SKEXP0020
             // Create a Qdrant VectorStore object
-            var vectorStore = new QdrantVectorStore(new QdrantClient(_vectorStoreSettingsDto.Host, _vectorStoreSettingsDto.Port));
+            var vectorStore = new QdrantVectorStore(new QdrantClient(_applicationConfig.QdrantConfig.Host, _applicationConfig.QdrantConfig.Port));
 
             // Choose a collection from the database and specify the type of key and record stored in it via Generic parameters.
             collection = vectorStore.GetCollection<ulong, HotelVector>("skhotels");
@@ -33,7 +29,7 @@ namespace HotelWise.Domain.AI.Adapter
         public async Task UpsertHotelAsync(HotelVector[] hotels)
         {
             // Create the collection if it doesn't exist yet.
-            await collection.CreateCollectionIfNotExistsAsync();
+            await collection.CreateCollectionIfNotExistsAsync().ConfigureAwait(false);
 
             // Create a record and generate a vector for the description using your chosen embedding generation implementation.
             // Just showing a placeholder embedding generation method here for brevity.

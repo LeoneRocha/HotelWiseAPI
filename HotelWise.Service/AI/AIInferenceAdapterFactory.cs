@@ -9,11 +9,11 @@ namespace HotelWise.Service.AI
     public class AIInferenceAdapterFactory : IAIInferenceAdapterFactory
     {
         private readonly IConfiguration _configuration;
-        private readonly IVectorStoreSettingsDto _vectorStoreSettingsDto;
-        public AIInferenceAdapterFactory(IConfiguration configuration, IVectorStoreSettingsDto vectorStoreSettingsDto)
+        private readonly IApplicationConfig _applicationConfig;
+        public AIInferenceAdapterFactory(IConfiguration configuration, IApplicationConfig applicationConfig)
         {
             _configuration = configuration;
-            _vectorStoreSettingsDto = vectorStoreSettingsDto;
+            _applicationConfig = applicationConfig;
         }
 
         public IAIInferenceAdapter CreateAdapter(EIAInferenceAdapterType eIAInferenceAdapterType, IModelStrategy modelStrategy)
@@ -23,9 +23,9 @@ namespace HotelWise.Service.AI
                 case EIAInferenceAdapterType.GroqApi:
                     return new GroqApiAdapter(_configuration, modelStrategy);
                 case EIAInferenceAdapterType.Mistral:
-                    return new MistralApiAdapter(_vectorStoreSettingsDto);
+                    return new MistralApiAdapter(_applicationConfig);
                 default:
-                    return new MistralApiAdapter(_vectorStoreSettingsDto);
+                    return new MistralApiAdapter(_applicationConfig);
             }
         }
     }
