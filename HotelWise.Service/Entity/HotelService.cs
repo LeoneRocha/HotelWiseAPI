@@ -10,11 +10,11 @@ namespace HotelWise.Service.Entity
     {
         private readonly IHotelRepository _hotelRepository;
         private readonly IGenerateHotelService _generateHotelService;
-        private readonly IVectorStoreService _vectorStoreService;
+        private readonly IVectorStoreService<Hotel> _vectorStoreService;
 
         public HotelService(IHotelRepository hotelRepository
             , IGenerateHotelService generateHotelService
-            , IVectorStoreService vectorStoreService)
+            , IVectorStoreService<Hotel> vectorStoreService)
         {
             _hotelRepository = hotelRepository;
             _generateHotelService = generateHotelService;

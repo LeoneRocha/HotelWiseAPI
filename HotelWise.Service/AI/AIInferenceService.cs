@@ -24,7 +24,7 @@ namespace HotelWise.Service.AI
             return await _adapter!.GenerateChatCompletionAsync(prompt);
         }
 
-        public async Task<decimal[]> GenerateEmbeddingAsync(string text, EIAInferenceAdapterType eIAInferenceAdapterType)
+        public async Task<float[]> GenerateEmbeddingAsync(string text, EIAInferenceAdapterType eIAInferenceAdapterType)
         {
             var model = new MixtralModelStrategy();
             var _adapter = _adapterFactory.CreateAdapter(_eIAInferenceAdapterType, model);

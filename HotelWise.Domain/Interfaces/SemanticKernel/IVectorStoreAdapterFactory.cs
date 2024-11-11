@@ -4,6 +4,6 @@ namespace HotelWise.Domain.Interfaces.IA
 {
     public interface IVectorStoreAdapterFactory
     {
-        IVectorStoreAdapter CreateAdapter();
+        IVectorStoreAdapter<TVector> CreateAdapter<TVector>();
     }
 }

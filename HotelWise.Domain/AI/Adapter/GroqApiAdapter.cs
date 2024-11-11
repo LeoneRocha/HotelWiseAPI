@@ -37,7 +37,7 @@ namespace HotelWise.Domain.AI.Adapter
             return resultOut ?? string.Empty;
         }
 
-        public Task<decimal[]> GenerateEmbeddingAsync(string text)
+        public Task<float[]> GenerateEmbeddingAsync(string text)
         {
             throw new NotImplementedException();
         }

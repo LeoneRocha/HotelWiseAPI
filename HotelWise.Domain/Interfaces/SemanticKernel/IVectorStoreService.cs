@@ -1,14 +1,12 @@
-﻿using HotelWise.Domain.Dto.SemanticKernel;
-using HotelWise.Domain.Model;
+﻿using HotelWise.Domain.Model;
 
 namespace HotelWise.Domain.Interfaces.SemanticKernel
 {
-    public interface IVectorStoreService
+    public interface IVectorStoreService<TEntity>
     {
-        Task UpsertHotelAsync(Hotel[] hotels);
-        Task<Hotel?> GetById(long hotelId);
-        Task<Hotel[]> SearchHotelsAsync(string searchText);
-
-        Task<decimal[]?> GenerateEmbeddingAsync(string text);
-    } 
+        Task UpsertHotelAsync(TEntity[] listEntity);
+        Task<TEntity?> GetById(long hotelId);
+        Task<TEntity[]> SearchHotelsAsync(string searchText);
+        Task<float[]?> GenerateEmbeddingAsync(string text);
+    }
 }

@@ -6,6 +6,6 @@ namespace HotelWise.Domain.Interfaces.IA
     { 
         Task<string> GenerateChatCompletionAsync(string prompt, EIAInferenceAdapterType eIAInferenceAdapterType);
 
-        Task<decimal[]> GenerateEmbeddingAsync(string text, EIAInferenceAdapterType eIAInferenceAdapterType);
+        Task<float[]> GenerateEmbeddingAsync(string text, EIAInferenceAdapterType eIAInferenceAdapterType);
     }
 }

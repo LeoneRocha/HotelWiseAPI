@@ -2,20 +2,22 @@
 using HotelWise.Domain.Interfaces;
 using HotelWise.Domain.Interfaces.IA;
 using HotelWise.Domain.Interfaces.SemanticKernel;
+using Microsoft.Extensions.VectorData;
 
 namespace HotelWise.Service.AI
 {
     public class VectorStoreAdapterFactory : IVectorStoreAdapterFactory
     {
         private readonly IApplicationConfig _applicationConfig;
-         
-        public VectorStoreAdapterFactory(IApplicationConfig applicationConfig)
+        private readonly IVectorStore _vectorStore;
+        public VectorStoreAdapterFactory(IApplicationConfig applicationConfig, IVectorStore vectorStore)
         {
-            _applicationConfig = applicationConfig;   
+            _applicationConfig = applicationConfig;
+            _vectorStore = vectorStore;
         }
-        public IVectorStoreAdapter CreateAdapter()
+        public IVectorStoreAdapter<TVector> CreateAdapter<TVector>()
         {
-            return new SemanticKernelVectorStoreAdapter(_applicationConfig);
+            return new QdrantVectorStoreAdapter<TVector>(_applicationConfig, _vectorStore);
         }
     }
 }

@@ -1,0 +1,493 @@
+#pragma warning disable SKEXP0040
+
+#pragma warning disable SKEXP0010
+
+#pragma warning disable SKEXP0070
+
+#pragma warning disable SKEXP0050
+
+#pragma warning disable SKEXP0001
+
+#pragma warning disable SKEXP0020
+ 
+using HandlebarsDotNet;
+
+using Microsoft.Extensions.Configuration;
+
+using Microsoft.Extensions.VectorData;
+
+using Microsoft.SemanticKernel;
+
+using Microsoft.SemanticKernel.ChatCompletion;
+
+using Microsoft.SemanticKernel.Connectors.Qdrant;
+
+using Microsoft.SemanticKernel.Data;
+
+using Microsoft.SemanticKernel.Embeddings;
+
+using Microsoft.SemanticKernel.PromptTemplates.Handlebars;
+
+using Microsoft.SemanticKernel.PromptTemplates.Liquid;
+
+using System.Text;
+ 
+namespace RagSkQdrantTxt
+
+{
+
+    internal class Program
+
+    {
+
+        const string APIKey = "APIKey";
+ 
+        static async Task Main(string[] args)
+
+        {
+
+            IConfigurationRoot configurationRoot = new ConfigurationBuilder()
+
+                .AddUserSecrets<Program>()
+
+                .Build();
+ 
+            var builder = Kernel.CreateBuilder()
+
+                //.AddOllamaChatCompletion(modelId: "llama3.2", new Uri("http://localhost:11434"))
+
+                .AddOpenAIChatCompletion("llama-3.2-90b-text-preview", new Uri("https://api.groq.com/openai/v1"), configurationRoot[APIKey])
+
+                .AddQdrantVectorStore("localhost", options: new QdrantVectorStoreOptions { HasNamedVectors = true })
+
+                .AddOllamaTextEmbeddingGeneration(modelId: "nomic-embed-text", new Uri("http://localhost:11434"));
+ 
+            var kernel = builder.Build();
+ 
+            IVectorStore vectorStore = kernel.GetRequiredService<IVectorStore>();
+
+            ITextEmbeddingGenerationService embeddingService = kernel.GetRequiredService<ITextEmbeddingGenerationService>();
+
+            IChatCompletionService chatService = kernel.GetRequiredService<IChatCompletionService>();
+ 
+            var collection = vectorStore.GetCollection<Guid, InformationItem>("ExampleCollection");
+
+            await collection.CreateCollectionIfNotExistsAsync();
+ 
+            var collectionName = "ExampleCollection";
+
+            foreach (var factTextFile in Directory.GetFiles("Facts", "*.txt"))
+
+            {
+
+                var factContent = File.ReadAllText(factTextFile);
+
+                await collection.UpsertAsync(new()
+
+                {
+
+                    Id = Guid.NewGuid(),
+
+                    Text = factContent,
+
+                    Embedding = await embeddingService.GenerateEmbeddingAsync(factContent)
+
+                });
+
+            }
+ 
+            var vectorStoreTextSearch = new VectorStoreTextSearch<InformationItem>(collection, embeddingService);
+ 
+ 
+            var searchPlugin = vectorStoreTextSearch.CreateWithGetTextSearchResults("SearchPlugin");
+
+            kernel.Plugins.Add(searchPlugin);
+ 
+            string template = """
+
+                    {{query}}
+
+                    {{#with (SearchPlugin-GetTextSearchResults query)}}  
+
+                        {{#each this}}  
+
+                            Text: {{Value}}
+
+                            -----------------
+
+                        {{/each}}  
+
+                    {{/with}}  
+
+                """;
+ 
+            while (true)
+
+            {
+
+                Console.ForegroundColor = ConsoleColor.White;
+
+                Console.Write("User > ");
+
+                var query = Console.ReadLine()!;
+
+                //var query = "quem é Cokiee?";
+ 
+                if (query is null || string.IsNullOrWhiteSpace(query))
+
+                {
+
+                    return;
+
+                }
+ 
+                //KernelSearchResults<TextSearchResult> textResults = await vectorStoreTextSearch.GetTextSearchResultsAsync(query, new() { Top = 2, Skip = 0 });
+
+                //foreach (TextSearchResult textSearchResult in textResults.Results.ToBlockingEnumerable())
+
+                //{
+
+                //    Console.WriteLine(textSearchResult.Name);
+
+                //    Console.WriteLine(textSearchResult.Value);
+
+                //    Console.WriteLine(textSearchResult.Link);
+
+                //}
+ 
+                //var vectorSearch = await embeddingService.GenerateEmbeddingAsync(query);
+
+                //var results = await collection.VectorizedSearchAsync(vectorSearch);
+ 
+                //Console.WriteLine($"Rag Results: ");
+
+                //foreach (var item in results.Results.ToBlockingEnumerable())
+
+                //{
+
+                //    Console.WriteLine(item.Score);
+
+                //    Console.WriteLine(item.Record.Text);
+
+                //}
+
+                //Console.WriteLine($"End Rag Results ");
+ 
+                var arguments = new KernelArguments
+
+                {
+
+                    { "query", query }
+
+                    //,
+
+                    //{ "results", textResults}
+
+                };
+ 
+ 
+                HandlebarsPromptTemplateFactory promptTemplateFactory = new();
+
+                //var templateResult = await promptTemplateFactory.Create(new PromptTemplateConfig()
+
+                //{
+
+                //    Template = template,
+
+                //    TemplateFormat = HandlebarsPromptTemplateFactory.HandlebarsTemplateFormat,
+
+                //    InputVariables = new List<InputVariable> {
+
+                //        new InputVariable() { Name = "query", Default = query },
+
+                //        new InputVariable() { Name = "results", Default = results }
+
+                //    }
+
+                //}).RenderAsync(kernel);
+ 
+                Console.Write("\nAssistant > ");
+
+                Console.WriteLine(await kernel.InvokePromptAsync(
+
+                    template,
+
+                    arguments,
+
+                    templateFormat: HandlebarsPromptTemplateFactory.HandlebarsTemplateFormat,
+
+                    promptTemplateFactory: promptTemplateFactory
+
+                ));
+ 
+ 
+                //Console.ForegroundColor = ConsoleColor.DarkBlue;
+
+                //Console.WriteLine($"Rendered Prompt:");
+
+                //Console.WriteLine(templateResult);
+ 
+ 
+                //await foreach (var message in kernel.InvokePromptStreamingAsync(
+
+                //    template,
+
+                //    arguments,
+
+                //    templateFormat: HandlebarsPromptTemplateFactory.HandlebarsTemplateFormat,
+
+                //    promptTemplateFactory: promptTemplateFactory
+
+                //))
+
+                //{
+
+                //    Console.Write(message);
+
+                //}
+ 
+                Console.WriteLine();
+
+            }
+
+        }
+ 
+        internal sealed class InformationItem
+
+        {
+
+            [VectorStoreRecordKey]
+
+            [TextSearchResultName]
+
+            public Guid Id { get; set; } = new Guid();
+ 
+            [VectorStoreRecordData]
+
+            [TextSearchResultValue]
+
+            public string Text { get; set; } = string.Empty;
+ 
+            [VectorStoreRecordVector(Dimensions: 768)]
+
+            public ReadOnlyMemory<float> Embedding { get; set; }
+
+        }
+
+    }
+
+}
+ 
+    <PackageReference Include="Microsoft.Extensions.Configuration" Version="8.0.0" />
+<PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="8.0.1" />
+<PackageReference Include="Microsoft.SemanticKernel" Version="1.28.0" />
+<PackageReference Include="Microsoft.SemanticKernel.Connectors.Ollama" Version="1.28.0-alpha" />
+<PackageReference Include="Microsoft.SemanticKernel.Connectors.Qdrant" Version="1.28.0-preview" />
+<PackageReference Include="Microsoft.SemanticKernel.PromptTemplates.Handlebars" Version="1.28.0" />
+ 
+https://learn.microsoft.com/en-us/semantic-kernel/concepts/text-search/text-search-vector-stores?pivots=programming-language-csharp
+ 
+https://learn.microsoft.com/en-us/semantic-kernel/concepts/vector-store-connectors/out-of-the-box-connectors/qdrant-connector?pivots=programming-language-csharp
+ 
+#pragma warning disable SKEXP0001
+
+#pragma warning disable SKEXP0020
+
+#pragma warning disable SKEXP0070
+
+using Microsoft.Extensions.Configuration;
+
+using Microsoft.Extensions.VectorData;
+
+using Microsoft.SemanticKernel;
+
+using Microsoft.SemanticKernel.Connectors.Qdrant;
+
+using Microsoft.SemanticKernel.Embeddings;
+ 
+namespace RagSemanticKernelQdrant
+
+{
+
+    internal class Program
+
+    {
+
+        const string APIKey = "APIKey";
+ 
+        static async Task Main(string[] args)
+
+        {
+
+            IConfigurationRoot configurationBuilder = new ConfigurationBuilder()
+
+                .AddUserSecrets<Program>()
+
+                .Build();
+ 
+            Kernel kernelBuilder = Kernel.CreateBuilder()
+
+                .AddQdrantVectorStore("localhost", options: new QdrantVectorStoreOptions { HasNamedVectors = true })
+
+                .AddOllamaTextEmbeddingGeneration(modelId: "nomic-embed-text", new Uri("http://localhost:11434"))
+
+                .Build();
+ 
+            IVectorStore vectorStore = kernelBuilder.GetRequiredService<IVectorStore>();
+
+            ITextEmbeddingGenerationService textEmbeddingGenerationService = kernelBuilder.GetRequiredService<ITextEmbeddingGenerationService>();
+ 
+            var collection = vectorStore.GetCollection<ulong, Hotel>("hotels");
+ 
+            // Create the collection if it doesn't exist yet.
+
+            await collection.CreateCollectionIfNotExistsAsync();
+ 
+            // Upsert a record.
+
+            string descriptionText = "Um lugar onde todos são felizes e contentes";
+ 
+            await collection.UpsertAsync(new Hotel
+
+            {
+
+                HotelId = 1,
+
+                HotelName = "Hotel Anchoa",
+
+                Description = descriptionText,
+
+                DescriptionEmbedding = await textEmbeddingGenerationService.GenerateEmbeddingAsync(descriptionText),
+
+                Tags = ["classe:alta", "Happy"]
+
+            });
+ 
+            descriptionText = "Hotel confortavel onde você encontrará tudo o que precisa de um lugar aconchegante";
+
+            await collection.UpsertAsync(new Hotel
+
+            {
+
+                HotelId = 2,
+
+                HotelName = "Hotel Mazda",
+
+                Description = descriptionText,
+
+                DescriptionEmbedding = await textEmbeddingGenerationService.GenerateEmbeddingAsync(descriptionText),
+
+                Tags = ["classe:média", "confortavel"]
+
+            });
+ 
+            descriptionText = "Hotel que tem o minimo para se viver e esquecer dos problemas, simples mas muito limpo e organizado";
+
+            await collection.UpsertAsync(new Hotel
+
+            {
+
+                HotelId = 3,
+
+                HotelName = "Hotel Caverna",
+
+                Description = descriptionText,
+
+                DescriptionEmbedding = await textEmbeddingGenerationService.GenerateEmbeddingAsync(descriptionText),
+
+                Tags = ["classe:baixa", "minimo para se viver"]
+
+            });
+ 
+            descriptionText = "Hotel considerado 5 estrelas e renomado pelo atendimento e opções de lazer";
+
+            await collection.UpsertAsync(new Hotel
+
+            {
+
+                HotelId = 4,
+
+                HotelName = "Hotel 5 estrelas",
+
+                Description = descriptionText,
+
+                DescriptionEmbedding = await textEmbeddingGenerationService.GenerateEmbeddingAsync(descriptionText),
+
+                Tags = ["classe:alta", "luxo"]
+
+            });
+ 
+            string prompt = "busco o hotel que possa me fazer feliz";
+
+            Console.ForegroundColor = ConsoleColor.DarkBlue;
+
+            Console.WriteLine(prompt);
+
+            var searchVector = await textEmbeddingGenerationService.GenerateEmbeddingAsync(prompt);
+ 
+            var searchResult = await collection.VectorizedSearchAsync(searchVector, new()
+
+            {
+
+                Top = 2
+
+                ,Filter = new VectorSearchFilter().AnyTagEqualTo(nameof(Hotel.Tags), "classe:alta")
+
+            });
+ 
+            Console.ForegroundColor = ConsoleColor.DarkCyan;
+
+            var hoteis = searchResult.Results.ToBlockingEnumerable();
+
+            foreach (var item in hoteis)
+
+            {
+
+                Console.WriteLine(item.Score);
+
+                Console.WriteLine(item.Record.HotelId);
+
+                Console.WriteLine(item.Record.HotelName);
+
+                Console.WriteLine(item.Record.Description);
+
+                Console.WriteLine(item.Record.DescriptionEmbedding);
+
+                Console.WriteLine(item.Record.Tags);
+
+            }
+ 
+            Console.Read();
+
+        }
+
+    }
+ 
+    public class Hotel
+
+    {
+
+        [VectorStoreRecordKey]
+
+        public ulong HotelId { get; set; }
+ 
+        [VectorStoreRecordData(IsFilterable = true, StoragePropertyName = "hotel_name")]
+
+        public string HotelName { get; set; }
+ 
+        [VectorStoreRecordData(IsFullTextSearchable = true, StoragePropertyName = "hotel_description")]
+
+        public string Description { get; set; }
+ 
+        [VectorStoreRecordVector(768, DistanceFunction.CosineSimilarity, IndexKind.Hnsw, StoragePropertyName = "hotel_description_embedding")]
+
+        public ReadOnlyMemory<float>? DescriptionEmbedding { get; set; }
+ 
+        [VectorStoreRecordData()]
+
+        public List<string> Tags { get; set; }
+
+    }
+
+}
+ {\rtf1}

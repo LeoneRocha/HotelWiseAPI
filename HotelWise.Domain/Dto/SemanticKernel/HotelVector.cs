@@ -13,10 +13,10 @@ namespace HotelWise.Domain.Dto.SemanticKernel
         [VectorStoreRecordData(IsFullTextSearchable = true)]
         public string Description { get; set; } = string.Empty;
 
-        [VectorStoreRecordVector(Dimensions: 4, DistanceFunction.CosineDistance, IndexKind.Hnsw)]
-        public ReadOnlyMemory<float>? DescriptionEmbedding { get; set; }
+        [VectorStoreRecordVector(Dimensions: 1024)]//BERT-base 768 (Bidirectional Encoder Representations from Transformers) 
+        public ReadOnlyMemory<float> DescriptionEmbedding { get; set; }
 
         [VectorStoreRecordData(IsFilterable = true)]
-        public string[] Tags { get; set; } = [];
-    }
+        public List<string> Tags { get; set; } = new List<string>();
+    } 
 }

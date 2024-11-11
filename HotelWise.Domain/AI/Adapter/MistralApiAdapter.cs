@@ -42,7 +42,7 @@ namespace HotelWise.Domain.AI.Adapter
 
         }
 
-        public async Task<decimal[]> GenerateEmbeddingAsync(string text)
+        public async Task<float[]> GenerateEmbeddingAsync(string text)
         {
             var request = new EmbeddingRequest(ModelDefinitions.MistralEmbed, new List<string>() { text }, EmbeddingRequest.EncodingFormatEnum.Float);
 
@@ -53,8 +53,8 @@ namespace HotelWise.Domain.AI.Adapter
             //-- CRIAR UM ADAPTER E SERVICE SEMELHANTE AO CROC o emband nao vai ficar na classe do quadrand ele ja vei receber tudo ja embeend
             //-- REFATORA PARA O _vectorStoreService chamar o NOVO SERVICE DO MISTRAL QUE VAI SUBSTITUIR O GROQ pára gerar o embbaeding e chamar o COmpletion 
 
-            var resultEmbedding = new List<decimal>();
-            response.Data.ForEach(x => resultEmbedding.AddRange(x.Embedding.ToList()));
+            var resultEmbedding = new List<float>();
+            response.Data.ForEach(x => resultEmbedding.AddRange(x.Embedding.Select(eb=> (float)eb).ToList()));
 
             return resultEmbedding.ToArray();
         }

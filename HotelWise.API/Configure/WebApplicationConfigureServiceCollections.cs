@@ -7,10 +7,11 @@ using HotelWise.Service.Configure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
-using Microsoft.Identity.Client;
+using Microsoft.Extensions.VectorData;
 using Microsoft.Net.Http.Headers;
 using Microsoft.OpenApi.Models;
 using Microsoft.SemanticKernel;
+using Microsoft.SemanticKernel.Connectors.Qdrant;
 using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
 using Swashbuckle.AspNetCore.Filters;
 
@@ -68,19 +69,26 @@ namespace HotelWise.API
 
             addRagConfig(services, configuration);
 
-            var appConfig  =  addApplicationConfig(services, configuration);
+            var appConfig = addApplicationConfig(services, configuration);
             addORM(services, configuration);
+
+            #region KERNEL 
+
+            services.AddKernel();
+
+            var builder = Kernel.CreateBuilder();
 
             // Register the kernel with the dependency injection container
             // and add Chat Completion and Text Embedding Generation services.
-            var kernelBuilder = services.AddKernel();
+            var kernelBuilder =
 #pragma warning disable SKEXP0020
-            kernelBuilder.AddQdrantVectorStoreRecordCollection<ulong, HotelVector>(
-            appConfig.RagConfig.CollectionName,
-            appConfig.QdrantConfig.Host,
-            appConfig.QdrantConfig.Port,
-            appConfig.QdrantConfig.Https,
-            appConfig.QdrantConfig.ApiKey);
+            builder.AddQdrantVectorStoreRecordCollection<ulong, HotelVector>(appConfig.RagConfig.CollectionName, appConfig.QdrantConfig.Host, appConfig.QdrantConfig.Port, appConfig.QdrantConfig.Https, appConfig.QdrantConfig.ApiKey);
+            builder.AddQdrantVectorStore("localhost", options: new QdrantVectorStoreOptions { HasNamedVectors = true });
+
+            var kernel = builder.Build();
+            IVectorStore vectorStore = kernel.GetRequiredService<IVectorStore>();
+            services.AddSingleton(vectorStore);             
+            #endregion KERNEL
 #pragma warning restore SKEXP0020
         }
 
@@ -126,7 +134,7 @@ namespace HotelWise.API
             // Register the PolicyConfig instance as a singleton
             services.AddSingleton<IRagConfig>(appSettingsValue);
         }
-         
+
         private static ApplicationConfig addApplicationConfig(IServiceCollection services, IConfiguration configuration)
         {
             var appConfig = new ApplicationConfig(configuration);

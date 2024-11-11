@@ -1,11 +1,9 @@
-﻿using HotelWise.Domain.Dto.SemanticKernel;
-
-namespace HotelWise.Domain.Interfaces.SemanticKernel
+﻿namespace HotelWise.Domain.Interfaces.SemanticKernel
 {
-    public interface IVectorStoreAdapter
+    public interface IVectorStoreAdapter<TVector>
     {
-        Task UpsertHotelAsync(HotelVector[] hotels);
-        Task<HotelVector?> GetById(ulong hotelId);
-        Task<HotelVector[]> SearchHotelsAsync(string searchText); 
+        Task UpsertDataAsync(string nameCollection, TVector[] vectors);
+        Task<TVector?> GetById(string nameCollection, ulong dataKey);
+        Task<TVector[]> SearchDatasAsync(string nameCollection, string searchText);
     }
 }

@@ -3,6 +3,7 @@ using HotelWise.Data.Repository;
 using HotelWise.Domain.Interfaces.Entity;
 using HotelWise.Domain.Interfaces.IA;
 using HotelWise.Domain.Interfaces.SemanticKernel;
+using HotelWise.Domain.Model;
 using HotelWise.Domain.Validator;
 using HotelWise.Service.AI;
 using HotelWise.Service.Entity;
@@ -23,7 +24,8 @@ namespace HotelWise.Service.Configure
             services.AddScoped<IGenerateHotelService, GenerateHotelService>();
 
             services.AddScoped<IVectorStoreAdapterFactory, VectorStoreAdapterFactory>();
-            services.AddScoped<IVectorStoreService, VectorStoreService>();
+            
+            services.AddScoped<IVectorStoreService<Hotel>, HotelVectorStoreService>();            
         }
     }
 }
