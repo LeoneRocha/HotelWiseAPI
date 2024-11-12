@@ -4,7 +4,7 @@ using Microsoft.Extensions.VectorData;
 
 namespace HotelWise.Domain.AI.Adapter
 {
-    public class QdrantVectorStoreAdapter<TVector> : IVectorStoreAdapter<TVector>
+    public class QdrantVectorStoreAdapter<TVector> : IVectorStoreAdapter<TVector> where TVector : class
     {
         private readonly IApplicationConfig _applicationConfig;
         private readonly IVectorStore _vectorStore;
@@ -56,7 +56,7 @@ namespace HotelWise.Domain.AI.Adapter
         {
             loadCollection(nameCollection);
             // Retrieve the upserted record.
-            TVector? retrievedHotel = await collection!.GetAsync(dataKey);
+            TVector retrievedHotel = await collection!.GetAsync(dataKey);
 
             return retrievedHotel != null;
         }
