@@ -44,7 +44,7 @@ namespace HotelWise.Domain.AI.Adapter
             // Just showing a placeholder embedding generation method here for brevity.
             foreach (TVector dataVector in dataVectors)
             {
-                await collection.UpsertAsync(dataVector);
+                await collection!.UpsertAsync(dataVector);
                 //collection.UpsertBatchAsync 
             }
         }
@@ -64,7 +64,7 @@ namespace HotelWise.Domain.AI.Adapter
             // Retrieve the upserted record.
             TVector? retrievedHotel = await collection!.GetAsync(dataKey);
 
-            return retrievedHotel != null;
+            return !EqualityComparer<TVector>.Default.Equals(retrievedHotel, default(TVector));
         }
 
         public async Task<TVector[]> SearchDatasAsync(string nameCollection, float[] searchEmbedding)
