@@ -2,8 +2,12 @@
 {
     public interface IVectorStoreAdapter<TVector>
     {
-        Task UpsertDataAsync(string nameCollection, TVector[] vectors);
-        Task<TVector?> GetById(string nameCollection, ulong dataKey);
+        Task UpsertDataAsync(string nameCollection, TVector dataVector);
+        Task UpsertDatasAsync(string nameCollection, TVector[] dataVectors);
+
+        Task<TVector?> GetByKey(string nameCollection, ulong dataKey);
+
+        Task<bool> Exists(string nameCollection, ulong dataKey);
         Task<TVector[]> SearchDatasAsync(string nameCollection, string searchText);
     }
 }

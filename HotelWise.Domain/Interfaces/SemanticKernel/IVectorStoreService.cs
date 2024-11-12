@@ -4,9 +4,10 @@ namespace HotelWise.Domain.Interfaces.SemanticKernel
 {
     public interface IVectorStoreService<TEntity>
     {
-        Task UpsertHotelAsync(TEntity[] listEntity);
-        Task<TEntity?> GetById(long hotelId);
-        Task<TEntity[]> SearchHotelsAsync(string searchText);
+        Task UpsertDataAsync(TEntity hotel);
+        Task UpsertDatasAsync(TEntity[] listEntity);
+        Task<TEntity?> GetById(long dataKey);
+        Task<TEntity[]> SearchDatasAsync(string searchText);
         Task<float[]?> GenerateEmbeddingAsync(string text);
     }
 }

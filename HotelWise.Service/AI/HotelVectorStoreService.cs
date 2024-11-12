@@ -9,6 +9,7 @@ namespace HotelWise.Service.AI
     {
         private readonly IVectorStoreAdapter<HotelVector> _adapter;
         private readonly IAIInferenceService _aIInferenceService;
+        private const string nameCollection = "skhotels";
 
         public HotelVectorStoreService(IVectorStoreAdapterFactory adapterFactory, IAIInferenceService aIInferenceService)
         {
@@ -21,32 +22,68 @@ namespace HotelWise.Service.AI
             return await _aIInferenceService.GenerateEmbeddingAsync(text, Domain.Enuns.EIAInferenceAdapterType.Mistral);
         }
 
-        public async Task<Hotel?> GetById(long hotelId)
+        public async Task<Hotel?> GetById(long dataKey)
         {
-            var hotelVector = await _adapter.GetById("skhotels", (ulong)hotelId);
+            var hotelVector = await _adapter.GetByKey(nameCollection, (ulong)dataKey);
 
             if (hotelVector != null)
             {
                 return new Hotel()
                 {
                     Description = hotelVector.Description,
-                    HotelId = hotelId,
+                    HotelId = dataKey,
                     HotelName = hotelVector.HotelName
                 };
             }
             return null;
         }
 
-        public async Task<Hotel[]> SearchHotelsAsync(string searchText)
+        public async Task UpsertDataAsync(Hotel hotel)
+        {
+            var embedding = await _aIInferenceService.GenerateEmbeddingAsync(hotel.Description, Domain.Enuns.EIAInferenceAdapterType.Mistral);
+
+            var hotelVector = new HotelVector()
+            {
+                HotelId = (ulong)hotel.HotelId,
+                HotelName = hotel.HotelName,
+                Description = hotel.Description,
+                Tags = hotel.Tags.ToList(),
+                DescriptionEmbedding = ConvertToReadOnlyMemory(embedding)
+            };
+
+            await _adapter.UpsertDataAsync(nameCollection, hotelVector);
+        }
+
+        public async Task UpsertDatasAsync(Hotel[] hotels)
+        {
+            var hotelVectors = new List<HotelVector>();
+
+            foreach (Hotel hotel in hotels)
+            {
+                if (!await _adapter.Exists(nameCollection, (ulong)hotel.HotelId))
+                {
+                    var embedding = await _aIInferenceService.GenerateEmbeddingAsync(hotel.Description, Domain.Enuns.EIAInferenceAdapterType.Mistral);
+
+                    hotelVectors.Add(new HotelVector()
+                    {
+                        HotelId = (ulong)hotel.HotelId,
+                        HotelName = hotel.HotelName,
+                        Description = hotel.Description,
+                        Tags = hotel.Tags.ToList(),
+                        DescriptionEmbedding = ConvertToReadOnlyMemory(embedding)
+                    });
+                }
+            }
+            await _adapter.UpsertDatasAsync(nameCollection, hotelVectors.ToArray());
+        }
+        public async Task<Hotel[]> SearchDatasAsync(string searchText)
         {
             //Get semantic search 
-            var hotelsVector = await _adapter.SearchDatasAsync("skhotels", searchText);
+            var hotelsVector = await _adapter.SearchDatasAsync(nameCollection, searchText);
 
             //Enriquecer com Interferencia IA  TODO:
 
-
             // Mapear para novo objeto e retonar novo objeto TODO:
-
 
             var resultHotels = new List<Hotel>();
             foreach (var hotelVector in hotelsVector)
@@ -59,36 +96,6 @@ namespace HotelWise.Service.AI
                 });
             }
             return resultHotels.ToArray();
-        }
-
-        public Task<TEntity[]> SearchHotelsAsync<TEntity>(string searchText) where TEntity : class
-        {
-            throw new NotImplementedException();
-        }
-
-        public async Task UpsertHotelAsync(Hotel[] hotels)
-        {
-            var hotelVectors = new List<HotelVector>();
-
-            foreach (Hotel hotel in hotels)
-            {
-                var embedding = await _aIInferenceService.GenerateEmbeddingAsync(hotel.Description, Domain.Enuns.EIAInferenceAdapterType.Mistral);
-
-                hotelVectors.Add(new HotelVector()
-                {
-                    HotelId = (ulong)hotel.HotelId,
-                    HotelName = hotel.HotelName,
-                    Description = hotel.Description,
-                    Tags = hotel.Tags.ToList(),
-                    DescriptionEmbedding = ConvertToReadOnlyMemory(embedding)
-                });
-            }
-            await _adapter.UpsertDataAsync("skhotels", hotelVectors.ToArray());
-        }
-
-        public Task UpsertHotelAsync<TEntity>(TEntity[] listEntity) where TEntity : class
-        {
-            throw new NotImplementedException();
         }
 
         private ReadOnlyMemory<float> ConvertToReadOnlyMemory(float[] embeddings)

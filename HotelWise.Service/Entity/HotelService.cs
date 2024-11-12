@@ -55,11 +55,20 @@ namespace HotelWise.Service.Entity
         }
         public async Task AddHotelAsync(Hotel hotel)
         {
+            await addOrUpdateDataVector(hotel);
             await _hotelRepository.AddAsync(hotel);
+        }
+
+        private async Task addOrUpdateDataVector(Hotel hotel)
+        {
+            if (hotel != null) {
+                await _vectorStoreService.UpsertDataAsync(hotel);
+            } 
         }
 
         public async Task UpdateHotelAsync(Hotel hotel)
         {
+            await addOrUpdateDataVector(hotel);
             await _hotelRepository.UpdateAsync(hotel);
         }
 
@@ -92,17 +101,15 @@ namespace HotelWise.Service.Entity
         public async Task<Hotel[]> SemanticSearch(SearchCriteria searchCriteria)
         {
             var allHotels = await FetchHotelsAsync();
-            allHotels = allHotels.Take(1).ToArray();
+            allHotels = allHotels.Take(5).ToArray();
              
             //Add vactor
-            await _vectorStoreService.UpsertHotelAsync(allHotels);
-
-            var testGetVector = await _vectorStoreService.GetById(1);
-
+            await _vectorStoreService.UpsertDatasAsync(allHotels);//TODO REMOVER DEPOIS QUE TIVER SALVO NO vector -- TODO CRIAR UMA ABORDAGEM DE SALVAR NO MONGO OU SIMILAR
+              
             //Search e IA
-            //var result = await _vectorStoreService.SearchHotelsAsync(searchCriteria.SearchTextCriteria);
+            var result = await _vectorStoreService.SearchDatasAsync(searchCriteria.SearchTextCriteria);
 
-            return allHotels;
+            return result;
         }
     }
 }

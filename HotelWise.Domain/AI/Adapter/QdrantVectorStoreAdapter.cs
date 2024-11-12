@@ -21,7 +21,15 @@ namespace HotelWise.Domain.AI.Adapter
             collection = _vectorStore.GetCollection<ulong, TVector>(nameCollection);
         }
 
-        public async Task UpsertDataAsync(string nameCollection, TVector[] dataVectors)
+        public async Task UpsertDataAsync(string nameCollection, TVector dataVector)
+        {
+            loadCollection(nameCollection);
+            // Create the collection if it doesn't exist yet.
+            await collection!.CreateCollectionIfNotExistsAsync();
+
+            await collection.UpsertAsync(dataVector);
+        }
+        public async Task UpsertDatasAsync(string nameCollection, TVector[] dataVectors)
         {
             loadCollection(nameCollection);
             // Create the collection if it doesn't exist yet.
@@ -35,13 +43,22 @@ namespace HotelWise.Domain.AI.Adapter
                 //collection.UpsertBatchAsync 
             }
         }
-        public async Task<TVector?> GetById(string nameCollection, ulong dataKey)
+        public async Task<TVector?> GetByKey(string nameCollection, ulong dataKey)
         {
             loadCollection(nameCollection);
             // Retrieve the upserted record.
             TVector? retrievedHotel = await collection!.GetAsync(dataKey);
 
             return retrievedHotel;
+        }
+
+        public async Task<bool> Exists(string nameCollection, ulong dataKey)
+        {
+            loadCollection(nameCollection);
+            // Retrieve the upserted record.
+            TVector? retrievedHotel = await collection!.GetAsync(dataKey);
+
+            return retrievedHotel != null;
         }
 
         public async Task<TVector[]> SearchDatasAsync(string nameCollection, string searchText)
