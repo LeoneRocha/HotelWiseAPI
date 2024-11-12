@@ -7,18 +7,18 @@ https://lionscorp.visualstudio.com/VariousStudies/_build
 
 ## SonarCloud
 
-https://lionscorp.visualstudio.com/VariousStudies/_build
+https://sonarcloud.io/project/overview?id=lionscorp_hotelwiseapi
 
 
 ## URL API 
 
-https://lionscorp.visualstudio.com/VariousStudies/_build
+N/A
 
 
 ## URL UI  
 
-https://lionscorp.visualstudio.com/VariousStudies/_build
+N/A
 
 ## GIT UI  
 
-https://lionscorp.visualstudio.com/VariousStudies/_build
+N/A
