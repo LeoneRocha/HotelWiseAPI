@@ -16,7 +16,7 @@ namespace HotelWise.Domain.Dto.SemanticKernel
 
         [NotMapped]
         [XmlIgnore]
-        [JsonIgnore]
+        [JsonIgnore]        
         public double Score { get; set; }
     } 
 }

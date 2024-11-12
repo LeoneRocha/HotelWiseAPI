@@ -11,7 +11,12 @@
 
 ------------------------------------------------ DASH BOARDS 
 
-http://localhost:6333/dashboard#/welcome
+http://localhost:6333/dashboard#/welcome QDRANT LOCAL 
+
+
+https://cloud.qdrant.io/accounts/db8b28be-f039-4ffd-8565-21c7cb6628b2/clusters << NUVEM
+
+
 ------------------------------------------------ DASH BOARDS 
 
 

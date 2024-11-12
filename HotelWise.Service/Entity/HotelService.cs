@@ -4,6 +4,7 @@ using HotelWise.Domain.Interfaces.Entity;
 using HotelWise.Domain.Interfaces.SemanticKernel;
 using HotelWise.Domain.Model;
 using System.Collections.Concurrent;
+using System.Linq;
 
 namespace HotelWise.Service.Entity
 {
@@ -104,7 +105,7 @@ namespace HotelWise.Service.Entity
         {
             //TODO ENVIAR PARA UM CACHE to que pesquisar toda vez no banco de dados 
             var allHotels = await FetchHotelsAsync();
-            allHotels = allHotels.Take(3).ToArray();
+            allHotels = allHotels.Take(searchCriteria.MaxHotelRetrive).ToArray();
 
             HotelVector[] hotelsVectorStore = convertHotelsToVector(allHotels);
             //Add vactor
