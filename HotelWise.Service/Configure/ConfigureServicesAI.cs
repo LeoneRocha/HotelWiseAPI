@@ -1,9 +1,9 @@
 ﻿using FluentValidation;
 using HotelWise.Data.Repository;
+using HotelWise.Domain.Dto.SemanticKernel;
 using HotelWise.Domain.Interfaces.Entity;
 using HotelWise.Domain.Interfaces.IA;
 using HotelWise.Domain.Interfaces.SemanticKernel;
-using HotelWise.Domain.Model;
 using HotelWise.Domain.Validator;
 using HotelWise.Service.AI;
 using HotelWise.Service.Entity;
@@ -25,7 +25,7 @@ namespace HotelWise.Service.Configure
 
             services.AddScoped<IVectorStoreAdapterFactory, VectorStoreAdapterFactory>();
             
-            services.AddScoped<IVectorStoreService<Hotel>, HotelVectorStoreService>();            
+            services.AddScoped<IVectorStoreService<HotelVector>, HotelVectorStoreService>();            
         }
     }
 }

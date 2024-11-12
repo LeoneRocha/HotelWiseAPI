@@ -15,7 +15,7 @@ namespace HotelWise.Service.AI
             _applicationConfig = applicationConfig;
             _vectorStore = vectorStore;
         }
-        public IVectorStoreAdapter<TVector> CreateAdapter<TVector>() where TVector : class
+        public IVectorStoreAdapter<TVector> CreateAdapter<TVector>() where TVector : IDataVector
         {
             return new QdrantVectorStoreAdapter<TVector>(_applicationConfig, _vectorStore);
         }

@@ -1,4 +1,5 @@
 ﻿using HotelWise.Domain.Dto;
+using HotelWise.Domain.Dto.SemanticKernel;
 using HotelWise.Domain.Interfaces.Entity;
 using HotelWise.Domain.Interfaces.SemanticKernel;
 using HotelWise.Domain.Model;
@@ -10,15 +11,15 @@ namespace HotelWise.Service.Entity
     {
         private readonly IHotelRepository _hotelRepository;
         private readonly IGenerateHotelService _generateHotelService;
-        private readonly IVectorStoreService<Hotel> _vectorStoreService;
+        private readonly IVectorStoreService<HotelVector> _hoteVectorStoreService;
 
         public HotelService(IHotelRepository hotelRepository
             , IGenerateHotelService generateHotelService
-            , IVectorStoreService<Hotel> vectorStoreService)
+            , IVectorStoreService<HotelVector> hotelVectorStoreService)
         {
             _hotelRepository = hotelRepository;
             _generateHotelService = generateHotelService;
-            _vectorStoreService = vectorStoreService;
+            _hoteVectorStoreService = hotelVectorStoreService;
         }
 
         public async Task<Hotel[]> GetAllHotelsAsync()
@@ -61,9 +62,10 @@ namespace HotelWise.Service.Entity
 
         private async Task addOrUpdateDataVector(Hotel hotel)
         {
-            if (hotel != null) {
-                await _vectorStoreService.UpsertDataAsync(hotel);
-            } 
+            if (hotel != null)
+            {
+                await _hoteVectorStoreService.UpsertDataAsync(convertHotelToVector(hotel));
+            }
         }
 
         public async Task UpdateHotelAsync(Hotel hotel)
@@ -98,18 +100,69 @@ namespace HotelWise.Service.Entity
             return allHotels.Distinct().OrderBy(hotel => hotel.HotelId).ToArray();
         }
 
-        public async Task<Hotel[]> SemanticSearch(SearchCriteria searchCriteria)
+        public async Task<HotelResponse[]> SemanticSearch(SearchCriteria searchCriteria)
         {
+            //TODO ENVIAR PARA UM CACHE to que pesquisar toda vez no banco de dados 
             var allHotels = await FetchHotelsAsync();
-            allHotels = allHotels.Take(5).ToArray();
-             
-            //Add vactor
-            await _vectorStoreService.UpsertDatasAsync(allHotels);//TODO REMOVER DEPOIS QUE TIVER SALVO NO vector -- TODO CRIAR UMA ABORDAGEM DE SALVAR NO MONGO OU SIMILAR
-              
-            //Search e IA
-            var result = await _vectorStoreService.SearchDatasAsync(searchCriteria.SearchTextCriteria);
+            allHotels = allHotels.Take(3).ToArray();
 
-            return result;
+            HotelVector[] hotelsVectorStore = convertHotelsToVector(allHotels);
+            //Add vactor
+            await _hoteVectorStoreService.UpsertDatasAsync(hotelsVectorStore);//TODO REMOVER DEPOIS QUE TIVER SALVO NO vector -- TODO CRIAR UMA ABORDAGEM DE SALVAR NO MONGO OU SIMILAR
+
+            //Search Vector
+            var hotelsVector = await _hoteVectorStoreService.SearchDatasAsync(searchCriteria.SearchTextCriteria);
+
+            //ENRRIQUECER COM IA TODO: 
+
+            // Mapear para novo objeto e retonar novo objeto TODO:
+            var resultHotels = new List<HotelResponse>();
+            //Enriquecer com Interferencia IA  TODO:  TROCAR UMA PARTE POR MAPPER para facilitar
+            foreach (var hotelVector in hotelsVector)
+            {
+                var hotelId = (long)hotelVector.DataKey;
+
+                var hotelEntity = allHotels.First(x => x.HotelId == hotelId);
+
+                var hotelResponse = new HotelResponse()
+                {
+                    HotelId = hotelId,
+                    Description = hotelVector.Description,
+                    HotelName = hotelVector.HotelName,
+                    Score = hotelVector.Score,
+                    City = hotelEntity.City,
+                    InitialRoomPrice = hotelEntity.InitialRoomPrice,
+                    Location = hotelEntity.Location,
+                    Stars = hotelEntity.Stars,
+                    StateCode = hotelEntity.StateCode,
+                    Tags = hotelEntity.Tags,
+                    ZipCode = hotelEntity.ZipCode
+                };
+
+                resultHotels.Add(hotelResponse);
+            }
+            return resultHotels.ToArray();
+        }
+
+        private HotelVector[] convertHotelsToVector(Hotel[] allHotels)
+        {
+            List<HotelVector> hotelsVectorStore = new List<HotelVector>();
+            foreach (var hotel in allHotels)
+            {
+                hotelsVectorStore.Add(convertHotelToVector(hotel));
+            }
+            return hotelsVectorStore.ToArray();
+        }
+
+        private HotelVector convertHotelToVector(Hotel hotel)
+        {
+            return new HotelVector()
+            {
+                DataKey = (ulong)hotel.HotelId,
+                Description = hotel.Description,
+                HotelName = hotel.HotelName,
+                Tags = hotel.Tags.ToList()
+            };
         }
     }
 }

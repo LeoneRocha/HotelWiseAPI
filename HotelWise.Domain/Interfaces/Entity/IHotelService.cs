@@ -12,6 +12,6 @@ namespace HotelWise.Domain.Interfaces.Entity
         Task UpdateHotelAsync(Hotel hotel);
         Task<Hotel[]> GenerateHotelsByIA(int numberGerate);
 
-        Task<Hotel[]> SemanticSearch(SearchCriteria searchCriteria);
+        Task<HotelResponse[]> SemanticSearch(SearchCriteria searchCriteria);
     }
 }

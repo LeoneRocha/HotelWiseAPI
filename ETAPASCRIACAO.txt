@@ -1,3 +1,20 @@
+
+-------- IMPLEMENTAR O SEARCH VECTOR 
+
+--- IMPLEMENTAR O LLM LOCAL USANDO ANYTHIG E OLLAMA para rodar o emmbading localmente para os 100. 
+
+--- Uma alternativa na nuvem de armazenar os hoteis vetorizado (MONGO DB)
+
+
+
+
+
+------------------------------------------------ DASH BOARDS 
+
+http://localhost:6333/dashboard#/welcome
+------------------------------------------------ DASH BOARDS 
+
+
 --- EM EF CORE 
 
 -- C# .net core 8 e CODEFRIST com uso de bogus para gerar 1000 hoteis 
@@ -8,18 +25,7 @@ Em C# .net core 8 e CODEFRIST com uso de padroes de projeto e clean code e repos
 
 Acrestente no hotel todas caracteristicas possivels como estrelas do hotel preco inicial dos quartos , cep localizacao etc gere todas caracteristicas possiveis
 
-
-public class Hotel
-{ 
-public ulong HotelId { get; set; }
  
-public string HotelName { get; set; }
- 
-public string Description { get; set; }
- 
- 
-public string[] Tags { get; set; }
-}
 
 >>>>>>>>>>>>>> ALVO ESTUDO 
     
@@ -52,7 +58,7 @@ localhost:6333/dashboard
 https://github.com/tghamm/Mistral.SDK?tab=readme-ov-file#examples,
 
 
-http://localhost:6333/dashboard#/welcome
+
 
 
 PRIMEIRO TEM QUE GERAR O CONTEUDO 
