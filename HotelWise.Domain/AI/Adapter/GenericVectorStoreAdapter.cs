@@ -3,7 +3,6 @@ using HotelWise.Domain.Interfaces;
 using HotelWise.Domain.Interfaces.IA;
 using HotelWise.Domain.Interfaces.SemanticKernel;
 using Microsoft.Extensions.VectorData;
-using Qdrant.Client;
 
 namespace HotelWise.Domain.AI.Adapter
 {
@@ -16,10 +15,7 @@ namespace HotelWise.Domain.AI.Adapter
         public GenericVectorStoreAdapter(IApplicationConfig applicationConfig, IVectorStore vectorStore)
         {
             _applicationConfig = applicationConfig;
-            _vectorStore = vectorStore;
-
-            var client = new QdrantClient(host: "55d8c0bf-d2f3-4242-87b0-5ac44100b868.us-east4-0.gcp.cloud.qdrant.io", https: true, apiKey: applicationConfig.QdrantConfig.ApiKey);
-
+            _vectorStore = vectorStore;  
         }
         private async Task LoadCollection(string nameCollection)
         {

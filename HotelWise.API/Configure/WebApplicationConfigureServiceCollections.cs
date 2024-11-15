@@ -110,26 +110,13 @@ namespace HotelWise.API
                     optionsMySQL.SchemaBehavior(MySqlSchemaBehavior.Ignore);
                 });
             }, ServiceLifetime.Transient, ServiceLifetime.Transient);
-        }
-
-        //private static void addVectorStoreConfig(IServiceCollection services, IConfiguration configuration)
-        //{
-        //    // Bind the PolicyConfig section of appsettings.json to the PolicyConfig class
-        //    var appSettingsValue = new VectorStoreSettingsDto();
-
-        //    var configValue = ConfigurationAppSettingsHelper.GetVectorStoreSettingsDto(configuration);
-
-        //    new ConfigureFromConfigurationOptions<VectorStoreSettingsDto>(configValue).Configure(appSettingsValue);
-        //    // Register the PolicyConfig instance as a singleton
-        //    services.AddSingleton<IVectorStoreSettingsDto>(appSettingsValue);
-        //}
-
+        }  
         private static void addRagConfig(IServiceCollection services, IConfiguration configuration)
         {
             // Bind the PolicyConfig section of appsettings.json to the PolicyConfig class
             var appSettingsValue = new RagConfig();
 
-            var configValue = ConfigurationAppSettingsHelper.GetVectorStoreSettingsDto(configuration);
+            var configValue = ConfigurationAppSettingsHelper.GetRagConfig(configuration);
 
             new ConfigureFromConfigurationOptions<RagConfig>(configValue).Configure(appSettingsValue);
             // Register the PolicyConfig instance as a singleton

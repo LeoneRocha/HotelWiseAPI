@@ -1,5 +1,6 @@
 ﻿using HotelWise.Domain.Dto;
 using HotelWise.Domain.Dto.SemanticKernel;
+using HotelWise.Domain.Interfaces;
 using HotelWise.Domain.Interfaces.Entity;
 using HotelWise.Domain.Interfaces.SemanticKernel;
 using HotelWise.Domain.Model;
@@ -12,11 +13,15 @@ namespace HotelWise.Service.Entity
         private readonly IHotelRepository _hotelRepository;
         private readonly IGenerateHotelService _generateHotelService;
         private readonly IVectorStoreService<HotelVector> _hoteVectorStoreService;
+        private readonly IApplicationConfig _applicationConfig;
 
-        public HotelService(IHotelRepository hotelRepository
+        public HotelService(
+            IApplicationConfig applicationConfig
+            , IHotelRepository hotelRepository
             , IGenerateHotelService generateHotelService
             , IVectorStoreService<HotelVector> hotelVectorStoreService)
         {
+            _applicationConfig = applicationConfig;
             _hotelRepository = hotelRepository;
             _generateHotelService = generateHotelService;
             _hoteVectorStoreService = hotelVectorStoreService;
@@ -110,6 +115,9 @@ namespace HotelWise.Service.Entity
             //Add vactor
             await _hoteVectorStoreService.UpsertDatasAsync(hotelsVectorStore);//TODO REMOVER DEPOIS QUE TIVER SALVO NO vector -- TODO CRIAR UMA ABORDAGEM DE SALVAR NO MONGO OU SIMILAR
 
+            // Aguardar o tempo configurado antes de buscar o vetor
+            await Task.Delay(_applicationConfig.RagConfig.SearchSettings.DelayBeforeSearchMilliseconds);
+             
             //Search Vector
             var hotelsVector = await _hoteVectorStoreService.SearchDatasAsync(searchCriteria.SearchTextCriteria);
 

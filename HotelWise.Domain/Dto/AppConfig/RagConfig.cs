@@ -30,5 +30,6 @@ namespace HotelWise.Domain.Dto.AppConfig
 
         [Required]
         public string VectorStoreType { get; set; } = string.Empty;
+        public SearchSettings SearchSettings { get; set; } = new();
     }
 }

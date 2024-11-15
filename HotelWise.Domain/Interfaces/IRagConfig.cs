@@ -1,4 +1,6 @@
-﻿namespace HotelWise.Domain.Interfaces
+﻿using HotelWise.Domain.Dto.AppConfig;
+
+namespace HotelWise.Domain.Interfaces
 {
     public interface IRagConfig
     {
@@ -10,5 +12,6 @@
         int DataLoadingBetweenBatchDelayInMilliseconds { get; set; }
         string[]? PdfFilePaths { get; set; }
         string VectorStoreType { get; set; }
+        SearchSettings SearchSettings { get; set; }
     }
 }
