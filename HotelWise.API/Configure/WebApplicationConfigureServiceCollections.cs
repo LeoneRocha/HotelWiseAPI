@@ -72,27 +72,11 @@ namespace HotelWise.API
             var appConfig = addApplicationConfig(services, configuration);
             addORM(services, configuration);
 
-            #region KERNEL 
-
-            services.AddKernel();
-
-            var builder = Kernel.CreateBuilder();
-
-            // Register the kernel with the dependency injection container
-            // and add Chat Completion and Text Embedding Generation services.
-            var kernelBuilder =
-#pragma warning disable SKEXP0020
-            builder.AddQdrantVectorStoreRecordCollection<ulong, HotelVector>(appConfig.RagConfig.CollectionName, appConfig.QdrantConfig.Host, appConfig.QdrantConfig.Port, appConfig.QdrantConfig.Https, appConfig.QdrantConfig.ApiKey);
-
-            builder.AddQdrantVectorStore(appConfig.QdrantConfig.Host, appConfig.QdrantConfig.Port, appConfig.QdrantConfig.Https, appConfig.QdrantConfig.ApiKey, options: new QdrantVectorStoreOptions { HasNamedVectors = true });
-
-            var kernel = builder.Build();
-            IVectorStore vectorStore = kernel.GetRequiredService<IVectorStore>();
-            services.AddSingleton(vectorStore);
+            #region KERNEL  
+            KernelProviderConfigure.SetupKernelProvider(services, appConfig);
             #endregion KERNEL
-#pragma warning restore SKEXP0020
-        }
 
+        }
 
         private static void addORM(IServiceCollection services, IConfiguration configuration)
         {
@@ -110,7 +94,7 @@ namespace HotelWise.API
                     optionsMySQL.SchemaBehavior(MySqlSchemaBehavior.Ignore);
                 });
             }, ServiceLifetime.Transient, ServiceLifetime.Transient);
-        }  
+        }
         private static void addRagConfig(IServiceCollection services, IConfiguration configuration)
         {
             // Bind the PolicyConfig section of appsettings.json to the PolicyConfig class

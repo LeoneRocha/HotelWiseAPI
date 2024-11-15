@@ -22,6 +22,7 @@ namespace HotelWise.Domain.Dto.AppConfig
         private readonly WeaviateConfig _weaviateConfig = new();
         private readonly MistralApiConfig _mistralApiConfig = new();
         private readonly GroqApiConfig _groqApiConfig = new();
+        private readonly MistralApíEmbeddingsConfig _mistralApíEmbeddingsConfig = new();
         #endregion FIELDS
 
         #region PROPERTIES
@@ -37,7 +38,9 @@ namespace HotelWise.Domain.Dto.AppConfig
         public RedisConfig RedisConfig => this._redisConfig;
         public WeaviateConfig WeaviateConfig => this._weaviateConfig;
         public MistralApiConfig MistralApiConfig => this._mistralApiConfig;
+        public MistralApíEmbeddingsConfig MistralApíEmbeddingsConfig => this._mistralApíEmbeddingsConfig;
         public GroqApiConfig GroqApiConfig => this._groqApiConfig;
+
         #endregion PROPERTIES
 
         public ApplicationConfig(IConfiguration configurationManager)
@@ -45,18 +48,8 @@ namespace HotelWise.Domain.Dto.AppConfig
             configurationManager.GetRequiredSection(RagConfig.ConfigSectionName).Bind(this._ragConfig);
             loadIAServices(configurationManager);
             loadStores(configurationManager);
+            loadEmbeddings(configurationManager);
         }
-
-        private void loadIAServices(IConfiguration configurationManager)
-        {
-            configurationManager.GetRequiredSection($"AIServices:{AzureOpenAIConfig.ConfigSectionName}").Bind(this._azureOpenAIConfig);
-            configurationManager.GetRequiredSection($"AIServices:{AzureOpenAIEmbeddingsConfig.ConfigSectionName}").Bind(this._azureOpenAIEmbeddingsConfig);
-            configurationManager.GetRequiredSection($"AIServices:{OpenAIConfig.ConfigSectionName}").Bind(this._openAIConfig);
-            configurationManager.GetRequiredSection($"AIServices:{OpenAIEmbeddingsConfig.ConfigSectionName}").Bind(this._openAIEmbeddingsConfig);
-            configurationManager.GetRequiredSection($"AIServices:{MistralApiConfig.ConfigSectionName}").Bind(this._mistralApiConfig);
-            configurationManager.GetRequiredSection($"AIServices:{GroqApiConfig.ConfigSectionName}").Bind(this._groqApiConfig);
-        }
-
         private void loadStores(IConfiguration configurationManager)
         {
             configurationManager.GetRequiredSection($"VectorStores:{AzureAISearchConfig.ConfigSectionName}").Bind(this._azureAISearchConfig);
@@ -66,5 +59,19 @@ namespace HotelWise.Domain.Dto.AppConfig
             configurationManager.GetRequiredSection($"VectorStores:{RedisConfig.ConfigSectionName}").Bind(this._redisConfig);
             configurationManager.GetRequiredSection($"VectorStores:{WeaviateConfig.ConfigSectionName}").Bind(this._weaviateConfig);
         }
+        private void loadEmbeddings(IConfiguration configurationManager)
+        {    
+            configurationManager.GetRequiredSection($"AIServices:{AzureOpenAIEmbeddingsConfig.ConfigSectionName}").Bind(this._azureOpenAIEmbeddingsConfig);
+            configurationManager.GetRequiredSection($"AIServices:{OpenAIEmbeddingsConfig.ConfigSectionName}").Bind(this._openAIEmbeddingsConfig);
+            configurationManager.GetRequiredSection($"AIServices:{MistralApíEmbeddingsConfig.ConfigSectionName}").Bind(this._mistralApíEmbeddingsConfig);
+        }
+
+        private void loadIAServices(IConfiguration configurationManager)
+        {
+            configurationManager.GetRequiredSection($"AIServices:{AzureOpenAIConfig.ConfigSectionName}").Bind(this._azureOpenAIConfig);
+            configurationManager.GetRequiredSection($"AIServices:{OpenAIConfig.ConfigSectionName}").Bind(this._openAIConfig);
+            configurationManager.GetRequiredSection($"AIServices:{MistralApiConfig.ConfigSectionName}").Bind(this._mistralApiConfig);
+            configurationManager.GetRequiredSection($"AIServices:{GroqApiConfig.ConfigSectionName}").Bind(this._groqApiConfig);
+        } 
     }
 }

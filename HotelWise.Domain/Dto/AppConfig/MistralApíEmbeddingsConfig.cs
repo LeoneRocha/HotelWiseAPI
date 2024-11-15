@@ -1,13 +1,10 @@
 ﻿using System.ComponentModel.DataAnnotations;
 namespace HotelWise.Domain.Dto.AppConfig;
-
-/// <summary>
-/// Qdrant service settings.
-/// </summary>
-public sealed class MistralApiConfig
+ 
+public sealed class MistralApíEmbeddingsConfig
 {
-    public const string ConfigSectionName = "MistralApí";
-     
+    public const string ConfigSectionName = "MistralApíEmbeddings";
+
     [Required]
     public string ModelId { get; set; } = string.Empty;
 
@@ -16,4 +13,4 @@ public sealed class MistralApiConfig
 
     [Required]
     public string? OrgId { get; set; } = null;
-} 
+}
