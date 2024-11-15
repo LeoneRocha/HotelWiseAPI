@@ -3,6 +3,7 @@ using HotelWise.Domain.Interfaces;
 using HotelWise.Domain.Interfaces.IA;
 using HotelWise.Domain.Interfaces.SemanticKernel;
 using Microsoft.Extensions.VectorData;
+using Qdrant.Client;
 
 namespace HotelWise.Domain.AI.Adapter
 {
@@ -16,6 +17,9 @@ namespace HotelWise.Domain.AI.Adapter
         {
             _applicationConfig = applicationConfig;
             _vectorStore = vectorStore;
+
+            var client = new QdrantClient(host: "55d8c0bf-d2f3-4242-87b0-5ac44100b868.us-east4-0.gcp.cloud.qdrant.io", https: true, apiKey: applicationConfig.QdrantConfig.ApiKey);
+
         }
         private async Task LoadCollection(string nameCollection)
         {
@@ -26,7 +30,7 @@ namespace HotelWise.Domain.AI.Adapter
         private async Task CreateCollection()
         {
             await collection!.CreateCollectionIfNotExistsAsync();
-        } 
+        }
 
         public async Task UpsertDataAsync(string nameCollection, TVector dataVector)
         {
@@ -34,11 +38,11 @@ namespace HotelWise.Domain.AI.Adapter
             // Create the collection if it doesn't exist yet. 
 
             await collection!.UpsertAsync(dataVector);
-        } 
+        }
 
         public async Task UpsertDatasAsync(string nameCollection, TVector[] dataVectors)
         {
-            await LoadCollection(nameCollection); 
+            await LoadCollection(nameCollection);
 
             // Create a record and generate a vector for the description using your chosen embedding generation implementation.
             // Just showing a placeholder embedding generation method here for brevity.

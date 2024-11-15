@@ -1,4 +1,4 @@
-﻿// Copyright (c) Microsoft. All rights reserved.
+﻿
 
 using HotelWise.Domain.Dto.AppConfig;
 
@@ -19,5 +19,7 @@ namespace HotelWise.Domain.Interfaces
         WeaviateConfig WeaviateConfig { get; }
 
         MistralApiConfig MistralApiConfig { get; }
+        GroqApiConfig GroqApiConfig { get; }
+
     }
 }

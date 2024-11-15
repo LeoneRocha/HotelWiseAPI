@@ -83,11 +83,12 @@ namespace HotelWise.API
             var kernelBuilder =
 #pragma warning disable SKEXP0020
             builder.AddQdrantVectorStoreRecordCollection<ulong, HotelVector>(appConfig.RagConfig.CollectionName, appConfig.QdrantConfig.Host, appConfig.QdrantConfig.Port, appConfig.QdrantConfig.Https, appConfig.QdrantConfig.ApiKey);
-            builder.AddQdrantVectorStore("localhost", options: new QdrantVectorStoreOptions { HasNamedVectors = true });
+
+            builder.AddQdrantVectorStore(appConfig.QdrantConfig.Host, appConfig.QdrantConfig.Port, appConfig.QdrantConfig.Https, appConfig.QdrantConfig.ApiKey, options: new QdrantVectorStoreOptions { HasNamedVectors = true });
 
             var kernel = builder.Build();
             IVectorStore vectorStore = kernel.GetRequiredService<IVectorStore>();
-            services.AddSingleton(vectorStore);             
+            services.AddSingleton(vectorStore);
             #endregion KERNEL
 #pragma warning restore SKEXP0020
         }

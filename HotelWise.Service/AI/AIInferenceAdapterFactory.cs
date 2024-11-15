@@ -8,11 +8,9 @@ namespace HotelWise.Service.AI
 {
     public class AIInferenceAdapterFactory : IAIInferenceAdapterFactory
     {
-        private readonly IConfiguration _configuration;
         private readonly IApplicationConfig _applicationConfig;
-        public AIInferenceAdapterFactory(IConfiguration configuration, IApplicationConfig applicationConfig)
+        public AIInferenceAdapterFactory(IApplicationConfig applicationConfig)
         {
-            _configuration = configuration;
             _applicationConfig = applicationConfig;
         }
 
@@ -21,7 +19,7 @@ namespace HotelWise.Service.AI
             switch (eIAInferenceAdapterType)
             {
                 case EIAInferenceAdapterType.GroqApi:
-                    return new GroqApiAdapter(_configuration, modelStrategy);
+                    return new GroqApiAdapter(_applicationConfig, modelStrategy);
                 case EIAInferenceAdapterType.Mistral:
                     return new MistralApiAdapter(_applicationConfig);
                 default:

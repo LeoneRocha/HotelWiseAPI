@@ -1,6 +1,6 @@
 ﻿using GroqApiLibrary;
+using HotelWise.Domain.Interfaces;
 using HotelWise.Domain.Interfaces.IA;
-using Microsoft.Extensions.Configuration;
 using System.Text.Json.Nodes;
 
 namespace HotelWise.Domain.AI.Adapter
@@ -8,12 +8,11 @@ namespace HotelWise.Domain.AI.Adapter
     public class GroqApiAdapter : IAIInferenceAdapter
     {
         private readonly GroqApiClient _groqApiClient;
-        private readonly IModelStrategy _modelStrategy;
+        private readonly IModelStrategy _modelStrategy; 
 
-        public GroqApiAdapter(IConfiguration configuration, IModelStrategy modelStrategy)
-        {
-            var apiKey = configuration["GroqApi:ApiKey"]!;
-            _groqApiClient = new GroqApiClient(apiKey);
+        public GroqApiAdapter(IApplicationConfig applicationConfig, IModelStrategy modelStrategy)
+        { 
+            _groqApiClient = new GroqApiClient(applicationConfig.GroqApiConfig.ApiKey);
             _modelStrategy = modelStrategy;
         }
         public async Task<string> GenerateChatCompletionAsync(string prompt)

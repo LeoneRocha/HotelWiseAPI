@@ -1,9 +1,5 @@
-﻿// Copyright (c) Microsoft. All rights reserved.
-
-using System.ComponentModel.DataAnnotations;
-
+﻿using System.ComponentModel.DataAnnotations;
 namespace HotelWise.Domain.Dto.AppConfig;
-
 /// <summary>
 /// OpenAI Embeddings service settings.
 /// </summary>

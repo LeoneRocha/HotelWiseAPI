@@ -1,15 +1,11 @@
-﻿
-
-using System.ComponentModel.DataAnnotations;
-
+﻿using System.ComponentModel.DataAnnotations;
 namespace HotelWise.Domain.Dto.AppConfig;
-
 /// <summary>
 /// Qdrant service settings.
 /// </summary>
-public sealed class MistralApiConfig
+public sealed class GroqApiConfig
 {
-    public const string ConfigSectionName = "MistralApí";
+    public const string ConfigSectionName = "GroqApi";
      
     [Required]
     public string ModelId { get; set; } = string.Empty;
