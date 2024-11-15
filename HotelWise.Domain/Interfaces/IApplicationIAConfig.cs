@@ -4,7 +4,7 @@ using HotelWise.Domain.Dto.AppConfig;
 
 namespace HotelWise.Domain.Interfaces
 {
-    public interface IApplicationConfig
+    public interface IApplicationIAConfig
     {
         RagConfig RagConfig { get; }
 

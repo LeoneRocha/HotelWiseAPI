@@ -6,7 +6,7 @@ namespace HotelWise.Domain.Dto.AppConfig
     /// <summary>
     /// Helper class to load all configuration settings for the VectorStoreRAG project.
     /// </summary>
-    public sealed class ApplicationConfig : IApplicationConfig
+    public sealed class ApplicationIAConfig : IApplicationIAConfig
     {
         #region FIELDS
         private readonly AzureOpenAIConfig _azureOpenAIConfig = new();
@@ -43,7 +43,7 @@ namespace HotelWise.Domain.Dto.AppConfig
 
         #endregion PROPERTIES
 
-        public ApplicationConfig(IConfiguration configurationManager)
+        public ApplicationIAConfig(IConfiguration configurationManager)
         {
             configurationManager.GetRequiredSection(RagConfig.ConfigSectionName).Bind(this._ragConfig);
             loadIAServices(configurationManager);

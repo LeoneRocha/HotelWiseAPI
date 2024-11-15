@@ -71,7 +71,7 @@ namespace HotelWise.Service.AI
             //Get semantic search 
             var embeddingSearchText = await _aIInferenceService.GenerateEmbeddingAsync(searchText, _eIAInferenceAdapterType);
 
-            var hotelsVector = await _adapter.SearchDatasAsync(nameCollection, embeddingSearchText);
+            var hotelsVector = await _adapter.VectorizedSearchAsync(nameCollection, embeddingSearchText);
 
             return hotelsVector;
         }

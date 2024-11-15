@@ -8,9 +8,9 @@ namespace HotelWise.Service.AI
 {
     public class VectorStoreAdapterFactory : IVectorStoreAdapterFactory
     {
-        private readonly IApplicationConfig _applicationConfig;
+        private readonly IApplicationIAConfig _applicationConfig;
         private readonly IVectorStore _vectorStore;
-        public VectorStoreAdapterFactory(IApplicationConfig applicationConfig, IVectorStore vectorStore)
+        public VectorStoreAdapterFactory(IApplicationIAConfig applicationConfig, IVectorStore vectorStore)
         {
             _applicationConfig = applicationConfig;
             _vectorStore = vectorStore;

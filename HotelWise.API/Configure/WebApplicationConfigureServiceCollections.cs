@@ -63,19 +63,14 @@ namespace HotelWise.API
             });
 
             services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
-
-
+             
             ConfigureServicesAI.ConfigureServices(services);
-
-            addRagConfig(services, configuration);
-
-            var appConfig = addApplicationConfig(services, configuration);
+             
             addORM(services, configuration);
 
             #region KERNEL  
-            KernelProviderConfigure.SetupKernelProvider(services, appConfig);
+            SemanticKernelProviderConfigure.SetupSemanticKernelProvider(services, configuration);
             #endregion KERNEL
-
         }
 
         private static void addORM(IServiceCollection services, IConfiguration configuration)
@@ -94,26 +89,6 @@ namespace HotelWise.API
                     optionsMySQL.SchemaBehavior(MySqlSchemaBehavior.Ignore);
                 });
             }, ServiceLifetime.Transient, ServiceLifetime.Transient);
-        }
-        private static void addRagConfig(IServiceCollection services, IConfiguration configuration)
-        {
-            // Bind the PolicyConfig section of appsettings.json to the PolicyConfig class
-            var appSettingsValue = new RagConfig();
-
-            var configValue = ConfigurationAppSettingsHelper.GetRagConfig(configuration);
-
-            new ConfigureFromConfigurationOptions<RagConfig>(configValue).Configure(appSettingsValue);
-            // Register the PolicyConfig instance as a singleton
-            services.AddSingleton<IRagConfig>(appSettingsValue);
-        }
-
-        private static ApplicationConfig addApplicationConfig(IServiceCollection services, IConfiguration configuration)
-        {
-            var appConfig = new ApplicationConfig(configuration);
-
-            // Register the PolicyConfig instance as a singleton
-            services.AddSingleton<IApplicationConfig>(appConfig);
-            return appConfig;
-        }
+        } 
     }
 }

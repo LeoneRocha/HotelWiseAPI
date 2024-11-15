@@ -8,11 +8,11 @@ namespace HotelWise.Domain.AI.Adapter
 {
     public class GenericVectorStoreAdapter<TVector> : IVectorStoreAdapter<TVector> where TVector : IDataVector
     {
-        private readonly IApplicationConfig _applicationConfig;
+        private readonly IApplicationIAConfig _applicationConfig;
         private readonly IVectorStore _vectorStore;
         private IVectorStoreRecordCollection<ulong, TVector>? collection;
 
-        public GenericVectorStoreAdapter(IApplicationConfig applicationConfig, IVectorStore vectorStore)
+        public GenericVectorStoreAdapter(IApplicationIAConfig applicationConfig, IVectorStore vectorStore)
         {
             _applicationConfig = applicationConfig;
             _vectorStore = vectorStore;  
@@ -67,7 +67,7 @@ namespace HotelWise.Domain.AI.Adapter
             return !EqualityComparer<TVector>.Default.Equals(retrievedHotel, default(TVector));
         }
 
-        public async Task<TVector[]> SearchDatasAsync(string nameCollection, float[] searchEmbedding)
+        public async Task<TVector[]> VectorizedSearchAsync(string nameCollection, float[] searchEmbedding)
         {
             await LoadCollection(nameCollection);
             // Generate a vector for your search text, using your chosen embedding generation implementation.

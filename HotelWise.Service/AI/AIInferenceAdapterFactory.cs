@@ -8,8 +8,8 @@ namespace HotelWise.Service.AI
 {
     public class AIInferenceAdapterFactory : IAIInferenceAdapterFactory
     {
-        private readonly IApplicationConfig _applicationConfig;
-        public AIInferenceAdapterFactory(IApplicationConfig applicationConfig)
+        private readonly IApplicationIAConfig _applicationConfig;
+        public AIInferenceAdapterFactory(IApplicationIAConfig applicationConfig)
         {
             _applicationConfig = applicationConfig;
         }

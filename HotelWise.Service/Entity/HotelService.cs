@@ -13,10 +13,10 @@ namespace HotelWise.Service.Entity
         private readonly IHotelRepository _hotelRepository;
         private readonly IGenerateHotelService _generateHotelService;
         private readonly IVectorStoreService<HotelVector> _hoteVectorStoreService;
-        private readonly IApplicationConfig _applicationConfig;
+        private readonly IApplicationIAConfig _applicationConfig;
 
         public HotelService(
-            IApplicationConfig applicationConfig
+            IApplicationIAConfig applicationConfig
             , IHotelRepository hotelRepository
             , IGenerateHotelService generateHotelService
             , IVectorStoreService<HotelVector> hotelVectorStoreService)

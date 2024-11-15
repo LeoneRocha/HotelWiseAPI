@@ -10,7 +10,7 @@ namespace HotelWise.Domain.AI.Adapter
         private readonly GroqApiClient _groqApiClient;
         private readonly IModelStrategy _modelStrategy; 
 
-        public GroqApiAdapter(IApplicationConfig applicationConfig, IModelStrategy modelStrategy)
+        public GroqApiAdapter(IApplicationIAConfig applicationConfig, IModelStrategy modelStrategy)
         { 
             _groqApiClient = new GroqApiClient(applicationConfig.GroqApiConfig.ApiKey);
             _modelStrategy = modelStrategy;

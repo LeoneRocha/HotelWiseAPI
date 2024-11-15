@@ -7,10 +7,10 @@ namespace HotelWise.Domain.AI.Adapter
 {
     public class MistralApiAdapter : IAIInferenceAdapter
     {
-        private readonly IApplicationConfig _applicationConfig;
+        private readonly IApplicationIAConfig _applicationConfig;
         private readonly MistralClient _client;
 
-        public MistralApiAdapter(IApplicationConfig applicationConfig)
+        public MistralApiAdapter(IApplicationIAConfig applicationConfig)
         {
             _applicationConfig = applicationConfig;
             _client = new MistralClient(_applicationConfig.MistralApiConfig.ApiKey);

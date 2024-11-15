@@ -11,6 +11,6 @@ namespace HotelWise.Domain.Interfaces.SemanticKernel
 
         Task<bool> Exists(string nameCollection, ulong dataKey);
 
-        Task<TVector[]> SearchDatasAsync(string nameCollection, float[] searchEmbedding);
+        Task<TVector[]> VectorizedSearchAsync(string nameCollection, float[] searchEmbedding);
     }
 }
