@@ -6,13 +6,13 @@ using Microsoft.Extensions.VectorData;
 
 namespace HotelWise.Domain.AI.Adapter
 {
-    public class QdrantVectorStoreAdapter<TVector> : IVectorStoreAdapter<TVector> where TVector : IDataVector
+    public class GenericVectorStoreAdapter<TVector> : IVectorStoreAdapter<TVector> where TVector : IDataVector
     {
         private readonly IApplicationConfig _applicationConfig;
         private readonly IVectorStore _vectorStore;
         private IVectorStoreRecordCollection<ulong, TVector>? collection;
 
-        public QdrantVectorStoreAdapter(IApplicationConfig applicationConfig, IVectorStore vectorStore)
+        public GenericVectorStoreAdapter(IApplicationConfig applicationConfig, IVectorStore vectorStore)
         {
             _applicationConfig = applicationConfig;
             _vectorStore = vectorStore;

@@ -4,7 +4,6 @@ using HotelWise.Domain.Interfaces.Entity;
 using HotelWise.Domain.Interfaces.SemanticKernel;
 using HotelWise.Domain.Model;
 using System.Collections.Concurrent;
-using System.Linq;
 
 namespace HotelWise.Service.Entity
 {
