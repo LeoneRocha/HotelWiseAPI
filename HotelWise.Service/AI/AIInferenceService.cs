@@ -19,16 +19,16 @@ namespace HotelWise.Service.AI
         public async Task<string> GenerateChatCompletionAsync(string prompt, EIAInferenceAdapterType eIAInferenceAdapterType)
         {
             var model = new MixtralModelStrategy();
+            _eIAInferenceAdapterType = eIAInferenceAdapterType;
             var _adapter = _adapterFactory.CreateAdapter(_eIAInferenceAdapterType, model);
-
             return await _adapter!.GenerateChatCompletionAsync(prompt);
         }
 
         public async Task<float[]> GenerateEmbeddingAsync(string text, EIAInferenceAdapterType eIAInferenceAdapterType)
         {
             var model = new MixtralModelStrategy();
+            _eIAInferenceAdapterType = eIAInferenceAdapterType;
             var _adapter = _adapterFactory.CreateAdapter(_eIAInferenceAdapterType, model);
-
             return await _adapter!.GenerateEmbeddingAsync(text);
         }
     }

@@ -13,5 +13,5 @@ namespace HotelWise.Domain.Interfaces.Entity
         Task<Hotel[]> GenerateHotelsByIA(int numberGerate);
 
         Task<HotelResponse[]> SemanticSearch(SearchCriteria searchCriteria);
-    }
+    } 
 }
