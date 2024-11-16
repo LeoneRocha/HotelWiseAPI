@@ -145,7 +145,7 @@ namespace HotelWise.Domain.AI.Adapter
 
                 await foreach (var message in result2)
                 {
-                    _logger.Information("Result t: {message}", message);
+                    _logger.Information("Result IA : {message}", message);
                 }
                 stopwatch.Stop();
                 _logger.Information("SearchPluginAsync completed in: {elapsed} (hh:mm:ss)", TimeFormatter.FormatElapsedTime(stopwatch.Elapsed));
