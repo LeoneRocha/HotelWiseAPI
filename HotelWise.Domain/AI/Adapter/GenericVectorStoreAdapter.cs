@@ -177,6 +177,7 @@ namespace HotelWise.Domain.AI.Adapter
             return template;
         }
 
+#pragma warning disable SKEXP0001
         private string CreatePlugin(VectorStoreTextSearch<TVector> vectorStoreTextSearch)
         {
             // Obter o nome da classe de TVector
@@ -191,6 +192,7 @@ namespace HotelWise.Domain.AI.Adapter
 
             return pluginName;
         }
+#pragma warning restore SKEXP0001
 
         private async Task<IAsyncEnumerable<StreamingKernelContent>> InvokePrompt(string template, KernelArguments arguments, HandlebarsPromptTemplateFactory promptTemplateFactory)
         {
