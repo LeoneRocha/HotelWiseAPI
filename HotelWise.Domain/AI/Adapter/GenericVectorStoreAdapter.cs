@@ -138,6 +138,7 @@ namespace HotelWise.Domain.AI.Adapter
 
                 HandlebarsPromptTemplateFactory promptTemplateFactory = new();
 
+                //ERRO AQUI <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< 
                 string templateResult = await RenderPrompt(searchQuery, template, results, promptTemplateFactory);
 
                 IAsyncEnumerable<StreamingKernelContent> result2 = await InvokePrompt(template, arguments, promptTemplateFactory);
