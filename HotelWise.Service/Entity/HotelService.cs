@@ -109,7 +109,7 @@ namespace HotelWise.Service.Entity
         {
             //TODO ENVIAR PARA UM CACHE to que pesquisar toda vez no banco de dados 
             var allHotels = await FetchHotelsAsync();
-            allHotels = allHotels.Take(searchCriteria.MaxHotelRetrive).ToArray();
+            allHotels = allHotels.Take(searchCriteria.MaxHotelRetrieve).ToArray();
 
             HotelVector[] hotelsVectorStore = convertHotelsToVector(allHotels);
             //Add vactor
@@ -143,7 +143,7 @@ namespace HotelWise.Service.Entity
                         InitialRoomPrice = hotelEntity.InitialRoomPrice,
                         Location = hotelEntity.Location,
                         Stars = hotelEntity.Stars,
-                        StateCode = hotelEntity.StateCode,
+                        StateCode = hotelEntity.StateCode,      
                         Tags = hotelEntity.Tags,
                         ZipCode = hotelEntity.ZipCode
                     };

@@ -2,7 +2,7 @@
 {
     public class SearchCriteria
     {
-        public int MaxHotelRetrive { get; set; }
+        public int MaxHotelRetrieve { get; set; }
         public string SearchTextCriteria { get; set; } = string.Empty;
     }
 }
