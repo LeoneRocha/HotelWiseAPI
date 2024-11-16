@@ -10,12 +10,10 @@ namespace HotelWise.API.Controllers
     public class HotelsController : ControllerBase
     {
         private readonly IHotelService _hotelService;
-
         public HotelsController(IHotelService hotelService)
         {
             _hotelService = hotelService;
         }
-
         /// <summary>
         /// Obtém todos os hotéis.
         /// </summary>
@@ -26,7 +24,6 @@ namespace HotelWise.API.Controllers
             var hotels = await _hotelService.GetAllHotelsAsync(); 
             return Ok(hotels);
         }
-
         /// <summary>
         /// Obtém um hotel pelo ID.
         /// </summary>
@@ -43,8 +40,6 @@ namespace HotelWise.API.Controllers
             }
             return Ok(hotel);
         }
-
-
         [HttpGet("generate/{numberGerate}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -52,8 +47,7 @@ namespace HotelWise.API.Controllers
         {
             var hotels = await _hotelService.GenerateHotelsByIA(numberGerate);
             return Ok(hotels); 
-        }
-         
+        }         
         [HttpPost("semanticsearch")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> SemanticSearch([FromBody] SearchCriteria searchCriteria)
@@ -61,8 +55,6 @@ namespace HotelWise.API.Controllers
             var hotels = await _hotelService.SemanticSearch(searchCriteria);
             return Ok(hotels);
         }
-
-
         /// <summary>
         /// Cria um novo hotel.
         /// </summary>
@@ -74,7 +66,6 @@ namespace HotelWise.API.Controllers
             await _hotelService.AddHotelAsync(hotel);
             return CreatedAtAction(nameof(GetById), new { id = hotel.HotelId }, hotel);
         }
-
         /// <summary>
         /// Atualiza um hotel existente.
         /// </summary>
@@ -92,7 +83,6 @@ namespace HotelWise.API.Controllers
             await _hotelService.UpdateHotelAsync(hotel);
             return NoContent();
         }
-
         /// <summary>
         /// Deleta um hotel pelo ID.
         /// </summary>
