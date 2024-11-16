@@ -21,15 +21,8 @@ namespace HotelWise.API
     {
         public static void Configure(IServiceCollection services, IConfiguration configuration, Serilog.Core.Logger _logger)
         {
-#pragma warning disable S5122 // Disabling Sonar warning for CORS
-            services.AddCors(options => options.AddDefaultPolicy(builder =>
-            {
-                builder.AllowAnyOrigin()
-                .AllowAnyMethod()
-                .AllowAnyHeader()
-                .WithExposedHeaders("Content-Disposition");
-            }));
-#pragma warning restore S5122
+
+            configureCors(services);
 
 
             services.AddSwaggerGen(c =>
@@ -71,6 +64,27 @@ namespace HotelWise.API
             #region KERNEL  
             SemanticKernelProviderConfigure.SetupSemanticKernelProvider(services, configuration);
             #endregion KERNEL
+        }
+
+        private static void configureCors(IServiceCollection services)
+        {
+#pragma warning disable S5122 // Disabling Sonar warning for CORS
+            services.AddCors(options => options.AddDefaultPolicy(builder =>
+            {
+                builder.AllowAnyOrigin()
+                .AllowAnyMethod()
+                .AllowAnyHeader()
+                .WithExposedHeaders("Content-Disposition");
+            }));
+
+            services.AddCors(options =>
+            {
+                options.AddPolicy("AllowAnyOrigin",
+                    builder => builder.AllowAnyOrigin()
+                    .AllowAnyMethod()
+                    .AllowAnyHeader());
+            });
+#pragma warning restore S5122
         }
 
         private static void addORM(IServiceCollection services, IConfiguration configuration)

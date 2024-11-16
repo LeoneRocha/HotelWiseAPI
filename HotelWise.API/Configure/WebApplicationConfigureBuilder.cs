@@ -66,7 +66,7 @@ namespace HotelWise.API.Configure
               
             app.UseRouting();
 
-            app.UseCors();
+            app.UseCors("AllowAnyOrigin");
 
             app.UseSwagger();
             app.UseSwaggerUI(c =>
