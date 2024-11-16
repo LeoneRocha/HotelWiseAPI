@@ -104,6 +104,6 @@ namespace HotelWise.Domain.Helpers
             {
                 Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", envVal);
             }
-        }
+        } 
     }
 }

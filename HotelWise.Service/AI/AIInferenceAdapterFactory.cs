@@ -2,7 +2,6 @@
 using HotelWise.Domain.Enuns;
 using HotelWise.Domain.Interfaces;
 using HotelWise.Domain.Interfaces.IA;
-using Microsoft.Extensions.Configuration;
 
 namespace HotelWise.Service.AI
 {

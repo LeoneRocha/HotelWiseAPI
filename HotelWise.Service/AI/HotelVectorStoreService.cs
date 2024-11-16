@@ -72,6 +72,8 @@ namespace HotelWise.Service.AI
             var embeddingSearchText = await _aIInferenceService.GenerateEmbeddingAsync(searchText, _eIAInferenceAdapterType);
 
             var hotelsVector = await _adapter.VectorizedSearchAsync(nameCollection, embeddingSearchText);
+             
+            var resultIA = await _adapter.SearchPluginAsync(nameCollection, searchText, embeddingSearchText);
 
             return hotelsVector;
         }
