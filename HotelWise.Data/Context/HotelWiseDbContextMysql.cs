@@ -1,4 +1,5 @@
-﻿using HotelWise.Data.Context.Configure.Mock;
+﻿using HotelWise.Data.Context.Configure;
+using HotelWise.Data.Context.Configure.Mock;
 using HotelWise.Domain.Model;
 using Microsoft.EntityFrameworkCore;
 
@@ -37,7 +38,9 @@ namespace HotelWise.Data.Context
 
                 entity.HasData(HotelsMockData.GetHotels());
             });
+
+            //Configure FLUENT API 
+            ConfigurationEntitiesHelper.AddConfigurationEntities(modelBuilder );
         }
     }
-
 }

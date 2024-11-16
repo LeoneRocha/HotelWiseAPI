@@ -33,7 +33,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Context\Configure\Entity\" />
     <Folder Include="Migrations\MySql\" />
   </ItemGroup>
 
