@@ -120,9 +120,12 @@ namespace HotelWise.Domain.AI.Adapter
                 await LoadCollection(nameCollection);
 
 #pragma warning disable SKEXP0001
+
                 ITextEmbeddingGenerationService embeddingService = _kernel.GetRequiredService<ITextEmbeddingGenerationService>();
-#pragma warning disable SKEXP0001
                 var vectorStoreTextSearch = new VectorStoreTextSearch<TVector>(collection!, embeddingService);
+
+#pragma warning restore SKEXP0001
+
                 string pluginName = CreatePlugin(vectorStoreTextSearch);
 
                 string template = CreateTemplate(pluginName);
@@ -142,7 +145,7 @@ namespace HotelWise.Domain.AI.Adapter
                 await foreach (var message in result2)
                 {
                     _logger.Information("Result t: {message}", message);
-                } 
+                }
                 stopwatch.Stop();
                 _logger.Information("SearchPluginAsync completed in: {elapsed} (hh:mm:ss)", TimeFormatter.FormatElapsedTime(stopwatch.Elapsed));
             }
