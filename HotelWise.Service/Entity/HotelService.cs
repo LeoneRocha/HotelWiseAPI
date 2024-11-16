@@ -117,7 +117,7 @@ namespace HotelWise.Service.Entity
 
             // Aguardar o tempo configurado antes de buscar o vetor
             await Task.Delay(_applicationConfig.RagConfig.SearchSettings.DelayBeforeSearchMilliseconds);
-             
+
             //Search Vector
             var hotelsVector = await _hoteVectorStoreService.SearchDatasAsync(searchCriteria.SearchTextCriteria);
 
@@ -130,24 +130,25 @@ namespace HotelWise.Service.Entity
             {
                 var hotelId = (long)hotelVector.DataKey;
 
-                var hotelEntity = allHotels.First(x => x.HotelId == hotelId);
-
-                var hotelResponse = new HotelResponse()
+                var hotelEntity = allHotels.FirstOrDefault(x => x.HotelId == hotelId);
+                if (hotelEntity != null)
                 {
-                    HotelId = hotelId,
-                    Description = hotelVector.Description,
-                    HotelName = hotelVector.HotelName,
-                    Score = hotelVector.Score,
-                    City = hotelEntity.City,
-                    InitialRoomPrice = hotelEntity.InitialRoomPrice,
-                    Location = hotelEntity.Location,
-                    Stars = hotelEntity.Stars,
-                    StateCode = hotelEntity.StateCode,
-                    Tags = hotelEntity.Tags,
-                    ZipCode = hotelEntity.ZipCode
-                };
-
-                resultHotels.Add(hotelResponse);
+                    var hotelResponse = new HotelResponse()
+                    {
+                        HotelId = hotelId,
+                        Description = hotelVector.Description,
+                        HotelName = hotelVector.HotelName,
+                        Score = hotelVector.Score,
+                        City = hotelEntity.City,
+                        InitialRoomPrice = hotelEntity.InitialRoomPrice,
+                        Location = hotelEntity.Location,
+                        Stars = hotelEntity.Stars,
+                        StateCode = hotelEntity.StateCode,
+                        Tags = hotelEntity.Tags,
+                        ZipCode = hotelEntity.ZipCode
+                    };
+                    resultHotels.Add(hotelResponse);
+                }
             }
             return resultHotels.ToArray();
         }
