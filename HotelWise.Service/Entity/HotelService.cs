@@ -46,6 +46,11 @@ namespace HotelWise.Service.Entity
 
             var hotelDto = _mapper.Map<HotelDto>(hotel);
 
+            var hoteVector = await _hoteVectorStoreService.GetById(id);
+
+            if (hoteVector != null) {
+                hotelDto.IsHotelInVectorStore = true;
+            } 
             return hotelDto;
         }
 
