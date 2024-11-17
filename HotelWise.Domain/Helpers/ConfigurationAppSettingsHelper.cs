@@ -46,5 +46,10 @@ namespace HotelWise.Domain.Helpers
         {
             return GetSectionApp(configuration, "Rag");
         }
+
+        public static IConfiguration GetTokenConfigurations(IConfiguration? configuration)
+        {
+            return GetSectionApp(configuration, "TokenConfigurations");
+        }
     }
 }

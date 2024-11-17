@@ -8,6 +8,7 @@ using HotelWise.Domain.Interfaces.SemanticKernel;
 using HotelWise.Domain.Validator;
 using HotelWise.Service.AI;
 using HotelWise.Service.Entity;
+using HotelWise.Service.Security;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace HotelWise.Service.Configure
@@ -29,6 +30,14 @@ namespace HotelWise.Service.Configure
             services.AddScoped<IVectorStoreService<HotelVector>, HotelVectorStoreService>();
 
             services.AddScoped<IAssistantService, AssistantService>();
+
+            //AutoMapper
+            ServiceCollectionConfigureAutoMapper.Configure(services);
+
+            services.AddScoped<IUserRepository, UserRepository>();
+            services.AddScoped<IUserService, UserService>(); 
+             
+            services.AddScoped<ITokenService, TokenService>();
         }
     }
 }

@@ -1,17 +1,14 @@
-﻿using HotelWise.Data.Context;
-using HotelWise.Domain.Dto.AppConfig;
-using HotelWise.Domain.Dto.SemanticKernel;
+﻿using HotelWise.API.Configure;
+using HotelWise.Data.Context;
+using HotelWise.Domain.Dto;
 using HotelWise.Domain.Helpers;
 using HotelWise.Domain.Interfaces;
 using HotelWise.Service.Configure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
-using Microsoft.Extensions.VectorData;
 using Microsoft.Net.Http.Headers;
 using Microsoft.OpenApi.Models;
-using Microsoft.SemanticKernel;
-using Microsoft.SemanticKernel.Connectors.Qdrant;
 using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
 using Swashbuckle.AspNetCore.Filters;
 
@@ -28,6 +25,13 @@ namespace HotelWise.API
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "HotelWise.API", Version = "v1" });
+                c.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme
+                {
+                    Description = "Standard Authorization header using the Bearer scheme. Example: \"bearer {token}\"",
+                    In = ParameterLocation.Header,
+                    Name = "Authorization",
+                    Type = SecuritySchemeType.ApiKey
+                });
                 c.OperationFilter<SecurityRequirementsOperationFilter>();
             });
 
@@ -64,6 +68,12 @@ namespace HotelWise.API
             #region KERNEL  
             SemanticKernelProviderConfigure.SetupSemanticKernelProvider(services, configuration);
             #endregion KERNEL
+
+            var tokenConfigurations = AddAndReturnTokenConfiguration(services, configuration);
+
+            //Security API
+            ServiceCollectionConfigureSecurity.Configure(services, tokenConfigurations);
+
         }
 
         private static void configureCors(IServiceCollection services)
@@ -103,6 +113,22 @@ namespace HotelWise.API
                     optionsMySQL.SchemaBehavior(MySqlSchemaBehavior.Ignore);
                 });
             }, ServiceLifetime.Transient, ServiceLifetime.Transient);
-        } 
+        }
+
+        public static TokenConfigurationDto AddAndReturnTokenConfiguration(IServiceCollection services, IConfiguration _configuration)
+        {
+            var configValue = ConfigurationAppSettingsHelper.GetTokenConfigurations(_configuration);
+
+            var tokenConfigurations = new TokenConfigurationDto();
+
+            new ConfigureFromConfigurationOptions<TokenConfigurationDto>(configValue)
+             .Configure(tokenConfigurations);
+
+            services.AddSingleton<ITokenConfigurationDto>(tokenConfigurations);
+            services.AddSingleton(tokenConfigurations);
+
+            return tokenConfigurations;
+        }
+
     }
 }

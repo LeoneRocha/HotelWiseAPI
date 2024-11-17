@@ -81,6 +81,8 @@ namespace HotelWise.API.Configure
 
             app.UseRewriter(option);
 
+            app.UseAuthentication();
+
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>

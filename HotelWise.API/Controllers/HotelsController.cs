@@ -1,10 +1,12 @@
 ﻿using HotelWise.Domain.Dto;
 using HotelWise.Domain.Interfaces.Entity;
 using HotelWise.Domain.Model;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HotelWise.API.Controllers
 {
+    [Authorize("Bearer")]
     [ApiController]
     [Route("api/[controller]/v1")]
     public class HotelsController : ControllerBase

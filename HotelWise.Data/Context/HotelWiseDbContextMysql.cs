@@ -7,7 +7,8 @@ namespace HotelWise.Data.Context
 {
     public class HotelWiseDbContextMysql : DbContext
     {
-        public DbSet<Hotel> Hotels { get; set; }
+        public virtual DbSet<Hotel> Hotels { get; set; }
+        public virtual DbSet<User> Users { get; set; }
 
         public HotelWiseDbContextMysql(DbContextOptions<HotelWiseDbContextMysql> options) : base(options) { }
 
