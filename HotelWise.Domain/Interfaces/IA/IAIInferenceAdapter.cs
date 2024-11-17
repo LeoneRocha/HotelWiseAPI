@@ -1,8 +1,10 @@
-﻿namespace HotelWise.Domain.Interfaces.IA
+﻿using HotelWise.Domain.Dto;
+
+namespace HotelWise.Domain.Interfaces.IA
 {
     public interface IAIInferenceAdapter
     {
         Task<float[]> GenerateEmbeddingAsync(string text);
-        Task<string> GenerateChatCompletionAsync(string prompt);
+        Task<string> GenerateChatCompletionAsync(PromptMessageVO[] messages);
     }
 }

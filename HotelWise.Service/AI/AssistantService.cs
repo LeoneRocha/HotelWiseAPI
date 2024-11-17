@@ -3,6 +3,7 @@ using HotelWise.Domain.Enuns;
 using HotelWise.Domain.Interfaces;
 using HotelWise.Domain.Interfaces.IA;
 using HotelWise.Domain.Model;
+using Microsoft.Graph.Models;
 
 namespace HotelWise.Service.Entity
 {
@@ -24,7 +25,24 @@ namespace HotelWise.Service.Entity
 
         public async Task<AskAssistantResponse[]> AskAssistant(SearchCriteria searchCriteria)
         {
-            var result = await _aIInferenceService.GenerateChatCompletionAsync(searchCriteria.SearchTextCriteria, _eIAInferenceAdapterType);
+            PromptMessageVO system1Msg = new PromptMessageVO()
+            {
+                RoleType = RoleAiPromptsEnum.System,
+                Content = "Você é um assistente de viagens e turismo. Você só responde a perguntas relacionadas a viagens, reservas de hotéis e turismo. Se a pergunta estiver fora desse escopo, responda de forma objetiva que não pode ajudar com isso. Não forneca nehuma infomação fora do escopo sobre viagens, reservas de hotéis e turismo"
+            };
+            PromptMessageVO system2Msg = new PromptMessageVO()
+            {
+                RoleType = RoleAiPromptsEnum.System,
+                Content = "Só responda exclusivamente em tópicos relacionados a viagens e turismo, e a responder de forma respeitosa e breve quando a pergunta estiver fora desse escopo"
+            };
+            PromptMessageVO userMsg = new PromptMessageVO()
+            {
+                RoleType = RoleAiPromptsEnum.User,
+                Content = searchCriteria.SearchTextCriteria
+            };
+            PromptMessageVO[] messages = [system1Msg, system2Msg, userMsg];
+
+            var result = await _aIInferenceService.GenerateChatCompletionAsync(messages, _eIAInferenceAdapterType);
             return [new AskAssistantResponse() { Response = result }];
         }
     }

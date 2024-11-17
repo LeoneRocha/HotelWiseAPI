@@ -22,8 +22,8 @@ namespace HotelWise.API.Controllers
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> GetAll()
-        { 
-            var hotels = await _hotelService.GetAllHotelsAsync(); 
+        {
+            var hotels = await _hotelService.GetAllHotelsAsync();
             return Ok(hotels);
         }
         /// <summary>
@@ -41,15 +41,15 @@ namespace HotelWise.API.Controllers
                 return NotFound();
             }
             return Ok(hotel);
-        }
-        [HttpGet("generate/{numberGerate}")]
+        } 
+        [HttpGet("generate")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> Generate(int numberGerate)
+        public async Task<IActionResult> Generate()
         {
-            var hotels = await _hotelService.GenerateHotelsByIA(numberGerate);
-            return Ok(hotels); 
-        }         
+            var hotel = await _hotelService.GenerateHotelByIA();
+            return Ok(hotel);
+        }
         [HttpPost("semanticsearch")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> SemanticSearch([FromBody] SearchCriteria searchCriteria)
@@ -96,5 +96,5 @@ namespace HotelWise.API.Controllers
             await _hotelService.DeleteHotelAsync(id);
             return NoContent();
         }
-    } 
+    }
 }

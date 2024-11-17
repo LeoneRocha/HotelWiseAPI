@@ -37,27 +37,11 @@ namespace HotelWise.Service.Entity
             return await _hotelRepository.GetByIdAsync(id);
         }
 
-        public async Task<Hotel[]> GenerateHotelsByIA(int numberGerate)
+        public async Task<Hotel> GenerateHotelByIA()
         {
-            var hotelsExists = await _hotelRepository.GetAllAsync();
-
-            foreach (var hotel in hotelsExists)
-            {
-                hotel.Tags = GenerateHotelService.ProcessTags(hotel.Tags);
-            }
-            await _hotelRepository.UpdateRangeAsync(hotelsExists);
-
-            if (hotelsExists.Length < numberGerate)
-            {
-                var totalAdd = numberGerate - hotelsExists.Length;
-                var hotels = await _generateHotelService.GetHotelsAsync(totalAdd);
-
-                await _hotelRepository.AddRangeAsync(hotels);
-                List<Hotel> result = new List<Hotel>(hotels);
-                result.AddRange(hotelsExists);
-                return result.ToArray();
-            }
-            return hotelsExists;
+            var hotel = await _generateHotelService.GetHotelAsync();
+             
+            return hotel;
         }
         public async Task AddHotelAsync(Hotel hotel)
         {
@@ -143,7 +127,7 @@ namespace HotelWise.Service.Entity
                         InitialRoomPrice = hotelEntity.InitialRoomPrice,
                         Location = hotelEntity.Location,
                         Stars = hotelEntity.Stars,
-                        StateCode = hotelEntity.StateCode,      
+                        StateCode = hotelEntity.StateCode,
                         Tags = hotelEntity.Tags,
                         ZipCode = hotelEntity.ZipCode
                     };
