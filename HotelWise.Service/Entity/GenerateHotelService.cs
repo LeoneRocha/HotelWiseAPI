@@ -1,4 +1,5 @@
 ﻿using Bogus;
+using DocumentFormat.OpenXml.Drawing;
 using HotelWise.Domain.Dto;
 using HotelWise.Domain.Interfaces.Entity;
 using HotelWise.Domain.Interfaces.IA;
@@ -99,7 +100,7 @@ namespace HotelWise.Service.Entity
                 Description = description,
                 Tags = tags,
                 Stars = (byte)faker.Random.Int(1, 5),
-                InitialRoomPrice = faker.Random.Decimal(100, 1000),
+                InitialRoomPrice = Math.Round(faker.Random.Decimal(100, 1000), 2, MidpointRounding.ToEven),
                 City = cityName,
                 StateCode = stateCode,
                 ZipCode = cepCode,
