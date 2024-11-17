@@ -259,5 +259,12 @@ namespace HotelWise.Domain.AI.Adapter
 
             return (SearchResult: searchResult!, DataSearchResult: dataSearchResult);
         }
+
+        public async Task DeleteAsync(string nameCollection, long dataKey)
+        {
+            await LoadCollection(nameCollection);
+
+            await collection!.DeleteAsync((ulong)dataKey);
+        }
     }
 }

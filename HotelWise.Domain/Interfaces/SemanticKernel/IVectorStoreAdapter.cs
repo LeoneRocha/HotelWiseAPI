@@ -14,5 +14,6 @@ namespace HotelWise.Domain.Interfaces.SemanticKernel
         Task<TVector[]> VectorizedSearchAsync(string nameCollection, float[] searchEmbedding);
 
         Task<TVector[]> SearchPluginAsync(string nameCollection, string searchQuery, float[] searchEmbedding);
+        Task DeleteAsync(string nameCollection, long dataKey);
     }
 }

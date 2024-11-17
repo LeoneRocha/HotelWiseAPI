@@ -63,7 +63,7 @@ namespace HotelWise.API.Controllers
         /// <param name="hotel">Dados do hotel</param>
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
-        public async Task<IActionResult> Create([FromBody] Hotel hotel)
+        public async Task<IActionResult> Create([FromBody] HotelDto hotel)
         {
             await _hotelService.AddHotelAsync(hotel);
             return CreatedAtAction(nameof(GetById), new { id = hotel.HotelId }, hotel);
@@ -76,7 +76,7 @@ namespace HotelWise.API.Controllers
         [HttpPut("{id}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> Update(long id, [FromBody] Hotel hotel)
+        public async Task<IActionResult> Update(long id, [FromBody] HotelDto hotel)
         {
             if (id != hotel.HotelId)
             {

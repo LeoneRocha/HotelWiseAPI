@@ -77,5 +77,10 @@ namespace HotelWise.Service.AI
 
             return hotelsVector;
         }
+
+        public async Task DeleteAsync(long dataKey)
+        {
+            await _adapter.DeleteAsync(nameCollection, dataKey);
+        }
     }
 }
