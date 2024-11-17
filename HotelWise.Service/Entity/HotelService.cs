@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using DocumentFormat.OpenXml.ExtendedProperties;
 using HotelWise.Domain.Dto;
 using HotelWise.Domain.Dto.SemanticKernel;
 using HotelWise.Domain.Interfaces;
@@ -40,6 +39,22 @@ namespace HotelWise.Service.Entity
             return hotelDtos;
         }
 
+        public async Task<bool> InsertHotelInVectorStore(long id)
+        { 
+            try
+            {
+                var hotel = await _hotelRepository.GetByIdAsync(id);
+
+                var hotelDto = _mapper.Map<HotelDto>(hotel);
+                  
+                await addOrUpdateDataVector(hotelDto);
+                return true;
+            }
+            catch (Exception)
+            {
+                throw;
+            } 
+        } 
         public async Task<HotelDto?> GetHotelByIdAsync(long id)
         {
             var hotel = await _hotelRepository.GetByIdAsync(id);

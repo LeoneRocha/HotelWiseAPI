@@ -41,7 +41,17 @@ namespace HotelWise.API.Controllers
                 return NotFound();
             }
             return Ok(hotel);
-        } 
+        }
+
+        [HttpGet("addvector/{id}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> AddVectorById(long id)
+        {
+            var result = await _hotelService.InsertHotelInVectorStore(id); 
+            return Ok(result);
+        }
+         
         [HttpGet("generate")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]

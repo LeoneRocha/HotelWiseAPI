@@ -5,6 +5,7 @@ namespace HotelWise.Domain.Interfaces.Entity
 {
     public interface IHotelService
     {
+        Task<bool> InsertHotelInVectorStore(long id);
         Task AddHotelAsync(HotelDto hotel);
         Task DeleteHotelAsync(long id);
         Task<HotelDto[]> GetAllHotelsAsync();
