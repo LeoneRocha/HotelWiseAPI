@@ -158,13 +158,8 @@ namespace HotelWise.Service.Entity
         public async Task<HotelDto[]> SemanticSearch(SearchCriteria searchCriteria)
         {
             //TODO ENVIAR PARA UM CACHE to que pesquisar toda vez no banco de dados 
-            var allHotels = await FetchHotelsAsync();
-            allHotels = allHotels.Take(searchCriteria.MaxHotelRetrieve).ToArray();
-
-            HotelVector[] hotelsVectorStore = convertHotelsToVector(allHotels);
-            //Add vactor
-            await _hoteVectorStoreService.UpsertDatasAsync(hotelsVectorStore);//TODO REMOVER DEPOIS QUE TIVER SALVO NO vector -- TODO CRIAR UMA ABORDAGEM DE SALVAR NO MONGO OU SIMILAR
-
+            var allHotels = await FetchHotelsAsync();  
+              
             // Aguardar o tempo configurado antes de buscar o vetor
             await Task.Delay(_applicationConfig.RagConfig.SearchSettings.DelayBeforeSearchMilliseconds);
 
