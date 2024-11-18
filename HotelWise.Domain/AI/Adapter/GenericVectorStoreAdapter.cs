@@ -90,7 +90,7 @@ namespace HotelWise.Domain.AI.Adapter
             // Do the search.
             var searchResult = await collection!.VectorizedSearchAsync(searchEmbeddingCriteria, new()
             {
-                Top = 2,
+                //Top = 2,
                 //Filter = new VectorSearchFilter().AnyTagEqualTo(nameof(TVector.Tags), "classe:alta") // ENRIQUECANDO O DADO PARA TORNAR MAIS RELEVANT
             });
 
