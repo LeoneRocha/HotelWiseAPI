@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using DocumentFormat.OpenXml.Office2010.Excel;
 using HotelWise.Domain.Dto;
 using HotelWise.Domain.Dto.SemanticKernel;
 using HotelWise.Domain.Interfaces;
@@ -40,21 +41,21 @@ namespace HotelWise.Service.Entity
         }
 
         public async Task<bool> InsertHotelInVectorStore(long id)
-        { 
+        {
             try
             {
                 var hotel = await _hotelRepository.GetByIdAsync(id);
 
                 var hotelDto = _mapper.Map<HotelDto>(hotel);
-                  
+
                 await addOrUpdateDataVector(hotelDto);
                 return true;
             }
             catch (Exception)
             {
                 throw;
-            } 
-        } 
+            }
+        }
         public async Task<HotelDto?> GetHotelByIdAsync(long id)
         {
             var hotel = await _hotelRepository.GetByIdAsync(id);
@@ -63,9 +64,10 @@ namespace HotelWise.Service.Entity
 
             var hoteVector = await _hoteVectorStoreService.GetById(id);
 
-            if (hoteVector != null) {
+            if (hoteVector != null)
+            {
                 hotelDto.IsHotelInVectorStore = true;
-            } 
+            }
             return hotelDto;
         }
 
@@ -82,8 +84,9 @@ namespace HotelWise.Service.Entity
             try
             {
                 var hotel = _mapper.Map<Hotel>(hotelDto);
-
                 await _hotelRepository.AddAsync(hotel);
+                 
+                hotelDto = _mapper.Map<HotelDto>(hotel);
 
                 //Add Vector
                 await addOrUpdateDataVector(hotelDto);
@@ -127,7 +130,7 @@ namespace HotelWise.Service.Entity
                 await _hoteVectorStoreService.DeleteAsync(id);
             }
             catch (Exception)
-            { 
+            {
                 throw;
             }
 
@@ -162,8 +165,8 @@ namespace HotelWise.Service.Entity
                 return [];
             }
             //TODO ENVIAR PARA UM CACHE to que pesquisar toda vez no banco de dados 
-            var allHotels = await FetchHotelsAsync();  
-              
+            var allHotels = await FetchHotelsAsync();
+
             // Aguardar o tempo configurado antes de buscar o vetor
             await Task.Delay(_applicationConfig.RagConfig.SearchSettings.DelayBeforeSearchMilliseconds);
 
