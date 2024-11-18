@@ -157,6 +157,10 @@ namespace HotelWise.Service.Entity
 
         public async Task<HotelDto[]> SemanticSearch(SearchCriteria searchCriteria)
         {
+            if (string.IsNullOrEmpty(searchCriteria.SearchTextCriteria))
+            {
+                return [];
+            }
             //TODO ENVIAR PARA UM CACHE to que pesquisar toda vez no banco de dados 
             var allHotels = await FetchHotelsAsync();  
               
