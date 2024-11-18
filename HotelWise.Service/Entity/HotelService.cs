@@ -202,7 +202,7 @@ namespace HotelWise.Service.Entity
                     resultHotels.Add(hotelResponse);
                 }
             }
-            return resultHotels.ToArray();
+            return resultHotels.OrderByDescending(h=> h.Score).ToArray();
         }
 
         private HotelVector[] convertHotelsToVector(HotelDto[] allHotels)
