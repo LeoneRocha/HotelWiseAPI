@@ -66,6 +66,7 @@ namespace HotelWise.Service.AI
                 await _adapter.UpsertDatasAsync(nameCollection, hotelVectors.ToArray());
             }
         }
+        //AQUI MUDAR PARA REPONSE ERROR PARA PEGAR ERRO DO RESULT IA 
         public async Task<HotelVector[]> SearchDatasAsync(string searchText)
         {
             //Get semantic search 

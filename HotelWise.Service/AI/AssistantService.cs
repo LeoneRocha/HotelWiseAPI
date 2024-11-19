@@ -28,12 +28,17 @@ namespace HotelWise.Service.Entity
             PromptMessageVO system1Msg = new PromptMessageVO()
             {
                 RoleType = RoleAiPromptsEnum.System,
-                Content = "Você é um assistente de viagens e turismo. Você só responde a perguntas relacionadas a viagens, reservas de hotéis e turismo. Se a pergunta estiver fora desse escopo, responda de forma objetiva que não pode ajudar com isso. Não forneca nehuma infomação fora do escopo sobre viagens, reservas de hotéis e turismo"
+                Content = "Você é um assistente de viagens e turismo. Você só responde a perguntas relacionadas a viagens, reservas de hotéis e turismo. Se a pergunta estiver fora desse escopo, responda de forma objetiva que não pode ajudar com isso. Não forneca nehuma infomação fora do escopo sobre viagens, reservas de hotéis e turismo.  Responda sempre em idioma português brasileiro em pt-br. E Também em formato html"
             };
             PromptMessageVO system2Msg = new PromptMessageVO()
             {
                 RoleType = RoleAiPromptsEnum.System,
-                Content = "Só responda exclusivamente em tópicos relacionados a viagens e turismo, e a responder de forma respeitosa e breve quando a pergunta estiver fora desse escopo"
+                Content = "Só responda exclusivamente em tópicos relacionados a viagens e turismo, e a responder de forma respeitosa e breve quando a pergunta estiver fora desse escopo. Responda sempre em idioma português brasileiro em pt-br. E Também em formato html"
+            };
+            PromptMessageVO system3Msg = new PromptMessageVO()
+            {
+                RoleType = RoleAiPromptsEnum.System,
+                Content = "Responda sempre em idioma português brasileiro em pt-br. E Também em formato html"
             };
             PromptMessageVO userMsg = new PromptMessageVO()
             {
