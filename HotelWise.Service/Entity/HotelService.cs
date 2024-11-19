@@ -42,7 +42,7 @@ namespace HotelWise.Service.Entity
                 var hotels = await _hotelRepository.GetAll();
                 var hotelDtos = _mapper.Map<HotelDto[]>(hotels);
 
-                response.Data = hotelDtos;
+                response.Data = hotelDtos.OrderBy(h=> h.HotelName).ToArray();
                 response.Success = true;
             }
             catch (Exception ex)
