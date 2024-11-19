@@ -5,14 +5,14 @@ namespace HotelWise.Domain.Interfaces.Entity
 {
     public interface IHotelService
     {
-        Task<bool> InsertHotelInVectorStore(long id);
-        Task AddHotelAsync(HotelDto hotel);
-        Task DeleteHotelAsync(long id);
-        Task<HotelDto[]> GetAllHotelsAsync();
-        Task<HotelDto?> GetHotelByIdAsync(long id);
-        Task UpdateHotelAsync(HotelDto hotel);
-        Task<HotelDto> GenerateHotelByIA();
+        Task<ServiceResponse<bool>> InsertHotelInVectorStore(long id);
+        Task<ServiceResponse<bool>> AddHotelAsync(HotelDto hotel);
+        Task<ServiceResponse<bool>> DeleteHotelAsync(long id);
+        Task<ServiceResponse<HotelDto[]>> GetAllHotelsAsync();
+        Task<ServiceResponse<HotelDto?>> GetHotelByIdAsync(long id);
+        Task<ServiceResponse<bool>> UpdateHotelAsync(HotelDto hotel);
+        Task<ServiceResponse<HotelDto>> GenerateHotelByIA();
 
-        Task<HotelDto[]> SemanticSearch(SearchCriteria searchCriteria);
+        Task<ServiceResponse<HotelDto[]>> SemanticSearch(SearchCriteria searchCriteria);
     } 
 }

@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
-using DocumentFormat.OpenXml.Office2010.Excel;
 using HotelWise.Domain.Dto;
 using HotelWise.Domain.Dto.SemanticKernel;
+using HotelWise.Domain.Helpers;
 using HotelWise.Domain.Interfaces;
 using HotelWise.Domain.Interfaces.Entity;
 using HotelWise.Domain.Interfaces.SemanticKernel;
@@ -17,13 +17,16 @@ namespace HotelWise.Service.Entity
         private readonly IVectorStoreService<HotelVector> _hoteVectorStoreService;
         private readonly IApplicationIAConfig _applicationConfig;
         private readonly IMapper _mapper;
+        protected readonly Serilog.ILogger _logger;
         public HotelService(
-            IMapper mapper,
-            IApplicationIAConfig applicationConfig
+            Serilog.ILogger logger
+            , IMapper mapper
+            , IApplicationIAConfig applicationConfig
             , IHotelRepository hotelRepository
             , IGenerateHotelService generateHotelService
             , IVectorStoreService<HotelVector> hotelVectorStoreService)
         {
+            _logger = logger;
             _mapper = mapper;
             _applicationConfig = applicationConfig;
             _hotelRepository = hotelRepository;
@@ -31,17 +34,28 @@ namespace HotelWise.Service.Entity
             _hoteVectorStoreService = hotelVectorStoreService;
         }
 
-        public async Task<HotelDto[]> GetAllHotelsAsync()
+        public async Task<ServiceResponse<HotelDto[]>> GetAllHotelsAsync()
         {
-            var hotels = await _hotelRepository.GetAll();
+            ServiceResponse<HotelDto[]> response = new ServiceResponse<HotelDto[]>();
+            try
+            {
+                var hotels = await _hotelRepository.GetAll();
+                var hotelDtos = _mapper.Map<HotelDto[]>(hotels);
 
-            var hotelDtos = _mapper.Map<HotelDto[]>(hotels);
-
-            return hotelDtos;
+                response.Data = hotelDtos;
+                response.Success = true;
+            }
+            catch (Exception ex)
+            {
+                _logger.Error(ex, "GetAllHotelsAsync: {Message} at: {time}", ex.Message, DataHelper.GetDateTimeNowToLog());
+                response.Errors.Add(new ErrorResponse() { Message = ex.Message });
+            }
+            return response;
         }
 
-        public async Task<bool> InsertHotelInVectorStore(long id)
+        public async Task<ServiceResponse<bool>> InsertHotelInVectorStore(long id)
         {
+            ServiceResponse<bool> response = new ServiceResponse<bool>();
             try
             {
                 var hotel = await _hotelRepository.GetByIdAsync(id);
@@ -49,56 +63,88 @@ namespace HotelWise.Service.Entity
                 var hotelDto = _mapper.Map<HotelDto>(hotel);
 
                 await addOrUpdateDataVector(hotelDto);
-                return true;
+                response.Success = true;
+                response.Data = true;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                throw;
+                _logger.Error(ex, "InsertHotelInVectorStore: {Message} at: {time}", ex.Message, DataHelper.GetDateTimeNowToLog());
+                response.Errors.Add(new ErrorResponse() { Message = ex.Message });
             }
+            return response;
         }
-        public async Task<HotelDto?> GetHotelByIdAsync(long id)
+        public async Task<ServiceResponse<HotelDto?>> GetHotelByIdAsync(long id)
         {
-            var hotel = await _hotelRepository.GetByIdAsync(id);
-
-            var hotelDto = _mapper.Map<HotelDto>(hotel);
-
-            var hoteVector = await _hoteVectorStoreService.GetById(id);
-
-            if (hoteVector != null)
+            ServiceResponse<HotelDto?> response = new ServiceResponse<HotelDto?>();
+            try
             {
-                hotelDto.IsHotelInVectorStore = true;
+                var hotel = await _hotelRepository.GetByIdAsync(id);
+
+                var hotelDto = _mapper.Map<HotelDto?>(hotel);
+
+                var hoteVector = await _hoteVectorStoreService.GetById(id);
+
+                if (hoteVector != null && hotelDto != null)
+                {
+                    hotelDto.IsHotelInVectorStore = true;
+                }
+                response.Success = true;
+                response.Data = hotelDto;
             }
-            return hotelDto;
+            catch (Exception ex)
+            {
+                _logger.Error(ex, "GetHotelByIdAsync: {Message} at: {time}", ex.Message, DataHelper.GetDateTimeNowToLog());
+                response.Errors.Add(new ErrorResponse() { Message = ex.Message });
+            }
+            return response;
         }
 
-        public async Task<HotelDto> GenerateHotelByIA()
+        public async Task<ServiceResponse<HotelDto>> GenerateHotelByIA()
         {
-            var hotel = await _generateHotelService.GetHotelAsync();
+            ServiceResponse<HotelDto> response = new ServiceResponse<HotelDto>();
+            try
+            {
+                var hotel = await _generateHotelService.GetHotelAsync();
 
-            var hotelDto = _mapper.Map<HotelDto>(hotel);
+                var hotelDto = _mapper.Map<HotelDto>(hotel);
 
-            return hotelDto;
+                response.Success = true;
+                response.Data = hotelDto;
+            }
+            catch (Exception ex)
+            {
+                _logger.Error(ex, "GenerateHotelByIA: {Message} at: {time}", ex.Message, DataHelper.GetDateTimeNowToLog());
+                response.Errors.Add(new ErrorResponse() { Message = ex.Message });
+            }
+            return response;
         }
-        public async Task AddHotelAsync(HotelDto hotelDto)
+        public async Task<ServiceResponse<bool>> AddHotelAsync(HotelDto hotelDto)
         {
+            ServiceResponse<bool> response = new ServiceResponse<bool>();
             try
             {
                 var hotel = _mapper.Map<Hotel>(hotelDto);
                 await _hotelRepository.AddAsync(hotel);
-                 
+
                 hotelDto = _mapper.Map<HotelDto>(hotel);
 
                 //Add Vector
                 await addOrUpdateDataVector(hotelDto);
+
+                response.Success = true;
+                response.Data = true;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                throw;
+                _logger.Error(ex, "AddHotelAsync: {Message} at: {time}", ex.Message, DataHelper.GetDateTimeNowToLog());
+                response.Errors.Add(new ErrorResponse() { Message = ex.Message });
             }
+            return response;
         }
 
-        public async Task UpdateHotelAsync(HotelDto hotelDto)
+        public async Task<ServiceResponse<bool>> UpdateHotelAsync(HotelDto hotelDto)
         {
+            ServiceResponse<bool> response = new ServiceResponse<bool>();
             try
             {
                 var hotel = _mapper.Map<Hotel>(hotelDto);
@@ -106,11 +152,16 @@ namespace HotelWise.Service.Entity
                 await _hotelRepository.UpdateAsync(hotel);
 
                 await addOrUpdateDataVector(hotelDto);
+
+                response.Success = true;
+                response.Data = true;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                throw;
+                _logger.Error(ex, "UpdateHotelAsync: {Message} at: {time}", ex.Message, DataHelper.GetDateTimeNowToLog());
+                response.Errors.Add(new ErrorResponse() { Message = ex.Message });
             }
+            return response;
         }
 
         private async Task addOrUpdateDataVector(HotelDto hotelDto)
@@ -121,88 +172,124 @@ namespace HotelWise.Service.Entity
             }
         }
 
-        public async Task DeleteHotelAsync(long id)
+        public async Task<ServiceResponse<bool>> DeleteHotelAsync(long id)
         {
+            ServiceResponse<bool> response = new ServiceResponse<bool>();
             try
             {
                 await _hotelRepository.DeleteAsync(id);
 
                 await _hoteVectorStoreService.DeleteAsync(id);
+
+                response.Success = true;
+                response.Data = true;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                throw;
+                _logger.Error(ex, "DeleteHotelAsync: {Message} at: {time}", ex.Message, DataHelper.GetDateTimeNowToLog());
+                response.Errors.Add(new ErrorResponse() { Message = ex.Message });
             }
+            return response;
 
         }
 
-        public async Task<HotelDto[]> FetchHotelsAsync()
+        public async Task<ServiceResponse<HotelDto[]>> FetchHotelsAsync()
         {
-            int batchSize = 10;
-            var allHotels = new ConcurrentBag<HotelDto>();
-
-            int totalHotels = await _hotelRepository.GetTotalHotelsCountAsync();
-            int fromCount = 0;
-            int toCount = (totalHotels + batchSize - 1) / batchSize;
-
-            await Parallel.ForEachAsync(Enumerable.Range(fromCount, toCount - fromCount), async (index, cancellationToken) =>
+            ServiceResponse<HotelDto[]> response = new ServiceResponse<HotelDto[]>();
+            try
             {
-                var hotels = await _hotelRepository.FetchHotelsAsync(index * batchSize, batchSize);
-                var hotelDtos = _mapper.Map<HotelDto[]>(hotels);
+                int batchSize = 10;
+                var allHotels = new ConcurrentBag<HotelDto>();
 
-                foreach (var hotel in hotelDtos)
+                int totalHotels = await _hotelRepository.GetTotalHotelsCountAsync();
+                int fromCount = 0;
+                int toCount = (totalHotels + batchSize - 1) / batchSize;
+
+                await Parallel.ForEachAsync(Enumerable.Range(fromCount, toCount - fromCount), async (index, cancellationToken) =>
                 {
-                    allHotels.Add(hotel);
-                }
-            });
-            return allHotels.Distinct().OrderBy(hotel => hotel.HotelId).ToArray();
-        }
+                    var hotels = await _hotelRepository.FetchHotelsAsync(index * batchSize, batchSize);
+                    var hotelDtos = _mapper.Map<HotelDto[]>(hotels);
 
-        public async Task<HotelDto[]> SemanticSearch(SearchCriteria searchCriteria)
-        {
-            if (string.IsNullOrEmpty(searchCriteria.SearchTextCriteria))
-            {
-                return [];
-            }
-            //TODO ENVIAR PARA UM CACHE to que pesquisar toda vez no banco de dados 
-            var allHotels = await FetchHotelsAsync();
-
-            // Aguardar o tempo configurado antes de buscar o vetor
-            await Task.Delay(_applicationConfig.RagConfig.SearchSettings.DelayBeforeSearchMilliseconds);
-
-            //Search Vector
-            var hotelsVector = await _hoteVectorStoreService.SearchDatasAsync(searchCriteria.SearchTextCriteria);
-
-            //ENRRIQUECER COM IA TODO: 
-
-            // Mapear para novo objeto e retonar novo objeto TODO:
-            var resultHotels = new List<HotelDto>();
-            //Enriquecer com Interferencia IA  TODO:  TROCAR UMA PARTE POR MAPPER para facilitar
-            foreach (var hotelVector in hotelsVector)
-            {
-                var hotelId = (long)hotelVector.DataKey;
-
-                var hotelEntity = allHotels.FirstOrDefault(x => x.HotelId == hotelId);
-                if (hotelEntity != null)
-                {
-                    var hotelResponse = new HotelDto()
+                    foreach (var hotel in hotelDtos)
                     {
-                        HotelId = hotelId,
-                        Description = hotelVector.Description,
-                        HotelName = hotelVector.HotelName,
-                        Score = hotelVector.Score,
-                        City = hotelEntity.City,
-                        InitialRoomPrice = hotelEntity.InitialRoomPrice,
-                        Location = hotelEntity.Location,
-                        Stars = hotelEntity.Stars,
-                        StateCode = hotelEntity.StateCode,
-                        Tags = hotelEntity.Tags,
-                        ZipCode = hotelEntity.ZipCode
-                    };
-                    resultHotels.Add(hotelResponse);
-                }
+                        allHotels.Add(hotel);
+                    }
+                });
+                var result = allHotels.Distinct().OrderBy(hotel => hotel.HotelId).ToArray();
+
+                response.Success = true;
+                response.Data = result;
             }
-            return resultHotels.OrderByDescending(h=> h.Score).ToArray();
+            catch (Exception ex)
+            {
+                _logger.Error(ex, "FetchHotelsAsync: {Message} at: {time}", ex.Message, DataHelper.GetDateTimeNowToLog());
+                response.Errors.Add(new ErrorResponse() { Message = ex.Message });
+            }
+            return response;
+        }
+
+        public async Task<ServiceResponse<HotelDto[]>> SemanticSearch(SearchCriteria searchCriteria)
+        {
+            ServiceResponse<HotelDto[]> response = new ServiceResponse<HotelDto[]>();
+            try
+            {
+                if (string.IsNullOrEmpty(searchCriteria.SearchTextCriteria))
+                {
+                    response.Success = false;
+                    response.Data = [];
+                    return response;
+                }
+                //TODO ENVIAR PARA UM CACHE to que pesquisar toda vez no banco de dados 
+                var allHotels = (await FetchHotelsAsync()).Data;
+
+                // Aguardar o tempo configurado antes de buscar o vetor
+                await Task.Delay(_applicationConfig.RagConfig.SearchSettings.DelayBeforeSearchMilliseconds);
+
+                //Search Vector
+                var hotelsVector = await _hoteVectorStoreService.SearchDatasAsync(searchCriteria.SearchTextCriteria);
+
+                //ENRRIQUECER COM IA TODO: 
+
+                // Mapear para novo objeto e retonar novo objeto TODO:
+                var resultHotels = new List<HotelDto>();
+                //Enriquecer com Interferencia IA  TODO:  TROCAR UMA PARTE POR MAPPER para facilitar
+                foreach (var hotelVector in hotelsVector)
+                {
+                    var hotelId = (long)hotelVector.DataKey;
+
+                    var hotelEntity = allHotels!.FirstOrDefault(x => x.HotelId == hotelId);
+                    if (hotelEntity != null)
+                    {
+                        var hotelResponse = new HotelDto()
+                        {
+                            HotelId = hotelId,
+                            Description = hotelVector.Description,
+                            HotelName = hotelVector.HotelName,
+                            Score = hotelVector.Score,
+                            City = hotelEntity.City,
+                            InitialRoomPrice = hotelEntity.InitialRoomPrice,
+                            Location = hotelEntity.Location,
+                            Stars = hotelEntity.Stars,
+                            StateCode = hotelEntity.StateCode,
+                            Tags = hotelEntity.Tags,
+                            ZipCode = hotelEntity.ZipCode
+                        };
+                        resultHotels.Add(hotelResponse);
+                    }
+                }
+                var result = resultHotels.OrderByDescending(h => h.Score).ToArray();
+
+                response.Success = true;
+                response.Data = result;
+
+            }
+            catch (Exception ex)
+            {
+                _logger.Error(ex, "SemanticSearch: {Message} at: {time}", ex.Message, DataHelper.GetDateTimeNowToLog());
+                response.Errors.Add(new ErrorResponse() { Message = ex.Message });
+            }
+            return response;
+
         }
 
         private HotelVector[] convertHotelsToVector(HotelDto[] allHotels)

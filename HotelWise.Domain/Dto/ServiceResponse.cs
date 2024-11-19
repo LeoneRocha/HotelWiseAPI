@@ -1,5 +1,4 @@
 ﻿using HotelWise.Domain.Interfaces;
-using Mistral.SDK.DTOs;
 
 namespace HotelWise.Domain.Dto
 {
