@@ -48,10 +48,10 @@ namespace HotelWise.API.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> AddVectorById(long id)
         {
-            var result = await _hotelService.InsertHotelInVectorStore(id); 
+            var result = await _hotelService.InsertHotelInVectorStore(id);
             return Ok(result);
         }
-         
+
         [HttpGet("generate")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -72,11 +72,12 @@ namespace HotelWise.API.Controllers
         /// </summary>
         /// <param name="hotel">Dados do hotel</param>
         [HttpPost]
-        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> Create([FromBody] HotelDto hotel)
         {
-            await _hotelService.AddHotelAsync(hotel);
-            return CreatedAtAction(nameof(GetById), new { id = hotel.HotelId }, hotel);
+            var response = await _hotelService.AddHotelAsync(hotel);
+
+            return Ok(response);
         }
         /// <summary>
         /// Atualiza um hotel existente.
@@ -84,7 +85,7 @@ namespace HotelWise.API.Controllers
         /// <param name="id">ID do hotel</param>
         /// <param name="hotel">Dados atualizados do hotel</param>
         [HttpPut("{id}")]
-        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> Update(long id, [FromBody] HotelDto hotel)
         {
@@ -92,19 +93,19 @@ namespace HotelWise.API.Controllers
             {
                 return BadRequest();
             }
-            await _hotelService.UpdateHotelAsync(hotel);
-            return NoContent();
+            var response = await _hotelService.UpdateHotelAsync(hotel);
+            return Ok(response);
         }
         /// <summary>
         /// Deleta um hotel pelo ID.
         /// </summary>
         /// <param name="id">ID do hotel</param>
         [HttpDelete("{id}")]
-        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> Delete(long id)
         {
-            await _hotelService.DeleteHotelAsync(id);
-            return NoContent();
+            var response = await _hotelService.DeleteHotelAsync(id);
+            return Ok(response);
         }
     }
 }
