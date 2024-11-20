@@ -109,7 +109,7 @@ namespace HotelWise.Domain.AI.Adapter
             return dataVectors.ToArray();
         }
 
-        public async Task<TVector[]> SearchPluginAsync(string nameCollection, string searchQuery, float[] searchEmbedding)
+        public async Task<TVector[]> SearchAndAnalyzePluginAsync(string nameCollection, string searchQuery, float[] searchEmbedding)
         {
             List<TVector> dataVectors = new List<TVector>();
             try
@@ -153,6 +153,7 @@ namespace HotelWise.Domain.AI.Adapter
             catch (Exception ex)
             {
                 _logger.Error(ex, "An error occurred in SearchPluginAsync at: {Message} at: {time}", ex.Message, DateTime.UtcNow);
+                throw;
             }
             return dataVectors.ToArray();
         }

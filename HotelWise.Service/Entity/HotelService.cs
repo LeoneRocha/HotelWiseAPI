@@ -247,36 +247,75 @@ namespace HotelWise.Service.Entity
             return response;
         }
 
-        public async Task<ServiceResponse<HotelDto[]>> SemanticSearch(SearchCriteria searchCriteria)
+        public async Task<ServiceResponse<HotelSemanticResult>> SemanticSearch(SearchCriteria searchCriteria)
         {
-            ServiceResponse<HotelDto[]> response = new ServiceResponse<HotelDto[]>();
+            ServiceResponse<HotelSemanticResult> response = new ServiceResponse<HotelSemanticResult>();
+            response.Data = new HotelSemanticResult();
+
             try
             {
                 if (string.IsNullOrEmpty(searchCriteria.SearchTextCriteria))
                 {
                     response.Success = false;
-                    response.Data = [];
                     return response;
                 }
                 //TODO ENVIAR PARA UM CACHE to que pesquisar toda vez no banco de dados 
-                var allHotels = (await FetchHotelsAsync()).Data;
+                var allHotelsFromDb = (await FetchHotelsAsync()).Data;
 
                 // Aguardar o tempo configurado antes de buscar o vetor
                 await Task.Delay(_applicationConfig.RagConfig.SearchSettings.DelayBeforeSearchMilliseconds);
 
-                //Search Vector
-                var hotelsVector = await _hoteVectorStoreService.SearchDatasAsync(searchCriteria.SearchTextCriteria);
+                //Search Vector  
+                await searchFromVector(searchCriteria, response, allHotelsFromDb);
 
-                //ENRRIQUECER COM IA TODO: 
+                //SearchAndAnalyzePluginAsync GET FROM IA INTERFERENCE                  
+                await searchByPluguin(searchCriteria, response, allHotelsFromDb);
 
-                // Mapear para novo objeto e retonar novo objeto TODO:
-                var resultHotels = new List<HotelDto>();
+                if (response.Errors.Count == 0)
+                {
+                    response.Success = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.Error(ex, "SemanticSearch: {Message} at: {time}", ex.Message, DataHelper.GetDateTimeNowToLog());
+                response.Errors.Add(new ErrorResponse() { Message = ex.Message });
+            }
+            return response;
+        }
+
+        private async Task searchFromVector(SearchCriteria searchCriteria, ServiceResponse<HotelSemanticResult> response, HotelDto[]? allHotelsFromDb)
+        {
+            var responseVector = await _hoteVectorStoreService.VectorizedSearchAsync(searchCriteria.SearchTextCriteria);
+            var hotelsVector = responseVector.Data;
+            HotelDto[] listHotelsVector = changeHotelsVectorToHotelDtos(allHotelsFromDb, hotelsVector);
+            response.Data!.HotelsVectorResult = listHotelsVector;
+            response.Errors.AddRange(responseVector.Errors);
+            response.Message = responseVector.Message;
+        }
+
+        private async Task searchByPluguin(SearchCriteria searchCriteria, ServiceResponse<HotelSemanticResult> response, HotelDto[]? allHotelsFromDb)
+        {
+            var responseIAInterference = await _hoteVectorStoreService.SearchAndAnalyzePluginAsync(searchCriteria.SearchTextCriteria);
+            var hotelsIAInterference = responseIAInterference.Data;
+            HotelDto[] listHotelsIAInterference = changeHotelsVectorToHotelDtos(allHotelsFromDb, hotelsIAInterference);
+            response.Data!.HotelsIAResult = listHotelsIAInterference;
+            response.Errors.AddRange(responseIAInterference.Errors);
+            response.Message = responseIAInterference.Message;
+        }
+
+        private HotelDto[] changeHotelsVectorToHotelDtos(HotelDto[]? allHotelsFromDb, HotelVector[]? hotelsVector)
+        {
+            // Mapear para novo objeto e retonar novo objeto TODO:
+            var resultHotels = new List<HotelDto>();
+            if (allHotelsFromDb != null && allHotelsFromDb.Length > 0 && hotelsVector != null && hotelsVector.Length > 0)
+            {
                 //Enriquecer com Interferencia IA  TODO:  TROCAR UMA PARTE POR MAPPER para facilitar
                 foreach (var hotelVector in hotelsVector)
                 {
                     var hotelId = (long)hotelVector.DataKey;
 
-                    var hotelEntity = allHotels!.FirstOrDefault(x => x.HotelId == hotelId);
+                    var hotelEntity = allHotelsFromDb!.FirstOrDefault(x => x.HotelId == hotelId);
                     if (hotelEntity != null)
                     {
                         var hotelResponse = new HotelDto()
@@ -297,18 +336,9 @@ namespace HotelWise.Service.Entity
                     }
                 }
                 var result = resultHotels.OrderByDescending(h => h.Score).ToArray();
-
-                response.Success = true;
-                response.Data = result;
-
+                return result;
             }
-            catch (Exception ex)
-            {
-                _logger.Error(ex, "SemanticSearch: {Message} at: {time}", ex.Message, DataHelper.GetDateTimeNowToLog());
-                response.Errors.Add(new ErrorResponse() { Message = ex.Message });
-            }
-            return response;
-
+            return [];
         }
 
         private HotelVector[] convertHotelsToVector(HotelDto[] allHotels)
@@ -331,5 +361,7 @@ namespace HotelWise.Service.Entity
                 Tags = hotel.Tags.ToList()
             };
         }
+
+
     }
 }

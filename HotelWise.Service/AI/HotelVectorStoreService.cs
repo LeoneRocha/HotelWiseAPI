@@ -1,4 +1,6 @@
-﻿using HotelWise.Domain.Dto.SemanticKernel;
+﻿using Azure;
+using HotelWise.Domain.Dto;
+using HotelWise.Domain.Dto.SemanticKernel;
 using HotelWise.Domain.Enuns;
 using HotelWise.Domain.Helpers;
 using HotelWise.Domain.Interfaces.IA;
@@ -58,7 +60,7 @@ namespace HotelWise.Service.AI
 
                     hotel.Embedding = EmbeddingHelper.ConvertToReadOnlyMemory(embedding);
 
-                    hotelVectors.Add(hotel);    
+                    hotelVectors.Add(hotel);
                 }
             }
             if (hotelVectors.Count > 0)
@@ -66,22 +68,55 @@ namespace HotelWise.Service.AI
                 await _adapter.UpsertDatasAsync(nameCollection, hotelVectors.ToArray());
             }
         }
-        //AQUI MUDAR PARA REPONSE ERROR PARA PEGAR ERRO DO RESULT IA 
-        public async Task<HotelVector[]> SearchDatasAsync(string searchText)
+
+        public async Task<ServiceResponse<HotelVector[]>> VectorizedSearchAsync(string searchText)
         {
-            //Get semantic search 
-            var embeddingSearchText = await _aIInferenceService.GenerateEmbeddingAsync(searchText, _eIAInferenceAdapterType);
+            ServiceResponse<HotelVector[]> response = new ServiceResponse<HotelVector[]>();
+            try
+            {
+                //Get semantic search 
+                var embeddingSearchText = await _aIInferenceService.GenerateEmbeddingAsync(searchText, _eIAInferenceAdapterType);
 
-            var hotelsVector = await _adapter.VectorizedSearchAsync(nameCollection, embeddingSearchText);
-             
-            var resultIA = await _adapter.SearchPluginAsync(nameCollection, searchText, embeddingSearchText);
+                var hotelsVector = await _adapter.VectorizedSearchAsync(nameCollection, embeddingSearchText);
+                response.Success = true;
+                response.Data = hotelsVector;
+            }
+            catch (Exception ex)
+            {
+                response.Success = false;
+                response.Message = ex.Message;
+                response.Errors = new List<ErrorResponse>() { new ErrorResponse() { Message = ex.Message }, new ErrorResponse() { Message = ex.StackTrace ?? string.Empty } };
+            }
+            return response;
+        }
 
-            return hotelsVector;
+        public async Task<ServiceResponse<HotelVector[]>> SearchAndAnalyzePluginAsync(string searchText)
+        {
+            ServiceResponse<HotelVector[]> response = new ServiceResponse<HotelVector[]>();
+            try
+            {
+                //Get semantic search 
+                var embeddingSearchText = await _aIInferenceService.GenerateEmbeddingAsync(searchText, _eIAInferenceAdapterType);
+
+                var resultIA = await _adapter.SearchAndAnalyzePluginAsync(nameCollection, searchText, embeddingSearchText);
+
+                response.Success = true;
+                response.Data = resultIA;
+            }
+            catch (Exception ex)
+            {
+                response.Success = false;
+                response.Message = ex.Message;
+                response.Errors = new List<ErrorResponse>() { new ErrorResponse() { Message = ex.Message }, new ErrorResponse() { Message = ex.StackTrace ?? string.Empty } };
+            }
+            return response;
         }
 
         public async Task DeleteAsync(long dataKey)
         {
             await _adapter.DeleteAsync(nameCollection, dataKey);
         }
+
+      
     }
 }
