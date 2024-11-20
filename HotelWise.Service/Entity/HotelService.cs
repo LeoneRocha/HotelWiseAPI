@@ -17,7 +17,11 @@ namespace HotelWise.Service.Entity
         private readonly IVectorStoreService<HotelVector> _hoteVectorStoreService;
         private readonly IApplicationIAConfig _applicationConfig;
         private readonly IMapper _mapper;
-        protected readonly Serilog.ILogger _logger;
+        private readonly Serilog.ILogger _logger;
+
+        protected long UserId { get; private set; }
+
+
         public HotelService(
             Serilog.ILogger logger
             , IMapper mapper
@@ -33,7 +37,10 @@ namespace HotelWise.Service.Entity
             _generateHotelService = generateHotelService;
             _hoteVectorStoreService = hotelVectorStoreService;
         }
-
+          public void SetUserId(long id)
+        {
+            UserId = id;
+        }
         public async Task<ServiceResponse<HotelDto[]>> GetAllHotelsAsync()
         {
             ServiceResponse<HotelDto[]> response = new ServiceResponse<HotelDto[]>();
@@ -124,6 +131,13 @@ namespace HotelWise.Service.Entity
             try
             {
                 var hotel = _mapper.Map<Hotel>(hotelDto);
+
+                #region Set default fields for bussines
+                hotel.CreatedUserId = UserId;
+                hotel.CreatedDate = DataHelper.GetDateTimeNow();
+                hotel.ModifyDate = DataHelper.GetDateTimeNow(); 
+                #endregion Set default fields for bussines
+                 
                 await _hotelRepository.AddAsync(hotel);
 
                 hotelDto = _mapper.Map<HotelDto>(hotel);
@@ -148,6 +162,11 @@ namespace HotelWise.Service.Entity
             try
             {
                 var hotel = _mapper.Map<Hotel>(hotelDto);
+
+                #region Set default fields for bussines
+                hotel.ModifyUserId = UserId;                
+                hotel.ModifyDate = DataHelper.GetDateTimeNow();
+                #endregion Set default fields for bussines
 
                 await _hotelRepository.UpdateAsync(hotel);
 

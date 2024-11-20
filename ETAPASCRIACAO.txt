@@ -50,7 +50,7 @@ https://learn.microsoft.com/en-us/training/modules/improve-search-results-vector
 Add-Migration InitialCreate -Context HotelWiseDbContextMysql -OutputDir Migrations\MySql -Project HotelWise.Data
 
 
-Add-Migration UserTable -Context HotelWiseDbContextMysql -OutputDir Migrations\MySql -Project HotelWise.Data
+Add-Migration LogDataAddUpdate -Context HotelWiseDbContextMysql -OutputDir Migrations\MySql -Project HotelWise.Data
 
 https://qdrant.tech/documentation/quickstart/
 

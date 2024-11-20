@@ -26,6 +26,10 @@ namespace HotelWise.Data.Context.Configure.Mock
                 Location = $"{hotelAddress.StreetSuffix()} {hotelAddress.StreetAddress()}",
                 City = hotelAddress.City(),
                 StateCode = hotelAddress.StateAbbr(),
+                CreatedUserId = 1,
+                ModifyUserId = 1,   
+                CreatedDate = DateTime.UtcNow,
+                ModifyDate = DateTime.UtcNow
             }); 
             return hotels.ToArray();
         } 

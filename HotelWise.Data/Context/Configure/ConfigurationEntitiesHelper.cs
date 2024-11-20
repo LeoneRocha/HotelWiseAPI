@@ -7,6 +7,7 @@ namespace HotelWise.Data.Context.Configure
     {
         public static void AddConfigurationEntities(ModelBuilder modelBuilder)
         {
+            modelBuilder.ApplyConfiguration(new HotelConfiguration());
             modelBuilder.ApplyConfiguration(new UserConfiguration());
         }
     }

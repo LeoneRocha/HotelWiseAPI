@@ -1,6 +1,8 @@
-﻿namespace HotelWise.Domain.Model
+﻿using HotelWise.Domain.Interfaces;
+
+namespace HotelWise.Domain.Model
 {
-    public class Hotel
+    public class Hotel : IEntityBaseLog
     {
         public long HotelId { get; set; }
         public string HotelName { get; set; } = string.Empty;
@@ -12,5 +14,12 @@
         public string Location { get; set; } = string.Empty;
         public string City { get; set; } = string.Empty;
         public string StateCode { get; set; } = string.Empty;
+
+        public User? CreatedUser { get; set; }
+        public long? CreatedUserId { get; set; }
+        public User? ModifyUser { get; set; }
+        public long? ModifyUserId { get; set; }         
+        public DateTime CreatedDate { get; set; }         
+        public DateTime ModifyDate { get; set; } 
     }
 }
