@@ -2,8 +2,6 @@
 using HotelWise.Domain.Enuns;
 using HotelWise.Domain.Interfaces;
 using HotelWise.Domain.Interfaces.IA;
-using HotelWise.Domain.Model;
-using Microsoft.Graph.Models;
 
 namespace HotelWise.Service.Entity
 {
