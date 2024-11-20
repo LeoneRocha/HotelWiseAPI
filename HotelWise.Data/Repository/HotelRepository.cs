@@ -7,7 +7,7 @@ namespace HotelWise.Data.Repository
 {
     public class HotelRepository : IHotelRepository
     {
-        private readonly HotelWiseDbContextMysql _context; 
+        private readonly HotelWiseDbContextMysql _context;
         private readonly DbContextOptions<HotelWiseDbContextMysql> _options;
 
         public HotelRepository(HotelWiseDbContextMysql context, DbContextOptions<HotelWiseDbContextMysql> options)
@@ -77,6 +77,16 @@ namespace HotelWise.Data.Repository
 
                 return resultRange;
             }
-        } 
+        }
+
+        public async Task<string[][]> GetAllTags(int offset, int limit)
+        {
+            using (var context = CreateContext())
+            {
+                var resultRange = await context.Hotels.AsNoTracking().Select(h => h.Tags).Skip(offset).Take(limit).ToArrayAsync();
+
+                return resultRange;
+            }
+        }
     }
 }

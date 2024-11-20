@@ -14,5 +14,6 @@ namespace HotelWise.Domain.Interfaces.Entity
         Task DeleteAsync(long id);
         Task<int> GetTotalHotelsCountAsync();
         Task<Hotel[]> FetchHotelsAsync(int offset, int limit);
+        Task<string[][]> GetAllTags(int offset, int limit);
     }
 }

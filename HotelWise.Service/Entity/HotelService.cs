@@ -362,6 +362,40 @@ namespace HotelWise.Service.Entity
             };
         }
 
+        public async Task<string[]> GetAllTags()
+        {
+            List<string> tagsResult = new List<string>();
+            try
+            {
+                int batchSize = 10;
+                var allTagsConcurrentBag = new ConcurrentBag<List<string>>();
 
+                int totalHotels = await _hotelRepository.GetTotalHotelsCountAsync();
+                int fromCount = 0;
+                int toCount = (totalHotels + batchSize - 1) / batchSize;
+
+                await Parallel.ForEachAsync(Enumerable.Range(fromCount, toCount - fromCount), async (index, cancellationToken) =>
+                {
+                    var tags = await _hotelRepository.GetAllTags(index * batchSize, batchSize);
+
+                    foreach (var tag in tags)
+                    {
+                        allTagsConcurrentBag.Add(tag.Select(x => x.ToLower()).ToList());
+                    }
+                });
+
+                foreach (var tagsbag in allTagsConcurrentBag)
+                { 
+                    tagsResult.AddRange(tagsbag); 
+                }
+                var result = tagsResult.Distinct().OrderBy(tag => tag).ToList();
+                tagsResult = result.ToList();
+            }
+            catch (Exception ex)
+            {
+                _logger.Error(ex, "FetchHotelsAsync: {Message} at: {time}", ex.Message, DataHelper.GetDateTimeNowToLog());
+            }
+            return tagsResult.ToArray();
+        }
     }
 }

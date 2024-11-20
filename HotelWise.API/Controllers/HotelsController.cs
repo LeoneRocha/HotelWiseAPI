@@ -56,6 +56,17 @@ namespace HotelWise.API.Controllers
             return Ok(hotel);
         }
 
+        [HttpGet("tags")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> GetAllTags()
+        {
+            string[] tags = await _hotelService.GetAllTags();
+            return Ok(tags);
+        }
+
+
+
         [HttpGet("addvector/{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
