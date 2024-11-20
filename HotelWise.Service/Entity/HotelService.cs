@@ -37,7 +37,7 @@ namespace HotelWise.Service.Entity
             _generateHotelService = generateHotelService;
             _hoteVectorStoreService = hotelVectorStoreService;
         }
-          public void SetUserId(long id)
+        public void SetUserId(long id)
         {
             UserId = id;
         }
@@ -49,7 +49,7 @@ namespace HotelWise.Service.Entity
                 var hotels = await _hotelRepository.GetAll();
                 var hotelDtos = _mapper.Map<HotelDto[]>(hotels);
 
-                response.Data = hotelDtos.OrderBy(h=> h.HotelName).ToArray();
+                response.Data = hotelDtos.OrderBy(h => h.HotelName).ToArray();
                 response.Success = true;
             }
             catch (Exception ex)
@@ -135,9 +135,9 @@ namespace HotelWise.Service.Entity
                 #region Set default fields for bussines
                 hotel.CreatedUserId = UserId;
                 hotel.CreatedDate = DataHelper.GetDateTimeNow();
-                hotel.ModifyDate = DataHelper.GetDateTimeNow(); 
+                hotel.ModifyDate = DataHelper.GetDateTimeNow();
                 #endregion Set default fields for bussines
-                 
+
                 await _hotelRepository.AddAsync(hotel);
 
                 hotelDto = _mapper.Map<HotelDto>(hotel);
@@ -164,7 +164,7 @@ namespace HotelWise.Service.Entity
                 var hotel = _mapper.Map<Hotel>(hotelDto);
 
                 #region Set default fields for bussines
-                hotel.ModifyUserId = UserId;                
+                hotel.ModifyUserId = UserId;
                 hotel.ModifyDate = DataHelper.GetDateTimeNow();
                 #endregion Set default fields for bussines
 

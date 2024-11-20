@@ -5,6 +5,7 @@ namespace HotelWise.Domain.Interfaces.Entity
 {
     public interface IHotelService
     {
+        void SetUserId(long id);
         Task<ServiceResponse<bool>> InsertHotelInVectorStore(long id);
         Task<ServiceResponse<bool>> AddHotelAsync(HotelDto hotel);
         Task<ServiceResponse<bool>> DeleteHotelAsync(long id);

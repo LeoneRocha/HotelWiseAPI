@@ -1,4 +1,5 @@
 ﻿using HotelWise.Domain.Dto;
+using HotelWise.Domain.Helpers;
 using HotelWise.Domain.Interfaces.Entity;
 using HotelWise.Domain.Model;
 using Microsoft.AspNetCore.Authorization;
@@ -15,6 +16,18 @@ namespace HotelWise.API.Controllers
         public HotelsController(IHotelService hotelService)
         {
             _hotelService = hotelService;
+        }
+
+        private void setUserIdCurrent()
+        {
+            _hotelService.SetUserId(GetUserIdCurrent());
+        }
+
+        private long GetUserIdCurrent()
+        {
+            long idUser = SecurityHelperApi.GetUserIdApi(User);
+            return idUser;
+
         }
         /// <summary>
         /// Obtém todos os hotéis.
@@ -75,6 +88,7 @@ namespace HotelWise.API.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> Create([FromBody] HotelDto hotel)
         {
+            setUserIdCurrent();
             var response = await _hotelService.AddHotelAsync(hotel);
 
             return Ok(response);
@@ -93,6 +107,7 @@ namespace HotelWise.API.Controllers
             {
                 return BadRequest();
             }
+            setUserIdCurrent();
             var response = await _hotelService.UpdateHotelAsync(hotel);
             return Ok(response);
         }
