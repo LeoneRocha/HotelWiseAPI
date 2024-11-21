@@ -85,20 +85,26 @@ namespace HotelWise.Domain.AI.Adapter
             await LoadCollection(nameCollection);
 
             var searchEmbeddingCriteria = EmbeddingHelper.ConvertToReadOnlyMemory(searchEmbedding);
-  
-            // Combina os filtros usando lógica OR
-            var combinedFilter = new VectorSearchFilter();
 
-            foreach (var tagValue in searchCriteria.TagsCriteria)
+            // Combina os filtros usando lógica OR
+            var vectorSearchOptions = new VectorSearchOptions(); 
+
+            if (searchCriteria.TagsCriteria.Length > 0)
             {
-                combinedFilter.AnyTagEqualTo(nameof(IDataVector.Tags), tagValue);
-            }
+                var combinedFilter = new VectorSearchFilter();
+                foreach (var tagValue in searchCriteria.TagsCriteria)
+                {
+                    combinedFilter.AnyTagEqualTo(nameof(IDataVector.Tags), tagValue);
+                }
+
+                vectorSearchOptions = new VectorSearchOptions()
+                {
+                    Filter = combinedFilter // Aplica o filtro combinado
+                };
+            } 
 
             // Realiza a busca
-            var searchResult = await collection!.VectorizedSearchAsync(searchEmbeddingCriteria, new()
-            {
-                Filter = combinedFilter // Aplica o filtro combinado
-            });
+            var searchResult = await collection!.VectorizedSearchAsync(searchEmbeddingCriteria, );
 
             var dataSearchResult = searchResult.Results.ToBlockingEnumerable().ToArray();
 
