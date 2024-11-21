@@ -108,7 +108,7 @@ namespace HotelWise.Domain.AI.Adapter
 
         private static VectorSearchOptions createOptions(SearchCriteria searchCriteria)
         {
-            var vectorSearchOptions = new VectorSearchOptions();
+            var vectorSearchOptions = new VectorSearchOptions() { Top = searchCriteria.MaxHotelRetrieve };
 
             if (searchCriteria.TagsCriteria.Length > 0)
             {
@@ -120,6 +120,7 @@ namespace HotelWise.Domain.AI.Adapter
 
                 vectorSearchOptions = new VectorSearchOptions()
                 {
+                    Top = searchCriteria.MaxHotelRetrieve,
                     Filter = combinedFilter // Aplica o filtro combinado
                 };
             }
