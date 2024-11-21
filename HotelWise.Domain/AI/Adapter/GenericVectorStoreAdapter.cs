@@ -87,24 +87,10 @@ namespace HotelWise.Domain.AI.Adapter
             var searchEmbeddingCriteria = EmbeddingHelper.ConvertToReadOnlyMemory(searchEmbedding);
 
             // Combina os filtros usando lógica OR
-            var vectorSearchOptions = new VectorSearchOptions(); 
-
-            if (searchCriteria.TagsCriteria.Length > 0)
-            {
-                var combinedFilter = new VectorSearchFilter();
-                foreach (var tagValue in searchCriteria.TagsCriteria)
-                {
-                    combinedFilter.AnyTagEqualTo(nameof(IDataVector.Tags), tagValue);
-                }
-
-                vectorSearchOptions = new VectorSearchOptions()
-                {
-                    Filter = combinedFilter // Aplica o filtro combinado
-                };
-            } 
+            VectorSearchOptions vectorSearchOptions = createOptions(searchCriteria);
 
             // Realiza a busca
-            var searchResult = await collection!.VectorizedSearchAsync(searchEmbeddingCriteria, );
+            var searchResult = await collection!.VectorizedSearchAsync(searchEmbeddingCriteria, vectorSearchOptions);
 
             var dataSearchResult = searchResult.Results.ToBlockingEnumerable().ToArray();
 
@@ -120,6 +106,26 @@ namespace HotelWise.Domain.AI.Adapter
             return dataVectors.ToArray();
         }
 
+        private static VectorSearchOptions createOptions(SearchCriteria searchCriteria)
+        {
+            var vectorSearchOptions = new VectorSearchOptions();
+
+            if (searchCriteria.TagsCriteria.Length > 0)
+            {
+                var combinedFilter = new VectorSearchFilter();
+                foreach (var tagValue in searchCriteria.TagsCriteria)
+                {
+                    combinedFilter.AnyTagEqualTo(nameof(IDataVector.Tags), tagValue);
+                }
+
+                vectorSearchOptions = new VectorSearchOptions()
+                {
+                    Filter = combinedFilter // Aplica o filtro combinado
+                };
+            }
+
+            return vectorSearchOptions;
+        }
 
         public async Task<TVector[]> SearchAndAnalyzePluginAsync(string nameCollection, string searchQuery, float[] searchEmbedding)
         {
