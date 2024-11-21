@@ -1,4 +1,5 @@
-﻿using HotelWise.Domain.Interfaces.IA;
+﻿using HotelWise.Domain.Dto;
+using HotelWise.Domain.Interfaces.IA;
 
 namespace HotelWise.Domain.Interfaces.SemanticKernel
 {
@@ -11,7 +12,7 @@ namespace HotelWise.Domain.Interfaces.SemanticKernel
 
         Task<bool> Exists(string nameCollection, ulong dataKey);
 
-        Task<TVector[]> VectorizedSearchAsync(string nameCollection, float[] searchEmbedding);
+        Task<TVector[]> VectorizedSearchAsync(string nameCollection, float[] searchEmbedding, SearchCriteria searchCriteria);
 
         Task<TVector[]> SearchAndAnalyzePluginAsync(string nameCollection, string searchQuery, float[] searchEmbedding);
         Task DeleteAsync(string nameCollection, long dataKey);

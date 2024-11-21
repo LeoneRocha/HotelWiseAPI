@@ -1,4 +1,5 @@
-﻿using HotelWise.Domain.Helpers;
+﻿using HotelWise.Domain.Dto;
+using HotelWise.Domain.Helpers;
 using HotelWise.Domain.Interfaces;
 using HotelWise.Domain.Interfaces.IA;
 using HotelWise.Domain.Interfaces.SemanticKernel;
@@ -79,19 +80,24 @@ namespace HotelWise.Domain.AI.Adapter
             return !EqualityComparer<TVector>.Default.Equals(retrievedHotel, default(TVector));
         }
 
-        public async Task<TVector[]> VectorizedSearchAsync(string nameCollection, float[] searchEmbedding)
+        public async Task<TVector[]> VectorizedSearchAsync(string nameCollection, float[] searchEmbedding, SearchCriteria searchCriteria)
         {
             await LoadCollection(nameCollection);
-            // Generate a vector for your search text, using your chosen embedding generation implementation.
-            // Just showing a placeholder method here for brevity.  
 
             var searchEmbeddingCriteria = EmbeddingHelper.ConvertToReadOnlyMemory(searchEmbedding);
+  
+            // Combina os filtros usando lógica OR
+            var combinedFilter = new VectorSearchFilter();
 
-            // Do the search.
+            foreach (var tagValue in searchCriteria.TagsCriteria)
+            {
+                combinedFilter.AnyTagEqualTo(nameof(IDataVector.Tags), tagValue);
+            }
+
+            // Realiza a busca
             var searchResult = await collection!.VectorizedSearchAsync(searchEmbeddingCriteria, new()
             {
-                //Top = 2,
-                //Filter = new VectorSearchFilter().AnyTagEqualTo(nameof(TVector.Tags), "classe:alta") // ENRIQUECANDO O DADO PARA TORNAR MAIS RELEVANT
+                Filter = combinedFilter // Aplica o filtro combinado
             });
 
             var dataSearchResult = searchResult.Results.ToBlockingEnumerable().ToArray();
@@ -104,10 +110,10 @@ namespace HotelWise.Domain.AI.Adapter
                 addVect.Score = item.Score.GetValueOrDefault();
                 dataVectors.Add(addVect);
             }
-            //// Inspect the returned hotels.
-            //HotelVector hotel = searchResult.First().Record;               
+
             return dataVectors.ToArray();
         }
+
 
         public async Task<TVector[]> SearchAndAnalyzePluginAsync(string nameCollection, string searchQuery, float[] searchEmbedding)
         {

@@ -5,5 +5,7 @@
         ulong DataKey { get; set; }
         ReadOnlyMemory<float> Embedding { get; set; }
         double Score { get; set; }
+
+        List<string> Tags { get; set; }
     }
 }

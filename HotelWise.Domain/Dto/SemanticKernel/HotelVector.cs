@@ -9,8 +9,6 @@ namespace HotelWise.Domain.Dto.SemanticKernel
 
         [VectorStoreRecordData(IsFullTextSearchable = true)]
         public string Description { get; set; } = string.Empty;
-          
-        [VectorStoreRecordData(IsFilterable = true)]
-        public List<string> Tags { get; set; } = new List<string>(); 
+           
     }
 }

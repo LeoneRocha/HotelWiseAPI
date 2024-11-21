@@ -18,5 +18,8 @@ namespace HotelWise.Domain.Dto.SemanticKernel
         [XmlIgnore]
         [JsonIgnore]
         public double Score { get; set; } = 0d;
+
+        [VectorStoreRecordData(IsFilterable = true)]
+        public List<string> Tags { get; set; } = new List<string>();
     } 
 }

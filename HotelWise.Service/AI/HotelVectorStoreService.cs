@@ -69,15 +69,15 @@ namespace HotelWise.Service.AI
             }
         }
 
-        public async Task<ServiceResponse<HotelVector[]>> VectorizedSearchAsync(string searchText)
+        public async Task<ServiceResponse<HotelVector[]>> VectorizedSearchAsync(SearchCriteria searchCriteria)
         {
             ServiceResponse<HotelVector[]> response = new ServiceResponse<HotelVector[]>();
             try
             {
                 //Get semantic search 
-                var embeddingSearchText = await _aIInferenceService.GenerateEmbeddingAsync(searchText, _eIAInferenceAdapterType);
+                var embeddingSearchText = await _aIInferenceService.GenerateEmbeddingAsync(searchCriteria.SearchTextCriteria, _eIAInferenceAdapterType);
 
-                var hotelsVector = await _adapter.VectorizedSearchAsync(nameCollection, embeddingSearchText);
+                var hotelsVector = await _adapter.VectorizedSearchAsync(nameCollection, embeddingSearchText, searchCriteria);
                 response.Success = true;
                 response.Data = hotelsVector;
             }
@@ -117,6 +117,6 @@ namespace HotelWise.Service.AI
             await _adapter.DeleteAsync(nameCollection, dataKey);
         }
 
-      
+
     }
 }

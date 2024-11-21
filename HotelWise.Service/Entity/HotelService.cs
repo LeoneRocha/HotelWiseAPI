@@ -286,7 +286,7 @@ namespace HotelWise.Service.Entity
 
         private async Task searchFromVector(SearchCriteria searchCriteria, ServiceResponse<HotelSemanticResult> response, HotelDto[]? allHotelsFromDb)
         {
-            var responseVector = await _hoteVectorStoreService.VectorizedSearchAsync(searchCriteria.SearchTextCriteria);
+            var responseVector = await _hoteVectorStoreService.VectorizedSearchAsync(searchCriteria);
             var hotelsVector = responseVector.Data;
             HotelDto[] listHotelsVector = changeHotelsVectorToHotelDtos(allHotelsFromDb, hotelsVector);
             response.Data!.HotelsVectorResult = listHotelsVector;
