@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Azure.ResourceManager.Resources.Models;
 using HotelWise.Domain.Dto;
 using HotelWise.Domain.Dto.SemanticKernel;
 using HotelWise.Domain.Helpers;
@@ -46,7 +47,7 @@ namespace HotelWise.Service.Entity
             ServiceResponse<HotelDto[]> response = new ServiceResponse<HotelDto[]>();
             try
             {
-                var hotels = await _hotelRepository.GetAll();
+                var hotels = await _hotelRepository.GetAll(); 
                 var hotelDtos = _mapper.Map<HotelDto[]>(hotels);
 
                 response.Data = hotelDtos.OrderBy(h => h.HotelName).ToArray();
@@ -138,6 +139,8 @@ namespace HotelWise.Service.Entity
                 hotel.ModifyDate = DataHelper.GetDateTimeNow();
                 #endregion Set default fields for bussines
 
+                handleTagsBeforeSave(hotel);
+
                 await _hotelRepository.AddAsync(hotel);
 
                 hotelDto = _mapper.Map<HotelDto>(hotel);
@@ -163,6 +166,9 @@ namespace HotelWise.Service.Entity
             {
                 var hotel = _mapper.Map<Hotel>(hotelDto);
 
+                //Padronizar tags
+                handleTagsBeforeSave(hotel);
+
                 #region Set default fields for bussines
                 hotel.ModifyUserId = UserId;
                 hotel.ModifyDate = DataHelper.GetDateTimeNow();
@@ -181,6 +187,11 @@ namespace HotelWise.Service.Entity
                 response.Errors.Add(new ErrorResponse() { Message = ex.Message });
             }
             return response;
+        }
+
+        private static void handleTagsBeforeSave(Hotel hotel)
+        {
+            hotel.Tags = hotel.Tags.Select(t => t.ToLower().Trim()).ToArray();
         }
 
         private async Task addOrUpdateDataVector(HotelDto hotelDto)
