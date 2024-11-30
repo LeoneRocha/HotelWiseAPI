@@ -1,4 +1,5 @@
-﻿using HotelWise.Domain.Dto;
+﻿using HotelWise.Domain.Constants;
+using HotelWise.Domain.Dto;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Identity.Web;
 using Microsoft.IdentityModel.Tokens;
@@ -12,13 +13,19 @@ namespace HotelWise.API.Configure
         {
             addSecurity(services, tokenConfigurations, configuration);
         }
+
         private static void addSecurity(IServiceCollection services, TokenConfigurationDto tokenConfigurations, IConfiguration configuration)
         {
+            var adScheme = AzureADEntraIDConstants.AzureAd;
+            var adSec = configuration.GetSection("AzureAd");
+
+            // Configura a autenticação JWT Bearer e Azure AD em uma única chamada
             services.AddAuthentication(options =>
             {
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
                 options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-            }).AddJwtBearer(options =>
+            })
+            .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
             {
                 options.TokenValidationParameters = new TokenValidationParameters
                 {
@@ -31,15 +38,23 @@ namespace HotelWise.API.Configure
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(tokenConfigurations.Secret))
                 };
             })
-            .AddMicrosoftIdentityWebApi(configuration, "AzureAd"); ;
-            services.AddAuthorizationCore(auth =>
+            .AddMicrosoftIdentityWebApi(adSec, adScheme);
+
+            // Configura a autorização
+            services.AddAuthorization(options =>
             {
-                auth.AddPolicy("Bearer", policyBuilder =>
+                options.AddPolicy("Bearer", policy =>
                 {
-                    policyBuilder.AddAuthenticationSchemes(JwtBearerDefaults.AuthenticationScheme)
-                        .RequireAuthenticatedUser();
+                    policy.AddAuthenticationSchemes(JwtBearerDefaults.AuthenticationScheme);
+                    policy.RequireAuthenticatedUser();
+                });
+
+                options.AddPolicy(adScheme, policy =>
+                {
+                    policy.AddAuthenticationSchemes(adScheme);
+                    policy.RequireAuthenticatedUser();
                 });
             });
-        }
+        } 
     }
 }
