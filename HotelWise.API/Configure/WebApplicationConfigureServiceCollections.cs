@@ -72,7 +72,7 @@ namespace HotelWise.API
             var tokenConfigurations = AddAndReturnTokenConfiguration(services, configuration);
 
             //Security API
-            ServiceCollectionConfigureSecurity.Configure(services, tokenConfigurations);
+            ServiceCollectionConfigureSecurity.Configure(services, tokenConfigurations, configuration);
 
         }
 

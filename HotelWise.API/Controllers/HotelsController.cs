@@ -36,6 +36,7 @@ namespace HotelWise.API.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> GetAll()
         {
+            setUserIdCurrent();
             var hotels = await _hotelService.GetAllHotelsAsync();
             return Ok(hotels);
         }
@@ -48,6 +49,7 @@ namespace HotelWise.API.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetById(long id)
         {
+            setUserIdCurrent();
             var hotel = await _hotelService.GetHotelByIdAsync(id);
             if (hotel == null)
             {
@@ -61,6 +63,7 @@ namespace HotelWise.API.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetAllTags()
         {
+            setUserIdCurrent();
             string[] tags = await _hotelService.GetAllTags();
             return Ok(tags);
         }
@@ -72,6 +75,7 @@ namespace HotelWise.API.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> AddVectorById(long id)
         {
+            setUserIdCurrent();
             var result = await _hotelService.InsertHotelInVectorStore(id);
             return Ok(result);
         }
@@ -81,6 +85,7 @@ namespace HotelWise.API.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Generate()
         {
+            setUserIdCurrent();
             var hotel = await _hotelService.GenerateHotelByIA();
             return Ok(hotel);
         }
@@ -88,6 +93,7 @@ namespace HotelWise.API.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> SemanticSearch([FromBody] SearchCriteria searchCriteria)
         {
+            setUserIdCurrent();
             var hotels = await _hotelService.SemanticSearch(searchCriteria);
             return Ok(hotels);
         }
@@ -130,6 +136,7 @@ namespace HotelWise.API.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> Delete(long id)
         {
+            setUserIdCurrent();
             var response = await _hotelService.DeleteHotelAsync(id);
             return Ok(response);
         }

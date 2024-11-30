@@ -1,5 +1,6 @@
 ﻿using HotelWise.Domain.Dto;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.Identity.Web;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
@@ -7,11 +8,11 @@ namespace HotelWise.API.Configure
 {
     public static class ServiceCollectionConfigureSecurity
     {
-        public static void Configure(IServiceCollection services, TokenConfigurationDto tokenConfigurations)
+        public static void Configure(IServiceCollection services, TokenConfigurationDto tokenConfigurations, IConfiguration configuration)
         {
-            addSecurity(services, tokenConfigurations);
+            addSecurity(services, tokenConfigurations, configuration);
         }
-        private static void addSecurity(IServiceCollection services, TokenConfigurationDto tokenConfigurations)
+        private static void addSecurity(IServiceCollection services, TokenConfigurationDto tokenConfigurations, IConfiguration configuration)
         {
             services.AddAuthentication(options =>
             {
@@ -29,7 +30,8 @@ namespace HotelWise.API.Configure
                     ValidAudience = tokenConfigurations.Audience,
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(tokenConfigurations.Secret))
                 };
-            });
+            })
+            .AddMicrosoftIdentityWebApi(configuration, "AzureAd"); ;
             services.AddAuthorizationCore(auth =>
             {
                 auth.AddPolicy("Bearer", policyBuilder =>

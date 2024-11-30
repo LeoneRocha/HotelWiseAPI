@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using Azure.ResourceManager.Resources.Models;
 using HotelWise.Domain.Dto;
 using HotelWise.Domain.Dto.SemanticKernel;
 using HotelWise.Domain.Helpers;
