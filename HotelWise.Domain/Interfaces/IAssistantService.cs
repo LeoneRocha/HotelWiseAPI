@@ -8,5 +8,6 @@ namespace HotelWise.Domain.Interfaces
         Task<float[]?> GenerateEmbeddingAsync(string text);
 
         Task<AskAssistantResponse[]> AskAssistant(SearchCriteria searchCriteria);
+        void SetUserId(long v);
     }
 }

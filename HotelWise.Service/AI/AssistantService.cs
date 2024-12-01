@@ -9,13 +9,17 @@ namespace HotelWise.Service.Entity
     {
         private readonly IAIInferenceService _aIInferenceService;
         private readonly EIAInferenceAdapterType _eIAInferenceAdapterType;
+        protected long UserId { get; private set; }
 
         public AssistantService(IAIInferenceService aIInferenceService)
         {
             _eIAInferenceAdapterType = EIAInferenceAdapterType.GroqApi;
             _aIInferenceService = aIInferenceService;
         }
-
+        public void SetUserId(long id)
+        {
+            UserId = id;
+        }
         public async Task<float[]?> GenerateEmbeddingAsync(string text)
         {
             return await _aIInferenceService.GenerateEmbeddingAsync(text, _eIAInferenceAdapterType);
@@ -47,6 +51,6 @@ namespace HotelWise.Service.Entity
 
             var result = await _aIInferenceService.GenerateChatCompletionAsync(messages, _eIAInferenceAdapterType);
             return [new AskAssistantResponse() { Response = result }];
-        }
+        } 
     }
 }
