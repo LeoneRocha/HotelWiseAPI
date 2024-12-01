@@ -38,20 +38,22 @@ namespace HotelWise.API.Configure
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(tokenConfigurations.Secret))
                 };
             })
-            .AddMicrosoftIdentityWebApi(adSec, adScheme);
+            .AddMicrosoftIdentityWebApi(adSec, "AzureAd");
 
             // Configura a autorização
             services.AddAuthorization(options =>
             {
                 options.AddPolicy("Bearer", policy =>
                 {
-                    policy.AddAuthenticationSchemes(JwtBearerDefaults.AuthenticationScheme);
+                    policy.AddAuthenticationSchemes(JwtBearerDefaults.AuthenticationScheme); 
+                    policy.AuthenticationSchemes.Add(JwtBearerDefaults.AuthenticationScheme); 
                     policy.RequireAuthenticatedUser();
                 });
 
-                options.AddPolicy(adScheme, policy =>
-                {
-                    policy.AddAuthenticationSchemes(adScheme);
+                options.AddPolicy("AzureAd", policy =>
+                {  
+                    policy.AddAuthenticationSchemes("AzureAd"); 
+                    policy.AuthenticationSchemes.Add("AzureAd");
                     policy.RequireAuthenticatedUser();
                 });
             });

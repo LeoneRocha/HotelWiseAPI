@@ -1,4 +1,5 @@
 ﻿using HotelWise.Data.Context;
+using HotelWise.Domain.CustomMiddleware;
 using HotelWise.Domain.Helpers;
 using Microsoft.AspNetCore.Rewrite;
 using Microsoft.EntityFrameworkCore;
@@ -54,6 +55,10 @@ namespace HotelWise.API.Configure
 
         public static void Configure(IApplicationBuilder app, IWebHostEnvironment env, IConfiguration configuration)
         {
+            app.UseMiddleware<RequestLoggingMiddleware>(); // Adicione esta linha
+
+            // Adiciona o middleware de logs de requisições integrado
+
             // Configure the HTTP request pipeline.
             if (env.IsDevelopment())
             {
@@ -92,6 +97,7 @@ namespace HotelWise.API.Configure
                 endpoints.MapControllerRoute("DefaultApi", "{controller=values}/{id?}");
             });
 
+      
         }
 
 
