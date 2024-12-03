@@ -19,44 +19,59 @@ namespace HotelWise.API.Configure
             var adScheme = AzureADEntraIDConstants.AzureAd;
             var adSec = configuration.GetSection("AzureAd");
 
-            // Configura a autenticação JWT Bearer e Azure AD em uma única chamada
+            //.AddMicrosoftIdentityWebApi(adSec, "AzureAd"); 
             services.AddAuthentication(options =>
             {
+                options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;                
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
                 options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-            })
-            .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
+            }).AddJwtBearer(options =>
             {
                 options.TokenValidationParameters = new TokenValidationParameters
                 {
                     ValidateIssuer = true,
                     ValidateAudience = true,
                     ValidateLifetime = true,
-                    ValidateIssuerSigningKey = true,
                     ValidIssuer = tokenConfigurations.Issuer,
                     ValidAudience = tokenConfigurations.Audience,
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(tokenConfigurations.Secret))
                 };
+                options.Events = new JwtBearerEvents
+                {
+                    OnAuthenticationFailed = context =>
+                    {
+                        var logger = context.HttpContext.RequestServices.GetRequiredService<Serilog.ILogger>();
+                        logger.Error("Authentication failed.", context.Exception);
+                        return Task.CompletedTask;
+                    },
+                    OnTokenValidated = context =>
+                    {
+                        var logger = context.HttpContext.RequestServices.GetRequiredService<Serilog.ILogger>();
+                        logger.Information("Token validated successfully.");
+                        return Task.CompletedTask;
+                    }
+                };
+
             })
-            .AddMicrosoftIdentityWebApi(adSec, "AzureAd");
+            .AddMicrosoftIdentityWebApi(adSec, "AzureAd"); //FUNCIONA SO COM ISSO 
 
             // Configura a autorização
             services.AddAuthorization(options =>
             {
                 options.AddPolicy("Bearer", policy =>
                 {
-                    policy.AddAuthenticationSchemes(JwtBearerDefaults.AuthenticationScheme); 
-                    policy.AuthenticationSchemes.Add(JwtBearerDefaults.AuthenticationScheme); 
+                    policy.AddAuthenticationSchemes(JwtBearerDefaults.AuthenticationScheme);
+                    policy.AuthenticationSchemes.Add(JwtBearerDefaults.AuthenticationScheme);
                     policy.RequireAuthenticatedUser();
                 });
 
                 options.AddPolicy("AzureAd", policy =>
-                {  
-                    policy.AddAuthenticationSchemes("AzureAd"); 
+                {
+                    policy.AddAuthenticationSchemes("AzureAd");
                     policy.AuthenticationSchemes.Add("AzureAd");
                     policy.RequireAuthenticatedUser();
                 });
             });
-        } 
+        }
     }
 }
