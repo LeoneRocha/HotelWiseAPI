@@ -19,13 +19,13 @@ namespace HotelWise.API.Configure
             var adScheme = AzureADEntraIDConstants.AzureAd;
             var adSec = configuration.GetSection("AzureAd");
 
-            //.AddMicrosoftIdentityWebApi(adSec, "AzureAd"); 
             services.AddAuthentication(options =>
             {
-                options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;                
+                options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
                 options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-            }).AddJwtBearer(options =>
+            })
+            .AddJwtBearer(options =>
             {
                 options.TokenValidationParameters = new TokenValidationParameters
                 {
@@ -41,21 +41,41 @@ namespace HotelWise.API.Configure
                     OnAuthenticationFailed = context =>
                     {
                         var logger = context.HttpContext.RequestServices.GetRequiredService<Serilog.ILogger>();
-                        logger.Error("Authentication failed.", context.Exception);
+                        logger.Error("JWT Authentication failed.", context.Exception);
                         return Task.CompletedTask;
                     },
                     OnTokenValidated = context =>
                     {
                         var logger = context.HttpContext.RequestServices.GetRequiredService<Serilog.ILogger>();
-                        logger.Information("Token validated successfully.");
+                        logger.Information("JWT Token validated successfully.");
                         return Task.CompletedTask;
                     }
                 };
-
             })
-            .AddMicrosoftIdentityWebApi(adSec, "AzureAd"); //FUNCIONA SO COM ISSO 
+            .AddMicrosoftIdentityWebApi(options =>
+            {
+                configuration.Bind("AzureAd", options);
+                options.Events = new JwtBearerEvents
+                {
+                    OnAuthenticationFailed = context =>
+                    {
+                        var logger = context.HttpContext.RequestServices.GetRequiredService<Serilog.ILogger>();
+                        logger.Error("AzureAD Authentication failed.", context.Exception);
+                        return Task.CompletedTask;
+                    },
+                    OnTokenValidated = context =>
+                    {
+                        var logger = context.HttpContext.RequestServices.GetRequiredService<Serilog.ILogger>();
+                        logger.Information("AzureAD Token validated successfully.");
+                        return Task.CompletedTask;
+                    }
+                };
+            }, options =>
+            {
+                configuration.Bind("AzureAd", options);
+                options.TokenValidationParameters.ValidAudiences = new[] { tokenConfigurations.Audience };
+            }, "AzureAd");
 
-            // Configura a autorização
             services.AddAuthorization(options =>
             {
                 options.AddPolicy("Bearer", policy =>
@@ -73,5 +93,6 @@ namespace HotelWise.API.Configure
                 });
             });
         }
+
     }
 }
