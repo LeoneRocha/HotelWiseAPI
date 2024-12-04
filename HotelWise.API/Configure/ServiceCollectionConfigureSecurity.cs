@@ -11,8 +11,8 @@ namespace HotelWise.API.Configure
     {
         public static void Configure(IServiceCollection services, TokenConfigurationDto tokenConfigurations, IConfiguration configuration)
         {
-            addSecurity(services, tokenConfigurations, configuration);
             //addSecuritySimple(services, tokenConfigurations, configuration);
+            addSecurity(services, tokenConfigurations, configuration);
         }
 
         private static void addSecuritySimple(IServiceCollection services, TokenConfigurationDto tokenConfigurations, IConfiguration configuration)
