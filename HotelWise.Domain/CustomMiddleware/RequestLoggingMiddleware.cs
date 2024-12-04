@@ -1,4 +1,5 @@
 ﻿
+using HotelWise.Domain.Helpers;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 
@@ -7,22 +8,22 @@ namespace HotelWise.Domain.CustomMiddleware
     public class RequestLoggingMiddleware
     {
         private readonly RequestDelegate _next;
-        private readonly ILogger<RequestLoggingMiddleware> _logger;
+        private readonly Serilog.ILogger _logger;
 
-        public RequestLoggingMiddleware(RequestDelegate next, ILogger<RequestLoggingMiddleware> logger)
+        public RequestLoggingMiddleware(RequestDelegate next, Serilog.ILogger logger)
         {
             _next = next;
-            _logger = logger;
+            _logger = logger; 
         }
 
         public async Task InvokeAsync(HttpContext context)
         {
-            var headers = context.Request.Headers;
+            var headers = context.Request.Headers.Where(x => x.Key.Contains("Authorization"));
 
             // Logando os cabeçalhos da requisição
             foreach (var header in headers)
             {
-                _logger.LogInformation($"{header.Key}: {header.Value}");
+                _logger.Information($"{header.Key}: {header.Value}");
             }
 
             // Chamando o próximo middleware na pipeline

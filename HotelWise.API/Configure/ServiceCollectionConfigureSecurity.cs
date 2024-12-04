@@ -12,6 +12,14 @@ namespace HotelWise.API.Configure
         public static void Configure(IServiceCollection services, TokenConfigurationDto tokenConfigurations, IConfiguration configuration)
         {
             addSecurity(services, tokenConfigurations, configuration);
+            //addSecuritySimple(services, tokenConfigurations, configuration);
+        }
+
+        private static void addSecuritySimple(IServiceCollection services, TokenConfigurationDto tokenConfigurations, IConfiguration configuration)
+        {
+            var adSec = configuration.GetSection("AzureAd");
+
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddMicrosoftIdentityWebApi(adSec); //FUNCIONA SO COM ISSO 
         }
 
         private static void addSecurity(IServiceCollection services, TokenConfigurationDto tokenConfigurations, IConfiguration configuration)
