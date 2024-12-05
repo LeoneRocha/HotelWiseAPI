@@ -12,7 +12,16 @@ namespace HotelWise.API.Configure
         public static void Configure(IServiceCollection services, TokenConfigurationDto tokenConfigurations, IConfiguration configuration)
         {
             //addSecuritySimple(services, tokenConfigurations, configuration);
-            addSecurity(services, tokenConfigurations, configuration);
+
+            //addSecurity(services, tokenConfigurations, configuration);
+            //https://learn.microsoft.com/en-us/samples/azure-samples/ms-identity-ciam-javascript-tutorial/ms-identity-ciam-javascript-tutorial-2-call-api-angular/
+        } 
+
+        private static void addSecuritySimpleJWT(IServiceCollection services, TokenConfigurationDto tokenConfigurations, IConfiguration configuration)
+        {
+            var adSec = configuration.GetSection("AzureAd");
+
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddMicrosoftIdentityWebApi(adSec); //FUNCIONA SO COM ISSO 
         }
 
         private static void addSecuritySimple(IServiceCollection services, TokenConfigurationDto tokenConfigurations, IConfiguration configuration)

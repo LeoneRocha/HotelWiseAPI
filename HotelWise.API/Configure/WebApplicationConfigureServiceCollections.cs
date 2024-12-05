@@ -69,7 +69,9 @@ namespace HotelWise.API
             SemanticKernelProviderConfigure.SetupSemanticKernelProvider(services, configuration);
             #endregion KERNEL
 
-            var tokenConfigurations = AddAndReturnTokenConfiguration(services, configuration);
+            var tokenConfigurations = ServiceCollectionConfigureAppSettings.AddAndReturnTokenConfiguration(services, configuration);
+
+            ServiceCollectionConfigureAppSettings.Configure(services, configuration);
 
             //Security API
             ServiceCollectionConfigureSecurity.Configure(services, tokenConfigurations, configuration);
@@ -113,22 +115,6 @@ namespace HotelWise.API
                     optionsMySQL.SchemaBehavior(MySqlSchemaBehavior.Ignore);
                 });
             }, ServiceLifetime.Transient, ServiceLifetime.Transient);
-        }
-
-        public static TokenConfigurationDto AddAndReturnTokenConfiguration(IServiceCollection services, IConfiguration _configuration)
-        {
-            var configValue = ConfigurationAppSettingsHelper.GetTokenConfigurations(_configuration);
-
-            var tokenConfigurations = new TokenConfigurationDto();
-
-            new ConfigureFromConfigurationOptions<TokenConfigurationDto>(configValue)
-             .Configure(tokenConfigurations);
-
-            services.AddSingleton<ITokenConfigurationDto>(tokenConfigurations);
-            services.AddSingleton(tokenConfigurations);
-
-            return tokenConfigurations;
-        }
-
+        } 
     }
 }

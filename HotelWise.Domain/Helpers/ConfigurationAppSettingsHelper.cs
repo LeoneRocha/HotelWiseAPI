@@ -51,5 +51,10 @@ namespace HotelWise.Domain.Helpers
         {
             return GetSectionApp(configuration, "TokenConfigurations");
         }
+
+        public static IConfiguration GetAzureAdConfig(IConfiguration configuration)
+        {
+            return GetSectionApp(configuration, "AzureAd");
+        }
     }
 }
