@@ -11,12 +11,10 @@ namespace HotelWise.Service.Configure
     public static class ServiceCollectionConfigureAppSettings
     {
         public static void Configure(IServiceCollection services, IConfiguration _configuration)
-        {
-            addAzureAdConfig(services, _configuration); 
+        { 
         }
 
-
-        private static void addAzureAdConfig(IServiceCollection services, IConfiguration configuration)
+        public static AzureAdConfig AddAndReturnAzureAdConfig(IServiceCollection services, IConfiguration configuration)
         {
             // Bind the PolicyConfig section of appsettings.json to the PolicyConfig class
             var appValue = new AzureAdConfig();
@@ -26,6 +24,8 @@ namespace HotelWise.Service.Configure
              .Configure(appValue);
             // Register the PolicyConfig instance as a singleton
             services.AddSingleton<IAzureAdConfig>(appValue);
+
+            return appValue;
         }
 
         public static TokenConfigurationDto AddAndReturnTokenConfiguration(IServiceCollection services, IConfiguration _configuration)

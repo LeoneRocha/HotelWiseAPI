@@ -71,10 +71,10 @@ namespace HotelWise.API
 
             var tokenConfigurations = ServiceCollectionConfigureAppSettings.AddAndReturnTokenConfiguration(services, configuration);
 
-            ServiceCollectionConfigureAppSettings.Configure(services, configuration);
+            var azureConfig  = ServiceCollectionConfigureAppSettings.AddAndReturnAzureAdConfig(services, configuration);
 
             //Security API
-            ServiceCollectionConfigureSecurity.Configure(services, tokenConfigurations, configuration);
+            ServiceCollectionConfigureSecurity.Configure(services, tokenConfigurations, configuration, azureConfig);
 
         }
 

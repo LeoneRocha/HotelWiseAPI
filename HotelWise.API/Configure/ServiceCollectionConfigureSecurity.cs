@@ -1,5 +1,6 @@
 ﻿using HotelWise.Domain.Constants;
 using HotelWise.Domain.Dto;
+using HotelWise.Domain.Dto.AppConfig;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Identity.Web;
 using Microsoft.IdentityModel.Tokens;
@@ -9,13 +10,13 @@ namespace HotelWise.API.Configure
 {
     public static class ServiceCollectionConfigureSecurity
     {
-        public static void Configure(IServiceCollection services, TokenConfigurationDto tokenConfigurations, IConfiguration configuration)
+        public static void Configure(IServiceCollection services, TokenConfigurationDto tokenConfigurations, IConfiguration configuration, AzureAdConfig azureConfig)
         {
             //addSecuritySimple(services, tokenConfigurations, configuration);
 
             //addSecurity(services, tokenConfigurations, configuration);
             //https://learn.microsoft.com/en-us/samples/azure-samples/ms-identity-ciam-javascript-tutorial/ms-identity-ciam-javascript-tutorial-2-call-api-angular/
-        } 
+        }
 
         private static void addSecuritySimpleJWT(IServiceCollection services, TokenConfigurationDto tokenConfigurations, IConfiguration configuration)
         {
