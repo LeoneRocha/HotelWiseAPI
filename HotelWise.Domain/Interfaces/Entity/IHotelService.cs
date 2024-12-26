@@ -7,11 +7,11 @@ namespace HotelWise.Domain.Interfaces.Entity
     {
         void SetUserId(long id);
         Task<ServiceResponse<bool>> InsertHotelInVectorStore(long id);
-        Task<ServiceResponse<bool>> AddHotelAsync(HotelDto hotel);
+        Task<ServiceResponse<bool>> AddHotelAsync(HotelDto hotelDto);
         Task<ServiceResponse<bool>> DeleteHotelAsync(long id);
         Task<ServiceResponse<HotelDto[]>> GetAllHotelsAsync();
         Task<ServiceResponse<HotelDto?>> GetHotelByIdAsync(long id);
-        Task<ServiceResponse<bool>> UpdateHotelAsync(HotelDto hotel);
+        Task<ServiceResponse<bool>> UpdateHotelAsync(HotelDto hotelDto);
         Task<ServiceResponse<HotelDto>> GenerateHotelByIA();
 
         Task<ServiceResponse<HotelSemanticResult>> SemanticSearch(SearchCriteria searchCriteria);

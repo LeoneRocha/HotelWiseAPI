@@ -1,5 +1,4 @@
-﻿using Azure;
-using HotelWise.Domain.Dto;
+﻿using HotelWise.Domain.Dto;
 using HotelWise.Domain.Dto.SemanticKernel;
 using HotelWise.Domain.Enuns;
 using HotelWise.Domain.Helpers;
@@ -13,11 +12,11 @@ namespace HotelWise.Service.AI
         private readonly IVectorStoreAdapter<HotelVector> _adapter;
         private readonly IAIInferenceService _aIInferenceService;
         private const string nameCollection = "skhotels";
-        private readonly EIAInferenceAdapterType _eIAInferenceAdapterType;
+        private readonly IAInferenceAdapterType _eIAInferenceAdapterType;
 
         public HotelVectorStoreService(IVectorStoreAdapterFactory adapterFactory, IAIInferenceService aIInferenceService)
         {
-            _eIAInferenceAdapterType = EIAInferenceAdapterType.Mistral;
+            _eIAInferenceAdapterType = IAInferenceAdapterType.Mistral;
 
             _adapter = adapterFactory.CreateAdapter<HotelVector>();
             _aIInferenceService = aIInferenceService;
@@ -39,20 +38,20 @@ namespace HotelWise.Service.AI
             return null;
         }
 
-        public async Task UpsertDataAsync(HotelVector hotelVector)
+        public async Task UpsertDataAsync(HotelVector entity)
         {
-            var embedding = await _aIInferenceService.GenerateEmbeddingAsync(hotelVector.Description, _eIAInferenceAdapterType);
+            var embedding = await _aIInferenceService.GenerateEmbeddingAsync(entity.Description, _eIAInferenceAdapterType);
 
-            hotelVector.Embedding = EmbeddingHelper.ConvertToReadOnlyMemory(embedding);
+            entity.Embedding = EmbeddingHelper.ConvertToReadOnlyMemory(embedding);
 
-            await _adapter.UpsertDataAsync(nameCollection, hotelVector);
+            await _adapter.UpsertDataAsync(nameCollection, entity);
         }
 
-        public async Task UpsertDatasAsync(HotelVector[] hotels)
+        public async Task UpsertDatasAsync(HotelVector[] listEntity)
         {
             var hotelVectors = new List<HotelVector>();
 
-            foreach (HotelVector hotel in hotels)
+            foreach (HotelVector hotel in listEntity)
             {
                 if (!await _adapter.Exists(nameCollection, hotel.DataKey))
                 {
@@ -83,9 +82,12 @@ namespace HotelWise.Service.AI
             }
             catch (Exception ex)
             {
+#pragma warning disable S6776
                 response.Success = false;
                 response.Message = ex.Message;
+                // NOSONAR
                 response.Errors = new List<ErrorResponse>() { new ErrorResponse() { Message = ex.Message }, new ErrorResponse() { Message = ex.StackTrace ?? string.Empty } };
+#pragma warning restore S6776
             }
             return response;
         }
@@ -105,9 +107,14 @@ namespace HotelWise.Service.AI
             }
             catch (Exception ex)
             {
+#pragma warning disable S6776
+                 
                 response.Success = false;
                 response.Message = ex.Message;
+                
+                // NOSONAR
                 response.Errors = new List<ErrorResponse>() { new ErrorResponse() { Message = ex.Message }, new ErrorResponse() { Message = ex.StackTrace ?? string.Empty } };
+#pragma warning restore S6776
             }
             return response;
         }

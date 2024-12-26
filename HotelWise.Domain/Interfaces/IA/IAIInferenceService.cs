@@ -5,8 +5,8 @@ namespace HotelWise.Domain.Interfaces.IA
 {
     public interface IAIInferenceService
     { 
-        Task<string> GenerateChatCompletionAsync(PromptMessageVO[] messages, EIAInferenceAdapterType eIAInferenceAdapterType);
+        Task<string> GenerateChatCompletionAsync(PromptMessageVO[] messages, IAInferenceAdapterType eIAInferenceAdapterType);
 
-        Task<float[]> GenerateEmbeddingAsync(string text, EIAInferenceAdapterType eIAInferenceAdapterType);
+        Task<float[]> GenerateEmbeddingAsync(string text, IAInferenceAdapterType eIAInferenceAdapterType);
     }
 }

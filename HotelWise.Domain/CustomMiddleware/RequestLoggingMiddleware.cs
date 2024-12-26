@@ -1,7 +1,4 @@
-﻿
-using HotelWise.Domain.Helpers;
-using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.AspNetCore.Http;
 
 namespace HotelWise.Domain.CustomMiddleware
 {
@@ -13,7 +10,7 @@ namespace HotelWise.Domain.CustomMiddleware
         public RequestLoggingMiddleware(RequestDelegate next, Serilog.ILogger logger)
         {
             _next = next;
-            _logger = logger; 
+            _logger = logger;
         }
 
         public async Task InvokeAsync(HttpContext context)
@@ -23,9 +20,8 @@ namespace HotelWise.Domain.CustomMiddleware
             // Logando os cabeçalhos da requisição
             foreach (var header in headers)
             {
-                _logger.Information($"{header.Key}: {header.Value}");
+                _logger.Information("header Key: {headerKey} -  header Value: {headerValue}", header.Key, header.Value);
             }
-
             // Chamando o próximo middleware na pipeline
             await _next(context);
         }

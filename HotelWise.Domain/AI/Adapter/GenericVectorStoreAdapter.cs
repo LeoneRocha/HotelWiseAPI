@@ -13,8 +13,7 @@ using System.Diagnostics;
 namespace HotelWise.Domain.AI.Adapter
 {
     public class GenericVectorStoreAdapter<TVector> : IVectorStoreAdapter<TVector> where TVector : IDataVector
-    {
-        private readonly IApplicationIAConfig _applicationConfig;
+    {    
         private readonly IVectorStore _vectorStore;
         private IVectorStoreRecordCollection<ulong, TVector>? collection;
         private readonly Kernel _kernel;
@@ -24,8 +23,7 @@ namespace HotelWise.Domain.AI.Adapter
             IApplicationIAConfig applicationConfig
             , IVectorStore vectorStore
             , Kernel kernel)
-        {
-            _applicationConfig = applicationConfig;
+        { 
             _vectorStore = vectorStore;
             _kernel = kernel;
             _logger = logger;
@@ -172,7 +170,9 @@ namespace HotelWise.Domain.AI.Adapter
             catch (Exception ex)
             {
                 _logger.Error(ex, "An error occurred in SearchPluginAsync at: {Message} at: {time}", ex.Message, DateTime.UtcNow);
+#pragma warning disable S2139
                 throw;
+#pragma warning restore S2139
             }
             return dataVectors.ToArray();
         }
@@ -227,7 +227,9 @@ namespace HotelWise.Domain.AI.Adapter
             catch (Exception ex)
             {
                 _logger.Error(ex, "An error occurred in InvokePrompt at: {Message} at: {time}", ex.Message, DateTime.UtcNow);
+#pragma warning disable S2139
                 throw;
+#pragma warning restore S2139
             }
         }
 
@@ -262,7 +264,9 @@ namespace HotelWise.Domain.AI.Adapter
             catch (Exception ex)
             {
                 _logger.Error(ex, "An error occurred in RenderPrompt at: {Message} at: {time}", ex.Message, DateTime.UtcNow);
+#pragma warning disable S2139
                 throw;
+#pragma warning restore S2139
             }
         }
 

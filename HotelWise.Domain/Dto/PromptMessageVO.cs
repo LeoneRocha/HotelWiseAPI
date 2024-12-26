@@ -5,7 +5,7 @@ namespace HotelWise.Domain.Dto
 {
     public class PromptMessageVO
     {
-        public RoleAiPromptsEnum RoleType { get; set; }
+        public RoleAiPromptsType RoleType { get; set; }
 
         public string Role => RoleType.GetDescription();
 

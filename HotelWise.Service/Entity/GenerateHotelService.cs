@@ -111,9 +111,9 @@ namespace HotelWise.Service.Entity
 
         private async Task<string> GenerateDescriptionAndTags(string prompt)
         {
-            PromptMessageVO[] messages = [new PromptMessageVO() { RoleType = Domain.Enuns.RoleAiPromptsEnum.User, Content = prompt }];
+            PromptMessageVO[] messages = [new PromptMessageVO() { RoleType = Domain.Enuns.RoleAiPromptsType.User, Content = prompt }];
 
-            return await _aIInferenceService.GenerateChatCompletionAsync(messages, Domain.Enuns.EIAInferenceAdapterType.GroqApi);
+            return await _aIInferenceService.GenerateChatCompletionAsync(messages, Domain.Enuns.IAInferenceAdapterType.GroqApi);
         }
 
         public static string[] ProcessTags(string[] tags)

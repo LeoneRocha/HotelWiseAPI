@@ -16,11 +16,6 @@
         public string RefreshToken { get; set; } = string.Empty;
         public DateTime? RefreshTokenExpiryTime { get; set; }
         #endregion Columns 
-
-        #region Relationship  
-
-        //public UserTokenSession? TokenSession { get; set; }
-
-        #endregion Relationship
+         
     }
 }

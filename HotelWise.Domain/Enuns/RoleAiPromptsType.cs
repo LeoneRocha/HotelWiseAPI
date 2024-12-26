@@ -3,7 +3,7 @@ using System.Text.Json.Serialization;
 
 namespace HotelWise.Domain.Enuns
 {
-    public enum RoleAiPromptsEnum
+    public enum RoleAiPromptsType
     {  
         [JsonPropertyName("system")]
         [Description("system")]

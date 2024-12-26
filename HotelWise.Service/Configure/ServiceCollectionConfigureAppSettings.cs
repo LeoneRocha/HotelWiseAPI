@@ -9,11 +9,7 @@ using Microsoft.Extensions.Options;
 namespace HotelWise.Service.Configure
 {
     public static class ServiceCollectionConfigureAppSettings
-    {
-        public static void Configure(IServiceCollection services, IConfiguration _configuration)
-        { 
-        }
-
+    { 
         public static AzureAdConfig AddAndReturnAzureAdConfig(IServiceCollection services, IConfiguration configuration)
         {
             // Bind the PolicyConfig section of appsettings.json to the PolicyConfig class
@@ -42,10 +38,5 @@ namespace HotelWise.Service.Configure
 
             return tokenConfigurations;
         }
-
-     
-      
-
-        
     }
 }

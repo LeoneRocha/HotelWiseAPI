@@ -21,7 +21,6 @@ namespace HotelWise.Service.Entity
 
         protected long UserId { get; private set; }
 
-
         public HotelService(
             Serilog.ILogger logger
             , IMapper mapper
@@ -46,7 +45,7 @@ namespace HotelWise.Service.Entity
             ServiceResponse<HotelDto[]> response = new ServiceResponse<HotelDto[]>();
             try
             {
-                var hotels = await _hotelRepository.GetAll(); 
+                var hotels = await _hotelRepository.GetAll();
                 var hotelDtos = _mapper.Map<HotelDto[]>(hotels);
 
                 response.Data = hotelDtos.OrderBy(h => h.HotelName).ToArray();
@@ -314,7 +313,7 @@ namespace HotelWise.Service.Entity
             response.Message = responseIAInterference.Message;
         }
 
-        private HotelDto[] changeHotelsVectorToHotelDtos(HotelDto[]? allHotelsFromDb, HotelVector[]? hotelsVector)
+        private static HotelDto[] changeHotelsVectorToHotelDtos(HotelDto[]? allHotelsFromDb, HotelVector[]? hotelsVector)
         {
             // Mapear para novo objeto e retonar novo objeto TODO:
             var resultHotels = new List<HotelDto>();
@@ -351,17 +350,7 @@ namespace HotelWise.Service.Entity
             return [];
         }
 
-        private HotelVector[] convertHotelsToVector(HotelDto[] allHotels)
-        {
-            List<HotelVector> hotelsVectorStore = new List<HotelVector>();
-            foreach (var hotel in allHotels)
-            {
-                hotelsVectorStore.Add(convertHotelToVector(hotel));
-            }
-            return hotelsVectorStore.ToArray();
-        }
-
-        private HotelVector convertHotelToVector(HotelDto hotel)
+        private static HotelVector convertHotelToVector(HotelDto hotel)
         {
             return new HotelVector()
             {
@@ -395,8 +384,8 @@ namespace HotelWise.Service.Entity
                 });
 
                 foreach (var tagsbag in allTagsConcurrentBag)
-                { 
-                    tagsResult.AddRange(tagsbag); 
+                {
+                    tagsResult.AddRange(tagsbag);
                 }
                 var result = tagsResult.Distinct().OrderBy(tag => tag).ToList();
                 tagsResult = result.ToList();

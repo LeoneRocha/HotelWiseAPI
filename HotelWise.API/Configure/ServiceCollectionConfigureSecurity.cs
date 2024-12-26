@@ -2,7 +2,6 @@
 using HotelWise.Domain.Dto;
 using HotelWise.Domain.Dto.AppConfig;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.Extensions.Options;
 using Microsoft.Identity.Web;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;

@@ -14,16 +14,21 @@ namespace HotelWise.Data.Repository
         {
             _context = context;
             _options = options;
+
+            if (context == null)
+            {
+                _context = CreateContext();
+            }
         }
 
         private HotelWiseDbContextMysql CreateContext()
         {
             return new HotelWiseDbContextMysql(_options);
-        } 
+        }
         public async Task<User?> FindByEmail(string value)
         {
             User? userResult = await _context.Users
-                .AsNoTracking()  
+                .AsNoTracking()
                 .FirstOrDefaultAsync(p => p.Email.ToLower().Trim().Equals(value.ToLower().Trim()));
 
             return userResult;
@@ -32,7 +37,7 @@ namespace HotelWise.Data.Repository
         public async Task<User?> FindByLogin(string login)
         {
             User? userResult = await _context.Users
-                .AsNoTracking()  
+                .AsNoTracking()
                 .FirstOrDefaultAsync(p => p.Login.ToLower().Trim().Equals(login.ToLower().Trim()));
 
             return userResult;
