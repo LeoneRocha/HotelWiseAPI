@@ -7,14 +7,12 @@ using Mistral.SDK.DTOs;
 namespace HotelWise.Domain.AI.Adapter
 {
     public class MistralApiAdapter : IAIInferenceAdapter
-    {
-        private readonly IApplicationIAConfig _applicationConfig;
+    { 
         private readonly MistralClient _client;
 
         public MistralApiAdapter(IApplicationIAConfig applicationConfig)
-        {
-            _applicationConfig = applicationConfig;
-            _client = new MistralClient(_applicationConfig.MistralApiConfig.ApiKey);
+        { 
+            _client = new MistralClient(applicationConfig.MistralApiConfig.ApiKey);
         }
         public async Task<string> GenerateChatCompletionAsync(PromptMessageVO[] messages)
         {

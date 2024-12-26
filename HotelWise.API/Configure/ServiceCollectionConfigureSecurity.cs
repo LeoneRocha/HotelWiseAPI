@@ -10,6 +10,8 @@ namespace HotelWise.API.Configure
 {
     public static class ServiceCollectionConfigureSecurity
     {
+        private const string AzureAdSchemeName = "AzureAd";
+
         public static void Configure(IServiceCollection services, TokenConfigurationDto tokenConfigurations, IConfiguration configuration, AzureAdConfig azureConfig)
         {
             addSecurity(services, tokenConfigurations, configuration);
@@ -17,16 +19,16 @@ namespace HotelWise.API.Configure
             ///addSecuritySimpleJWT1(services, tokenConfigurations, configuration, azureConfig);
             //https://learn.microsoft.com/en-us/samples/azure-samples/ms-identity-ciam-javascript-tutorial/ms-identity-ciam-javascript-tutorial-2-call-api-angular/
         }
-        private static void addSecuritySimpleJWT1(IServiceCollection services, TokenConfigurationDto tokenConfigurations, IConfiguration configuration, AzureAdConfig azureConfig)
+        private static void addSecuritySimpleJWT1(IServiceCollection services, AzureAdConfig azureConfig)
         {
             services.AddAuthentication(options =>
             {
 
-                options.DefaultScheme = "AzureAd";
-                options.DefaultAuthenticateScheme = "AzureAd";
-                options.DefaultChallengeScheme = "AzureAd";
+                options.DefaultScheme = AzureAdSchemeName;
+                options.DefaultAuthenticateScheme = AzureAdSchemeName;
+                options.DefaultChallengeScheme = AzureAdSchemeName;
             })
-                .AddJwtBearer("AzureAd", options =>
+                .AddJwtBearer(AzureAdSchemeName, options =>
                 {
                     options.Authority = $"https://login.microsoftonline.com/{azureConfig.TenantId}";
                     options.Audience = azureConfig.ClientId; // Ou "api://YOUR_API_ID"
@@ -56,15 +58,15 @@ namespace HotelWise.API.Configure
                 });
             services.AddAuthorization(options =>
             {
-                options.AddPolicy("AzureAd", policy =>
+                options.AddPolicy(AzureAdSchemeName, policy =>
                 {
                     policy.RequireAuthenticatedUser();
-                    policy.AddAuthenticationSchemes("AzureAd");
+                    policy.AddAuthenticationSchemes(AzureAdSchemeName);
                 });
             });
         }
 
-        private static void addSecuritySimpleJWT(IServiceCollection services, TokenConfigurationDto tokenConfigurations, IConfiguration configuration, AzureAdConfig azureConfig)
+        private static void addSecuritySimpleJWT(IServiceCollection services, AzureAdConfig azureConfig)
         {
             //Funcionou
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -106,7 +108,7 @@ namespace HotelWise.API.Configure
             });
         }
 
-        private static void addSecuritySimpleJWT2(IServiceCollection services, TokenConfigurationDto tokenConfigurations, IConfiguration configuration, AzureAdConfig azureConfig)
+        private static void addSecuritySimpleJWT2(IServiceCollection services, TokenConfigurationDto tokenConfigurations, AzureAdConfig azureConfig)
         {
             services.AddAuthentication(options =>
             {
@@ -141,7 +143,7 @@ namespace HotelWise.API.Configure
                    }
                };
            })
-           .AddJwtBearer("AzureAd", options =>
+           .AddJwtBearer(AzureAdSchemeName, options =>
            {
                options.Authority = $"https://login.microsoftonline.com/{azureConfig.TenantId}";
                options.Audience = azureConfig.ClientId; // Ou "api://YOUR_API_ID"
@@ -179,24 +181,21 @@ namespace HotelWise.API.Configure
 
                 options.AddPolicy("AzureAdPolicy", policy =>
                 {
-                    policy.AddAuthenticationSchemes("AzureAd");
+                    policy.AddAuthenticationSchemes(AzureAdSchemeName);
                     policy.RequireAuthenticatedUser();
                 });
             });
         }
 
-        private static void addSecuritySimple(IServiceCollection services, TokenConfigurationDto tokenConfigurations, IConfiguration configuration)
+        private static void addSecuritySimple(IServiceCollection services, IConfiguration configuration)
         {
-            var adSec = configuration.GetSection("AzureAd");
+            var adSec = configuration.GetSection(AzureAdSchemeName);
 
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddMicrosoftIdentityWebApi(adSec); //FUNCIONA SO COM ISSO 
         }
 
         private static void addSecurity(IServiceCollection services, TokenConfigurationDto tokenConfigurations, IConfiguration configuration)
-        {
-            var adScheme = AzureADEntraIDConstants.AzureAd;
-            var adSec = configuration.GetSection("AzureAd");
-
+        {    
             services.AddAuthentication(options =>
             {
                 options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -232,7 +231,7 @@ namespace HotelWise.API.Configure
             })
             .AddMicrosoftIdentityWebApi(options =>
             {
-                configuration.Bind("AzureAd", options);
+                configuration.Bind(AzureAdSchemeName, options);
                 options.Events = new JwtBearerEvents
                 {
                     OnAuthenticationFailed = context =>
@@ -250,9 +249,9 @@ namespace HotelWise.API.Configure
                 };
             }, options =>
             {
-                configuration.Bind("AzureAd", options);
+                configuration.Bind(AzureAdSchemeName, options);
                 options.TokenValidationParameters.ValidAudiences = new[] { tokenConfigurations.Audience };
-            }, "AzureAd");
+            }, AzureAdSchemeName);
 
             services.AddAuthorization(options =>
             {
@@ -263,14 +262,13 @@ namespace HotelWise.API.Configure
                     policy.RequireAuthenticatedUser();
                 });
 
-                options.AddPolicy("AzureAd", policy =>
+                options.AddPolicy(AzureAdSchemeName, policy =>
                 {
-                    policy.AddAuthenticationSchemes("AzureAd");
-                    policy.AuthenticationSchemes.Add("AzureAd");
+                    policy.AddAuthenticationSchemes(AzureAdSchemeName);
+                    policy.AuthenticationSchemes.Add(AzureAdSchemeName);
                     policy.RequireAuthenticatedUser();
                 });
             });
         }
-
     }
 }

@@ -133,7 +133,7 @@ namespace HotelWise.Domain.AI.Adapter
             {
                 var stopwatch = new Stopwatch();
                 stopwatch.Start();
-                _logger.Information("SearchPluginAsync: {time}", DateTime.UtcNow);
+                insertLogStarterSearchPluginAsync();
                 await LoadCollection(nameCollection);
 
 #pragma warning disable SKEXP0001
@@ -149,7 +149,7 @@ namespace HotelWise.Domain.AI.Adapter
 
                 var results = await GetVectorsResults(searchEmbedding);
 
-                _logger.Information("VectorizedSearchAsync : {dataSearchResult}", results.DataSearchResult);
+                insertLogVectorizedSearchAsync(results);
 
                 KernelArguments arguments = CreateArgments(searchQuery, results.SearchResult);
 
@@ -175,6 +175,16 @@ namespace HotelWise.Domain.AI.Adapter
 #pragma warning restore S2139
             }
             return dataVectors.ToArray();
+        }
+
+        private void insertLogVectorizedSearchAsync((VectorSearchResults<TVector> SearchResult, VectorSearchResult<TVector>[] DataSearchResult) results)
+        {
+            _logger.Information("VectorizedSearchAsync : {dataSearchResult}", results.DataSearchResult);
+        }
+
+        private void insertLogStarterSearchPluginAsync()
+        {
+            _logger.Information("SearchPluginAsync: {time}", DateTime.UtcNow);
         }
 
         private static string CreateTemplate(string pluginName)
