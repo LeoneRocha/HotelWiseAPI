@@ -1,5 +1,4 @@
 ﻿using HotelWise.API.Configure;
-using HotelWise.Domain.Dto.AppConfig;
 using HotelWise.Service.Configure;
 using Microsoft.Net.Http.Headers;
 using Microsoft.OpenApi.Models;
@@ -11,9 +10,7 @@ namespace HotelWise.API
     {
         public static void Configure(IServiceCollection services, IConfiguration configuration, Serilog.Core.Logger _logger)
         {
-
-            configureCors(services);
-
+            ServiceCollectionConfigureCors.Configure(services);
 
             services.AddSwaggerGen(c =>
             {
@@ -44,36 +41,14 @@ namespace HotelWise.API
                 .AddDataAnnotationsLocalization()
                 .AddXmlSerializerFormatters();
 
-             
             services.AddLogging();
 
             ServiceCollectionAddAllDependencies.Configure(services, _logger, configuration);
 
             //Security API
             var tokenConfigurations = ServiceCollectionConfigureAppSettings.AddAndReturnTokenConfiguration(services, configuration);
-            var azureConfig = ServiceCollectionConfigureAppSettings.AddAndReturnAzureAdConfig(services, configuration);            
+            var azureConfig = ServiceCollectionConfigureAppSettings.AddAndReturnAzureAdConfig(services, configuration);
             ServiceCollectionConfigureSecurity.Configure(services, tokenConfigurations, configuration, azureConfig);
         }
-
-        private static void configureCors(IServiceCollection services)
-        {
-#pragma warning disable S5122 // Disabling Sonar warning for CORS
-            services.AddCors(options => options.AddDefaultPolicy(builder =>
-            {
-                builder.AllowAnyOrigin()
-                .AllowAnyMethod()
-                .AllowAnyHeader()
-                .WithExposedHeaders("Content-Disposition");
-            }));
-
-            services.AddCors(options =>
-            {
-                options.AddPolicy("AllowAnyOrigin",
-                    builder => builder.AllowAnyOrigin()
-                    .AllowAnyMethod()
-                    .AllowAnyHeader());
-            });
-#pragma warning restore S5122
-        } 
     }
 }

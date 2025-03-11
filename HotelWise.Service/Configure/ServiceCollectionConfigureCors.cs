@@ -10,7 +10,7 @@ namespace HotelWise.Service.Configure
         }
         private static void addCors(IServiceCollection services)
         {
-#pragma warning disable S5122 // Disabling Sonar warning for CORS
+#pragma warning disable S5122 // Disabling Sonar warning for CORS 
             services.AddCors(options => options.AddDefaultPolicy(builder =>
             {
                 builder.AllowAnyOrigin()
@@ -18,7 +18,15 @@ namespace HotelWise.Service.Configure
                 .AllowAnyHeader()
                 .WithExposedHeaders("Content-Disposition");
             }));
-#pragma warning restore S5122
+
+            services.AddCors(options =>
+            {
+                options.AddPolicy("AllowAnyOrigin",
+                    builder => builder.AllowAnyOrigin()
+                    .AllowAnyMethod()
+                    .AllowAnyHeader());
+            });
+#pragma warning restore S5122 
 
         }
     }
