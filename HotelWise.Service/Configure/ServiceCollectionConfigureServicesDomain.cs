@@ -19,9 +19,12 @@ namespace HotelWise.Service.Configure
 
             addCollectionDependencies(services);
 
-            ConfigureServicesAI.ConfigureServices(services);
+            ServicesDomainRepository.AddDependenciesManually(services);
 
             ServicesDomainService.AddDependenciesManually(services);
+
+
+            ConfigureServicesAI.ConfigureServices(services);
              
             #region KERNEL  
             SemanticKernelProviderConfigure.SetupSemanticKernelProvider(services, _configuration);
@@ -30,7 +33,7 @@ namespace HotelWise.Service.Configure
             //Validators
             services.AddValidatorsFromAssemblyContaining<HotelValidator>();
 
-            ServicesDomainRepository.AddDependencies(services);
+            ServicesDomainRepository.AddDependenciesAuto(services);
             ServicesDomainService.AddDependenciesAuto(services);
         }
         private static void addCollectionDependencies(IServiceCollection services)

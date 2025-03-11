@@ -10,18 +10,13 @@ namespace HotelWise.Service.Configure
     {
         private const string RepositorySuffix = "Repository";
 
-        public static void AddDependencies(IServiceCollection services)
+        public static void AddDependenciesManually(IServiceCollection services)
         {
-            RegisterManuallyAddedServices(services);
-            RegisterRepositories(services);
+            services.AddScoped<IHotelRepository, HotelRepository>(); 
+            services.AddScoped<IUserRepository, UserRepository>();
         }
 
-        private static void RegisterManuallyAddedServices(IServiceCollection services)
-        {
-             // services.AddScoped<IHotelRepository, HotelRepository>(); 
-        }
-
-        private static void RegisterRepositories(IServiceCollection services)
+        public static void AddDependenciesAuto(IServiceCollection services)
         {
             var assemblies = new[]
             {
@@ -33,7 +28,7 @@ namespace HotelWise.Service.Configure
             var ignoredInterfaces = new List<Type>
             {
                 typeof(IHotelRepository),
-                typeof(IUserRepository), 
+                typeof(IUserRepository),
             };
 
             ServiceCollectionHelper.RegisterInterfaces(services, [RepositorySuffix], ignoredInterfaces, assemblies);

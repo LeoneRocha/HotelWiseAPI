@@ -1,5 +1,7 @@
 ﻿using HotelWise.Domain.Helpers;
 using HotelWise.Domain.Interfaces;
+using HotelWise.Domain.Interfaces.Entity;
+using HotelWise.Service.Entity;
 using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
 
@@ -19,7 +21,8 @@ namespace HotelWise.Service.Configure
         }
         private static void RegisterManuallyAddedServices(IServiceCollection services)
         {
-           //services.AddScoped<ICacheService, CacheService>(); 
+            services.AddScoped<IUserService, UserService>();
+            services.AddScoped<IHotelService, HotelService>();
         }
         private static void RegisterServices(IServiceCollection services)
         {
@@ -31,8 +34,10 @@ namespace HotelWise.Service.Configure
             };
 
             var ignoredInterfaces = new List<Type>
-            { 
-                typeof(ITokenService),  
+            {
+                typeof(ITokenService),
+                typeof(IHotelService),
+                typeof(IUserService),
             };
             ignoredInterfaces.AddRange(ServiceCollectionHelper.GetRegisteredInterfaces(services));
 
