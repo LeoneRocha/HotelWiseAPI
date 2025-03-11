@@ -2,6 +2,8 @@
 using HotelWise.Domain.Dto.SemanticKernel;
 using HotelWise.Domain.Helpers;
 using HotelWise.Domain.Interfaces;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.VectorData;
 using Microsoft.SemanticKernel;
@@ -9,7 +11,7 @@ using Microsoft.SemanticKernel.ChatCompletion;
 using Microsoft.SemanticKernel.Connectors.Qdrant;
 using Microsoft.SemanticKernel.Embeddings;
 
-namespace HotelWise.API
+namespace HotelWise.Service.Configure
 {
     public static class SemanticKernelProviderConfigure
     {

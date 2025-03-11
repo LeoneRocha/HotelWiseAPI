@@ -1,15 +1,8 @@
 ﻿using HotelWise.API.Configure;
-using HotelWise.Data.Context;
-using HotelWise.Domain.Dto;
-using HotelWise.Domain.Helpers;
-using HotelWise.Domain.Interfaces;
+using HotelWise.Domain.Dto.AppConfig;
 using HotelWise.Service.Configure;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection.Extensions;
-using Microsoft.Extensions.Options;
 using Microsoft.Net.Http.Headers;
 using Microsoft.OpenApi.Models;
-using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
 using Swashbuckle.AspNetCore.Filters;
 
 namespace HotelWise.API
@@ -51,31 +44,15 @@ namespace HotelWise.API
                 .AddDataAnnotationsLocalization()
                 .AddXmlSerializerFormatters();
 
-
-
+             
             services.AddLogging();
-            services.AddSingleton<Serilog.ILogger>(sp =>
-            {
-                return _logger;
-            });
 
-            services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
-             
-            ConfigureServicesAI.ConfigureServices(services);
-             
-            addORM(services, configuration);
-
-            #region KERNEL  
-            SemanticKernelProviderConfigure.SetupSemanticKernelProvider(services, configuration);
-            #endregion KERNEL
-
-            var tokenConfigurations = ServiceCollectionConfigureAppSettings.AddAndReturnTokenConfiguration(services, configuration);
-
-            var azureConfig  = ServiceCollectionConfigureAppSettings.AddAndReturnAzureAdConfig(services, configuration);
+            ServiceCollectionAddAllDependencies.Configure(services, _logger, configuration);
 
             //Security API
+            var tokenConfigurations = ServiceCollectionConfigureAppSettings.AddAndReturnTokenConfiguration(services, configuration);
+            var azureConfig = ServiceCollectionConfigureAppSettings.AddAndReturnAzureAdConfig(services, configuration);            
             ServiceCollectionConfigureSecurity.Configure(services, tokenConfigurations, configuration, azureConfig);
-
         }
 
         private static void configureCors(IServiceCollection services)
@@ -97,24 +74,6 @@ namespace HotelWise.API
                     .AllowAnyHeader());
             });
 #pragma warning restore S5122
-        }
-
-        private static void addORM(IServiceCollection services, IConfiguration configuration)
-        {
-            var connection = ConfigurationAppSettingsHelper.GetConnectionStringMySQL(configuration);
-
-            services.AddPooledDbContextFactory<HotelWiseDbContextMysql>(options => options.UseMySql(connection, new MySqlServerVersion(new Version(8, 0, 21))));
-
-
-            services.AddDbContext<HotelWiseDbContextMysql>((serviceProvider, optionsBuilder) =>
-            {
-                optionsBuilder.UseMySql(connection, ServerVersion.AutoDetect(connection),
-                optionsMySQL =>
-                {
-                    optionsMySQL.MigrationsAssembly("HotelWise.Data");
-                    optionsMySQL.SchemaBehavior(MySqlSchemaBehavior.Ignore);
-                });
-            }, ServiceLifetime.Transient, ServiceLifetime.Transient);
         } 
     }
 }

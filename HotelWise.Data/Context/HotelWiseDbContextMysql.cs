@@ -1,4 +1,4 @@
-﻿using HotelWise.Data.Context.Configure;
+﻿using HotelWise.Data.Context.Configure.Helper;
 using HotelWise.Domain.Model;
 using Microsoft.EntityFrameworkCore;
 
@@ -12,9 +12,9 @@ namespace HotelWise.Data.Context
         public HotelWiseDbContextMysql(DbContextOptions<HotelWiseDbContextMysql> options) : base(options) { }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
-        { 
+        {
             //Configure FLUENT API 
-            ConfigurationEntitiesHelper.AddConfigurationEntities(modelBuilder );
+            ConfigurationEntitiesHelper.AddConfigurationEntitiesManually(modelBuilder); ConfigurationEntitiesHelper.AddConfigurationEntities(modelBuilder);
         }
     }
 }

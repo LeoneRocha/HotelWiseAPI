@@ -1,4 +1,5 @@
-﻿using HotelWise.Data.Context.Configure.Mock;
+﻿using HotelWise.Data.Context.Configure.Helper;
+using HotelWise.Data.Context.Configure.Mock;
 using HotelWise.Domain.Constants;
 using HotelWise.Domain.Model;
 using Microsoft.EntityFrameworkCore;

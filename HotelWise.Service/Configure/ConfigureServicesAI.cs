@@ -18,8 +18,7 @@ namespace HotelWise.Service.Configure
         public static void ConfigureServices(IServiceCollection services)
         {
             services.AddScoped<IHotelRepository, HotelRepository>();
-            services.AddScoped<IHotelService, HotelService>();
-            services.AddValidatorsFromAssemblyContaining<HotelValidator>();
+            services.AddScoped<IHotelService, HotelService>(); 
 
             services.AddScoped<IAIInferenceAdapterFactory, AIInferenceAdapterFactory>();
             services.AddScoped<IAIInferenceService, AIInferenceService>();
@@ -30,9 +29,7 @@ namespace HotelWise.Service.Configure
             services.AddScoped<IVectorStoreService<HotelVector>, HotelVectorStoreService>();
 
             services.AddScoped<IAssistantService, AssistantService>();
-
-            //AutoMapper
-            ServiceCollectionConfigureAutoMapper.Configure(services);
+              
 
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IUserService, UserService>(); 
