@@ -5,61 +5,77 @@ using HotelWise.Domain.Helpers;
 using HotelWise.Domain.Interfaces;
 using HotelWise.Domain.Interfaces.Entity;
 using HotelWise.Domain.Model;
+using HotelWise.Service.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 
 namespace HotelWise.Service.Entity
 {
-    public class UserService : IUserService
+    public class UserService : GenericServiceBase<User, UserLoginDto>, IUserService
     {
-        private readonly IMapper _mapper;
-        private readonly IUserRepository _entityRepository;
         private readonly ITokenService _tokenService;
         private readonly ITokenConfigurationDto _configurationToken;
-         
-        public UserService(IUserRepository entityRepository, IMapper mapper, ITokenService tokenService, ITokenConfigurationDto configurationToken)
+
+        private readonly IUserRepository _userRepository;
+
+        public UserService(
+              Serilog.ILogger logger,
+            IUserRepository repository,
+            IMapper mapper,
+            ITokenService tokenService,
+            ITokenConfigurationDto configurationToken
+        ) : base(repository, mapper, logger)
         {
-            _entityRepository = entityRepository;
-            _mapper = mapper;
             _tokenService = tokenService;
             _configurationToken = configurationToken;
+            _userRepository = repository;
         }
 
         public async Task<ServiceResponse<GetUserAuthenticatedDto>> Login(string login, string password)
         {
             var response = new ServiceResponse<GetUserAuthenticatedDto>();
 
-            var user = await _entityRepository.FindByLogin(login);
+            // Busca o usuário no repositório
+            var user = await _userRepository.FindByLogin(login);
             if (user == null)
             {
                 response.Success = false;
                 response.Message = ValidatorConstants.Validade_UserNotFound;
                 return response;
             }
-            else if (!SecurityHelper.VerifyPasswordHash(password, user.PasswordHash, user.PasswordSalt))
+
+            // Verifica a senha
+            if (!SecurityHelper.VerifyPasswordHash(password, user.PasswordHash, user.PasswordSalt))
             {
                 response.Success = false;
                 response.Message = "Wrong password.";
                 return response;
             }
 
-            response.Data = await executeLoginJwt(user);
-
+            // Gera o token e preenche a resposta
+            response.Data = await ExecuteLoginJwt(user);
             response.Success = true;
-            response.Message = "User Logged.";
+            response.Message = "User logged in successfully.";
             return response;
         }
-        private async Task<GetUserAuthenticatedDto> executeLoginJwt(User user)
+
+        private async Task<GetUserAuthenticatedDto> ExecuteLoginJwt(User user)
         {
-            TokenVO token = await validateCredentials(user);
-            GetUserAuthenticatedDto response = _mapper.Map<GetUserAuthenticatedDto>(user);
-             
+            // Valida as credenciais e gera o token
+            TokenVO token = await ValidateCredentials(user);
+
+            // Mapeia o usuário para o DTO e adiciona o token
+            var response = _mapper.Map<GetUserAuthenticatedDto>(user);
             response.TokenAuth = token;
+
             return response;
         }
-        private async Task<TokenVO> validateCredentials(User user)
+
+        private async Task<TokenVO> ValidateCredentials(User user)
         {
             if (user == null) return new TokenVO();
+
+            // Gera as claims para o token
             var claims = new List<Claim>
             {
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString("N")),
@@ -67,28 +83,27 @@ namespace HotelWise.Service.Entity
                 new Claim(JwtRegisteredClaimNames.Name, user.Name),
             };
 
+            // Gera o access token e o refresh token
             var accessToken = _tokenService.GenerateAccessToken(claims);
             var refreshToken = _tokenService.GenerateRefreshToken();
 
+            // Atualiza o usuário com o token de atualização e seu prazo de expiração
             user.RefreshToken = refreshToken;
+            user.RefreshTokenExpiryTime = DataHelper.GetDateTimeNow().AddDays(_configurationToken.DaysToExpiry);
 
-            DateTime refreshTokenExpiryTime = DataHelper.GetDateTimeNow().AddDays(_configurationToken.DaysToExpiry);
+            await _repository.UpdateAsync(user);
 
-            user.RefreshTokenExpiryTime = refreshTokenExpiryTime;
-
-            await _entityRepository.RefreshUserInfo(user);
-
+            // Cria o objeto TokenVO com informações do token
             DateTime createDate = DataHelper.GetDateTimeNow();
             DateTime expirationDate = createDate.AddMinutes(_configurationToken.Minutes);
 
-            var tokenResult = new TokenVO(true,
+            return new TokenVO(
+                true,
                 createDate.ToString(AppConfigConstants.DATE_FORMAT2),
                 expirationDate.ToString(AppConfigConstants.DATE_FORMAT2),
                 accessToken,
                 refreshToken
-                );
-
-            return tokenResult;
+            );
         }
     }
 }

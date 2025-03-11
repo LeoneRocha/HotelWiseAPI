@@ -1,9 +1,10 @@
 ﻿using HotelWise.Domain.Dto;
 using HotelWise.Domain.Model;
+using HotelWise.Service.Generic;
 
 namespace HotelWise.Domain.Interfaces.Entity
 {
-    public interface IHotelService
+    public interface IHotelService : IGenericService<HotelDto>
     {
         void SetUserId(long id);
         Task<ServiceResponse<bool>> InsertHotelInVectorStore(long id);
