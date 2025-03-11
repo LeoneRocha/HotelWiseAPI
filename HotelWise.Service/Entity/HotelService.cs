@@ -45,7 +45,7 @@ namespace HotelWise.Service.Entity
             ServiceResponse<HotelDto[]> response = new ServiceResponse<HotelDto[]>();
             try
             {
-                var hotels = await _hotelRepository.GetAll();
+                var hotels = await _hotelRepository.GetAllAsync();
                 var hotelDtos = _mapper.Map<HotelDto[]>(hotels);
 
                 response.Data = hotelDtos.OrderBy(h => h.HotelName).ToArray();
@@ -375,7 +375,7 @@ namespace HotelWise.Service.Entity
 
                 await Parallel.ForEachAsync(Enumerable.Range(fromCount, toCount - fromCount), async (index, cancellationToken) =>
                 {
-                    var tags = await _hotelRepository.GetAllTags(index * batchSize, batchSize);
+                    var tags = await _hotelRepository.GetAllTagsAsync(index * batchSize, batchSize);
 
                     foreach (var tag in tags)
                     {

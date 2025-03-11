@@ -1,92 +1,30 @@
 ﻿using HotelWise.Data.Context;
+using HotelWise.Data.Repository.Generic;
 using HotelWise.Domain.Interfaces.Entity;
 using HotelWise.Domain.Model;
 using Microsoft.EntityFrameworkCore;
 
 namespace HotelWise.Data.Repository
 {
-    public class HotelRepository : IHotelRepository
+    public class HotelRepository : GenericRepositoryBase<Hotel>, IHotelRepository
     {
-        private readonly HotelWiseDbContextMysql _context;
-        private readonly DbContextOptions<HotelWiseDbContextMysql> _options;
-
-        public HotelRepository(HotelWiseDbContextMysql context, DbContextOptions<HotelWiseDbContextMysql> options)
+        public HotelRepository(HotelWiseDbContextMysql context) : base(context)
         {
-            _context = context;
-            _options = options;
-        }
-
-        private HotelWiseDbContextMysql CreateContext()
-        {
-            return new HotelWiseDbContextMysql(_options);
-        }
-
-        public async Task<Hotel[]> GetAll()
-        {
-            return await _context.Hotels.AsNoTracking().ToArrayAsync();
-        }
-        public async Task<Hotel[]> GetAllAsync()
-        {
-            return await _context.Hotels.ToArrayAsync();
-        }
-
-        public async Task<Hotel?> GetByIdAsync(long id)
-        {
-            return await _context.Hotels.FindAsync(id);
-        }
-
-        public async Task AddAsync(Hotel hotel)
-        {
-            await _context.Hotels.AddAsync(hotel);
-            await _context.SaveChangesAsync();
-        }
-        public async Task AddRangeAsync(Hotel[] hotels)
-        {
-            await _context.Hotels.AddRangeAsync(hotels);
-            await _context.SaveChangesAsync();
-        }
-        public async Task UpdateAsync(Hotel hotel)
-        {
-            _context.Hotels.Update(hotel);
-            await _context.SaveChangesAsync();
-        }
-        public async Task UpdateRangeAsync(Hotel[] hotel)
-        {
-            _context.Hotels.UpdateRange(hotel);
-            await _context.SaveChangesAsync();
-        }
-        public async Task DeleteAsync(long id)
-        {
-            var hotel = await _context.Hotels.FindAsync(id);
-            if (hotel != null)
-            {
-                _context.Hotels.Remove(hotel);
-                await _context.SaveChangesAsync();
-            }
         }
 
         public async Task<int> GetTotalHotelsCountAsync()
         {
-            return await _context.Hotels.AsNoTracking().CountAsync();
+            return await _dataset.AsNoTracking().CountAsync();
         }
+
         public async Task<Hotel[]> FetchHotelsAsync(int offset, int limit)
         {
-            using (var context = CreateContext())
-            {
-                var resultRange = await context.Hotels.AsNoTracking().Skip(offset).Take(limit).ToArrayAsync();
-
-                return resultRange;
-            }
+            return await _dataset.AsNoTracking().Skip(offset).Take(limit).ToArrayAsync();
         }
 
-        public async Task<string[][]> GetAllTags(int offset, int limit)
+        public async Task<string[][]> GetAllTagsAsync(int offset, int limit)
         {
-            using (var context = CreateContext())
-            {
-                var resultRange = await context.Hotels.AsNoTracking().Select(h => h.Tags).Skip(offset).Take(limit).ToArrayAsync();
-
-                return resultRange;
-            }
+            return await _dataset.AsNoTracking().Select(h => h.Tags).Skip(offset).Take(limit).ToArrayAsync();
         }
     }
 }
