@@ -6,9 +6,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace HotelWise.Data.Repository
 {
-    public class UserRepository : GenericRepositoryBase<User>, IUserRepository
+    public class UserRepository : GenericRepositoryBase<User, HotelWiseDbContextMysql>, IUserRepository
     {
-        public UserRepository(HotelWiseDbContextMysql context) : base(context)
+        public UserRepository(HotelWiseDbContextMysql context, DbContextOptions<HotelWiseDbContextMysql> options) : base(context, options)
         {
         }
 

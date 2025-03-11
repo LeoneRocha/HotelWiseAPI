@@ -1,37 +1,31 @@
-﻿using HotelWise.Data.Context;
-using HotelWise.Domain.Interfaces.Entity.HotelWise.Domain.Interfaces.Entity;
+﻿using HotelWise.Domain.Interfaces.Entity.HotelWise.Domain.Interfaces.Entity;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 
 namespace HotelWise.Data.Repository.Generic
 {
-    public abstract class GenericRepositoryBase<T> : IGenericRepository<T> where T : class
+    public abstract class GenericRepositoryBase<T, TContext> : IGenericRepository<T>
+        where T : class
+        where TContext : DbContext
     {
-        protected readonly DbContext _context;
+        protected readonly TContext _context;
         protected readonly DbSet<T> _dataset;
-         
-        private readonly DbContextOptions<DbContext>? _options;
 
-        public GenericRepositoryBase(DbContext context, DbContextOptions<DbContext> options)
+        private readonly DbContextOptions<TContext>? _options;
+
+        public GenericRepositoryBase(TContext context, DbContextOptions<TContext> options)
         {
-            _context = context;
+            _context = context ?? throw new ArgumentNullException(nameof(context));
             _dataset = _context.Set<T>();
             _options = options;
-        }
-
-        protected DbContext CreateContext()
+        } 
+        protected TContext CreateContext()
         {
             if (_options == null)
             {
-                throw new InvalidOperationException("DbContextOptions não foi fornecido.");
+                throw new InvalidOperationException("DbContextOptions was not provided.");
             }
-            return (DbContext)Activator.CreateInstance(typeof(DbContext), _options)!;
-        }
-
-        protected GenericRepositoryBase(DbContext context)
-        {
-            _context = context;
-            _dataset = _context.Set<T>();
+            return (TContext)Activator.CreateInstance(typeof(TContext), _options)!;
         }
 
         public virtual async Task<List<T>> GetAllAsync()

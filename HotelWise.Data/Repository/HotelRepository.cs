@@ -6,12 +6,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace HotelWise.Data.Repository
 {
-    public class HotelRepository : GenericRepositoryBase<Hotel>, IHotelRepository
+    public class HotelRepository : GenericRepositoryBase<Hotel, HotelWiseDbContextMysql>, IHotelRepository
     {
-        public HotelRepository(HotelWiseDbContextMysql context) : base(context)
+        public HotelRepository(HotelWiseDbContextMysql context, DbContextOptions<HotelWiseDbContextMysql> options) : base(context, options)
         {
-        }
-
+        } 
         public async Task<int> GetTotalHotelsCountAsync()
         {
             return await _dataset.AsNoTracking().CountAsync();
@@ -19,12 +18,22 @@ namespace HotelWise.Data.Repository
 
         public async Task<Hotel[]> FetchHotelsAsync(int offset, int limit)
         {
-            return await _dataset.AsNoTracking().Skip(offset).Take(limit).ToArrayAsync();
+            using (var context = CreateContext())
+            {
+                var resultRange = await context.Hotels.AsNoTracking().Skip(offset).Take(limit).ToArrayAsync();
+
+                return resultRange;
+            }
         }
 
         public async Task<string[][]> GetAllTagsAsync(int offset, int limit)
         {
-            return await _dataset.AsNoTracking().Select(h => h.Tags).Skip(offset).Take(limit).ToArrayAsync();
-        }
+            using (var context = CreateContext())
+            {
+                var resultRange = await context.Hotels.AsNoTracking().Select(h => h.Tags).Skip(offset).Take(limit).ToArrayAsync();
+
+                return resultRange;
+            }
+        } 
     }
 }
