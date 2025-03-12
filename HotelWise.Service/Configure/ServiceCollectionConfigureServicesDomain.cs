@@ -16,14 +16,11 @@ namespace HotelWise.Service.Configure
             ////AutoMapper
             ServiceCollectionConfigureAutoMapper.Configure(services);
             addDependenciesSingleton(services);
-
-            addCollectionDependencies(services);
-
+              
             ServicesDomainRepository.AddDependenciesManually(services);
 
             ServicesDomainService.AddDependenciesManually(services);
-
-
+             
             ConfigureServicesAI.ConfigureServices(services);
              
             #region KERNEL  
@@ -35,11 +32,7 @@ namespace HotelWise.Service.Configure
 
             ServicesDomainRepository.AddDependenciesAuto(services);
             ServicesDomainService.AddDependenciesAuto(services);
-        }
-        private static void addCollectionDependencies(IServiceCollection services)
-        {
-           
-        }
+        } 
         private static void addDependenciesSingleton(IServiceCollection services)
         {
             services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();

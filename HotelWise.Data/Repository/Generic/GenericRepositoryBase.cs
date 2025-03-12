@@ -13,7 +13,7 @@ namespace HotelWise.Data.Repository.Generic
 
         private readonly DbContextOptions<TContext>? _options;
 
-        public GenericRepositoryBase(TContext context, DbContextOptions<TContext> options)
+        protected GenericRepositoryBase(TContext context, DbContextOptions<TContext> options)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
             _dataset = _context.Set<T>();
