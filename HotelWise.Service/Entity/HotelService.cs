@@ -11,7 +11,7 @@ using System.Collections.Concurrent;
 
 namespace HotelWise.Service.Entity
 {
-    public class HotelService : GenericServiceBase<Hotel, HotelDto>, IHotelService
+    public class HotelService : GenericEntityServiceBase<Hotel, HotelDto>, IHotelService
     { 
         private readonly IGenerateHotelService _generateHotelService;
         private readonly IVectorStoreService<HotelVector> _hotelVectorStoreService;
@@ -284,7 +284,7 @@ namespace HotelWise.Service.Entity
                     response.Success = false;
                     return response;
                 }
-                //TODO ENVIAR PARA UM CACHE to que pesquisar toda vez no banco de dados 
+                //NEXSTEP: ENVIAR PARA UM CACHE to que pesquisar toda vez no banco de dados 
                 var allHotelsFromDb = (await FetchHotelsAsync()).Data;
 
                 // Aguardar o tempo configurado antes de buscar o vetor

@@ -11,7 +11,7 @@ using System.Security.Claims;
 
 namespace HotelWise.Service.Entity
 {
-    public class UserService : GenericServiceBase<User, UserLoginDto>, IUserService
+    public class UserService : GenericEntityServiceBase<User, UserLoginDto>, IUserService
     {
         private readonly ITokenService _tokenService;
         private readonly ITokenConfigurationDto _configurationToken;

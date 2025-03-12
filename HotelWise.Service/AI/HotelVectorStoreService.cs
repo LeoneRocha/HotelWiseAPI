@@ -1,20 +1,26 @@
-﻿using HotelWise.Domain.Dto;
+﻿using AutoMapper;
+using HotelWise.Domain.Dto;
 using HotelWise.Domain.Dto.SemanticKernel;
 using HotelWise.Domain.Enuns;
 using HotelWise.Domain.Helpers;
 using HotelWise.Domain.Interfaces.IA;
 using HotelWise.Domain.Interfaces.SemanticKernel;
+using HotelWise.Service.Generic;
 
 namespace HotelWise.Service.AI
 {
-    public class HotelVectorStoreService : IVectorStoreService<HotelVector>
+    public class HotelVectorStoreService : GenericVectorStoreServiceBase, IVectorStoreService<HotelVector>
     {
         private readonly IVectorStoreAdapter<HotelVector> _adapter;
         private readonly IAIInferenceService _aIInferenceService;
         private const string nameCollection = "skhotels";
         private readonly IAInferenceAdapterType _eIAInferenceAdapterType;
-
-        public HotelVectorStoreService(IVectorStoreAdapterFactory adapterFactory, IAIInferenceService aIInferenceService)
+         
+        public HotelVectorStoreService(
+            Serilog.ILogger logger, 
+            IMapper mapper, 
+            IVectorStoreAdapterFactory adapterFactory,
+            IAIInferenceService aIInferenceService) : base(mapper, logger)
         {
             _eIAInferenceAdapterType = IAInferenceAdapterType.Mistral;
 
@@ -107,11 +113,12 @@ namespace HotelWise.Service.AI
             }
             catch (Exception ex)
             {
-#pragma warning disable S6776
-                 
+                _logger.Error(ex, "An error occurred in SearchAndAnalyzePluginAsync at: {Message} at: {time}", ex.Message, DateTime.UtcNow);
+
                 response.Success = false;
                 response.Message = ex.Message;
-                
+
+#pragma warning disable S6776
                 // NOSONAR
                 response.Errors = new List<ErrorResponse>() { new ErrorResponse() { Message = ex.Message }, new ErrorResponse() { Message = ex.StackTrace ?? string.Empty } };
 #pragma warning restore S6776

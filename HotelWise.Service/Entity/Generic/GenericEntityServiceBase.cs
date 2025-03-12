@@ -4,7 +4,7 @@ using System.Linq.Expressions;
 
 namespace HotelWise.Service.Generic
 {
-    public abstract class GenericServiceBase<T, TDto> : IGenericService<TDto>
+    public abstract class GenericEntityServiceBase<T, TDto> : IGenericService<TDto>
         where T : class, new()
         where TDto : class, new()
     {
@@ -28,7 +28,7 @@ namespace HotelWise.Service.Generic
 
         private const string GeneralErrorOccurred = "An error occurred while processing the request.";
 
-        protected GenericServiceBase(IGenericRepository<T> repository, IMapper mapper, Serilog.ILogger logger)
+        protected GenericEntityServiceBase(IGenericRepository<T> repository, IMapper mapper, Serilog.ILogger logger)
         {
             _repository = repository ?? throw new ArgumentNullException(nameof(repository));
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
