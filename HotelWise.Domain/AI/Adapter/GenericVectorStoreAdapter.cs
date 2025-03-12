@@ -158,6 +158,8 @@ namespace HotelWise.Domain.AI.Adapter
                 //ERRO AQUI <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< 
                 string templateResult = await RenderPrompt(searchQuery, template, results, promptTemplateFactory);
 
+                _logger.Information("SearchAndAnalyzePluginAsync - Rendered Prompt: {templateResult}", templateResult);
+
                 IAsyncEnumerable<StreamingKernelContent> result2 = await InvokePrompt(template, arguments, promptTemplateFactory);
 
                 await foreach (var message in result2)
@@ -230,6 +232,9 @@ namespace HotelWise.Domain.AI.Adapter
             try
             {
                 var resultKernel = await _kernel.InvokePromptAsync(template, arguments, templateFormat: HandlebarsPromptTemplateFactory.HandlebarsTemplateFormat, promptTemplateFactory: promptTemplateFactory);
+
+                _logger.Information("InvokePrompt  - InvokePromptAsync: {templateResult}", resultKernel);
+                 
                 var result2 = _kernel.InvokePromptStreamingAsync(template, arguments, templateFormat: HandlebarsPromptTemplateFactory.HandlebarsTemplateFormat, promptTemplateFactory: promptTemplateFactory);
 
                 return result2;

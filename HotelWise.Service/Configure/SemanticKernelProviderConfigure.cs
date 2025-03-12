@@ -58,6 +58,8 @@ namespace HotelWise.Service.Configure
             return appConfig;
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "SKEXP0070", Justification = "Usar interface para promover desacoplamento é intencional.")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1859", Justification = "Usar interface para promover desacoplamento é intencional.")]
         private static void addTextEmbeddingGeneration(IApplicationIAConfig appConfig, IKernelBuilder builder)
         {
             var mistral = appConfig.MistralApíEmbeddingsConfig;
@@ -67,6 +69,8 @@ namespace HotelWise.Service.Configure
 
 #pragma warning restore SKEXP0070
         }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "SKEXP0070", Justification = "Usar interface para promover desacoplamento é intencional.")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1859", Justification = "Usar interface para promover desacoplamento é intencional.")]
 
         private static void addAIServices(IApplicationIAConfig appConfig, IKernelBuilder builder)
         {
@@ -109,6 +113,8 @@ namespace HotelWise.Service.Configure
             #endregion ChatCompletionService
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "SKEXP0070", Justification = "Usar interface para promover desacoplamento é intencional.")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1859", Justification = "Usar interface para promover desacoplamento é intencional.")]
         private static void addVectorStores(IApplicationIAConfig appConfig, IKernelBuilder builder)
         {
 #pragma warning disable SKEXP0020

@@ -344,11 +344,11 @@ namespace HotelWise.Service.Entity
 
         private static HotelDto[] changeHotelsVectorToHotelDtos(HotelDto[]? allHotelsFromDb, HotelVector[]? hotelsVector)
         {
-            // Mapear para novo objeto e retonar novo objeto TODO:
+            // Mapear para novo objeto e retonar novo objeto NEXSTEP:
             var resultHotels = new List<HotelDto>();
             if (allHotelsFromDb != null && allHotelsFromDb.Length > 0 && hotelsVector != null && hotelsVector.Length > 0)
             {
-                //Enriquecer com Interferencia IA  TODO:  TROCAR UMA PARTE POR MAPPER para facilitar
+                //Enriquecer com Interferencia IA  NEXSTEP:  TROCAR UMA PARTE POR MAPPER para facilitar
                 foreach (var hotelVector in hotelsVector)
                 {
                     var hotelId = (long)hotelVector.DataKey;
