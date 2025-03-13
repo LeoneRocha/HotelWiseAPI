@@ -129,50 +129,45 @@ namespace HotelWise.Domain.AI.Adapter
         public async Task<TVector[]> SearchAndAnalyzePluginAsync(string nameCollection, string searchQuery, float[] searchEmbedding)
         {
             List<TVector> dataVectors = new List<TVector>();
-            try
-            {
-                var stopwatch = new Stopwatch();
-                stopwatch.Start();
-                insertLogStarterSearchPluginAsync();
-                await LoadCollection(nameCollection);
+
+            var stopwatch = new Stopwatch();
+            stopwatch.Start();
+            insertLogStarterSearchPluginAsync();
+            await LoadCollection(nameCollection);
 
 #pragma warning disable SKEXP0001
 
-                ITextEmbeddingGenerationService embeddingService = _kernel.GetRequiredService<ITextEmbeddingGenerationService>();
-                var vectorStoreTextSearch = new VectorStoreTextSearch<TVector>(collection!, embeddingService);
+            ITextEmbeddingGenerationService embeddingService = _kernel.GetRequiredService<ITextEmbeddingGenerationService>();
+            var vectorStoreTextSearch = new VectorStoreTextSearch<TVector>(collection!, embeddingService);
 
 #pragma warning restore SKEXP0001
 
-                string pluginName = CreatePlugin(vectorStoreTextSearch);
+            string pluginName = CreatePlugin(vectorStoreTextSearch);
 
-                string template = CreateTemplate(pluginName);
+            string template = CreateTemplate(pluginName);
 
-                var results = await GetVectorsResults(searchEmbedding);
+            var results = await GetVectorsResults(searchEmbedding);
 
-                insertLogVectorizedSearchAsync(results);
+            insertLogVectorizedSearchAsync(results);
 
-                KernelArguments arguments = CreateArgments(searchQuery, results.SearchResult);
+            KernelArguments arguments = CreateArgments(searchQuery, results.SearchResult);
 
-                HandlebarsPromptTemplateFactory promptTemplateFactory = new();
+            HandlebarsPromptTemplateFactory promptTemplateFactory = new();
 
-                //ERRO AQUI <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< 
-                string templateResult = await RenderPrompt(searchQuery, template, results, promptTemplateFactory);
+            //ERRO AQUI <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< 
+            string templateResult = await RenderPrompt(searchQuery, template, results, promptTemplateFactory);
 
-                _logger.Information("SearchAndAnalyzePluginAsync - Rendered Prompt: {templateResult}", templateResult);
+            _logger.Information("SearchAndAnalyzePluginAsync - Rendered Prompt: {templateResult}", templateResult);
 
-                IAsyncEnumerable<StreamingKernelContent> result2 = await InvokePrompt(template, arguments, promptTemplateFactory);
+            IAsyncEnumerable<StreamingKernelContent> result2 = await InvokePrompt(template, arguments, promptTemplateFactory);
 
-                await foreach (var message in result2)
-                {
-                    _logger.Information("Result IA : {message}", message);
-                }
-                stopwatch.Stop();
-                _logger.Information("SearchPluginAsync completed in: {elapsed} (hh:mm:ss)", TimeFormatter.FormatElapsedTime(stopwatch.Elapsed));
-            }
-            catch (Exception)
+            await foreach (var message in result2)
             {
-                throw;
+                _logger.Information("Result IA : {message}", message);
             }
+            stopwatch.Stop();
+            _logger.Information("SearchPluginAsync completed in: {elapsed} (hh:mm:ss)", TimeFormatter.FormatElapsedTime(stopwatch.Elapsed));
+
             return dataVectors.ToArray();
         }
 
@@ -226,20 +221,15 @@ namespace HotelWise.Domain.AI.Adapter
 
         private async Task<IAsyncEnumerable<StreamingKernelContent>> InvokePrompt(string template, KernelArguments arguments, HandlebarsPromptTemplateFactory promptTemplateFactory)
         {
-            try
-            {
-                var resultKernel = await _kernel.InvokePromptAsync(template, arguments, templateFormat: HandlebarsPromptTemplateFactory.HandlebarsTemplateFormat, promptTemplateFactory: promptTemplateFactory);
 
-                _logger.Information("InvokePrompt  - InvokePromptAsync: {templateResult}", resultKernel);
+            var resultKernel = await _kernel.InvokePromptAsync(template, arguments, templateFormat: HandlebarsPromptTemplateFactory.HandlebarsTemplateFormat, promptTemplateFactory: promptTemplateFactory);
 
-                var result2 = _kernel.InvokePromptStreamingAsync(template, arguments, templateFormat: HandlebarsPromptTemplateFactory.HandlebarsTemplateFormat, promptTemplateFactory: promptTemplateFactory);
+            _logger.Information("InvokePrompt  - InvokePromptAsync: {templateResult}", resultKernel);
 
-                return result2;
-            }
-            catch (Exception)
-            {
-                throw;
-            }
+            var result2 = _kernel.InvokePromptStreamingAsync(template, arguments, templateFormat: HandlebarsPromptTemplateFactory.HandlebarsTemplateFormat, promptTemplateFactory: promptTemplateFactory);
+
+            return result2;
+
         }
 
         private static KernelArguments CreateArgments(string searchQuery, VectorSearchResults<TVector> searchResult)
@@ -253,27 +243,19 @@ namespace HotelWise.Domain.AI.Adapter
 
         private async Task<string> RenderPrompt(string searchQuery, string template, (VectorSearchResults<TVector> SearchResult, VectorSearchResult<TVector>[] DataSearchResult) results, HandlebarsPromptTemplateFactory promptTemplateFactory)
         {
-
-            try
+            string templateResult = await promptTemplateFactory.Create(new PromptTemplateConfig()
             {
-                string templateResult = await promptTemplateFactory.Create(new PromptTemplateConfig()
-                {
-                    Template = template,
-                    TemplateFormat = HandlebarsPromptTemplateFactory.HandlebarsTemplateFormat,
-                    InputVariables = new List<InputVariable> {
+                Template = template,
+                TemplateFormat = HandlebarsPromptTemplateFactory.HandlebarsTemplateFormat,
+                InputVariables = new List<InputVariable> {
                     new InputVariable() { Name = "query", Default = searchQuery },
                     new InputVariable() { Name = "results", Default = results.SearchResult }
                 }
-                }).RenderAsync(_kernel);
+            }).RenderAsync(_kernel);
 
-                _logger.Information("Rendered Prompt: {templateResult}", templateResult);
+            _logger.Information("Rendered Prompt: {templateResult}", templateResult);
 
-                return templateResult;
-            }
-            catch (Exception)
-            {
-                throw;
-            }
+            return templateResult;
         }
 
         private async Task<(VectorSearchResults<TVector> SearchResult, VectorSearchResult<TVector>[] DataSearchResult)> GetVectorsResults(float[] searchEmbedding)

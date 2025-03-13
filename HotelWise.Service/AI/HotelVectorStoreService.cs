@@ -120,7 +120,7 @@ namespace HotelWise.Service.AI
 
 #pragma warning disable S6776
                 // NOSONAR
-                response.Errors = new List<ErrorResponse>() { new ErrorResponse() { Message = ex.Message }, new ErrorResponse() { Message = ex.StackTrace ?? string.Empty } };
+                response.Errors = new List<ErrorResponse>() { new ErrorResponse() { Message = ex.Message }  };
 #pragma warning restore S6776
             }
             return response;
