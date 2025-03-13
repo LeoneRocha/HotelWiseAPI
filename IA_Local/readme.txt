@@ -1,3 +1,18 @@
+
+--------- INstalar o LLM LOCAL 
+
+---------AJUSTAR O PROJETO COM USAR O LLM LOCAL ENDPOINTS ETC 
+
+
+
+
+
+
+
+
+
+
+
 # Subir os serviços
 docker-compose -f D:\GITHUB\HotelWiseAPI\IA_Local\docker-compose.yml up -d
 
@@ -13,6 +28,208 @@ https://hub.docker.com/r/ollama/ollama
 
 2025DevAI!
 llama3.2
+
+
+
+
+
+
+
+
+Se você já tem o Ollama em execução, mas deseja configurá-lo para usar a GPU NVIDIA (como sua RTX 3070 Ti), você pode ajustar seu `docker-compose.yml` para habilitar o suporte à GPU. Vou explicar como fazer isso e adaptar o seu compose para que ele utilize a GPU adequadamente.
+
+---
+
+### **Passos para Atualizar o Docker Compose**
+Atualize seu `docker-compose.yml` para ativar a GPU no contêiner do Ollama. Abaixo está o arquivo ajustado:
+
+```yaml
+services:
+  anythingllm:
+    image: mintplexlabs/anythingllm:latest
+    container_name: anythingllm
+    ports:
+      - "3001:3001" # Porta para acessar o Anything LLM
+    volumes:
+      - "${STORAGE_LOCATION}:/app/server/storage" # Diretório persistente para dados
+      - "${STORAGE_LOCATION}/.env:/app/server/.env" # Arquivo de configuração
+    environment:
+      STORAGE_DIR: "/app/server/storage"
+    cap_add:
+      - SYS_ADMIN
+    depends_on:
+      - ollama # Garantindo que o Ollama esteja disponível antes de iniciar
+    links:
+      - ollama # Garante acesso ao Ollama pelo nome de serviço
+
+  ollama:
+    image: ollama/ollama:latest
+    container_name: ollama
+    ports: ["11434:11434"] # Porta para o Ollama
+    volumes:
+      - ollama:/root/.ollama  # Diretório persistente para os dados do Ollama
+    pull_policy: always
+    tty: true
+    restart: unless-stopped
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia # Habilitando suporte à GPU NVIDIA
+              count: 1 # Número de GPUs a serem utilizadas
+              capabilities:
+                - gpu
+
+  ollama-webui:
+    image: ghcr.io/ollama-webui/ollama-webui:main
+    container_name: ollama-webui
+    ports: ["3000:8080"]
+    volumes:
+      - ollama-webui:/app/backend/data
+    depends_on:
+      - ollama
+    environment:
+      - 'OLLAMA_API_BASE_URL=http://ollama:11434/api'
+    restart: unless-stopped 
+
+volumes:
+  ollama: {}
+  ollama-webui: {}
+```
+
+### **Detalhes das Modificações**
+1. **Adição do suporte a GPU NVIDIA**:
+   - A seção `deploy.resources.reservations.devices` foi adicionada ao serviço `ollama`.
+   - `driver: nvidia`: Define que o contêiner deve usar a GPU NVIDIA.
+   - `count: 1`: Especifica que o contêiner deve utilizar uma GPU.
+   - `capabilities: gpu`: Garante que o contêiner tenha acesso às capacidades de processamento de GPU.
+
+2. **Habilitar o uso de GPU no Docker**:
+   - Certifique-se de que o **NVIDIA Container Toolkit** está instalado no sistema host (veja as instruções abaixo).
+
+---
+
+### **Configurar o Docker para Usar GPU NVIDIA**
+Antes de usar o compose atualizado, você precisa configurar o Docker para suportar GPUs:
+
+#### a) Instale os drivers NVIDIA no host:
+Certifique-se de que os drivers corretos para a sua GPU (RTX 3070 Ti) estão instalados. Teste com o comando:
+```bash
+nvidia-smi
+```
+Se o comando exibir informações sobre a GPU, os drivers estão configurados corretamente.
+
+#### b) Instale o NVIDIA Container Toolkit:
+Adicione o suporte ao Docker para GPUs NVIDIA:
+```bash
+distribution=$(. /etc/os-release;echo $ID$VERSION_ID) && \
+    curl -s -L https://nvidia.github.io/nvidia-docker/gpgkey | sudo gpg --dearmor -o /usr/share/keyrings/nvidia-container-toolkit-keyring.gpg && \
+    curl -s -L https://nvidia.github.io/nvidia-docker/$distribution/nvidia-docker.list | sudo tee /etc/apt/sources.list.d/nvidia-docker.list && \
+    sudo apt-get update && sudo apt-get install -y nvidia-container-toolkit
+```
+
+Reinicie o Docker:
+```bash
+sudo systemctl restart docker
+```
+
+#### c) Teste o uso da GPU no Docker:
+Execute o seguinte comando para verificar se o Docker está reconhecendo a GPU:
+```bash
+docker run --rm --gpus all nvidia/cuda:11.8.0-base nvidia-smi
+```
+Se o comando exibir as informações da GPU, tudo está configurado corretamente.
+
+---
+
+### **Passos Finais**
+1. Atualize o arquivo `docker-compose.yml` com a configuração da GPU (veja acima).
+2. Execute o compose novamente para reiniciar os serviços com suporte à GPU:
+   ```bash
+   docker-compose down
+   docker-compose up -d
+   ```
+3. Teste se o Ollama está utilizando a GPU para o modelo `llama3.2:latest`.
+
+---
+
+### **Observação sobre o Modelo**
+O modelo que você escolheu (`llama3.2:latest`) pesa apenas **1.9GB**, então, mesmo com a GPU habilitada, ele provavelmente não exige uso pesado da memória VRAM da 3070 Ti. Modelos maiores, como versões de 7B, 13B ou 65B, farão melhor uso da GPU.
+
+Se precisar de mais ajuda para ajustar ou verificar o desempenho, é só me avisar! 🚀
+
+
+
+
+
+
+
+O erro indica que a imagem `nvidia/cuda:11.8.0-base` não está disponível no repositório do Docker Hub. Isso pode acontecer porque a tag específica da imagem não existe ou foi renomeada. Vamos corrigir isso:
+
+---
+
+### **1. Use uma Tag Disponível**
+A imagem correta pode ter uma tag diferente. Por exemplo, você pode usar:
+```powershell
+docker run --rm --gpus all nvidia/cuda:11.8.0-base-ubuntu22.04 nvidia-smi
+```
+
+Aqui, `-ubuntu22.04` especifica a versão do sistema base da imagem. Certifique-se de usar uma tag válida.
+
+---
+
+### **2. Verifique as Tags Disponíveis**
+Você pode verificar as tags disponíveis para a imagem CUDA no Docker Hub:
+- Acesse o repositório oficial da NVIDIA no Docker Hub: [NVIDIA CUDA Images](https://hub.docker.com/r/nvidia/cuda).
+- Procure pela versão `11.8.0` e escolha a tag apropriada, como `11.8.0-base-ubuntu22.04`.
+
+---
+
+### **3. Teste com uma Imagem Atualizada**
+Se a imagem acima não funcionar, tente uma versão mais recente ou estável:
+```powershell
+docker run --rm --gpus all nvidia/cuda:11.8.0-runtime-ubuntu22.04 nvidia-smi
+```
+A tag `runtime` inclui bibliotecas necessárias para executar aplicativos CUDA.
+
+---
+
+### **4. Atualize o Docker**
+Certifique-se de que o Docker está atualizado para evitar problemas de compatibilidade:
+1. Abra o Docker Desktop.
+2. Vá para **Settings > About** e verifique se há atualizações disponíveis.
+
+---
+
+### **5. Diagnóstico Adicional**
+Se o problema persistir:
+- Verifique se o NVIDIA Container Toolkit está instalado corretamente.
+- Teste o suporte à GPU com:
+  ```powershell
+  docker run --rm --runtime=nvidia nvidia/cuda:11.8.0-base-ubuntu22.04 nvidia-smi
+  ```
+
+Se precisar de mais ajuda, posso te guiar em cada etapa! 🚀
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 Para rodar o arquivo `docker-compose.yml` localizado em `D:\GITHUB\HotelWiseAPI\IA_Local` no terminal do Docker Desktop, siga estes passos:
 

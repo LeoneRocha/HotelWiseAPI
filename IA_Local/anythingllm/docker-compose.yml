@@ -24,15 +24,15 @@ services:
     pull_policy: always
     tty: true
     restart: unless-stopped
-    # Uncomment below to run on GPU support
-    # deploy:
-    #   resources:
-    #     reservations:
-    #       devices:
-    #         - driver: ${OLLAMA_GPU_DRIVER-nvidia}
-    #           count: ${OLLAMA_GPU_COUNT-1}
-    #           capabilities:
-    #             - gpu
+    #Uncomment below to run on GPU support
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: ${OLLAMA_GPU_DRIVER-nvidia}
+              count: ${OLLAMA_GPU_COUNT-1}
+              capabilities:
+                - gpu
   ollama-webui:
     image: ghcr.io/ollama-webui/ollama-webui:main
     container_name: ollama-webui
@@ -50,3 +50,8 @@ volumes:
   
 #cd D:\GITHUB\HotelWiseAPI\IA_Local
 #docker-compose up -d
+
+#run befoore 
+#$env:STORAGE_LOCATION="$HOME\Documents\anythingllm"; `
+#If(!(Test-Path $env:STORAGE_LOCATION)) {New-Item $env:STORAGE_LOCATION -ItemType Directory}; `
+#If(!(Test-Path "$env:STORAGE_LOCATION\.env")) {New-Item "$env:STORAGE_LOCATION\.env" -ItemType File}; `
