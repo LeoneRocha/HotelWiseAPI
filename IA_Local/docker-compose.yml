@@ -1,0 +1,29 @@
+services:
+  anythingllm:
+    image: mintplexlabs/anythingllm:latest
+    container_name: anythingllm
+    ports:
+      - "3001:3001" # Porta para acessar o Anything LLM
+    volumes:
+      - "${STORAGE_LOCATION}:/app/server/storage" # Diretório persistente para dados
+      - "${STORAGE_LOCATION}/.env:/app/server/.env" # Arquivo de configuração
+    environment:
+      STORAGE_DIR: "/app/server/storage"
+    cap_add:
+      - SYS_ADMIN
+    depends_on:
+      - ollama # Garantindo que o Ollama esteja disponível antes de iniciar
+    links:
+      - ollama # Garante acesso ao Ollama pelo nome de serviço
+
+  ollama:
+    image: ollama/ollama:latest
+    container_name: ollama
+    ports:
+      - "11434:11434" # Porta para o Ollama
+    command: ["ollama", "serve"] # Comando para rodar o serviço do Ollama
+    volumes:
+      - "./ollama:/ollama" # Diretório persistente para os dados do Ollama
+
+#cd D:\GITHUB\HotelWiseAPI\IA_Local
+#docker-compose up -d

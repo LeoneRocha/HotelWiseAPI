@@ -1,0 +1,52 @@
+services:
+  anythingllm:
+    image: mintplexlabs/anythingllm:latest
+    container_name: anythingllm
+    ports:
+      - "3001:3001" # Porta para acessar o Anything LLM
+    volumes:
+      - "${STORAGE_LOCATION}:/app/server/storage" # Diretório persistente para dados
+      - "${STORAGE_LOCATION}/.env:/app/server/.env" # Arquivo de configuração
+    environment:
+      STORAGE_DIR: "/app/server/storage"
+    cap_add:
+      - SYS_ADMIN
+    depends_on:
+      - ollama # Garantindo que o Ollama esteja disponível antes de iniciar
+    links:
+      - ollama # Garante acesso ao Ollama pelo nome de serviço
+  ollama:
+    image: ollama/ollama:latest
+    container_name: ollama
+    ports: ["11434:11434"] # Porta para o Ollama
+    volumes:
+      - ollama:/root/.ollama  # Diretório persistente para os dados do Ollama
+    pull_policy: always
+    tty: true
+    restart: unless-stopped
+    # Uncomment below to run on GPU support
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: ${OLLAMA_GPU_DRIVER-nvidia}
+    #           count: ${OLLAMA_GPU_COUNT-1}
+    #           capabilities:
+    #             - gpu
+  ollama-webui:
+    image: ghcr.io/ollama-webui/ollama-webui:main
+    container_name: ollama-webui
+    ports: ["3000:8080"]
+    volumes:
+      - ollama-webui:/app/backend/data
+    depends_on:
+      - ollama
+    environment:
+      - 'OLLAMA_API_BASE_URL=http://ollama:11434/api'
+    restart: unless-stopped 
+volumes:
+  ollama: {}
+  ollama-webui: {}
+  
+#cd D:\GITHUB\HotelWiseAPI\IA_Local
+#docker-compose up -d

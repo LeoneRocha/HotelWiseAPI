@@ -1,0 +1,40 @@
+version: '3.9'
+services:
+  anythingllm:
+    image: mintplexlabs/anythingllm:latest
+    container_name: anythingllm
+    ports:
+      - "3001:3001"
+    volumes:
+      - "${STORAGE_LOCATION}:/app/server/storage"
+      - "${STORAGE_LOCATION}/.env:/app/server/.env"
+    environment:
+      STORAGE_DIR: "/app/server/storage"
+    cap_add:
+      - SYS_ADMIN
+    depends_on:
+      - ollama
+    links:
+      - ollama
+    command: >
+      sh -c "
+      if [ ! -f /app/server/.env ]; then
+      echo '# Configuração do Ollama como LocalAI' > /app/server/.env &&
+      echo 'LOCALAI_ENDPOINT=http://ollama:11434/v1' >> /app/server/.env &&
+      echo 'LOCALAI_MODEL=llama2' >> /app/server/.env &&
+      echo '' >> /app/server/.env &&
+      echo '# (Opcional) Configuração de embeddings, caso o Ollama seja utilizado para isso' >> /app/server/.env &&
+      echo 'EMBEDDING_SERVICE=http://ollama:11434/v1' >> /app/server/.env &&
+      echo 'EMBEDDING_MODEL=embedding-model-name' >> /app/server/.env;
+      fi;
+      npm run start
+      "
+
+  ollama:
+    image: ollama/ollama:latest
+    container_name: ollama
+    ports:
+      - "11434:11434"
+    command: ["ollama", "serve"]
+    volumes:
+      - "./ollama:/ollama"

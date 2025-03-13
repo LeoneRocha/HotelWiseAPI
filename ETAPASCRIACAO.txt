@@ -4,51 +4,34 @@
 --- IMPLEMENTAR O LLM LOCAL USANDO ANYTHIG E OLLAMA para rodar o emmbading localmente para os 100. 
 
 --- Uma alternativa na nuvem de armazenar os hoteis vetorizado (MONGO DB)
-
-
-
 --- LIMPAR BASE para ja 
-
 --- usar o qdrant online 
-
-
-
-
 
 ------------------------------------------------ DASH BOARDS 
 
 http://localhost:6333/dashboard#/welcome QDRANT LOCAL 
 
-
 https://cloud.qdrant.io/accounts/db8b28be-f039-4ffd-8565-21c7cb6628b2/clusters << NUVEM
-
-
 ------------------------------------------------ DASH BOARDS 
-
-
 --- EM EF CORE 
 
 -- C# .net core 8 e CODEFRIST com uso de bogus para gerar 1000 hoteis 
 
-
 Em C# .net core 8 e CODEFRIST com uso de padroes de projeto e clean code e repository pattern gere um crud completo usando camada de repositorio , service e da api usando injecao de dependencia e que pode ser testado facilmente. Use o codigo abaixo para usar como refenrencia o projeto deve tanto rodar em sql server como mysql Usando Entity Framework core e usando fluent api e que ja seja possivel usanddo Hasdata carregar um array de hotel , e tambem FluentValidation 
-
 
 Acrestente no hotel todas caracteristicas possivels como estrelas do hotel preco inicial dos quartos , cep localizacao etc gere todas caracteristicas possiveis
 
- 
-
 >>>>>>>>>>>>>> ALVO ESTUDO 
-    
 
+Anything LLM 
+https://docs.anythingllm.com/installation-docker/local-docker
 
+ 
 https://learn.microsoft.com/en-us/semantic-kernel/concepts/vector-store-connectors/?pivots=programming-language-csharp
-
 
 https://learn.microsoft.com/en-us/training/modules/improve-search-results-vector-search/?source=recommendations
 
 Add-Migration InitialCreate -Context HotelWiseDbContextMysql -OutputDir Migrations\MySql -Project HotelWise.Data
-
 
 Add-Migration LogDataAddUpdate -Context HotelWiseDbContextMysql -OutputDir Migrations\MySql -Project HotelWise.Data
 
@@ -70,11 +53,7 @@ docker-compose up --build
 localhost:6333/dashboard
 
 https://github.com/tghamm/Mistral.SDK?tab=readme-ov-file#examples,
-
-
-
-
-
+ 
 PRIMEIRO TEM QUE GERAR O CONTEUDO 
 
 
