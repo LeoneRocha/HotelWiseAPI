@@ -88,6 +88,8 @@ namespace HotelWise.Service.AI
             }
             catch (Exception ex)
             {
+                _logger.Error(ex, "An error occurred in VectorizedSearchAsync at: {Message} at: {time}", ex.Message, DateTime.UtcNow);
+
 #pragma warning disable S6776
                 response.Success = false;
                 response.Message = ex.Message;
