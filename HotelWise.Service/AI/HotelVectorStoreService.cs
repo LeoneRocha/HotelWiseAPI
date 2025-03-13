@@ -15,10 +15,10 @@ namespace HotelWise.Service.AI
         private readonly IAIInferenceService _aIInferenceService;
         private const string nameCollection = "skhotels";
         private readonly IAInferenceAdapterType _eIAInferenceAdapterType;
-         
+
         public HotelVectorStoreService(
-            Serilog.ILogger logger, 
-            IMapper mapper, 
+            Serilog.ILogger logger,
+            IMapper mapper,
             IVectorStoreAdapterFactory adapterFactory,
             IAIInferenceService aIInferenceService) : base(mapper, logger)
         {
@@ -92,7 +92,7 @@ namespace HotelWise.Service.AI
                 response.Success = false;
                 response.Message = ex.Message;
                 // NOSONAR
-                response.Errors = new List<ErrorResponse>() { new ErrorResponse() { Message = ex.Message }, new ErrorResponse() { Message = ex.StackTrace ?? string.Empty } };
+                response.Errors = new List<ErrorResponse>() { new ErrorResponse() { Message = ex.Message } };
 #pragma warning restore S6776
             }
             return response;
@@ -120,7 +120,7 @@ namespace HotelWise.Service.AI
 
 #pragma warning disable S6776
                 // NOSONAR
-                response.Errors = new List<ErrorResponse>() { new ErrorResponse() { Message = ex.Message }  };
+                response.Errors = new List<ErrorResponse>() { new ErrorResponse() { Message = ex.Message } };
 #pragma warning restore S6776
             }
             return response;
