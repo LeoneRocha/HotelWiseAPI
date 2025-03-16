@@ -6,7 +6,6 @@ using HotelWise.Domain.Interfaces.IA;
 using Microsoft.Extensions.AI;
 using OllamaSharp;
 using OllamaSharp.Models.Chat;
-using System.IO;
 using System.Text;
 
 namespace HotelWise.Domain.AI.Adapter
