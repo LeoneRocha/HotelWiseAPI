@@ -35,11 +35,18 @@ namespace HotelWise.Service.AI
 
         public async Task<HotelVector?> GetById(long dataKey)
         {
-            var hotelVector = await _adapter.GetByKey(nameCollection, (ulong)dataKey);
-
-            if (hotelVector != null)
+            try
             {
-                return hotelVector;
+                var hotelVector = await _adapter.GetByKey(nameCollection, (ulong)dataKey);
+
+                if (hotelVector != null)
+                {
+                    return hotelVector;
+                } 
+            }
+            catch (Exception ex)
+            {
+                _logger.Error(ex, "HotelVectorStoreService GetById: {Message} at: {time}", ex.Message, DataHelper.GetDateTimeNowToLog());
             }
             return null;
         }
@@ -107,11 +114,10 @@ namespace HotelWise.Service.AI
             {
                 //Get semantic search 
                 var embeddingSearchText = await _aIInferenceService.GenerateEmbeddingAsync(searchText, _eIAInferenceAdapterType);
-
-                //var resultIA = await _adapter.SearchAndAnalyzePluginAsync(nameCollection, searchText, embeddingSearchText);
+                var resultIA = await _adapter.SearchAndAnalyzePluginAsync(nameCollection, searchText, embeddingSearchText);
 
                 response.Success = true;
-                //response.Data = resultIA;
+                response.Data = resultIA;
             }
             catch (Exception ex)
             {

@@ -12,13 +12,13 @@ using System.Collections.Concurrent;
 namespace HotelWise.Service.Entity
 {
     public class HotelService : GenericEntityServiceBase<Hotel, HotelDto>, IHotelService
-    { 
+    {
         private readonly IGenerateHotelService _generateHotelService;
         private readonly IVectorStoreService<HotelVector> _hotelVectorStoreService;
         private readonly IApplicationIAConfig _applicationConfig;
         private readonly IHotelRepository _hotelRepository;
 
-      
+
         public HotelService(
             Serilog.ILogger logger,
             IMapper mapper,
@@ -27,12 +27,12 @@ namespace HotelWise.Service.Entity
             IGenerateHotelService generateHotelService,
             IVectorStoreService<HotelVector> hotelVectorStoreService)
             : base(hotelRepository, mapper, logger)
-        { 
+        {
             _applicationConfig = applicationConfig;
             _generateHotelService = generateHotelService;
             _hotelVectorStoreService = hotelVectorStoreService;
             _hotelRepository = hotelRepository;
-        } 
+        }
         public async Task<ServiceResponse<HotelDto[]>> GetAllHotelsAsync()
         {
             ServiceResponse<HotelDto[]> response = new ServiceResponse<HotelDto[]>();
@@ -82,7 +82,7 @@ namespace HotelWise.Service.Entity
                 var hotelDto = _mapper.Map<HotelDto?>(hotel);
 
                 //TODO CORRIGIR VECTOR dependencias
-                object hoteVector  = null!; //await _hotelVectorStoreService.GetById(id);
+                var hoteVector = await _hotelVectorStoreService.GetById(id);
 
                 if (hoteVector != null && hotelDto != null)
                 {
@@ -234,8 +234,7 @@ namespace HotelWise.Service.Entity
                 _logger.Error(ex, "DeleteHotelAsync: {Message} at: {time}", ex.Message, DataHelper.GetDateTimeNowToLog());
                 response.Errors.Add(new ErrorResponse() { Message = ex.Message });
             }
-            return response;
-
+            return response; 
         }
 
         public async Task<ServiceResponse<HotelDto[]>> FetchHotelsAsync()
@@ -319,7 +318,14 @@ namespace HotelWise.Service.Entity
         {
             if (hotelDto != null)
             {
-                await _hotelVectorStoreService.UpsertDataAsync(convertHotelToVector(hotelDto));
+                try
+                {
+                    await _hotelVectorStoreService.UpsertDataAsync(convertHotelToVector(hotelDto));
+                }
+                catch (Exception ex)
+                {
+                    _logger.Error(ex, "addOrUpdateDataVector: {Message} at: {time}", ex.Message, DataHelper.GetDateTimeNowToLog());
+                } 
             }
         }
 
