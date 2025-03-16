@@ -85,7 +85,7 @@ namespace HotelWise.Domain.AI.Adapter
             var searchEmbeddingCriteria = EmbeddingHelper.ConvertToReadOnlyMemory(searchEmbedding);
 
             // Combina os filtros usando lógica OR
-            VectorSearchOptions vectorSearchOptions = createOptions(searchCriteria);
+            VectorSearchOptions<TVector> vectorSearchOptions = createOptions(searchCriteria);
 
             // Realiza a busca
             var searchResult = await collection!.VectorizedSearchAsync(searchEmbeddingCriteria, vectorSearchOptions);
@@ -103,10 +103,12 @@ namespace HotelWise.Domain.AI.Adapter
 
             return dataVectors.ToArray();
         }
-
-        private static VectorSearchOptions createOptions(SearchCriteria searchCriteria)
+        //https://learn.microsoft.com/en-us/azure/search/vector-search-overview
+        //https://devblogs.microsoft.com/dotnet/vector-data-qdrant-ai-search-dotnet/
+        //https://learn.microsoft.com/en-us/dotnet/ai/quickstarts/build-vector-search-app?tabs=azd&pivots=openai
+        private static VectorSearchOptions<TVector> createOptions(SearchCriteria searchCriteria)
         {
-            var vectorSearchOptions = new VectorSearchOptions() { Top = searchCriteria.MaxHotelRetrieve };
+            var vectorSearchOptions = new VectorSearchOptions<TVector>() { Top = searchCriteria.MaxHotelRetrieve };
 
             if (searchCriteria.TagsCriteria.Length > 0)
             {
@@ -116,10 +118,12 @@ namespace HotelWise.Domain.AI.Adapter
                     combinedFilter.AnyTagEqualTo(nameof(IDataVector.Tags), tagValue);
                 }
 
-                vectorSearchOptions = new VectorSearchOptions()
+                vectorSearchOptions = new VectorSearchOptions<TVector>()
                 {
                     Top = searchCriteria.MaxHotelRetrieve,
-                    Filter = combinedFilter // Aplica o filtro combinado
+                    OldFilter = combinedFilter,
+                    VectorPropertyName = "Embedding",
+                    //Filter = combinedFilter // Aplica o filtro combinado
                 };
             }
 

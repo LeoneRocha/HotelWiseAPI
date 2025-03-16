@@ -9,7 +9,7 @@ $filter = Read-Host "Digite parte do nome para filtrar dependencias (deixe em br
 [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
 
 # Lista pacotes desatualizados e salva em UTF-8
-dotnet list package --outdated | Out-File -FilePath $outdatedPackagesFile -Encoding UTF8
+dotnet list package  | Out-File -FilePath $outdatedPackagesFile -Encoding UTF8
 
 # Funcao para buscar dependencias no NuGet
 function Get-NuGetDependencies {

@@ -1,45 +1,107 @@
-﻿
-As fontes a seguir foram usadas:
-   https://api.nuget.org/v3/index.json
-   C:\Program Files (x86)\Microsoft SDKs\NuGetPackages\
-
-O projeto 'HotelWise.Data' tem as seguintes atualizações para seus pacotes
+﻿O projeto 'HotelWise.Data' tem as seguintes referências de pacote
    [net8.0]: 
-   Pacote de Nível Superior                        Solicitado   Resolvido   Mais Recente
-   > Microsoft.EntityFrameworkCore                 8.0.13       8.0.13      9.0.3       
-   > Microsoft.EntityFrameworkCore.Design          8.0.13       8.0.13      9.0.3       
-   > Microsoft.EntityFrameworkCore.Relational      8.0.13       8.0.13      9.0.3       
-   > Microsoft.EntityFrameworkCore.SqlServer       8.0.13       8.0.13      9.0.3       
-   > Microsoft.EntityFrameworkCore.Tools           8.0.13       8.0.13      9.0.3       
+   Pacote de Nível Superior                                 Solicitado   Resolvido
+   > Azure.Data.Tables                                      12.10.0      12.10.0  
+   > Azure.Identity                                         1.13.2       1.13.2   
+   > Bogus                                                  35.6.2       35.6.2   
+   > Microsoft.EntityFrameworkCore                          8.0.13       8.0.13   
+   > Microsoft.EntityFrameworkCore.Design                   8.0.13       8.0.13   
+   > Microsoft.EntityFrameworkCore.Relational               8.0.13       8.0.13   
+   > Microsoft.EntityFrameworkCore.SqlServer                8.0.13       8.0.13   
+   > Microsoft.EntityFrameworkCore.Tools                    8.0.13       8.0.13   
+   > Microsoft.Extensions.Caching.Memory                    9.0.3        9.0.3    
+   > Microsoft.Extensions.Configuration.FileExtensions      9.0.3        9.0.3    
+   > Microsoft.Extensions.Configuration.Json                9.0.3        9.0.3    
+   > Newtonsoft.Json                                        13.0.3       13.0.3   
+   > Pomelo.EntityFrameworkCore.MySql                       8.0.3        8.0.3    
+   > System.Drawing.Common                                  9.0.3        9.0.3    
+   > System.Formats.Asn1                                    9.0.3        9.0.3    
+   > System.Text.Json                                       9.0.3        9.0.3    
 
-O projeto 'HotelWise.API' tem as seguintes atualizações para seus pacotes
+O projeto 'HotelWise.API' tem as seguintes referências de pacote
    [net8.0]: 
-   Pacote de Nível Superior                             Solicitado     Resolvido      Mais Recente             
-   > Microsoft.EntityFrameworkCore                      8.0.13         8.0.13         9.0.3                    
-   > Microsoft.EntityFrameworkCore.Design               8.0.13         8.0.13         9.0.3                    
-   > Microsoft.EntityFrameworkCore.Relational           8.0.13         8.0.13         9.0.3                    
-   > Microsoft.EntityFrameworkCore.SqlServer            8.0.13         8.0.13         9.0.3                    
-   > Microsoft.EntityFrameworkCore.Tools                8.0.13         8.0.13         9.0.3                    
-   > Microsoft.SemanticKernel.Connectors.MistralAI      1.29.0-alpha   1.29.0-alpha   Não encontrado nas fontes
+   Pacote de Nível Superior                                       Solicitado     Resolvido   
+   > Azure.Identity                                               1.13.2         1.13.2      
+   > Microsoft.EntityFrameworkCore                                8.0.13         8.0.13      
+   > Microsoft.EntityFrameworkCore.Design                         8.0.13         8.0.13      
+   > Microsoft.EntityFrameworkCore.Relational                     8.0.13         8.0.13      
+   > Microsoft.EntityFrameworkCore.SqlServer                      8.0.13         8.0.13      
+   > Microsoft.EntityFrameworkCore.Tools                          8.0.13         8.0.13      
+   > Microsoft.Extensions.Configuration                           9.0.3          9.0.3       
+   > Microsoft.Extensions.Configuration.Binder                    9.0.3          9.0.3       
+   > Microsoft.Extensions.Configuration.CommandLine               9.0.3          9.0.3       
+   > Microsoft.Extensions.Configuration.EnvironmentVariables      9.0.3          9.0.3       
+   > Microsoft.Extensions.Configuration.Json                      9.0.3          9.0.3       
+   > Microsoft.Graph                                              5.73.0         5.73.0      
+   > Microsoft.IdentityModel.JsonWebTokens                        8.6.1          8.6.1       
+   > Microsoft.SemanticKernel.Connectors.MistralAI                1.40.1-alpha   1.40.1-alpha
+   > Microsoft.SemanticKernel.Connectors.Ollama                   1.41.0-alpha   1.41.0-alpha
+   > Microsoft.VisualStudio.Azure.Containers.Tools.Targets        1.21.2         1.21.2      
+   > Serilog.Sinks.Console                                        6.0.0          6.0.0       
+   > Serilog.Sinks.File                                           6.0.0          6.0.0       
+   > System.Formats.Asn1                                          9.0.3          9.0.3       
+   > System.Text.Json                                             9.0.3          9.0.3       
 
-O projeto 'HotelWise.Domain' tem as seguintes atualizações para seus pacotes
+O projeto 'HotelWise.Domain' tem as seguintes referências de pacote
    [net8.0]: 
-   Pacote de Nível Superior                                   Solicitado                Resolvido                 Mais Recente             
-   > Microsoft.AspNetCore.Authentication.JwtBearer            8.0.13                    8.0.13                    9.0.3                    
-   > Microsoft.Extensions.VectorData.Abstractions             9.0.0-preview.1.25078.1   9.0.0-preview.1.25078.1   Não encontrado nas fontes
-   > Microsoft.SemanticKernel                                 1.40.1                    1.40.1                    1.41.0                   
-   > Microsoft.SemanticKernel.Abstractions                    1.40.1                    1.40.1                    1.41.0                   
-   > Microsoft.SemanticKernel.Connectors.Qdrant               1.28.0-preview            1.28.0-preview            Não encontrado nas fontes
-   > Microsoft.SemanticKernel.Core                            1.40.1                    1.40.1                    1.41.0                   
-   > Microsoft.SemanticKernel.PromptTemplates.Handlebars      1.40.1                    1.40.1                    1.41.0                   
+   Pacote de Nível Superior                                     Solicitado                Resolvido              
+   > AutoMapper                                                 14.0.0                    14.0.0                 
+   > Azure.Data.Tables                                          12.10.0                   12.10.0                
+   > Azure.Storage.Blobs                                        12.24.0                   12.24.0                
+   > DocumentFormat.OpenXml                                     3.3.0                     3.3.0                  
+   > DocumentFormat.OpenXml.Framework                           3.3.0                     3.3.0                  
+   > FluentValidation.AspNetCore                                11.3.0                    11.3.0                 
+   > Markdig                                                    0.40.0                    0.40.0                 
+   > Microsoft.AspNetCore.Authentication.JwtBearer              8.0.13                    8.0.13                 
+   > Microsoft.Extensions.Identity.Core                         9.0.3                     9.0.3                  
+   > Microsoft.Extensions.VectorData.Abstractions               9.0.0-preview.1.25078.1   9.0.0-preview.1.25078.1
+   > Microsoft.Identity.Web                                     3.8.0                     3.8.0                  
+   > Microsoft.IdentityModel.JsonWebTokens                      8.6.1                     8.6.1                  
+   > Microsoft.KernelMemory.AI.Ollama                           0.97.250211.1             0.97.250211.1          
+   > Microsoft.SemanticKernel                                   1.40.1                    1.40.1                 
+   > Microsoft.SemanticKernel.Abstractions                      1.40.1                    1.40.1                 
+   > Microsoft.SemanticKernel.Connectors.Qdrant                 1.40.1-preview            1.40.1-preview         
+   > Microsoft.SemanticKernel.Core                              1.40.1                    1.40.1                 
+   > Microsoft.SemanticKernel.Plugins.Memory                    1.40.1-alpha              1.40.1-alpha           
+   > Microsoft.SemanticKernel.PromptTemplates.Handlebars        1.40.1                    1.40.1                 
+   > Microsoft.VisualStudio.Azure.Containers.Tools.Targets      1.21.2                    1.21.2                 
+   > Mistral.SDK                                                2.1.0                     2.1.0                  
+   > Newtonsoft.Json                                            13.0.3                    13.0.3                 
+   > OllamaSharp                                                5.1.7                     5.1.7                  
+   > PDFsharp                                                   6.1.1                     6.1.1                  
+   > PDFsharp-MigraDoc                                          6.1.1                     6.1.1                  
+   > Polly                                                      8.5.2                     8.5.2                  
+   > Polly.Core                                                 8.5.2                     8.5.2                  
+   > QuestPDF                                                   2025.1.6                  2025.1.6               
+   > Serilog                                                    4.2.0                     4.2.0                  
+   > Serilog.AspNetCore                                         9.0.0                     9.0.0                  
+   > Serilog.Sinks.Console                                      6.0.0                     6.0.0                  
+   > Serilog.Sinks.File                                         6.0.0                     6.0.0                  
+   > Swashbuckle.AspNetCore                                     7.3.1                     7.3.1                  
+   > Swashbuckle.AspNetCore.Filters                             8.0.2                     8.0.2                  
+   > System.IO.Packaging                                        9.0.3                     9.0.3                  
+   > System.Security.Claims                                     4.3.0                     4.3.0                  
+   > System.Text.Json                                           9.0.3                     9.0.3                  
 
-O projeto 'HotelWise.Service' tem as seguintes atualizações para seus pacotes
+O projeto 'HotelWise.Service' tem as seguintes referências de pacote
    [net8.0]: 
-   Pacote de Nível Superior                             Solicitado     Resolvido      Mais Recente             
-   > Microsoft.SemanticKernel.Connectors.MistralAI      1.29.0-alpha   1.29.0-alpha   Não encontrado nas fontes
+   Pacote de Nível Superior                             Solicitado     Resolvido   
+   > AutoMapper                                         14.0.0         14.0.0      
+   > Azure.ResourceManager.Authorization                1.1.4          1.1.4       
+   > Azure.Storage.Blobs                                12.24.0        12.24.0     
+   > Azure.Storage.Queues                               12.22.0        12.22.0     
+   > FluentValidation.AspNetCore                        11.3.0         11.3.0      
+   > Microsoft.SemanticKernel.Connectors.MistralAI      1.40.1-alpha   1.40.1-alpha
+   > Microsoft.SemanticKernel.Connectors.Ollama         1.41.0-alpha   1.41.0-alpha
+   > System.Text.Json                                   9.0.3          9.0.3       
 
-O projeto 'GroqApiLibrary' tem as seguintes atualizações para seus pacotes
+O projeto 'GroqApiLibrary' tem as seguintes referências de pacote
    [net8.0]: 
-   Pacote de Nível Superior               Solicitado   Resolvido   Mais Recente
-   > Microsoft.AspNetCore.Components      8.0.13       8.0.13      9.0.3       
+   Pacote de Nível Superior               Solicitado   Resolvido
+   > Microsoft.AspNetCore.Components      8.0.13       8.0.13   
+
+O projeto 'HotelWise.ConsolePOC' tem as seguintes referências de pacote
+   [net8.0]: 
+   Pacote de Nível Superior      Solicitado   Resolvido
+   > OllamaSharp                 5.1.7        5.1.7    
 
