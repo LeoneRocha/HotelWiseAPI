@@ -89,13 +89,13 @@ namespace HotelWise.Service.Configure
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1859", Justification = "Usar interface para promover desacoplamento é intencional.")]
         private static void addOllama(IApplicationIAConfig appConfig, IKernelBuilder builder)
         {
-#pragma warning disable SKEXP0070      
-            //https://ollama.com/library/llama3.2
-            builder.AddOllamaChatCompletion(modelId: "llama3.2", endpoint: new Uri("http://localhost:11434"));
-            //https://ollama.com/library/nomic-embed-text
-            builder.AddOllamaTextEmbeddingGeneration(modelId: "nomic-embed-text", endpoint: new Uri("http://localhost:11434/api/embeddings"));
+//#pragma warning disable SKEXP0070      
+//            //https://ollama.com/library/llama3.2
+//            builder.AddOllamaChatCompletion(modelId: "llama3.2", endpoint: new Uri("http://localhost:11434"));
+//            //https://ollama.com/library/nomic-embed-text
+//            builder.AddOllamaTextEmbeddingGeneration(modelId: "nomic-embed-text", endpoint: new Uri("http://localhost:11434/api/embeddings"));
 
-#pragma warning restore SKEXP0070
+//#pragma warning restore SKEXP0070
         }
 
         private static void addServicesDependecies(IServiceCollection services, Kernel kernel)
