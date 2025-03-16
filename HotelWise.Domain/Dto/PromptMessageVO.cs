@@ -1,4 +1,4 @@
-﻿using HotelWise.Domain.Enuns;
+﻿using HotelWise.Domain.Enuns.IA;
 using HotelWise.Domain.Helpers;
 
 namespace HotelWise.Domain.Dto

@@ -1,4 +1,9 @@
 
+--------- CRIAR NO JSON UMA CONFIG PARA O O OLLAMA 
+
+------ VER O FLUXO 
+
+
 -------- IMPLEMENTAR O SEARCH VECTOR 
 
 --- IMPLEMENTAR O LLM LOCAL USANDO ANYTHIG E OLLAMA para rodar o emmbading localmente para os 100. 

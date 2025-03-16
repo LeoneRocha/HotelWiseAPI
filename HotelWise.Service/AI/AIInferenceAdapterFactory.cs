@@ -1,5 +1,5 @@
 ﻿using HotelWise.Domain.AI.Adapter;
-using HotelWise.Domain.Enuns;
+using HotelWise.Domain.Enuns.IA;
 using HotelWise.Domain.Interfaces;
 using HotelWise.Domain.Interfaces.IA;
 
@@ -13,13 +13,13 @@ namespace HotelWise.Service.AI
             _applicationConfig = applicationConfig;
         }
 
-        public IAIInferenceAdapter CreateAdapter(IAInferenceAdapterType eIAInferenceAdapterType, IModelStrategy modelStrategy)
+        public IAIInferenceAdapter CreateAdapter(AInferenceAdapterType eIAInferenceAdapterType, IModelStrategy modelStrategy)
         {
             switch (eIAInferenceAdapterType)
             {
-                case IAInferenceAdapterType.GroqApi:
+                case AInferenceAdapterType.GroqApi:
                     return new GroqApiAdapter(_applicationConfig, modelStrategy);
-                case IAInferenceAdapterType.Mistral:
+                case AInferenceAdapterType.Mistral:
                     return new MistralApiAdapter(_applicationConfig);
                 default:
                     return new MistralApiAdapter(_applicationConfig);

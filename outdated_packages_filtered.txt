@@ -1,0 +1,45 @@
+﻿
+As fontes a seguir foram usadas:
+   https://api.nuget.org/v3/index.json
+   C:\Program Files (x86)\Microsoft SDKs\NuGetPackages\
+
+O projeto 'HotelWise.Data' tem as seguintes atualizações para seus pacotes
+   [net8.0]: 
+   Pacote de Nível Superior                        Solicitado   Resolvido   Mais Recente
+   > Microsoft.EntityFrameworkCore                 8.0.13       8.0.13      9.0.3       
+   > Microsoft.EntityFrameworkCore.Design          8.0.13       8.0.13      9.0.3       
+   > Microsoft.EntityFrameworkCore.Relational      8.0.13       8.0.13      9.0.3       
+   > Microsoft.EntityFrameworkCore.SqlServer       8.0.13       8.0.13      9.0.3       
+   > Microsoft.EntityFrameworkCore.Tools           8.0.13       8.0.13      9.0.3       
+
+O projeto 'HotelWise.API' tem as seguintes atualizações para seus pacotes
+   [net8.0]: 
+   Pacote de Nível Superior                             Solicitado     Resolvido      Mais Recente             
+   > Microsoft.EntityFrameworkCore                      8.0.13         8.0.13         9.0.3                    
+   > Microsoft.EntityFrameworkCore.Design               8.0.13         8.0.13         9.0.3                    
+   > Microsoft.EntityFrameworkCore.Relational           8.0.13         8.0.13         9.0.3                    
+   > Microsoft.EntityFrameworkCore.SqlServer            8.0.13         8.0.13         9.0.3                    
+   > Microsoft.EntityFrameworkCore.Tools                8.0.13         8.0.13         9.0.3                    
+   > Microsoft.SemanticKernel.Connectors.MistralAI      1.29.0-alpha   1.29.0-alpha   Não encontrado nas fontes
+
+O projeto 'HotelWise.Domain' tem as seguintes atualizações para seus pacotes
+   [net8.0]: 
+   Pacote de Nível Superior                                   Solicitado                Resolvido                 Mais Recente             
+   > Microsoft.AspNetCore.Authentication.JwtBearer            8.0.13                    8.0.13                    9.0.3                    
+   > Microsoft.Extensions.VectorData.Abstractions             9.0.0-preview.1.25078.1   9.0.0-preview.1.25078.1   Não encontrado nas fontes
+   > Microsoft.SemanticKernel                                 1.40.1                    1.40.1                    1.41.0                   
+   > Microsoft.SemanticKernel.Abstractions                    1.40.1                    1.40.1                    1.41.0                   
+   > Microsoft.SemanticKernel.Connectors.Qdrant               1.28.0-preview            1.28.0-preview            Não encontrado nas fontes
+   > Microsoft.SemanticKernel.Core                            1.40.1                    1.40.1                    1.41.0                   
+   > Microsoft.SemanticKernel.PromptTemplates.Handlebars      1.40.1                    1.40.1                    1.41.0                   
+
+O projeto 'HotelWise.Service' tem as seguintes atualizações para seus pacotes
+   [net8.0]: 
+   Pacote de Nível Superior                             Solicitado     Resolvido      Mais Recente             
+   > Microsoft.SemanticKernel.Connectors.MistralAI      1.29.0-alpha   1.29.0-alpha   Não encontrado nas fontes
+
+O projeto 'GroqApiLibrary' tem as seguintes atualizações para seus pacotes
+   [net8.0]: 
+   Pacote de Nível Superior               Solicitado   Resolvido   Mais Recente
+   > Microsoft.AspNetCore.Components      8.0.13       8.0.13      9.0.3       
+

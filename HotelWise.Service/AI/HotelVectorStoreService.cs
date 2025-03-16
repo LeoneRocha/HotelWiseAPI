@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using HotelWise.Domain.Dto;
 using HotelWise.Domain.Dto.SemanticKernel;
-using HotelWise.Domain.Enuns;
+using HotelWise.Domain.Enuns.IA;
 using HotelWise.Domain.Helpers;
 using HotelWise.Domain.Interfaces.IA;
 using HotelWise.Domain.Interfaces.SemanticKernel;
@@ -14,7 +14,7 @@ namespace HotelWise.Service.AI
         private readonly IVectorStoreAdapter<HotelVector> _adapter;
         private readonly IAIInferenceService _aIInferenceService;
         private const string nameCollection = "skhotels";
-        private readonly IAInferenceAdapterType _eIAInferenceAdapterType;
+        private readonly AInferenceAdapterType _eIAInferenceAdapterType;
 
         public HotelVectorStoreService(
             Serilog.ILogger logger,
@@ -22,7 +22,7 @@ namespace HotelWise.Service.AI
             IVectorStoreAdapterFactory adapterFactory,
             IAIInferenceService aIInferenceService) : base(mapper, logger)
         {
-            _eIAInferenceAdapterType = IAInferenceAdapterType.Mistral;
+            _eIAInferenceAdapterType = AInferenceAdapterType.Mistral;
 
             _adapter = adapterFactory.CreateAdapter<HotelVector>();
             _aIInferenceService = aIInferenceService;

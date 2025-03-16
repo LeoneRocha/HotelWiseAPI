@@ -1,5 +1,5 @@
 ﻿using HotelWise.Domain.Dto;
-using HotelWise.Domain.Enuns;
+using HotelWise.Domain.Enuns.IA;
 using HotelWise.Domain.Interfaces;
 using HotelWise.Domain.Interfaces.IA;
 
@@ -8,12 +8,14 @@ namespace HotelWise.Service.Entity
     public class AssistantService : IAssistantService
     {
         private readonly IAIInferenceService _aIInferenceService;
-        private readonly IAInferenceAdapterType _eIAInferenceAdapterType;
+        private readonly AInferenceAdapterType _eIAInferenceAdapterType;
         protected long UserId { get; private set; }
 
         public AssistantService(IAIInferenceService aIInferenceService)
         {
-            _eIAInferenceAdapterType = IAInferenceAdapterType.GroqApi;
+            _eIAInferenceAdapterType = AInferenceAdapterType.GroqApi;//Get TYPE By APPCONFIG 
+
+
             _aIInferenceService = aIInferenceService;
         }
         public void SetUserId(long id)

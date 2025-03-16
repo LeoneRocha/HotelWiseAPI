@@ -1,17 +1,18 @@
 ﻿using HotelWise.Domain.Dto.AppConfig;
+using HotelWise.Domain.Enuns.IA;
 
 namespace HotelWise.Domain.Interfaces
 {
     public interface IRagConfig
     {
-        string AIChatService { get; set; }
-        string AIEmbeddingService { get; set; }
-        bool BuildCollection { get; set; }
-        string CollectionName { get; set; }
-        int DataLoadingBatchSize { get; set; }
-        int DataLoadingBetweenBatchDelayInMilliseconds { get; set; }
-        string[]? PdfFilePaths { get; set; }
-        string VectorStoreType { get; set; }
-        SearchSettings SearchSettings { get; set; }
+        AIChatServiceType AIChatService { get; }
+        AIEmbeddingServiceType AIEmbeddingService { get; }
+        bool BuildCollection { get; }
+        string CollectionName { get; }
+        int DataLoadingBatchSize { get; }
+        int DataLoadingBetweenBatchDelayInMilliseconds { get; }
+        string[]? PdfFilePaths { get; }
+        VectorStoreType VectorStoreType { get; }
+        SearchSettings SearchSettings { get; } 
     }
 }

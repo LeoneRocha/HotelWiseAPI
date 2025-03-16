@@ -1,8 +1,8 @@
 ﻿using System.ComponentModel;
 
-namespace HotelWise.Domain.Enuns
+namespace HotelWise.Domain.Enuns.IA
 {
-    public enum IAInferenceAdapterType
+    public enum AInferenceAdapterType
     {
         /// <summary>
         /// GroqApi
@@ -15,6 +15,6 @@ namespace HotelWise.Domain.Enuns
         /// </summary>
         [Description("Mistral")]
         Mistral = 1,
-         
+
     }
 }

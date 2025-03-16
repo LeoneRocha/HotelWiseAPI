@@ -1,5 +1,6 @@
 ﻿using Bogus;
 using HotelWise.Domain.Dto;
+using HotelWise.Domain.Enuns.IA;
 using HotelWise.Domain.Interfaces.Entity;
 using HotelWise.Domain.Interfaces.IA;
 using HotelWise.Domain.Model;
@@ -110,9 +111,9 @@ namespace HotelWise.Service.Entity
 
         private async Task<string> GenerateDescriptionAndTags(string prompt)
         {
-            PromptMessageVO[] messages = [new PromptMessageVO() { RoleType = Domain.Enuns.RoleAiPromptsType.User, Content = prompt }];
+            PromptMessageVO[] messages = [new PromptMessageVO() { RoleType = RoleAiPromptsType.User, Content = prompt }];
 
-            return await _aIInferenceService.GenerateChatCompletionAsync(messages, Domain.Enuns.IAInferenceAdapterType.GroqApi);
+            return await _aIInferenceService.GenerateChatCompletionAsync(messages, AInferenceAdapterType.GroqApi);
         }
 
         public static string[] ProcessTags(string[] tags)

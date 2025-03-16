@@ -8,6 +8,8 @@ namespace HotelWise.Domain.Dto.AppConfig
     /// </summary>
     public sealed class ApplicationIAConfig : IApplicationIAConfig
     {
+        public const string ConfigSectionName = "ApplicationIAConfig";
+         
         #region FIELDS
         private readonly AzureOpenAIConfig _azureOpenAIConfig = new();
         private readonly AzureOpenAIEmbeddingsConfig _azureOpenAIEmbeddingsConfig = new();
@@ -52,26 +54,26 @@ namespace HotelWise.Domain.Dto.AppConfig
         }
         private void loadStores(IConfiguration configurationManager)
         {
-            configurationManager.GetRequiredSection($"VectorStores:{AzureAISearchConfig.ConfigSectionName}").Bind(this._azureAISearchConfig);
-            configurationManager.GetRequiredSection($"VectorStores:{AzureCosmosDBConfig.MongoDBConfigSectionName}").Bind(this._azureCosmosDBMongoDBConfig);
-            configurationManager.GetRequiredSection($"VectorStores:{AzureCosmosDBConfig.NoSQLConfigSectionName}").Bind(this._azureCosmosDBNoSQLConfig);
-            configurationManager.GetRequiredSection($"VectorStores:{QdrantConfig.ConfigSectionName}").Bind(this._qdrantConfig);
-            configurationManager.GetRequiredSection($"VectorStores:{RedisConfig.ConfigSectionName}").Bind(this._redisConfig);
-            configurationManager.GetRequiredSection($"VectorStores:{WeaviateConfig.ConfigSectionName}").Bind(this._weaviateConfig);
+            configurationManager.GetRequiredSection($"{ApplicationIAConfig.ConfigSectionName}:VectorStores:{AzureAISearchConfig.ConfigSectionName}").Bind(this._azureAISearchConfig);
+            configurationManager.GetRequiredSection($"{ApplicationIAConfig.ConfigSectionName}:VectorStores:{AzureCosmosDBConfig.MongoDBConfigSectionName}").Bind(this._azureCosmosDBMongoDBConfig);
+            configurationManager.GetRequiredSection($"{ApplicationIAConfig.ConfigSectionName}:VectorStores:{AzureCosmosDBConfig.NoSQLConfigSectionName}").Bind(this._azureCosmosDBNoSQLConfig);
+            configurationManager.GetRequiredSection($"{ApplicationIAConfig.ConfigSectionName}:VectorStores:{QdrantConfig.ConfigSectionName}").Bind(this._qdrantConfig);
+            configurationManager.GetRequiredSection($"{ApplicationIAConfig.ConfigSectionName}:VectorStores:{RedisConfig.ConfigSectionName}").Bind(this._redisConfig);
+            configurationManager.GetRequiredSection($"{ApplicationIAConfig.ConfigSectionName}:VectorStores:{WeaviateConfig.ConfigSectionName}").Bind(this._weaviateConfig);
         }
         private void loadEmbeddings(IConfiguration configurationManager)
         {    
-            configurationManager.GetRequiredSection($"AIServices:{AzureOpenAIEmbeddingsConfig.ConfigSectionName}").Bind(this._azureOpenAIEmbeddingsConfig);
-            configurationManager.GetRequiredSection($"AIServices:{OpenAIEmbeddingsConfig.ConfigSectionName}").Bind(this._openAIEmbeddingsConfig);
-            configurationManager.GetRequiredSection($"AIServices:{MistralApíEmbeddingsConfig.ConfigSectionName}").Bind(this._mistralApíEmbeddingsConfig);
+            configurationManager.GetRequiredSection($"{ApplicationIAConfig.ConfigSectionName}:AIServices:{AzureOpenAIEmbeddingsConfig.ConfigSectionName}").Bind(this._azureOpenAIEmbeddingsConfig);
+            configurationManager.GetRequiredSection($"{ApplicationIAConfig.ConfigSectionName}:AIServices:{OpenAIEmbeddingsConfig.ConfigSectionName}").Bind(this._openAIEmbeddingsConfig);
+            configurationManager.GetRequiredSection($"{ApplicationIAConfig.ConfigSectionName}:AIServices:{MistralApíEmbeddingsConfig.ConfigSectionName}").Bind(this._mistralApíEmbeddingsConfig);
         }
 
         private void loadIAServices(IConfiguration configurationManager)
         {
-            configurationManager.GetRequiredSection($"AIServices:{AzureOpenAIConfig.ConfigSectionName}").Bind(this._azureOpenAIConfig);
-            configurationManager.GetRequiredSection($"AIServices:{OpenAIConfig.ConfigSectionName}").Bind(this._openAIConfig);
-            configurationManager.GetRequiredSection($"AIServices:{MistralApiConfig.ConfigSectionName}").Bind(this._mistralApiConfig);
-            configurationManager.GetRequiredSection($"AIServices:{GroqApiConfig.ConfigSectionName}").Bind(this._groqApiConfig);
+            configurationManager.GetRequiredSection($"{ApplicationIAConfig.ConfigSectionName}:AIServices:{AzureOpenAIConfig.ConfigSectionName}").Bind(this._azureOpenAIConfig);
+            configurationManager.GetRequiredSection($"{ApplicationIAConfig.ConfigSectionName}:AIServices:{OpenAIConfig.ConfigSectionName}").Bind(this._openAIConfig);
+            configurationManager.GetRequiredSection($"{ApplicationIAConfig.ConfigSectionName}:AIServices:{MistralApiConfig.ConfigSectionName}").Bind(this._mistralApiConfig);
+            configurationManager.GetRequiredSection($"{ApplicationIAConfig.ConfigSectionName}:AIServices:{GroqApiConfig.ConfigSectionName}").Bind(this._groqApiConfig);
         } 
     }
 }

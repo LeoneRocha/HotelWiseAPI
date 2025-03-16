@@ -1,15 +1,50 @@
 
+https://learn.microsoft.com/pt-br/semantic-kernel/
+
+https://learn.microsoft.com/pt-br/semantic-kernel/
+
 --------- INstalar o LLM LOCAL 
 
 ---------AJUSTAR O PROJETO COM USAR O LLM LOCAL ENDPOINTS ETC 
 
 
 
+$env:STORAGE_LOCATION="$HOME\Documents\anythingllm"; `
+If(!(Test-Path $env:STORAGE_LOCATION)) {New-Item $env:STORAGE_LOCATION -ItemType Directory}; `
+If(!(Test-Path "$env:STORAGE_LOCATION\.env")) {New-Item "$env:STORAGE_LOCATION\.env" -ItemType File}; `
+docker run -d -p 3001:3001 `
+--cap-add SYS_ADMIN `
+-v "$env:STORAGE_LOCATION`:/app/server/storage" `
+-v "$env:STORAGE_LOCATION\.env:/app/server/.env" `
+-e STORAGE_DIR="/app/server/storage" `
+mintplexlabs/anythingllm;
 
 
 
+samantha-mistral
+
+https://ollama.com/library/samantha-mistral
 
 
+
+https://devblogs.microsoft.com/semantic-kernel/introducing-new-ollama-connector-for-local-models/
+
+
+https://mehmetozkaya.medium.com/ollama-integration-using-semantic-kernel-and-c-a-step-by-step-guide-311b7d163b67
+
+https://github.com/awaescher/OllamaSharp
+
+https://medium.com/@johnkane24/using-semantic-kernel-with-ollama-to-access-phi-3-model-68bb5b2fcb7b
+
+
+https://devblogs.microsoft.com/dotnet/introducing-microsoft-extensions-ai-preview/
+
+
+
+https://mehmetozkaya.medium.com/ollama-integration-using-semantic-kernel-and-c-a-step-by-step-guide-311b7d163b67  <<<<<<<<<<<
+
+
+API 51HKA0Y-MR2MPSE-PHKQGP5-MYT4D9D
 
 
 
@@ -180,7 +215,7 @@ Aqui, `-ubuntu22.04` especifica a versão do sistema base da imagem. Certifique-
 
 ### **2. Verifique as Tags Disponíveis**
 Você pode verificar as tags disponíveis para a imagem CUDA no Docker Hub:
-- Acesse o repositório oficial da NVIDIA no Docker Hub: [NVIDIA CUDA Images](https://hub.docker.com/r/nvidia/cuda).
+- Acesse o repositório oficial da NVIDIA no Docker Hub: [NVIDIA CUDA Images](	).
 - Procure pela versão `11.8.0` e escolha a tag apropriada, como `11.8.0-base-ubuntu22.04`.
 
 ---

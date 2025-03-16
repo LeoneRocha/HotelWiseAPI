@@ -1,6 +1,6 @@
 ﻿using HotelWise.Domain.AI.Models;
 using HotelWise.Domain.Dto;
-using HotelWise.Domain.Enuns;
+using HotelWise.Domain.Enuns.IA;
 using HotelWise.Domain.Interfaces.IA;
 using Microsoft.Extensions.Configuration;
 
@@ -15,14 +15,17 @@ namespace HotelWise.Service.AI
             _adapterFactory = adapterFactory;
         }
 
-        public async Task<string> GenerateChatCompletionAsync(PromptMessageVO[] messages, IAInferenceAdapterType eIAInferenceAdapterType)
+        public async Task<string> GenerateChatCompletionAsync(PromptMessageVO[] messages, AInferenceAdapterType eIAInferenceAdapterType)
         {
             var model = new MixtralModelStrategy(); 
+
+
+
             var _adapter = _adapterFactory.CreateAdapter(eIAInferenceAdapterType, model);
             return await _adapter!.GenerateChatCompletionAsync(messages);
         }
 
-        public async Task<float[]> GenerateEmbeddingAsync(string text, IAInferenceAdapterType eIAInferenceAdapterType)
+        public async Task<float[]> GenerateEmbeddingAsync(string text, AInferenceAdapterType eIAInferenceAdapterType)
         {
             var model = new MixtralModelStrategy(); 
             var _adapter = _adapterFactory.CreateAdapter(eIAInferenceAdapterType, model);

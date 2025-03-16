@@ -18,7 +18,7 @@ namespace HotelWise.Service.Configure
         public static void SetupSemanticKernelProvider(IServiceCollection services, IConfiguration configuration)
         {
             var appConfig = addApplicationConfig(services, configuration);
-            
+
             addRagConfig(services, configuration);
 
             var builder = Kernel.CreateBuilder();
@@ -28,9 +28,7 @@ namespace HotelWise.Service.Configure
 
             addVectorStores(appConfig, builder);
 
-            addAIServices(appConfig, builder);
-
-            addTextEmbeddingGeneration(appConfig, builder);
+            addAIServices(appConfig, builder); 
 
             var kernel = builder.Build();
 
@@ -57,29 +55,45 @@ namespace HotelWise.Service.Configure
             services.AddSingleton<IApplicationIAConfig>(appConfig);
             return appConfig;
         }
-
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "SKEXP0070", Justification = "Usar interface para promover desacoplamento é intencional.")]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1859", Justification = "Usar interface para promover desacoplamento é intencional.")]
-        private static void addTextEmbeddingGeneration(IApplicationIAConfig appConfig, IKernelBuilder builder)
-        {
-            var mistral = appConfig.MistralApíEmbeddingsConfig;
-#pragma warning disable SKEXP0070
-
-            builder.AddMistralTextEmbeddingGeneration(modelId: mistral.ModelId, apiKey: mistral.ApiKey);
-
-#pragma warning restore SKEXP0070
-        }
+         
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "SKEXP0070", Justification = "Usar interface para promover desacoplamento é intencional.")]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1859", Justification = "Usar interface para promover desacoplamento é intencional.")]
 
         private static void addAIServices(IApplicationIAConfig appConfig, IKernelBuilder builder)
         {
-            var mistral = appConfig.MistralApiConfig;
+
 
 #pragma warning disable SKEXP0070
+            //addMistral(appConfig, builder);
+            // Adiciona o serviço de conclusão de chat Ollama
+            addOllama(appConfig, builder);
 
+#pragma warning restore SKEXP0070
+        }
+
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "SKEXP0070", Justification = "Usar interface para promover desacoplamento é intencional.")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1859", Justification = "Usar interface para promover desacoplamento é intencional.")]
+        private static void addMistral(IApplicationIAConfig appConfig, IKernelBuilder builder)
+        {
+            var mistralEmbeddings = appConfig.MistralApíEmbeddingsConfig;
+            var mistral = appConfig.MistralApiConfig;
+#pragma warning disable SKEXP0070
             // Optional; for targeting specific services within Semantic Kernel    httpClient: new HttpClient() // Optional; for customizing HTTP client , endpoint: new Uri("YOUR_ENDPOINT"), serviceId: "SERVICE_ID"
-            builder.AddMistralChatCompletion(modelId: mistral.ModelId, apiKey: mistral.ApiKey);
+            //builder.AddMistralChatCompletion(modelId: mistral.ModelId, apiKey: mistral.ApiKey);
+            //builder.AddMistralTextEmbeddingGeneration(modelId: mistral.ModelId, apiKey: mistral.ApiKey);
+
+#pragma warning restore SKEXP0070
+        }
+
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "SKEXP0070", Justification = "Usar interface para promover desacoplamento é intencional.")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1859", Justification = "Usar interface para promover desacoplamento é intencional.")]
+        private static void addOllama(IApplicationIAConfig appConfig, IKernelBuilder builder)
+        {
+#pragma warning disable SKEXP0070      
+            //https://ollama.com/library/llama3.2
+            builder.AddOllamaChatCompletion(modelId: "llama3.2", endpoint: new Uri("http://localhost:11434"));
+            //https://ollama.com/library/nomic-embed-text
+            builder.AddOllamaTextEmbeddingGeneration(modelId: "nomic-embed-text", endpoint: new Uri("http://localhost:11434/api/embeddings"));
 
 #pragma warning restore SKEXP0070
         }
