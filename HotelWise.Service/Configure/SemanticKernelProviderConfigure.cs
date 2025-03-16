@@ -64,9 +64,9 @@ namespace HotelWise.Service.Configure
 
 
 #pragma warning disable SKEXP0070
-            //addMistral(appConfig, builder);
+            addMistral(appConfig, builder);
             // Adiciona o serviço de conclusão de chat Ollama
-            addOllama(appConfig, builder);
+            //addOllama(appConfig, builder);
 
 #pragma warning restore SKEXP0070
         }
@@ -79,8 +79,8 @@ namespace HotelWise.Service.Configure
             var mistral = appConfig.MistralApiConfig;
 #pragma warning disable SKEXP0070
             // Optional; for targeting specific services within Semantic Kernel    httpClient: new HttpClient() // Optional; for customizing HTTP client , endpoint: new Uri("YOUR_ENDPOINT"), serviceId: "SERVICE_ID"
-            //builder.AddMistralChatCompletion(modelId: mistral.ModelId, apiKey: mistral.ApiKey);
-            //builder.AddMistralTextEmbeddingGeneration(modelId: mistral.ModelId, apiKey: mistral.ApiKey);
+            builder.AddMistralChatCompletion(modelId: mistral.ModelId, apiKey: mistral.ApiKey);
+            builder.AddMistralTextEmbeddingGeneration(modelId: mistral.ModelId, apiKey: mistral.ApiKey);
 
 #pragma warning restore SKEXP0070
         }

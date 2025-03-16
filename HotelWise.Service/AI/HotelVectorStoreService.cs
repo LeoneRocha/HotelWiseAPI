@@ -14,7 +14,7 @@ namespace HotelWise.Service.AI
         private readonly IVectorStoreAdapter<HotelVector> _adapter;
         private readonly IAIInferenceService _aIInferenceService;
         private const string nameCollection = "skhotels";
-        private readonly AInferenceAdapterType _eIAInferenceAdapterType;
+        private readonly InferenceAiAdapterType _eIAInferenceAdapterType;
 
         public HotelVectorStoreService(
             Serilog.ILogger logger,
@@ -22,7 +22,7 @@ namespace HotelWise.Service.AI
             IVectorStoreAdapterFactory adapterFactory,
             IAIInferenceService aIInferenceService) : base(mapper, logger)
         {
-            _eIAInferenceAdapterType = AInferenceAdapterType.Mistral;
+            _eIAInferenceAdapterType = InferenceAiAdapterType.Mistral;
 
             _adapter = adapterFactory.CreateAdapter<HotelVector>();
             _aIInferenceService = aIInferenceService;

@@ -1,4 +1,6 @@
-﻿namespace HotelWise.Domain.Dto.AppConfig
+﻿using HotelWise.Domain.Interfaces.AppConfig;
+
+namespace HotelWise.Domain.Dto.AppConfig
 {
     public class AzureAdConfig : IAzureAdConfig
     {

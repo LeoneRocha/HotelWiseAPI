@@ -4,6 +4,6 @@ namespace HotelWise.Domain.Interfaces.IA
 {
     public interface IAIInferenceAdapterFactory
     {
-        IAIInferenceAdapter CreateAdapter(AInferenceAdapterType eIAInferenceAdapterType, IModelStrategy modelStrategy);
+        IAIInferenceAdapter CreateAdapter(InferenceAiAdapterType eIAInferenceAdapterType, IModelStrategy modelStrategy);
     }
 }

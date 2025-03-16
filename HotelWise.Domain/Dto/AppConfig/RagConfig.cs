@@ -7,7 +7,7 @@ namespace HotelWise.Domain.Dto.AppConfig
 {  
     public sealed class RagConfig : IRagConfig
     {
-        public const string ConfigSectionName = "Rag";
+        public const string ConfigSectionName = "ApplicationIAConfig:Rag";
 
         [Required]
         [JsonConverter(typeof(JsonStringEnumConverter))]

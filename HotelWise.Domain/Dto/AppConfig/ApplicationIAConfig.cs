@@ -1,5 +1,7 @@
-﻿using HotelWise.Domain.Interfaces;
+﻿using HotelWise.Domain.Enuns.IA;
+using HotelWise.Domain.Interfaces;
 using Microsoft.Extensions.Configuration;
+using System;
 
 namespace HotelWise.Domain.Dto.AppConfig
 {
@@ -9,7 +11,7 @@ namespace HotelWise.Domain.Dto.AppConfig
     public sealed class ApplicationIAConfig : IApplicationIAConfig
     {
         public const string ConfigSectionName = "ApplicationIAConfig";
-         
+
         #region FIELDS
         private readonly AzureOpenAIConfig _azureOpenAIConfig = new();
         private readonly AzureOpenAIEmbeddingsConfig _azureOpenAIEmbeddingsConfig = new();
@@ -42,7 +44,6 @@ namespace HotelWise.Domain.Dto.AppConfig
         public MistralApiConfig MistralApiConfig => this._mistralApiConfig;
         public MistralApíEmbeddingsConfig MistralApíEmbeddingsConfig => this._mistralApíEmbeddingsConfig;
         public GroqApiConfig GroqApiConfig => this._groqApiConfig;
-
         #endregion PROPERTIES
 
         public ApplicationIAConfig(IConfiguration configurationManager)
@@ -52,6 +53,48 @@ namespace HotelWise.Domain.Dto.AppConfig
             loadStores(configurationManager);
             loadEmbeddings(configurationManager);
         }
+
+        // Method to get the chat service configuration based on the type
+        public object GetChatServiceConfig(AIChatServiceType serviceType)
+        {
+            return serviceType switch
+            {
+                AIChatServiceType.AzureOpenAI => _azureOpenAIConfig,
+                AIChatServiceType.OpenAI => _openAIConfig,
+                AIChatServiceType.MistralApi => _mistralApiConfig,
+                AIChatServiceType.GroqApi => _groqApiConfig,
+                _ => throw new NotImplementedException($"Configuration definition not implemented for chat service: {serviceType}")
+            };
+        }
+
+        // Method to get the embedding service configuration based on the type
+        public object GetEmbeddingServiceConfig(AIEmbeddingServiceType embeddingType)
+        {
+            return embeddingType switch
+            {
+                AIEmbeddingServiceType.AzureOpenAIEmbeddings => _azureOpenAIEmbeddingsConfig,
+                AIEmbeddingServiceType.OpenAIEmbeddings => _openAIEmbeddingsConfig,
+                AIEmbeddingServiceType.MistralApiEmbeddings => _mistralApíEmbeddingsConfig,
+                _ => throw new NotImplementedException($"Configuration definition not implemented for embedding service: {embeddingType}")
+            };
+        }
+
+        // Method to get the Vector Store configuration based on the type
+        public object? GetVectorStoreConfig(VectorStoreType storeType)
+        {
+            return storeType switch
+            {
+                VectorStoreType.AzureAISearch => _azureAISearchConfig,
+                VectorStoreType.AzureCosmosDBMongoDB => _azureCosmosDBMongoDBConfig,
+                VectorStoreType.AzureCosmosDBNoSQL => _azureCosmosDBNoSQLConfig,
+                VectorStoreType.Qdrant => _qdrantConfig,
+                VectorStoreType.Redis => _redisConfig,
+                VectorStoreType.Weaviate => _weaviateConfig,
+                VectorStoreType.InMemory => null, // InMemory does not require configuration
+                _ => throw new NotImplementedException($"Configuration definition not implemented for Vector Store: {storeType}")
+            };
+        }
+
         private void loadStores(IConfiguration configurationManager)
         {
             configurationManager.GetRequiredSection($"{ApplicationIAConfig.ConfigSectionName}:VectorStores:{AzureAISearchConfig.ConfigSectionName}").Bind(this._azureAISearchConfig);
@@ -61,8 +104,9 @@ namespace HotelWise.Domain.Dto.AppConfig
             configurationManager.GetRequiredSection($"{ApplicationIAConfig.ConfigSectionName}:VectorStores:{RedisConfig.ConfigSectionName}").Bind(this._redisConfig);
             configurationManager.GetRequiredSection($"{ApplicationIAConfig.ConfigSectionName}:VectorStores:{WeaviateConfig.ConfigSectionName}").Bind(this._weaviateConfig);
         }
+
         private void loadEmbeddings(IConfiguration configurationManager)
-        {    
+        {
             configurationManager.GetRequiredSection($"{ApplicationIAConfig.ConfigSectionName}:AIServices:{AzureOpenAIEmbeddingsConfig.ConfigSectionName}").Bind(this._azureOpenAIEmbeddingsConfig);
             configurationManager.GetRequiredSection($"{ApplicationIAConfig.ConfigSectionName}:AIServices:{OpenAIEmbeddingsConfig.ConfigSectionName}").Bind(this._openAIEmbeddingsConfig);
             configurationManager.GetRequiredSection($"{ApplicationIAConfig.ConfigSectionName}:AIServices:{MistralApíEmbeddingsConfig.ConfigSectionName}").Bind(this._mistralApíEmbeddingsConfig);
@@ -74,6 +118,6 @@ namespace HotelWise.Domain.Dto.AppConfig
             configurationManager.GetRequiredSection($"{ApplicationIAConfig.ConfigSectionName}:AIServices:{OpenAIConfig.ConfigSectionName}").Bind(this._openAIConfig);
             configurationManager.GetRequiredSection($"{ApplicationIAConfig.ConfigSectionName}:AIServices:{MistralApiConfig.ConfigSectionName}").Bind(this._mistralApiConfig);
             configurationManager.GetRequiredSection($"{ApplicationIAConfig.ConfigSectionName}:AIServices:{GroqApiConfig.ConfigSectionName}").Bind(this._groqApiConfig);
-        } 
+        }
     }
 }

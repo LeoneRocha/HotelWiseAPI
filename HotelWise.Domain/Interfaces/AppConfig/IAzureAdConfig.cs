@@ -1,4 +1,4 @@
-﻿namespace HotelWise.Domain.Dto.AppConfig
+﻿namespace HotelWise.Domain.Interfaces.AppConfig
 {
     public interface IAzureAdConfig
     {

@@ -5,13 +5,11 @@ namespace HotelWise.Domain.Dto.AppConfig;
 /// <summary>
 /// Azure OpenAI service settings.
 /// </summary>
-public sealed class AzureOpenAIConfig
+public sealed class AzureOpenAIConfig : AiInferenceConfigBase
 {
-    public const string ConfigSectionName = "AzureOpenAI";
+    public new static string ConfigSectionName => "AzureOpenAI";
 
     [Required]
     public string ChatDeploymentName { get; set; } = string.Empty;
 
-    [Required]
-    public string Endpoint { get; set; } = string.Empty;
 }

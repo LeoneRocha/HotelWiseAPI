@@ -2,7 +2,7 @@
 
 namespace HotelWise.Domain.Enuns.IA
 {
-    public enum AInferenceAdapterType
+    public enum InferenceAiAdapterType
     {
         /// <summary>
         /// GroqApi

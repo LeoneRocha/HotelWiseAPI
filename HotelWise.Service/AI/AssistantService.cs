@@ -8,12 +8,12 @@ namespace HotelWise.Service.Entity
     public class AssistantService : IAssistantService
     {
         private readonly IAIInferenceService _aIInferenceService;
-        private readonly AInferenceAdapterType _eIAInferenceAdapterType;
+        private readonly InferenceAiAdapterType _eIAInferenceAdapterType;
         protected long UserId { get; private set; }
 
         public AssistantService(IAIInferenceService aIInferenceService)
         {
-            _eIAInferenceAdapterType = AInferenceAdapterType.GroqApi;//Get TYPE By APPCONFIG 
+            _eIAInferenceAdapterType = InferenceAiAdapterType.GroqApi;//Get TYPE By APPCONFIG 
 
 
             _aIInferenceService = aIInferenceService;

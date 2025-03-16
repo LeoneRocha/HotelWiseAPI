@@ -113,7 +113,7 @@ namespace HotelWise.Service.Entity
         {
             PromptMessageVO[] messages = [new PromptMessageVO() { RoleType = RoleAiPromptsType.User, Content = prompt }];
 
-            return await _aIInferenceService.GenerateChatCompletionAsync(messages, AInferenceAdapterType.GroqApi);
+            return await _aIInferenceService.GenerateChatCompletionAsync(messages, InferenceAiAdapterType.GroqApi);
         }
 
         public static string[] ProcessTags(string[] tags)

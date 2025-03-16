@@ -13,13 +13,13 @@ namespace HotelWise.Service.AI
             _applicationConfig = applicationConfig;
         }
 
-        public IAIInferenceAdapter CreateAdapter(AInferenceAdapterType eIAInferenceAdapterType, IModelStrategy modelStrategy)
+        public IAIInferenceAdapter CreateAdapter(InferenceAiAdapterType eIAInferenceAdapterType, IModelStrategy modelStrategy)
         {
             switch (eIAInferenceAdapterType)
             {
-                case AInferenceAdapterType.GroqApi:
+                case InferenceAiAdapterType.GroqApi:
                     return new GroqApiAdapter(_applicationConfig, modelStrategy);
-                case AInferenceAdapterType.Mistral:
+                case InferenceAiAdapterType.Mistral:
                     return new MistralApiAdapter(_applicationConfig);
                 default:
                     return new MistralApiAdapter(_applicationConfig);
