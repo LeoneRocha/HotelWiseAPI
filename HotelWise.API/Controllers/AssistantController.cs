@@ -2,6 +2,7 @@
 using HotelWise.Domain.Helpers;
 using HotelWise.Domain.Interfaces;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HotelWise.API.Controllers

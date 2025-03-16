@@ -16,5 +16,7 @@ namespace HotelWise.Domain.Enuns.IA
         [Description("Mistral")]
         Mistral = 1,
 
+        [Description("Ollama")]
+        Ollama = 2,
     }
 }

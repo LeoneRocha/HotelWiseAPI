@@ -21,6 +21,8 @@ namespace HotelWise.Service.AI
                     return new GroqApiAdapter(_applicationConfig, modelStrategy);
                 case InferenceAiAdapterType.Mistral:
                     return new MistralApiAdapter(_applicationConfig);
+                case InferenceAiAdapterType.Ollama:
+                    return new OllamaAdapter(_applicationConfig);
                 default:
                     return new MistralApiAdapter(_applicationConfig);
             }

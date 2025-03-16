@@ -8,17 +8,18 @@ namespace HotelWise.Domain.Dto.AppConfig;
 public abstract class AiInferenceConfigBase : IAiInferenceConfigBase
 {
     // Propriedade estática protegida na classe base
+    [Required]
     public static string ConfigSectionName { get; protected set; } = string.Empty;
 
-    [Required]
     public string Endpoint { get; set; } = string.Empty;
 
-    [Required]
     public string ApiKey { get; set; } = string.Empty;
-     
-    [Required]
+
     public string ModelId { get; set; } = string.Empty;
 
-    [Required]
     public string? OrgId { get; set; } = null;
+
+    public string EndpointEmbeddings { get; set; } = string.Empty;
+
+    public string ModelIdEmbeddings { get; set; } = string.Empty;
 }

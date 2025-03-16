@@ -27,6 +27,8 @@ namespace HotelWise.Domain.Dto.AppConfig
         private readonly MistralApiConfig _mistralApiConfig = new();
         private readonly GroqApiConfig _groqApiConfig = new();
         private readonly MistralApíEmbeddingsConfig _mistralApíEmbeddingsConfig = new();
+        private readonly OllamaConfig _ollamaConfig = new();
+
         #endregion FIELDS
 
         #region PROPERTIES
@@ -44,6 +46,9 @@ namespace HotelWise.Domain.Dto.AppConfig
         public MistralApiConfig MistralApiConfig => this._mistralApiConfig;
         public MistralApíEmbeddingsConfig MistralApíEmbeddingsConfig => this._mistralApíEmbeddingsConfig;
         public GroqApiConfig GroqApiConfig => this._groqApiConfig;
+        public OllamaConfig OllamaConfig => this._ollamaConfig;
+
+
         #endregion PROPERTIES
 
         public ApplicationIAConfig(IConfiguration configurationManager)
@@ -63,6 +68,7 @@ namespace HotelWise.Domain.Dto.AppConfig
                 AIChatServiceType.OpenAI => _openAIConfig,
                 AIChatServiceType.MistralApi => _mistralApiConfig,
                 AIChatServiceType.GroqApi => _groqApiConfig,
+                AIChatServiceType.Ollama => _ollamaConfig,
                 _ => throw new NotImplementedException($"Configuration definition not implemented for chat service: {serviceType}")
             };
         }
@@ -118,6 +124,8 @@ namespace HotelWise.Domain.Dto.AppConfig
             configurationManager.GetRequiredSection($"{ApplicationIAConfig.ConfigSectionName}:AIServices:{OpenAIConfig.ConfigSectionName}").Bind(this._openAIConfig);
             configurationManager.GetRequiredSection($"{ApplicationIAConfig.ConfigSectionName}:AIServices:{MistralApiConfig.ConfigSectionName}").Bind(this._mistralApiConfig);
             configurationManager.GetRequiredSection($"{ApplicationIAConfig.ConfigSectionName}:AIServices:{GroqApiConfig.ConfigSectionName}").Bind(this._groqApiConfig);
+            configurationManager.GetRequiredSection($"{ApplicationIAConfig.ConfigSectionName}:AIServices:{OllamaConfig.ConfigSectionName}").Bind(this._ollamaConfig);
+
         }
     }
 }

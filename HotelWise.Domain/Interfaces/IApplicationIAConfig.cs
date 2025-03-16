@@ -1,6 +1,7 @@
 ﻿
 
 using HotelWise.Domain.Dto.AppConfig;
+using HotelWise.Domain.Enuns.IA;
 
 namespace HotelWise.Domain.Interfaces
 {
@@ -29,5 +30,11 @@ namespace HotelWise.Domain.Interfaces
         WeaviateConfig WeaviateConfig { get; }
 
         #endregion VectorStores
+
+
+        object GetChatServiceConfig(AIChatServiceType serviceType);
+        object GetEmbeddingServiceConfig(AIEmbeddingServiceType embeddingType);
+
+        object? GetVectorStoreConfig(VectorStoreType storeType);
     }
 }

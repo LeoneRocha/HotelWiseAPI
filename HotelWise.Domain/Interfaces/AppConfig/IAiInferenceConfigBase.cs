@@ -6,5 +6,7 @@
         string Endpoint { get; set; }
         public string ModelId { get; set; }
         string? OrgId { get; set; }
+        string EndpointEmbeddings { get; set; }
+        string ModelIdEmbeddings { get; set; }
     }
 }
