@@ -14,14 +14,14 @@ public static class MarkdownHelper
             return string.Empty;
 
         // Expressões regulares para remover elementos Markdown
-        var result = Regex.Replace(markdownText, @"(\*\*|__|~~|`|_|[*[\]()])", ""); // Negrito, itálico, links, etc.
-        result = Regex.Replace(result, @"\!\[.*?\]\(.*?\)", ""); // Imagens ![alt](url)
-        result = Regex.Replace(result, @"\[.*?\]\(.*?\)", ""); // Links [text](url)
-        result = Regex.Replace(result, @"#{1,6}\s*", ""); // Headers (#, ##, ###, etc.)
-        result = Regex.Replace(result, @">\s*", ""); // Blocos de citação >
-        result = Regex.Replace(result, @"^\s*\-\s+", "", RegexOptions.Multiline); // Listas com '-'
-        result = Regex.Replace(result, @"^\s*\*\s+", "", RegexOptions.Multiline); // Listas com '*'
-        result = Regex.Replace(result, @"^\s*\d+\.\s+", "", RegexOptions.Multiline); // Listas ordenadas '1. ...'
+        var result = Regex.Replace(markdownText, @"(\*\*|__|~~|`|_|[*[\]()])", "", RegexOptions.None, TimeSpan.FromMilliseconds(100)); // Negrito, itálico, links, etc.
+        result = Regex.Replace(result, @"\!\[.*?\]\(.*?\)", "", RegexOptions.None, TimeSpan.FromMilliseconds(100)); // Imagens ![alt](url)
+        result = Regex.Replace(result, @"\[.*?\]\(.*?\)", "", RegexOptions.None, TimeSpan.FromMilliseconds(100)); // Links [text](url)
+        result = Regex.Replace(result, @"#{1,6}\s*", "", RegexOptions.None, TimeSpan.FromMilliseconds(100)); // Headers (#, ##, ###, etc.)
+        result = Regex.Replace(result, @">\s*", "", RegexOptions.None, TimeSpan.FromMilliseconds(100)); // Blocos de citação >
+        result = Regex.Replace(result, @"^\s*\-\s+", "", RegexOptions.Multiline, TimeSpan.FromMilliseconds(100)); // Listas com '-'
+        result = Regex.Replace(result, @"^\s*\*\s+", "", RegexOptions.Multiline, TimeSpan.FromMilliseconds(100)); // Listas com '*'
+        result = Regex.Replace(result, @"^\s*\d+\.\s+", "", RegexOptions.Multiline, TimeSpan.FromMilliseconds(100)); // Listas ordenadas '1. ...'
         return result.Trim();
     }
 
@@ -37,7 +37,7 @@ public static class MarkdownHelper
 
         // Expressão regular para detectar padrões comuns de Markdown
         var markdownPattern = @"(\*\*|__|~~|`|_|[*[\]()!#>\-])";
-        return Regex.IsMatch(text, markdownPattern);
+        return Regex.IsMatch(text, markdownPattern, RegexOptions.None, TimeSpan.FromMilliseconds(100));
     }
 
     /// <summary>
