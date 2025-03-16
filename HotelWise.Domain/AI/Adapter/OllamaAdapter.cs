@@ -6,6 +6,8 @@ using HotelWise.Domain.Interfaces.IA;
 using Microsoft.Extensions.AI;
 using OllamaSharp;
 using OllamaSharp.Models.Chat;
+using System.IO;
+using System.Text;
 
 namespace HotelWise.Domain.AI.Adapter
 {
@@ -40,6 +42,8 @@ namespace HotelWise.Domain.AI.Adapter
 
             try
             {
+                // Cria uma instância de chat e envia as mensagens
+                ChatRequest chatRequest = new ChatRequest();
                 // Converte as mensagens para o formato de chat do Ollama
                 var chatMessages = messages.Select(m => new Message
                 {
@@ -47,19 +51,20 @@ namespace HotelWise.Domain.AI.Adapter
                     Content = m.Content
                 }).ToList();
 
-                // Cria uma instância de chat e envia as mensagens
-                var chat = new Chat(_client);
+                chatRequest.Messages = chatMessages;
+                StringBuilder responseContent = new StringBuilder();
 
-                string responseContent = string.Empty;
-                foreach (var message in chatMessages.Where(x => string.IsNullOrWhiteSpace(x.Content)))
+                await foreach (var stream in _client.ChatAsync(chatRequest))
                 {
-                    await foreach (var answerToken in chat.SendAsync(message.Content!))
+                    var msgresult = stream!.Message.Content;
+                    if (msgresult != null)
                     {
-                        responseContent += answerToken;
+                        responseContent.Append(msgresult);
                     }
                 }
-
-                return responseContent;
+                var result = responseContent.ToString();
+                result = MarkdownHelper.ConvertToHtmlIfMarkdown(result);
+                return result;
             }
             catch (Exception ex)
             {
@@ -76,7 +81,7 @@ namespace HotelWise.Domain.AI.Adapter
             {
                 fetchClient(_config.EndpointEmbeddings);
                 _client.SelectedModel = _config.ModelIdEmbeddings;
-                
+
                 // Chama o método GenerateEmbeddingAsync com os tipos explicitamente definidos
                 var embedding = await _client.GenerateEmbeddingAsync(
                     text,
@@ -94,7 +99,7 @@ namespace HotelWise.Domain.AI.Adapter
             {
                 throw new Exception($"Error generating embedding with Ollama: {ex.Message}", ex);
             }
-        } 
+        }
         private string ConvertRole(string role)
         {
             // Mapeia os papéis para o formato suportado pelo OllamaSharp

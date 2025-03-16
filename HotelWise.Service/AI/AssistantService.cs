@@ -69,27 +69,32 @@ namespace HotelWise.Service.Entity
         {
             try
             {
-                PromptMessageVO system1Msg = new PromptMessageVO()
+                PromptMessageVO sysMsgRule01 = new PromptMessageVO()
                 {
                     RoleType = RoleAiPromptsType.System,
-                    Content = "Você é um assistente de viagens e turismo. Você só responde a perguntas relacionadas a viagens, reservas de hotéis e turismo. Se a pergunta estiver fora desse escopo, responda de forma objetiva que não pode ajudar com isso. Não forneca nehuma infomação fora do escopo sobre viagens, reservas de hotéis e turismo.  Responda sempre em idioma português brasileiro em pt-br. E Também em formato html"
+                    Content = "Você é um assistente de viagens e turismo. Você só responde a perguntas relacionadas a viagens, reservas de hotéis e turismo. Se a pergunta estiver fora desse escopo, responda de forma objetiva que não pode ajudar com isso. Não forneca nehuma infomação fora do escopo sobre viagens, reservas de hotéis e turismo."
                 };
-                PromptMessageVO system2Msg = new PromptMessageVO()
+                PromptMessageVO sysMsgRule02 = new PromptMessageVO()
                 {
                     RoleType = RoleAiPromptsType.System,
-                    Content = "Só responda exclusivamente em tópicos relacionados a viagens e turismo, e a responder de forma respeitosa e breve quando a pergunta estiver fora desse escopo. Responda sempre em idioma português brasileiro em pt-br. E Também em formato html"
+                    Content = "Só responda exclusivamente em tópicos relacionados a viagens e turismo, e a responder de forma respeitosa e breve quando a pergunta estiver fora desse escopo."
                 };
-                PromptMessageVO system3Msg = new PromptMessageVO()
+                PromptMessageVO sysMsgLanguage = new PromptMessageVO()
                 {
                     RoleType = RoleAiPromptsType.System,
-                    Content = "Responda sempre em idioma português brasileiro em pt-br. E Também em formato html"
+                    Content = "Responda sempre em idioma português brasileiro em pt-br."
+                };
+                PromptMessageVO sysMsgHtmlOut = new PromptMessageVO()
+                {
+                    RoleType = RoleAiPromptsType.System,
+                    Content = "E responda em formato html com tags html ou em Markdown, formatando a resposta para ser renderizado no site."
                 };
                 PromptMessageVO userMsg = new PromptMessageVO()
                 {
                     RoleType = RoleAiPromptsType.User,
                     Content = searchCriteria.SearchTextCriteria
                 };
-                PromptMessageVO[] messages = [system1Msg, system2Msg, system3Msg, userMsg];
+                PromptMessageVO[] messages = [sysMsgRule01, sysMsgRule02, sysMsgLanguage, sysMsgHtmlOut, userMsg];
 
                 var result = await _aIInferenceService.GenerateChatCompletionAsync(messages, _eIAInferenceAdapterType);
                 return [new AskAssistantResponse() { Response = result }];
