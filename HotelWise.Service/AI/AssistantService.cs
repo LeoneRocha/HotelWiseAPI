@@ -49,7 +49,7 @@ namespace HotelWise.Service.Entity
                 RoleType = RoleAiPromptsType.User,
                 Content = searchCriteria.SearchTextCriteria
             };
-            PromptMessageVO[] messages = [system1Msg, system2Msg, system3Msg, userMsg];
+             PromptMessageVO[] messages = [system1Msg, system2Msg, system3Msg, userMsg];
 
             var result = await _aIInferenceService.GenerateChatCompletionAsync(messages, _eIAInferenceAdapterType);
             return [new AskAssistantResponse() { Response = result }];
