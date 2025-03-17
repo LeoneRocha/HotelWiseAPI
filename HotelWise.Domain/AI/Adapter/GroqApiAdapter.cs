@@ -9,20 +9,20 @@ namespace HotelWise.Domain.AI.Adapter
     public class GroqApiAdapter : IAIInferenceAdapter
     {
         private readonly GroqApiClient _groqApiClient;
-        private readonly IModelStrategy _modelStrategy;
-
-        public GroqApiAdapter(IApplicationIAConfig applicationConfig, IModelStrategy modelStrategy)
+        private readonly string _model;
+        private readonly IModelStrategy? _modelStrategy;
+         
+        public GroqApiAdapter(IApplicationIAConfig applicationConfig)
         {
             _groqApiClient = new GroqApiClient(applicationConfig.GroqApiConfig.ApiKey);
-            _modelStrategy = modelStrategy;
+            _model = applicationConfig.GroqApiConfig.ModelId;
         }
 
         public async Task<string> GenerateChatCompletionAsync(PromptMessageVO[] messages)
-        {
-            var model = _modelStrategy.GetModel();
+        { 
             var request = new JsonObject
             {
-                ["model"] = model,
+                ["model"] = _model,
                 ["messages"] = new JsonArray(messages.Select(m => new JsonObject
                 {
                     ["role"] = m.Role,

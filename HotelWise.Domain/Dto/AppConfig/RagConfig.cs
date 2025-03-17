@@ -11,7 +11,7 @@ namespace HotelWise.Domain.Dto.AppConfig
 
         [Required]
         [JsonConverter(typeof(JsonStringEnumConverter))]
-        public AIChatServiceType AIChatService { get; set; } = AIChatServiceType.OpenAI;
+        public AIChatServiceType AIChatService { get; set; } = AIChatServiceType.Default;
 
         [Required]
         [JsonConverter(typeof(JsonStringEnumConverter))]
@@ -36,11 +36,6 @@ namespace HotelWise.Domain.Dto.AppConfig
         [JsonConverter(typeof(JsonStringEnumConverter))]
         public VectorStoreType VectorStoreType { get; set; } = VectorStoreType.InMemory;
 
-        public SearchSettings SearchSettings { get; set; } = new();
-
-        //// Propriedades de compatibilidade para IRagConfig (se a interface ainda requer strings)
-        //string IRagConfig.AIChatService => AIChatService.ToString();
-        //string IRagConfig.AIEmbeddingService => AIEmbeddingService.ToString();
-        //string IRagConfig.VectorStoreType => VectorStoreType.ToString();
+        public SearchSettings SearchSettings { get; set; } = new(); 
     }
 }

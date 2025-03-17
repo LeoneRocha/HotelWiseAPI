@@ -8,6 +8,7 @@ namespace HotelWise.Domain.Enuns.IA
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public enum AIEmbeddingServiceType
     {
+        DefaultEmbeddings,
         AzureOpenAIEmbeddings,
         OpenAIEmbeddings,
         MistralApiEmbeddings,

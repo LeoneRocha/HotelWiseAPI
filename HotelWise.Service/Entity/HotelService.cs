@@ -80,8 +80,7 @@ namespace HotelWise.Service.Entity
                 var hotel = await _hotelRepository.GetByIdAsync(id);
 
                 var hotelDto = _mapper.Map<HotelDto?>(hotel);
-
-                //TODO CORRIGIR VECTOR dependencias
+                 
                 var hoteVector = await _hotelVectorStoreService.GetById(id);
 
                 if (hoteVector != null && hotelDto != null)

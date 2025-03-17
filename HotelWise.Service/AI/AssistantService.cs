@@ -36,21 +36,22 @@ namespace HotelWise.Service.Entity
                     case AIChatServiceType.GroqApi:
                         return InferenceAiAdapterType.GroqApi;  
                     case AIChatServiceType.MistralApi:
-                        return InferenceAiAdapterType.Mistral;
-                        break;
+                        return InferenceAiAdapterType.Mistral; 
                     case AIChatServiceType.Anthropic:
                         break;
                     case AIChatServiceType.Cohere:
                         break;
-                    case AIChatServiceType.Ollama:
+                    case AIChatServiceType.OllamaAdapter:
                         return InferenceAiAdapterType.Ollama;
                         break;
                     case AIChatServiceType.LlamaCpp:
-                        break;
+                        break; 
+                    case AIChatServiceType.Default:
+                        return InferenceAiAdapterType.GroqApi;
                     case AIChatServiceType.HuggingFace:
                         break;
                     default:
-                        break;
+                        return InferenceAiAdapterType.GroqApi; 
                 }
             }
             return InferenceAiAdapterType.GroqApi; 

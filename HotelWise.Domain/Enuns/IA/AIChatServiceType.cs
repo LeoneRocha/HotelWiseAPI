@@ -5,6 +5,7 @@ namespace HotelWise.Domain.Enuns.IA
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public enum AIChatServiceType
     {
+        Default, 
         AzureOpenAI,
         OpenAI,
         GroqApi,
@@ -12,7 +13,8 @@ namespace HotelWise.Domain.Enuns.IA
         Anthropic,
         Cohere,
         Ollama,
+        OllamaAdapter,
         LlamaCpp,
         HuggingFace
-    } 
+    }
 }

@@ -1,5 +1,6 @@
 ﻿using HotelWise.Domain.Dto.AppConfig;
 using HotelWise.Domain.Dto.SemanticKernel;
+using HotelWise.Domain.Enuns.IA;
 using HotelWise.Domain.Helpers;
 using HotelWise.Domain.Interfaces;
 using Microsoft.Extensions.Configuration;
@@ -28,7 +29,7 @@ namespace HotelWise.Service.Configure
 
             addVectorStores(appConfig, builder);
 
-            addAIServices(appConfig, builder); 
+            addAIServices(appConfig, builder);
 
             var kernel = builder.Build();
 
@@ -55,19 +56,42 @@ namespace HotelWise.Service.Configure
             services.AddSingleton<IApplicationIAConfig>(appConfig);
             return appConfig;
         }
-         
+
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "SKEXP0070", Justification = "Usar interface para promover desacoplamento é intencional.")]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1859", Justification = "Usar interface para promover desacoplamento é intencional.")]
 
         private static void addAIServices(IApplicationIAConfig appConfig, IKernelBuilder builder)
         {
-
+            var aiServiceType = appConfig?.RagConfig?.AIChatService ?? AIChatServiceType.MistralApi;
 
 #pragma warning disable SKEXP0070
-            addMistral(appConfig, builder);
-            // Adiciona o serviço de conclusão de chat Ollama
-            //addOllama(appConfig, builder);
-
+            switch (aiServiceType)
+            {
+                case AIChatServiceType.AzureOpenAI:
+                    break;
+                case AIChatServiceType.OpenAI:
+                    break;
+                case AIChatServiceType.GroqApi:
+                    break;
+                case AIChatServiceType.Default:
+                case AIChatServiceType.MistralApi: 
+                    addMistral(appConfig!, builder);
+                    break;
+                case AIChatServiceType.Anthropic:
+                    break;
+                case AIChatServiceType.Cohere:
+                    break;
+                case AIChatServiceType.Ollama:
+                case AIChatServiceType.OllamaAdapter:
+                    addOllama(appConfig!, builder);
+                    break;
+                case AIChatServiceType.LlamaCpp:
+                    break;
+                case AIChatServiceType.HuggingFace:
+                    break;
+                default:
+                    break;
+            }
 #pragma warning restore SKEXP0070
         }
 
@@ -81,7 +105,6 @@ namespace HotelWise.Service.Configure
             // Optional; for targeting specific services within Semantic Kernel    httpClient: new HttpClient() // Optional; for customizing HTTP client , endpoint: new Uri("YOUR_ENDPOINT"), serviceId: "SERVICE_ID"
             builder.AddMistralChatCompletion(modelId: mistral.ModelId, apiKey: mistral.ApiKey);
             builder.AddMistralTextEmbeddingGeneration(modelId: mistral.ModelId, apiKey: mistral.ApiKey);
-
 #pragma warning restore SKEXP0070
         }
 
@@ -89,13 +112,12 @@ namespace HotelWise.Service.Configure
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1859", Justification = "Usar interface para promover desacoplamento é intencional.")]
         private static void addOllama(IApplicationIAConfig appConfig, IKernelBuilder builder)
         {
-//#pragma warning disable SKEXP0070      
-//            //https://ollama.com/library/llama3.2
-//            builder.AddOllamaChatCompletion(modelId: "llama3.2", endpoint: new Uri("http://localhost:11434"));
-//            //https://ollama.com/library/nomic-embed-text
-//            builder.AddOllamaTextEmbeddingGeneration(modelId: "nomic-embed-text", endpoint: new Uri("http://localhost:11434/api/embeddings"));
-
-//#pragma warning restore SKEXP0070
+#pragma warning disable SKEXP0070      
+            //https://ollama.com/library/llama3.2
+            builder.AddOllamaChatCompletion(modelId: "llama3.2", endpoint: new Uri("http://localhost:11434"));
+            //https://ollama.com/library/nomic-embed-text
+            builder.AddOllamaTextEmbeddingGeneration(modelId: "nomic-embed-text", endpoint: new Uri("http://localhost:11434/api/embeddings"));
+#pragma warning restore SKEXP0070
         }
 
         private static void addServicesDependecies(IServiceCollection services, Kernel kernel)

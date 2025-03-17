@@ -20,7 +20,7 @@ namespace HotelWise.Domain.AI.Adapter
         public OllamaAdapter(IApplicationIAConfig applicationConfig)
         {
             // Inicializa a configuração e o cliente Ollama
-            _config = (OllamaConfig)applicationConfig.GetChatServiceConfig(AIChatServiceType.Ollama)
+            _config = (OllamaConfig)applicationConfig.GetChatServiceConfig(AIChatServiceType.OllamaAdapter)
                 ?? throw new InvalidOperationException("Ollama configuration is missing.");
             fetchClient(_config.Endpoint);
             _modelId = _config.ModelId;

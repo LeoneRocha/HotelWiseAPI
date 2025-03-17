@@ -68,7 +68,8 @@ namespace HotelWise.Domain.Dto.AppConfig
                 AIChatServiceType.OpenAI => _openAIConfig,
                 AIChatServiceType.MistralApi => _mistralApiConfig,
                 AIChatServiceType.GroqApi => _groqApiConfig,
-                AIChatServiceType.Ollama => _ollamaConfig,
+                AIChatServiceType.Default => _groqApiConfig,
+                AIChatServiceType.OllamaAdapter => _ollamaConfig,  
                 _ => throw new NotImplementedException($"Configuration definition not implemented for chat service: {serviceType}")
             };
         }
