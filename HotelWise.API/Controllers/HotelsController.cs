@@ -13,9 +13,11 @@ namespace HotelWise.API.Controllers
     public class HotelsController : ControllerBase
     {
         private readonly IHotelService _hotelService;
-        public HotelsController(IHotelService hotelService)
+        private readonly IHotelSearchService _hotelSearchService;
+        public HotelsController(IHotelService hotelService, IHotelSearchService  hotelSearchService)
         {
             _hotelService = hotelService;
+            _hotelSearchService = hotelSearchService;
         }
 
         private void setUserIdCurrent()
@@ -94,7 +96,7 @@ namespace HotelWise.API.Controllers
         public async Task<IActionResult> SemanticSearch([FromBody] SearchCriteria searchCriteria)
         {
             setUserIdCurrent();
-            var hotels = await _hotelService.SemanticSearch(searchCriteria);
+            var hotels = await _hotelSearchService.SemanticSearch(searchCriteria);
             return Ok(hotels);
         }
         /// <summary>

@@ -13,9 +13,7 @@ namespace HotelWise.Domain.Interfaces.Entity
         Task<ServiceResponse<HotelDto[]>> GetAllHotelsAsync();
         Task<ServiceResponse<HotelDto?>> GetHotelByIdAsync(long id);
         Task<ServiceResponse<bool>> UpdateHotelAsync(HotelDto hotelDto);
-        Task<ServiceResponse<HotelDto>> GenerateHotelByIA();
-
-        Task<ServiceResponse<HotelSemanticResult>> SemanticSearch(SearchCriteria searchCriteria);
+        Task<ServiceResponse<HotelDto>> GenerateHotelByIA(); 
         Task<string[]> GetAllTags();
     } 
 }
