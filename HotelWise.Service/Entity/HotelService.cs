@@ -18,7 +18,6 @@ namespace HotelWise.Service.Entity
         private readonly IApplicationIAConfig _applicationConfig;
         private readonly IHotelRepository _hotelRepository;
 
-
         public HotelService(
             Serilog.ILogger logger,
             IMapper mapper,
@@ -80,7 +79,7 @@ namespace HotelWise.Service.Entity
                 var hotel = await _hotelRepository.GetByIdAsync(id);
 
                 var hotelDto = _mapper.Map<HotelDto?>(hotel);
-                 
+
                 var hoteVector = await _hotelVectorStoreService.GetById(id);
 
                 if (hoteVector != null && hotelDto != null)
@@ -233,7 +232,7 @@ namespace HotelWise.Service.Entity
                 _logger.Error(ex, "DeleteHotelAsync: {Message} at: {time}", ex.Message, DataHelper.GetDateTimeNowToLog());
                 response.Errors.Add(new ErrorResponse() { Message = ex.Message });
             }
-            return response; 
+            return response;
         }
 
         public async Task<ServiceResponse<HotelDto[]>> FetchHotelsAsync()
@@ -324,7 +323,7 @@ namespace HotelWise.Service.Entity
                 catch (Exception ex)
                 {
                     _logger.Error(ex, "addOrUpdateDataVector: {Message} at: {time}", ex.Message, DataHelper.GetDateTimeNowToLog());
-                } 
+                }
             }
         }
 

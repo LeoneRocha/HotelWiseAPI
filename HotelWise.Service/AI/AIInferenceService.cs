@@ -1,5 +1,4 @@
-﻿using HotelWise.Domain.AI.Models;
-using HotelWise.Domain.Dto;
+﻿using HotelWise.Domain.Dto;
 using HotelWise.Domain.Enuns.IA;
 using HotelWise.Domain.Interfaces.IA;
 using Microsoft.Extensions.Configuration;

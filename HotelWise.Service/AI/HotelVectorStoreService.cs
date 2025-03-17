@@ -3,6 +3,7 @@ using HotelWise.Domain.Dto;
 using HotelWise.Domain.Dto.SemanticKernel;
 using HotelWise.Domain.Enuns.IA;
 using HotelWise.Domain.Helpers;
+using HotelWise.Domain.Interfaces;
 using HotelWise.Domain.Interfaces.IA;
 using HotelWise.Domain.Interfaces.SemanticKernel;
 using HotelWise.Service.Generic;
@@ -13,19 +14,21 @@ namespace HotelWise.Service.AI
     {
         private readonly IVectorStoreAdapter<HotelVector> _adapter;
         private readonly IAIInferenceService _aIInferenceService;
-        private const string nameCollection = "skhotels";
+        private readonly string nameCollection;
         private readonly InferenceAiAdapterType _eIAInferenceAdapterType;
 
         public HotelVectorStoreService(
             Serilog.ILogger logger,
             IMapper mapper,
+            IApplicationIAConfig applicationIAConfig,
             IVectorStoreAdapterFactory adapterFactory,
             IAIInferenceService aIInferenceService) : base(mapper, logger)
         {
-            _eIAInferenceAdapterType = InferenceAiAdapterType.Mistral;
-
+            _eIAInferenceAdapterType = applicationIAConfig.RagConfig.GetAInferenceAdapterType();
             _adapter = adapterFactory.CreateAdapter<HotelVector>();
             _aIInferenceService = aIInferenceService;
+
+            nameCollection = $"{applicationIAConfig?.RagConfig?.VectorStoreCollectionPrefixName}skhotels";
         }
 
         public async Task<float[]?> GenerateEmbeddingAsync(string text)
@@ -42,7 +45,7 @@ namespace HotelWise.Service.AI
                 if (hotelVector != null)
                 {
                     return hotelVector;
-                } 
+                }
             }
             catch (Exception ex)
             {

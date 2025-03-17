@@ -15,6 +15,7 @@ namespace HotelWise.Domain.Interfaces
         MistralApiConfig MistralApiConfig { get; }
         MistralApíEmbeddingsConfig MistralApíEmbeddingsConfig { get; }
         GroqApiConfig GroqApiConfig { get; }
+        OllamaConfig OllamaConfig { get; }
 
         #endregion AIServices
 
@@ -30,8 +31,7 @@ namespace HotelWise.Domain.Interfaces
         WeaviateConfig WeaviateConfig { get; }
 
         #endregion VectorStores
-
-
+         
         object GetChatServiceConfig(AIChatServiceType serviceType);
         object GetEmbeddingServiceConfig(AIEmbeddingServiceType embeddingType);
 

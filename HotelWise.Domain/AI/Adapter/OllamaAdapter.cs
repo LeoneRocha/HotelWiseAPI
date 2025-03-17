@@ -13,26 +13,32 @@ namespace HotelWise.Domain.AI.Adapter
 {
     public class OllamaAdapter : IAIInferenceAdapter
     {
-        private OllamaApiClient _client;
-        private readonly string _modelId;
-        private readonly OllamaConfig _config;
-
+        private readonly OllamaApiClient _clientChat;
+        private readonly OllamaApiClient _clientEmbedding;
+         
         public OllamaAdapter(IApplicationIAConfig applicationConfig)
         {
             // Inicializa a configuração e o cliente Ollama
-            _config = (OllamaConfig)applicationConfig.GetChatServiceConfig(AIChatServiceType.OllamaAdapter)
-                ?? throw new InvalidOperationException("Ollama configuration is missing.");
-            fetchClient(_config.Endpoint);
-            _modelId = _config.ModelId;
-
-            // Seleciona o modelo configurado
-            _client!.SelectedModel = _modelId;
+            var _config = (OllamaConfig)applicationConfig.GetChatServiceConfig(AIChatServiceType.OllamaAdapter)
+                    ?? throw new InvalidOperationException("Ollama configuration is missing.");
+            _clientChat = createClient(_config.Endpoint, _config.ModelId);
+            _clientEmbedding = createClient(_config.Endpoint, _config.ModelId);
         }
-
-        private void fetchClient(string url)
+        public OllamaApiClient GetClientChat()
+        {
+            return _clientChat;
+        }
+        public OllamaApiClient GetClientEmbedding()
+        {
+            return _clientEmbedding;
+        }
+        private static OllamaApiClient createClient(string url, string modelId)
         {
             var uri = new Uri(url);
-            _client = new OllamaApiClient(uri);
+            var clientInstance = new OllamaApiClient(uri);
+            // Seleciona o modelo configurado - Chat
+            clientInstance!.SelectedModel = modelId;
+            return clientInstance;
         }
 
         public async Task<string> GenerateChatCompletionAsync(PromptMessageVO[] messages)
@@ -54,7 +60,7 @@ namespace HotelWise.Domain.AI.Adapter
                 chatRequest.Messages = chatMessages;
                 StringBuilder responseContent = new StringBuilder();
 
-                await foreach (var stream in _client.ChatAsync(chatRequest))
+                await foreach (var stream in _clientChat.ChatAsync(chatRequest))
                 {
                     var msgresult = stream!.Message.Content;
                     if (msgresult != null)
@@ -79,11 +85,8 @@ namespace HotelWise.Domain.AI.Adapter
 
             try
             {
-                fetchClient(_config.EndpointEmbeddings);
-                _client.SelectedModel = _config.ModelIdEmbeddings;
-
                 // Chama o método GenerateEmbeddingAsync com os tipos explicitamente definidos
-                var embedding = await _client.GenerateEmbeddingAsync(
+                var embedding = await _clientChat.GenerateEmbeddingAsync(
                     text,
                     options: null, // Pode passar opções se necessário
                     cancellationToken: CancellationToken.None

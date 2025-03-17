@@ -3,7 +3,7 @@
 namespace HotelWise.Domain.Dto.SemanticKernel
 {
     public class HotelVector : DataVectorBase
-    {
+    { 
         [VectorStoreRecordData(IsFilterable = true)]
         public string HotelName { get; set; } = string.Empty;
 
@@ -12,3 +12,5 @@ namespace HotelWise.Domain.Dto.SemanticKernel
            
     }
 }
+
+ 

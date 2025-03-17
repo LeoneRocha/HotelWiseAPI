@@ -1,16 +1,21 @@
-﻿using HotelWise.Domain.Dto.AppConfig;
+﻿using HotelWise.Domain.AI.Adapter;
+using HotelWise.Domain.Dto.AppConfig;
 using HotelWise.Domain.Dto.SemanticKernel;
 using HotelWise.Domain.Enuns.IA;
 using HotelWise.Domain.Helpers;
 using HotelWise.Domain.Interfaces;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.VectorData;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.ChatCompletion;
+using Microsoft.SemanticKernel.Connectors.Ollama;
 using Microsoft.SemanticKernel.Connectors.Qdrant;
 using Microsoft.SemanticKernel.Embeddings;
+using Microsoft.SemanticKernel.TextGeneration;
+using OllamaSharp;
 
 namespace HotelWise.Service.Configure
 {
@@ -33,7 +38,7 @@ namespace HotelWise.Service.Configure
 
             var kernel = builder.Build();
 
-            addServicesDependecies(services, kernel);
+            addServicesDependecies(services, kernel, appConfig);
         }
 
         private static void addRagConfig(IServiceCollection services, IConfiguration configuration)
@@ -74,7 +79,7 @@ namespace HotelWise.Service.Configure
                 case AIChatServiceType.GroqApi:
                     break;
                 case AIChatServiceType.Default:
-                case AIChatServiceType.MistralApi: 
+                case AIChatServiceType.MistralApi:
                     addMistral(appConfig!, builder);
                     break;
                 case AIChatServiceType.Anthropic:
@@ -112,41 +117,105 @@ namespace HotelWise.Service.Configure
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1859", Justification = "Usar interface para promover desacoplamento é intencional.")]
         private static void addOllama(IApplicationIAConfig appConfig, IKernelBuilder builder)
         {
-#pragma warning disable SKEXP0070      
+            var modelConfig = appConfig.OllamaConfig;
+#pragma warning disable SKEXP0070
             //https://ollama.com/library/llama3.2
-            builder.AddOllamaChatCompletion(modelId: "llama3.2", endpoint: new Uri("http://localhost:11434"));
+            builder.AddOllamaChatCompletion(modelId: modelConfig.ModelId, endpoint: new Uri(modelConfig.Endpoint));
             //https://ollama.com/library/nomic-embed-text
-            builder.AddOllamaTextEmbeddingGeneration(modelId: "nomic-embed-text", endpoint: new Uri("http://localhost:11434/api/embeddings"));
+            builder.AddOllamaTextEmbeddingGeneration(modelId: modelConfig.ModelIdEmbeddings, endpoint: new Uri(modelConfig.EndpointEmbeddings));
+             
+            builder.Services.AddTransient((serviceProvider) => { return new Kernel(serviceProvider); });
+
 #pragma warning restore SKEXP0070
         }
 
-        private static void addServicesDependecies(IServiceCollection services, Kernel kernel)
+        private static void addServicesDependecies(IServiceCollection services, Kernel kernel, IApplicationIAConfig configuration)
         {
             services.AddKernel();
             services.AddSingleton(kernel);
 
-            #region VectorStores
+            addVectorStores(services, kernel);
 
-            IVectorStore vectorStore = kernel.GetRequiredService<IVectorStore>();
-            services.AddSingleton(vectorStore);
+            addTextEmbeddingGenerationService(services, kernel, configuration);
 
-            #endregion VectorStores
+            addChatCompletionService(services, kernel);
+        }
 
-            #region TextEmbeddingGenerationService
-#pragma warning disable SKEXP0001
-
-            ITextEmbeddingGenerationService embeddingService = kernel.GetRequiredService<ITextEmbeddingGenerationService>();
-            services.AddSingleton(embeddingService);
-
-#pragma warning disable SKEXP0001
-            #endregion TextEmbeddingGenerationService
-
+        private static void addChatCompletionService(IServiceCollection services, Kernel kernel)
+        {
             #region ChatCompletionService
 
             IChatCompletionService chatService = kernel.GetRequiredService<IChatCompletionService>();
             services.AddSingleton(chatService);
 
             #endregion ChatCompletionService
+        }
+
+        private static void addVectorStores(IServiceCollection services, Kernel kernel)
+        {
+            #region VectorStores
+
+            IVectorStore vectorStore = kernel.GetRequiredService<IVectorStore>();
+            services.AddSingleton(vectorStore);
+
+            #endregion VectorStores
+        }
+
+        private static void addTextEmbeddingGenerationService(IServiceCollection services, Kernel kernel, IApplicationIAConfig configuration)
+        {
+            #region TextEmbeddingGenerationService
+
+            var typeAIEmbeddingService = configuration.RagConfig.AIEmbeddingService;
+            switch (typeAIEmbeddingService)
+            {
+                case AIEmbeddingServiceType.DefaultEmbeddings:
+                    addDefaultTextEmbeddingGenerationService(services, kernel);
+                    break;
+                case AIEmbeddingServiceType.AzureOpenAIEmbeddings:
+                    break;
+                case AIEmbeddingServiceType.OpenAIEmbeddings:
+                    break;
+                case AIEmbeddingServiceType.MistralApiEmbeddings:
+                    addDefaultTextEmbeddingGenerationService(services, kernel);
+                    break;
+                case AIEmbeddingServiceType.CohereEmbeddings:
+                    break;
+                case AIEmbeddingServiceType.HuggingFaceEmbeddings:
+                    break;
+                case AIEmbeddingServiceType.OllamaEmbeddings:
+                    addOllamaTextEmbeddingGenerationService(services, configuration, kernel);
+                    break;
+                case AIEmbeddingServiceType.SentenceTransformersEmbeddings:
+                    break;
+                default:
+                    break;
+            }
+
+            #endregion TextEmbeddingGenerationService
+        }
+        private static void addOllamaTextEmbeddingGenerationService(IServiceCollection services, IApplicationIAConfig configuration, Kernel kernel)
+        {
+#pragma warning disable SKEXP0001
+            var ollamaAdapter = new OllamaAdapter(configuration);
+            var ollamaClient = ollamaAdapter.GetClientEmbedding();
+#pragma warning disable SKEXP0070
+            Func<IServiceProvider, OllamaTextGenerationService> factory = (serviceProvider) =>
+            {  
+                return new OllamaTextGenerationService(ollamaClient, serviceProvider.GetService<ILoggerFactory>());
+            }; 
+            services.AddSingleton<ITextGenerationService>(factory);
+#pragma warning restore SKEXP0070 
+#pragma warning restore SKEXP0001
+        }
+
+        private static void addDefaultTextEmbeddingGenerationService(IServiceCollection services, Kernel kernel)
+        {
+#pragma warning disable SKEXP0001
+
+            ITextEmbeddingGenerationService embeddingService = kernel.GetRequiredService<ITextEmbeddingGenerationService>();
+            services.AddSingleton(embeddingService);
+
+#pragma warning restore SKEXP0001
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "SKEXP0070", Justification = "Usar interface para promover desacoplamento é intencional.")]
@@ -158,7 +227,7 @@ namespace HotelWise.Service.Configure
 
             var qdrantConfig = appConfig.QdrantConfig;
 
-            builder.AddQdrantVectorStoreRecordCollection<ulong, HotelVector>(appConfig.RagConfig.CollectionName, qdrantConfig.Host, qdrantConfig.Port, qdrantConfig.Https, qdrantConfig.ApiKey);
+            builder.AddQdrantVectorStoreRecordCollection<ulong, HotelVector>(appConfig.RagConfig.VectorStoreCollectionPrefixName, qdrantConfig.Host, qdrantConfig.Port, qdrantConfig.Https, qdrantConfig.ApiKey);
 
             builder.AddQdrantVectorStore(qdrantConfig.Host, qdrantConfig.Port, qdrantConfig.Https, qdrantConfig.ApiKey, options: new QdrantVectorStoreOptions { HasNamedVectors = true });
             #endregion Vector Store
