@@ -15,7 +15,7 @@ namespace HotelWise.Domain.AI.Adapter
     {
         private readonly OllamaApiClient _clientChat;
         private readonly OllamaApiClient _clientEmbedding;
-         
+
         public OllamaAdapter(IApplicationIAConfig applicationConfig)
         {
             // Inicializa a configuração e o cliente Ollama
@@ -43,7 +43,7 @@ namespace HotelWise.Domain.AI.Adapter
 
         public async Task<string> GenerateChatCompletionAsync(PromptMessageVO[] messages)
         {
-            if (messages == null || !messages.Any())
+            if (messages == null || messages.Length <= 0)
                 throw new ArgumentException("Messages cannot be null or empty.");
 
             try
@@ -83,27 +83,20 @@ namespace HotelWise.Domain.AI.Adapter
             if (string.IsNullOrWhiteSpace(text))
                 throw new ArgumentException("Text cannot be null or empty.");
 
-            try
-            {
-                // Chama o método GenerateEmbeddingAsync com os tipos explicitamente definidos
-                var embedding = await _clientChat.GenerateEmbeddingAsync(
-                    text,
-                    options: null, // Pode passar opções se necessário
-                    cancellationToken: CancellationToken.None
-                );
+            // Chama o método GenerateEmbeddingAsync com os tipos explicitamente definidos
+            var embedding = await _clientChat.GenerateEmbeddingAsync(
+                text,
+                options: null, // Pode passar opções se necessário
+                cancellationToken: CancellationToken.None
+            );
 
-                // Converte os embeddings em um array de floats
-                // Converte o Vector para um array de float
-                float[] floatArray = embedding.Vector.ToArray();
+            // Converte os embeddings em um array de floats
+            // Converte o Vector para um array de float
+            float[] floatArray = embedding.Vector.ToArray();
 
-                return floatArray;
-            }
-            catch (Exception ex)
-            {
-                throw new Exception($"Error generating embedding with Ollama: {ex.Message}", ex);
-            }
+            return floatArray;
         }
-        private string ConvertRole(string role)
+        private static string ConvertRole(string role)
         {
             // Mapeia os papéis para o formato suportado pelo OllamaSharp
             return role.ToLower() switch

@@ -32,7 +32,7 @@ namespace HotelWise.Service.Configure
             // Register the kernel with the dependency injection container
             // and add Chat Completion and Text Embedding Generation services.
 
-            addVectorStores(appConfig, builder);
+            addQdrantVectorStoreToBuilder(appConfig, builder);
 
             addAIServices(appConfig, builder);
 
@@ -104,12 +104,14 @@ namespace HotelWise.Service.Configure
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1859", Justification = "Usar interface para promover desacoplamento é intencional.")]
         private static void addMistral(IApplicationIAConfig appConfig, IKernelBuilder builder)
         {
-            var mistralEmbeddings = appConfig.MistralApíEmbeddingsConfig;
-            var mistral = appConfig.MistralApiConfig;
 #pragma warning disable SKEXP0070
+            var mistral = appConfig.MistralApiConfig;
             // Optional; for targeting specific services within Semantic Kernel    httpClient: new HttpClient() // Optional; for customizing HTTP client , endpoint: new Uri("YOUR_ENDPOINT"), serviceId: "SERVICE_ID"
             builder.AddMistralChatCompletion(modelId: mistral.ModelId, apiKey: mistral.ApiKey);
-            builder.AddMistralTextEmbeddingGeneration(modelId: mistral.ModelId, apiKey: mistral.ApiKey);
+
+            var mistralEmbeddings = appConfig.MistralApíEmbeddingsConfig;
+
+            builder.AddMistralTextEmbeddingGeneration(modelId: mistralEmbeddings.ModelId, apiKey: mistralEmbeddings.ApiKey);
 #pragma warning restore SKEXP0070
         }
 
@@ -123,7 +125,7 @@ namespace HotelWise.Service.Configure
             builder.AddOllamaChatCompletion(modelId: modelConfig.ModelId, endpoint: new Uri(modelConfig.Endpoint));
             //https://ollama.com/library/nomic-embed-text
             builder.AddOllamaTextEmbeddingGeneration(modelId: modelConfig.ModelIdEmbeddings, endpoint: new Uri(modelConfig.EndpointEmbeddings));
-             
+
             builder.Services.AddTransient((serviceProvider) => { return new Kernel(serviceProvider); });
 
 #pragma warning restore SKEXP0070
@@ -134,7 +136,7 @@ namespace HotelWise.Service.Configure
             services.AddKernel();
             services.AddSingleton(kernel);
 
-            addVectorStores(services, kernel);
+            addKernelVectorStoreToServiceCollection(services, kernel);
 
             addTextEmbeddingGenerationService(services, kernel, configuration);
 
@@ -151,7 +153,7 @@ namespace HotelWise.Service.Configure
             #endregion ChatCompletionService
         }
 
-        private static void addVectorStores(IServiceCollection services, Kernel kernel)
+        private static void addKernelVectorStoreToServiceCollection(IServiceCollection services, Kernel kernel)
         {
             #region VectorStores
 
@@ -183,7 +185,7 @@ namespace HotelWise.Service.Configure
                 case AIEmbeddingServiceType.HuggingFaceEmbeddings:
                     break;
                 case AIEmbeddingServiceType.OllamaEmbeddings:
-                    addOllamaTextEmbeddingGenerationService(services, configuration, kernel);
+                    addOllamaTextEmbeddingGenerationService(services, configuration);
                     break;
                 case AIEmbeddingServiceType.SentenceTransformersEmbeddings:
                     break;
@@ -193,16 +195,16 @@ namespace HotelWise.Service.Configure
 
             #endregion TextEmbeddingGenerationService
         }
-        private static void addOllamaTextEmbeddingGenerationService(IServiceCollection services, IApplicationIAConfig configuration, Kernel kernel)
+        private static void addOllamaTextEmbeddingGenerationService(IServiceCollection services, IApplicationIAConfig configuration)
         {
 #pragma warning disable SKEXP0001
             var ollamaAdapter = new OllamaAdapter(configuration);
             var ollamaClient = ollamaAdapter.GetClientEmbedding();
 #pragma warning disable SKEXP0070
             Func<IServiceProvider, OllamaTextGenerationService> factory = (serviceProvider) =>
-            {  
+            {
                 return new OllamaTextGenerationService(ollamaClient, serviceProvider.GetService<ILoggerFactory>());
-            }; 
+            };
             services.AddSingleton<ITextGenerationService>(factory);
 #pragma warning restore SKEXP0070 
 #pragma warning restore SKEXP0001
@@ -220,7 +222,7 @@ namespace HotelWise.Service.Configure
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "SKEXP0070", Justification = "Usar interface para promover desacoplamento é intencional.")]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1859", Justification = "Usar interface para promover desacoplamento é intencional.")]
-        private static void addVectorStores(IApplicationIAConfig appConfig, IKernelBuilder builder)
+        private static void addQdrantVectorStoreToBuilder(IApplicationIAConfig appConfig, IKernelBuilder builder)
         {
 #pragma warning disable SKEXP0020
             #region Vector Store

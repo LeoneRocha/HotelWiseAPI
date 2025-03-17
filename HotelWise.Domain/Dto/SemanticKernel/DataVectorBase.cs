@@ -11,7 +11,7 @@ namespace HotelWise.Domain.Dto.SemanticKernel
         [VectorStoreRecordKey]
         public ulong DataKey { get; set; } = ulong.MinValue;
          
-        [VectorStoreRecordVector(Dimensions: 3072)]// Dimensions: 1024 BERT-base 768 (Bidirectional Encoder Representations from Transformers) 
+        [VectorStoreRecordVector(Dimensions: 1024)]// Dimensions: 1024 BERT-base 768 (Bidirectional Encoder Representations from Transformers) 
         public virtual ReadOnlyMemory<float> Embedding { get; set; } = new ReadOnlyMemory<float>();
 
         [NotMapped]

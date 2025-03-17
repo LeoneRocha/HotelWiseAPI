@@ -1,14 +1,14 @@
 ﻿using OllamaSharp;
 namespace HotelWise.ConsolePOC
 {
-    class Program
+    static class Program
     {
         static async Task Main(string[] args)
         {
             try
             {
                 // Configuração do cliente Ollama
-                var uri = new Uri("http://localhost:11434"); // Atualize se necessário
+                var uri = new Uri("localhost"); // Atualize se necessário
                 var ollama = new OllamaApiClient(uri);
 
                 // Selecione o modelo que será usado

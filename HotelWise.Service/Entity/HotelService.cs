@@ -14,8 +14,7 @@ namespace HotelWise.Service.Entity
     public class HotelService : GenericEntityServiceBase<Hotel, HotelDto>, IHotelService
     {
         private readonly IGenerateHotelService _generateHotelService;
-        private readonly IVectorStoreService<HotelVector> _hotelVectorStoreService;
-        private readonly IApplicationIAConfig _applicationConfig;
+        private readonly IVectorStoreService<HotelVector> _hotelVectorStoreService; 
         private readonly IHotelRepository _hotelRepository;
         public HotelService(
             Serilog.ILogger logger,
@@ -25,8 +24,7 @@ namespace HotelWise.Service.Entity
             IGenerateHotelService generateHotelService,
             IVectorStoreService<HotelVector> hotelVectorStoreService)
             : base(hotelRepository, mapper, logger)
-        {
-            _applicationConfig = applicationConfig;
+        { 
             _generateHotelService = generateHotelService;
             _hotelVectorStoreService = hotelVectorStoreService;
             _hotelRepository = hotelRepository;

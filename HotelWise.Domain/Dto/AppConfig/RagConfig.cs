@@ -50,7 +50,7 @@ namespace HotelWise.Domain.Dto.AppConfig
                 case AIChatServiceType.OpenAI:
                     return InferenceAiAdapterType.Mistral;
                 case AIChatServiceType.GroqApi:
-                    return InferenceAiAdapterType.Mistral;
+                    return InferenceAiAdapterType.GroqApi;
                 case AIChatServiceType.MistralApi:
                     return InferenceAiAdapterType.Mistral;
                 case AIChatServiceType.Anthropic:
@@ -67,6 +67,21 @@ namespace HotelWise.Domain.Dto.AppConfig
                 default:
                     return InferenceAiAdapterType.Mistral;
             }
+        }
+
+        public InferenceAiAdapterType GetAInferenceAdapterTypeForAssistant()
+        {
+            switch (AIChatService)
+            {
+                case AIChatServiceType.GroqApi:
+                case AIChatServiceType.MistralApi:
+                    return InferenceAiAdapterType.GroqApi;
+                case AIChatServiceType.Ollama:
+                case AIChatServiceType.OllamaAdapter:
+                    return InferenceAiAdapterType.Ollama;
+                default:
+                    return InferenceAiAdapterType.GroqApi;
+            }           
         }
     }
 }

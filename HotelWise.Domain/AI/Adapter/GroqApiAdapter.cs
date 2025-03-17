@@ -9,8 +9,7 @@ namespace HotelWise.Domain.AI.Adapter
     public class GroqApiAdapter : IAIInferenceAdapter
     {
         private readonly GroqApiClient _groqApiClient;
-        private readonly string _model;
-        private readonly IModelStrategy? _modelStrategy;
+        private readonly string _model; 
          
         public GroqApiAdapter(IApplicationIAConfig applicationConfig)
         {

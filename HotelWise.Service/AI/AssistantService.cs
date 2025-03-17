@@ -12,49 +12,11 @@ namespace HotelWise.Service.Entity
         private readonly InferenceAiAdapterType _eIAInferenceAdapterType;
         protected long UserId { get; private set; }
         private readonly Serilog.ILogger _logger;
-
-
         public AssistantService(Serilog.ILogger logger, IApplicationIAConfig applicationConfig, IAIInferenceService aIInferenceService)
         {
             _logger = logger;
-            _eIAInferenceAdapterType = getAdapterType(applicationConfig); 
+            _eIAInferenceAdapterType = applicationConfig.RagConfig.GetAInferenceAdapterTypeForAssistant();
             _aIInferenceService = aIInferenceService;
-        }
-
-        private static InferenceAiAdapterType getAdapterType(IApplicationIAConfig applicationConfig)
-        {
-            if (applicationConfig != null && applicationConfig.RagConfig != null)
-            {
-                var typeAdp = applicationConfig.RagConfig.AIChatService;
-
-                switch (typeAdp)
-                {
-                    case AIChatServiceType.AzureOpenAI:
-                        break;
-                    case AIChatServiceType.OpenAI:
-                        break;
-                    case AIChatServiceType.GroqApi:
-                        return InferenceAiAdapterType.GroqApi;  
-                    case AIChatServiceType.MistralApi:
-                        return InferenceAiAdapterType.Mistral; 
-                    case AIChatServiceType.Anthropic:
-                        break;
-                    case AIChatServiceType.Cohere:
-                        break;
-                    case AIChatServiceType.OllamaAdapter:
-                        return InferenceAiAdapterType.Ollama;
-                        break;
-                    case AIChatServiceType.LlamaCpp:
-                        break; 
-                    case AIChatServiceType.Default:
-                        return InferenceAiAdapterType.GroqApi;
-                    case AIChatServiceType.HuggingFace:
-                        break;
-                    default:
-                        return InferenceAiAdapterType.GroqApi; 
-                }
-            }
-            return InferenceAiAdapterType.GroqApi; 
         }
 
         public void SetUserId(long id)
@@ -66,7 +28,7 @@ namespace HotelWise.Service.Entity
             return await _aIInferenceService.GenerateEmbeddingAsync(text, _eIAInferenceAdapterType);
         }
 
-        public async Task<AskAssistantResponse[]> AskAssistant(SearchCriteria searchCriteria)
+        public async Task<AskAssistantResponse[]?> AskAssistant(SearchCriteria searchCriteria)
         {
             try
             {
@@ -102,10 +64,9 @@ namespace HotelWise.Service.Entity
             }
             catch (Exception ex)
             {
-                _logger.Error(ex, "HotelVectorStoreService GetById: {Message} at: {time}", ex.Message, DataHelper.GetDateTimeNowToLog());
-                throw ;
-            } 
-            
+                _logger.Error(ex, "AssistantService AskAssistant: {Message} at: {time}", ex.Message, DataHelper.GetDateTimeNowToLog()); 
+            }
+            return null;
         }
     }
 }

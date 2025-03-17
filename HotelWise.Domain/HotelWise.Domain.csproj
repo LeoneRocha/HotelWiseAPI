@@ -53,4 +53,8 @@
     <ProjectReference Include="..\GroqApiLibrary\GroqApiLibrary.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="AI\Models\" />
+  </ItemGroup>
+
 </Project>

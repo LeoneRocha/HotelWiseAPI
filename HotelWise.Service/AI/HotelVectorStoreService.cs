@@ -28,7 +28,7 @@ namespace HotelWise.Service.AI
             _adapter = adapterFactory.CreateAdapter<HotelVector>();
             _aIInferenceService = aIInferenceService;
 
-            nameCollection = $"{applicationIAConfig?.RagConfig?.VectorStoreCollectionPrefixName}skhotels";
+            nameCollection = $"{applicationIAConfig.RagConfig.VectorStoreCollectionPrefixName}skhotels";
         }
 
         public async Task<float[]?> GenerateEmbeddingAsync(string text)

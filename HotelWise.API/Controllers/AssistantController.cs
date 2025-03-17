@@ -2,7 +2,6 @@
 using HotelWise.Domain.Helpers;
 using HotelWise.Domain.Interfaces;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HotelWise.API.Controllers
@@ -24,17 +23,21 @@ namespace HotelWise.API.Controllers
         private long GetUserIdCurrent()
         {
             long idUser = SecurityHelperApi.GetUserIdApi(User);
-            return idUser;
-
+            return idUser; 
         }
 
         [HttpPost("ask")]
         [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)] 
         public async Task<IActionResult> AskAssistant([FromBody] SearchCriteria searchCriteria)
         {
             setUserIdCurrent();
             var result = await _assistantService.AskAssistant(searchCriteria);
-            return Ok(result);
+            if (result != null)
+            {
+                return Ok(result); 
+            }
+            return BadRequest();
         }
     }
 }
