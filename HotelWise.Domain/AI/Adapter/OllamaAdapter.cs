@@ -46,36 +46,29 @@ namespace HotelWise.Domain.AI.Adapter
             if (messages == null || messages.Length <= 0)
                 throw new ArgumentException("Messages cannot be null or empty.");
 
-            try
+            // Cria uma instância de chat e envia as mensagens
+            ChatRequest chatRequest = new ChatRequest();
+            // Converte as mensagens para o formato de chat do Ollama
+            var chatMessages = messages.Select(m => new Message
             {
-                // Cria uma instância de chat e envia as mensagens
-                ChatRequest chatRequest = new ChatRequest();
-                // Converte as mensagens para o formato de chat do Ollama
-                var chatMessages = messages.Select(m => new Message
-                {
-                    Role = ConvertRole(m.Role),
-                    Content = m.Content
-                }).ToList();
+                Role = ConvertRole(m.Role),
+                Content = m.Content
+            }).ToList();
 
-                chatRequest.Messages = chatMessages;
-                StringBuilder responseContent = new StringBuilder();
+            chatRequest.Messages = chatMessages;
+            StringBuilder responseContent = new StringBuilder();
 
-                await foreach (var stream in _clientChat.ChatAsync(chatRequest))
+            await foreach (var stream in _clientChat.ChatAsync(chatRequest))
+            {
+                var msgresult = stream!.Message.Content;
+                if (msgresult != null)
                 {
-                    var msgresult = stream!.Message.Content;
-                    if (msgresult != null)
-                    {
-                        responseContent.Append(msgresult);
-                    }
+                    responseContent.Append(msgresult);
                 }
-                var result = responseContent.ToString();
-                result = MarkdownHelper.ConvertToHtmlIfMarkdown(result);
-                return result;
             }
-            catch (Exception ex)
-            {
-                throw new Exception($"Error generating chat completion with Ollama: {ex.Message}", ex);
-            }
+            var result = responseContent.ToString();
+            result = MarkdownHelper.ConvertToHtmlIfMarkdown(result);
+            return result; 
         }
 
         public async Task<float[]> GenerateEmbeddingAsync(string text)
