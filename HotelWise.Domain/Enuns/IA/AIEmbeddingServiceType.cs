@@ -9,12 +9,15 @@ namespace HotelWise.Domain.Enuns.IA
     public enum AIEmbeddingServiceType
     {
         DefaultEmbeddings,
+        OllamaEmbeddings,
         AzureOpenAIEmbeddings,
         OpenAIEmbeddings,
         MistralApiEmbeddings,
         CohereEmbeddings,
         HuggingFaceEmbeddings,
-        OllamaEmbeddings,
+        SemanticKernel,
+        SemanticKernelEmbeddings,
+        OllamaAdapter,
         SentenceTransformersEmbeddings
     }
 }
