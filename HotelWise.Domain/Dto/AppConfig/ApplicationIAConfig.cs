@@ -1,5 +1,6 @@
 ﻿using HotelWise.Domain.Enuns.IA;
 using HotelWise.Domain.Interfaces;
+using HotelWise.Domain.Interfaces.AppConfig;
 using Microsoft.Extensions.Configuration;
 using System;
 
@@ -12,12 +13,12 @@ namespace HotelWise.Domain.Dto.AppConfig
     {
         public const string ConfigSectionName = "ApplicationIAConfig";
 
+        private readonly RagConfig _ragConfig = new();
         #region FIELDS
         private readonly AzureOpenAIConfig _azureOpenAIConfig = new();
         private readonly AzureOpenAIEmbeddingsConfig _azureOpenAIEmbeddingsConfig = new();
         private readonly OpenAIConfig _openAIConfig = new();
         private readonly OpenAIEmbeddingsConfig _openAIEmbeddingsConfig = new();
-        private readonly RagConfig _ragConfig = new();
         private readonly AzureAISearchConfig _azureAISearchConfig = new();
         private readonly AzureCosmosDBConfig _azureCosmosDBMongoDBConfig = new();
         private readonly AzureCosmosDBConfig _azureCosmosDBNoSQLConfig = new();
@@ -26,9 +27,8 @@ namespace HotelWise.Domain.Dto.AppConfig
         private readonly WeaviateConfig _weaviateConfig = new();
         private readonly MistralApiConfig _mistralApiConfig = new();
         private readonly GroqApiConfig _groqApiConfig = new();
-        private readonly MistralApíEmbeddingsConfig _mistralApíEmbeddingsConfig = new();
-        private readonly OllamaConfig _ollamaConfig = new();
-
+        private readonly MistralApiEmbeddingsConfig _mistralApiEmbeddingsConfig = new();
+        private readonly OllamaConfig _ollamaConfig = new(); 
         #endregion FIELDS
 
         #region PROPERTIES
@@ -44,7 +44,7 @@ namespace HotelWise.Domain.Dto.AppConfig
         public RedisConfig RedisConfig => this._redisConfig;
         public WeaviateConfig WeaviateConfig => this._weaviateConfig;
         public MistralApiConfig MistralApiConfig => this._mistralApiConfig;
-        public MistralApíEmbeddingsConfig MistralApíEmbeddingsConfig => this._mistralApíEmbeddingsConfig;
+        public MistralApiEmbeddingsConfig MistralApiEmbeddingsConfig => this._mistralApiEmbeddingsConfig;
         public GroqApiConfig GroqApiConfig => this._groqApiConfig;
         public OllamaConfig OllamaConfig => this._ollamaConfig;
 
@@ -60,7 +60,7 @@ namespace HotelWise.Domain.Dto.AppConfig
         }
 
         // Method to get the chat service configuration based on the type
-        public object GetChatServiceConfig(AIChatServiceType serviceType)
+        public IAiInferenceConfigBase GetChatServiceConfig(AIChatServiceType serviceType)
         {
             return serviceType switch
             {
@@ -69,19 +69,34 @@ namespace HotelWise.Domain.Dto.AppConfig
                 AIChatServiceType.MistralApi => _mistralApiConfig,
                 AIChatServiceType.GroqApi => _groqApiConfig,
                 AIChatServiceType.Default => _groqApiConfig,
-                AIChatServiceType.OllamaAdapter => _ollamaConfig,  
+                AIChatServiceType.OllamaAdapter => _ollamaConfig,
                 _ => throw new NotImplementedException($"Configuration definition not implemented for chat service: {serviceType}")
+            };
+        } 
+        public IAiInferenceConfigBase GetChatServiceConfig()
+        {
+            return _ragConfig.AIChatServiceApi switch
+            {
+                AIChatServiceType.Default => _groqApiConfig,
+                AIChatServiceType.AzureOpenAI => _azureOpenAIConfig,
+                AIChatServiceType.OpenAI => _openAIConfig,
+                AIChatServiceType.MistralApi => _mistralApiConfig,
+                AIChatServiceType.GroqApi => _groqApiConfig,
+                AIChatServiceType.Ollama => _ollamaConfig,
+                AIChatServiceType.OllamaAdapter => _ollamaConfig,
+                _ => throw new NotImplementedException($"Configuration definition not implemented for chat service: {_ragConfig.AIChatServiceApi}")
             };
         }
 
         // Method to get the embedding service configuration based on the type
-        public object GetEmbeddingServiceConfig(AIEmbeddingServiceType embeddingType)
+        public IAiInferenceConfigBase GetEmbeddingServiceConfig(AIEmbeddingServiceType embeddingType)
         {
             return embeddingType switch
             {
                 AIEmbeddingServiceType.AzureOpenAIEmbeddings => _azureOpenAIEmbeddingsConfig,
                 AIEmbeddingServiceType.OpenAIEmbeddings => _openAIEmbeddingsConfig,
-                AIEmbeddingServiceType.MistralApiEmbeddings => _mistralApíEmbeddingsConfig,
+                AIEmbeddingServiceType.MistralApiEmbeddings => _mistralApiEmbeddingsConfig,
+                AIEmbeddingServiceType.OllamaEmbeddings => _ollamaConfig,
                 _ => throw new NotImplementedException($"Configuration definition not implemented for embedding service: {embeddingType}")
             };
         }
@@ -116,7 +131,7 @@ namespace HotelWise.Domain.Dto.AppConfig
         {
             configurationManager.GetRequiredSection($"{ApplicationIAConfig.ConfigSectionName}:AIServices:{AzureOpenAIEmbeddingsConfig.ConfigSectionName}").Bind(this._azureOpenAIEmbeddingsConfig);
             configurationManager.GetRequiredSection($"{ApplicationIAConfig.ConfigSectionName}:AIServices:{OpenAIEmbeddingsConfig.ConfigSectionName}").Bind(this._openAIEmbeddingsConfig);
-            configurationManager.GetRequiredSection($"{ApplicationIAConfig.ConfigSectionName}:AIServices:{MistralApíEmbeddingsConfig.ConfigSectionName}").Bind(this._mistralApíEmbeddingsConfig);
+            configurationManager.GetRequiredSection($"{ApplicationIAConfig.ConfigSectionName}:AIServices:{MistralApiEmbeddingsConfig.ConfigSectionName}").Bind(this._mistralApiEmbeddingsConfig);
         }
 
         private void loadIAServices(IConfiguration configurationManager)

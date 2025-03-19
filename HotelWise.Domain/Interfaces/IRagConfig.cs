@@ -5,10 +5,12 @@ namespace HotelWise.Domain.Interfaces
 {
     public interface IRagConfig
     {
-        AIChatServiceType AIChatService { get; }
-        AIEmbeddingServiceType AIEmbeddingService { get; }
+        AIChatServiceType AIChatServiceApi { get; }
+        AIEmbeddingServiceType AIEmbeddingServiceApi { get; }
+        AIChatServiceType AIChatServiceAdapter { get; }
+        AIEmbeddingServiceType AIEmbeddingServiceAdapter { get; }
         bool BuildCollection { get; }
-        string VectorStoreCollectionPrefixName { get; } 
+        string VectorStoreCollectionPrefixName { get; }
         int VectorStoreDimensions { get; }
         int DataLoadingBatchSize { get; }
         int DataLoadingBetweenBatchDelayInMilliseconds { get; }

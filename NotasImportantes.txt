@@ -1,0 +1,2 @@
+ Mistral chat completion com semantic kernel funcionando 
+

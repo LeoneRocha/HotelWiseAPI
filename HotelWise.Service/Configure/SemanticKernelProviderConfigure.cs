@@ -67,7 +67,7 @@ namespace HotelWise.Service.Configure
 
         private static void addAIServices(IApplicationIAConfig appConfig, IKernelBuilder builder)
         {
-            var aiServiceType = appConfig?.RagConfig?.AIChatService ?? AIChatServiceType.MistralApi;
+            var aiServiceType = appConfig?.RagConfig?.AIChatServiceApi ?? AIChatServiceType.MistralApi;
 
 #pragma warning disable SKEXP0070
             switch (aiServiceType)
@@ -109,9 +109,14 @@ namespace HotelWise.Service.Configure
             // Optional; for targeting specific services within Semantic Kernel    httpClient: new HttpClient() // Optional; for customizing HTTP client , endpoint: new Uri("YOUR_ENDPOINT"), serviceId: "SERVICE_ID"
             builder.AddMistralChatCompletion(modelId: mistral.ModelId, apiKey: mistral.ApiKey);
 
-            var mistralEmbeddings = appConfig.MistralApíEmbeddingsConfig;
+            var mistralEmbeddings = appConfig.MistralApiEmbeddingsConfig;
 
             builder.AddMistralTextEmbeddingGeneration(modelId: mistralEmbeddings.ModelId, apiKey: mistralEmbeddings.ApiKey);
+
+            builder.Services.AddTransient((serviceProvider) => {
+                return new Kernel(serviceProvider);
+            });
+
 #pragma warning restore SKEXP0070
         }
 
@@ -167,7 +172,7 @@ namespace HotelWise.Service.Configure
         {
             #region TextEmbeddingGenerationService
 
-            var typeAIEmbeddingService = configuration.RagConfig.AIEmbeddingService;
+            var typeAIEmbeddingService = configuration.RagConfig.AIEmbeddingServiceApi;
             switch (typeAIEmbeddingService)
             {
                 case AIEmbeddingServiceType.DefaultEmbeddings:

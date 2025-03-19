@@ -11,11 +11,19 @@ namespace HotelWise.Domain.Dto.AppConfig
 
         [Required]
         [JsonConverter(typeof(JsonStringEnumConverter))]
-        public AIChatServiceType AIChatService { get; set; } = AIChatServiceType.Default;
+        public AIChatServiceType AIChatServiceApi { get; set; } = AIChatServiceType.Default;
 
         [Required]
         [JsonConverter(typeof(JsonStringEnumConverter))]
-        public AIEmbeddingServiceType AIEmbeddingService { get; set; } = AIEmbeddingServiceType.OpenAIEmbeddings;
+        public AIEmbeddingServiceType AIEmbeddingServiceApi { get; set; } = AIEmbeddingServiceType.OpenAIEmbeddings;
+         
+        [Required]
+        [JsonConverter(typeof(JsonStringEnumConverter))]
+        public AIChatServiceType AIChatServiceAdapter { get; set; } = AIChatServiceType.Default;
+
+        [Required]
+        [JsonConverter(typeof(JsonStringEnumConverter))]
+        public AIEmbeddingServiceType AIEmbeddingServiceAdapter { get; set; } = AIEmbeddingServiceType.DefaultEmbeddings;
 
         [Required]
         public bool BuildCollection { get; set; } = true;
@@ -41,38 +49,30 @@ namespace HotelWise.Domain.Dto.AppConfig
 
         public InferenceAiAdapterType GetAInferenceAdapterType()
         {
-            switch (AIChatService)
+            switch (AIChatServiceApi)
             {
                 case AIChatServiceType.Default:
-                    return InferenceAiAdapterType.Mistral;
-                case AIChatServiceType.AzureOpenAI:
-                    return InferenceAiAdapterType.Mistral;
-                case AIChatServiceType.OpenAI:
-                    return InferenceAiAdapterType.Mistral;
+                case AIChatServiceType.SemanticKernel:
+                    return InferenceAiAdapterType.SemanticKernel; 
                 case AIChatServiceType.GroqApi:
                     return InferenceAiAdapterType.GroqApi;
                 case AIChatServiceType.MistralApi:
-                    return InferenceAiAdapterType.Mistral;
-                case AIChatServiceType.Anthropic:
-                    return InferenceAiAdapterType.Mistral;
-                case AIChatServiceType.Cohere:
-                    return InferenceAiAdapterType.Mistral;
+                    return InferenceAiAdapterType.Mistral; 
                 case AIChatServiceType.Ollama:
                 case AIChatServiceType.OllamaAdapter:
-                    return InferenceAiAdapterType.Ollama;
-                case AIChatServiceType.LlamaCpp:
-                    return InferenceAiAdapterType.Mistral;
-                case AIChatServiceType.HuggingFace:
-                    return InferenceAiAdapterType.Mistral;
+                    return InferenceAiAdapterType.Ollama; 
                 default:
-                    return InferenceAiAdapterType.Mistral;
+                    return InferenceAiAdapterType.SemanticKernel;
             }
         }
 
         public InferenceAiAdapterType GetAInferenceAdapterTypeForAssistant()
         {
-            switch (AIChatService)
+            switch (AIChatServiceAdapter)
             {
+                case AIChatServiceType.Default:
+                case AIChatServiceType.SemanticKernel:
+                    return InferenceAiAdapterType.SemanticKernel;
                 case AIChatServiceType.GroqApi:
                 case AIChatServiceType.MistralApi:
                     return InferenceAiAdapterType.GroqApi;
@@ -80,7 +80,7 @@ namespace HotelWise.Domain.Dto.AppConfig
                 case AIChatServiceType.OllamaAdapter:
                     return InferenceAiAdapterType.Ollama;
                 default:
-                    return InferenceAiAdapterType.GroqApi;
+                    return InferenceAiAdapterType.SemanticKernel;
             }           
         }
     }

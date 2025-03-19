@@ -6,5 +6,5 @@ namespace HotelWise.Domain.Dto.AppConfig;
 /// </summary>
 public sealed class MistralApiConfig : AiInferenceConfigBase
 { 
-    public new static string ConfigSectionName => "MistralApí"; 
+    public new static string ConfigSectionName => "MistralApi"; 
 } 

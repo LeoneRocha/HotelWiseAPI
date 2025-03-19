@@ -19,7 +19,7 @@ namespace HotelWise.Domain.AI.Adapter
         public OllamaAdapter(IApplicationIAConfig applicationConfig)
         {
             // Inicializa a configuração e o cliente Ollama
-            var _config = (OllamaConfig)applicationConfig.GetChatServiceConfig(AIChatServiceType.OllamaAdapter)
+            var _config = applicationConfig.GetChatServiceConfig(AIChatServiceType.OllamaAdapter) as OllamaConfig
                     ?? throw new InvalidOperationException("Ollama configuration is missing.");
             _clientChat = createClient(_config.Endpoint, _config.ModelId);
             _clientEmbedding = createClient(_config.Endpoint, _config.ModelId);
@@ -68,7 +68,7 @@ namespace HotelWise.Domain.AI.Adapter
             }
             var result = responseContent.ToString();
             result = MarkdownHelper.ConvertToHtmlIfMarkdown(result);
-            return result; 
+            return result;
         }
 
         public async Task<float[]> GenerateEmbeddingAsync(string text)

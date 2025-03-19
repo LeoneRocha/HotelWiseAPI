@@ -6,6 +6,7 @@ namespace HotelWise.Domain.Enuns.IA
     public enum AIChatServiceType
     {
         Default, 
+        SemanticKernel,
         AzureOpenAI,
         OpenAI,
         GroqApi,
@@ -15,6 +16,6 @@ namespace HotelWise.Domain.Enuns.IA
         Ollama,
         OllamaAdapter,
         LlamaCpp,
-        HuggingFace
+        HuggingFace,
     }
 }

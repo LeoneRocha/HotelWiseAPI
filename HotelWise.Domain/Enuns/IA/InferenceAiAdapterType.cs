@@ -18,5 +18,8 @@ namespace HotelWise.Domain.Enuns.IA
 
         [Description("Ollama")]
         Ollama = 2,
+
+        [Description("SemanticKernel")]
+        SemanticKernel = 3,
     }
 }

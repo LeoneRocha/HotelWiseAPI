@@ -2,6 +2,7 @@
 
 using HotelWise.Domain.Dto.AppConfig;
 using HotelWise.Domain.Enuns.IA;
+using HotelWise.Domain.Interfaces.AppConfig;
 
 namespace HotelWise.Domain.Interfaces
 {
@@ -13,7 +14,7 @@ namespace HotelWise.Domain.Interfaces
         AzureOpenAIConfig AzureOpenAIConfig { get; }
         AzureOpenAIEmbeddingsConfig AzureOpenAIEmbeddingsConfig { get; }
         MistralApiConfig MistralApiConfig { get; }
-        MistralApíEmbeddingsConfig MistralApíEmbeddingsConfig { get; }
+        MistralApiEmbeddingsConfig MistralApiEmbeddingsConfig { get; }
         GroqApiConfig GroqApiConfig { get; }
         OllamaConfig OllamaConfig { get; }
 
@@ -31,9 +32,10 @@ namespace HotelWise.Domain.Interfaces
         WeaviateConfig WeaviateConfig { get; }
 
         #endregion VectorStores
-         
-        object GetChatServiceConfig(AIChatServiceType serviceType);
-        object GetEmbeddingServiceConfig(AIEmbeddingServiceType embeddingType);
+
+        IAiInferenceConfigBase GetChatServiceConfig(AIChatServiceType serviceType);
+        IAiInferenceConfigBase GetChatServiceConfig();
+        IAiInferenceConfigBase GetEmbeddingServiceConfig(AIEmbeddingServiceType embeddingType);
 
         object? GetVectorStoreConfig(VectorStoreType storeType);
     }
