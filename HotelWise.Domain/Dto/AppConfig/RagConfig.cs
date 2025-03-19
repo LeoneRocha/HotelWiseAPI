@@ -46,27 +46,8 @@ namespace HotelWise.Domain.Dto.AppConfig
         public VectorStoreType VectorStoreType { get; set; } = VectorStoreType.InMemory;
 
         public SearchSettings SearchSettings { get; set; } = new();
-
+         
         public InferenceAiAdapterType GetAInferenceAdapterType()
-        {
-            switch (AIChatServiceApi)
-            {
-                case AIChatServiceType.Default:
-                case AIChatServiceType.SemanticKernel:
-                    return InferenceAiAdapterType.SemanticKernel; 
-                case AIChatServiceType.GroqApi:
-                    return InferenceAiAdapterType.GroqApi;
-                case AIChatServiceType.MistralApi:
-                    return InferenceAiAdapterType.Mistral; 
-                case AIChatServiceType.Ollama:
-                case AIChatServiceType.OllamaAdapter:
-                    return InferenceAiAdapterType.Ollama; 
-                default:
-                    return InferenceAiAdapterType.SemanticKernel;
-            }
-        }
-
-        public InferenceAiAdapterType GetAInferenceAdapterTypeForAssistant()
         {
             switch (AIChatServiceAdapter)
             {

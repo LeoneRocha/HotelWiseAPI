@@ -17,7 +17,7 @@ namespace HotelWise.Domain.Interfaces
         string[]? PdfFilePaths { get; }
         VectorStoreType VectorStoreType { get; }
         SearchSettings SearchSettings { get; }
-
+         
         InferenceAiAdapterType GetAInferenceAdapterType();
     }
 }

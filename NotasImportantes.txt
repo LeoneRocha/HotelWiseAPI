@@ -1,2 +1,7 @@
- Mistral chat completion com semantic kernel funcionando 
+--- Semantic Kernel so tem implementado Mistral e Ollama
+-- GroqApi é um adpater implementacao manual
+
+ Mistral chat completion com semantic kernel funcionando  e emmbadding 
+
+
 

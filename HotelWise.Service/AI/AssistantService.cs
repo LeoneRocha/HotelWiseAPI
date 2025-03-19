@@ -15,7 +15,7 @@ namespace HotelWise.Service.Entity
         public AssistantService(Serilog.ILogger logger, IApplicationIAConfig applicationConfig, IAIInferenceService aIInferenceService)
         {
             _logger = logger;
-            _eIAInferenceAdapterType = applicationConfig.RagConfig.GetAInferenceAdapterTypeForAssistant();
+            _eIAInferenceAdapterType = applicationConfig.RagConfig.GetAInferenceAdapterType();
             _aIInferenceService = aIInferenceService;
         }
 
