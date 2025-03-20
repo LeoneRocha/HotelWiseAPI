@@ -1,4 +1,5 @@
 ﻿using HotelWise.Domain.Dto;
+using HotelWise.Domain.Enuns.IA;
 using HotelWise.Domain.Helpers;
 using HotelWise.Domain.Interfaces;
 using HotelWise.Domain.Interfaces.IA;
@@ -35,16 +36,21 @@ namespace HotelWise.Domain.AI.Adapter
             var chatHistory = new ChatHistory();
             foreach (var message in messages)
             {
-                chatHistory.AddUserMessage(message.Content);
-
-                if (message.Role.ToLower() == "assistant")
+                if (message.RoleType == RoleAiPromptsType.System)
                 {
-                    chatHistory.AddAssistantMessage(message.Content);
-                }
-                if (message.Role.ToLower() == "system")
-                {
+                    // Define as instruções ou o contexto para guiar o comportamento da IA.
                     chatHistory.AddSystemMessage(message.Content);
-                }
+                } 
+                if (message.RoleType == RoleAiPromptsType.Assistant)
+                {
+                    // Adiciona uma resposta gerada pelo assistente ao histórico da conversa.
+                    chatHistory.AddAssistantMessage(message.Content);
+                } 
+                if (message.RoleType == RoleAiPromptsType.User)
+                {
+                    // Adiciona a entrada fornecida pelo usuário ao histórico da conversa.
+                    chatHistory.AddUserMessage(message.Content); 
+                } 
             }
             var result = await _chatCompletionService.GetChatMessageContentAsync(chatHistory);
 
