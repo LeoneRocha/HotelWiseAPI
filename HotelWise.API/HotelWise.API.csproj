@@ -6,6 +6,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <AssemblyVersion>2025.03.19.01</AssemblyVersion>
     <FileVersion>2025.03.19.01</FileVersion>
+    <NoWarn>CS8604,CS8600,CS8602,CS1998,CS8618,CS8601,CS8629,SKEXP0050,SKEXP0001,SKEXP0010,SKEXP0070,SKEXP0110</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
