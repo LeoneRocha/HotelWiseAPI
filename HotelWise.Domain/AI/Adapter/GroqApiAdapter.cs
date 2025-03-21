@@ -1,5 +1,6 @@
 ﻿using GroqApiLibrary;
 using HotelWise.Domain.Dto;
+using HotelWise.Domain.Enuns.IA;
 using HotelWise.Domain.Interfaces;
 using HotelWise.Domain.Interfaces.IA;
 using System.Text.Json.Nodes;
@@ -24,7 +25,7 @@ namespace HotelWise.Domain.AI.Adapter
                 ["model"] = _model,
                 ["messages"] = new JsonArray(messages.Select(m => new JsonObject
                 {
-                    ["role"] = m.Role,
+                    ["role"] = getRole(m.RoleType),
                     ["content"] = m.Content
                 }).ToArray())
             };
@@ -32,6 +33,18 @@ namespace HotelWise.Domain.AI.Adapter
             var result = await _groqApiClient.CreateChatCompletionAsync(request);
             var resultOut = result?["choices"]?[0]?["message"]?["content"]?.ToString();
             return resultOut ?? string.Empty;
+        }
+
+        private string getRole(RoleAiPromptsType roleType)
+        {
+            return roleType switch
+            {
+                RoleAiPromptsType.System => "system",
+                RoleAiPromptsType.Agent => "system",
+                RoleAiPromptsType.User => "user",
+                RoleAiPromptsType.Assistant => "assistant",
+                _ => "user"
+            };
         }
 
         public async Task<string> GenerateChatCompletionByAgentAsync(PromptMessageVO[] messages)

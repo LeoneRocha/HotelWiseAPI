@@ -94,6 +94,7 @@ namespace HotelWise.Domain.AI.Adapter
             // Mapeia os papéis para o formato suportado pelo OllamaSharp
             return role.ToLower() switch
             {
+                "agent" => "system",
                 "system" => "system",
                 "user" => "user",
                 "assistant" => "assistant",

@@ -17,7 +17,7 @@ namespace HotelWise.Domain.AI.Adapter
         public async Task<string> GenerateChatCompletionAsync(PromptMessageVO[] messages)
         {
             var chatMessages = messages.Select(m => new ChatMessage(
-                Enum.Parse<ChatMessage.RoleEnum>(m.Role, true),
+                getRole(m),
                 m.Content)).ToList();
 
             var request = new ChatCompletionRequest(
@@ -32,6 +32,23 @@ namespace HotelWise.Domain.AI.Adapter
 
             var response = await _client.Completions.GetCompletionAsync(request);
             return response.VarObject.ToString();
+        }
+
+        private static ChatMessage.RoleEnum getRole(PromptMessageVO pm)
+        {
+            switch (pm.RoleType)
+            {
+                case Enuns.IA.RoleAiPromptsType.System:
+                case Enuns.IA.RoleAiPromptsType.Agent:                    
+                    return ChatMessage.RoleEnum.System;
+                case Enuns.IA.RoleAiPromptsType.User:
+                    return ChatMessage.RoleEnum.User;
+                case Enuns.IA.RoleAiPromptsType.Assistant:
+                    return ChatMessage.RoleEnum.Assistant;
+             
+                default:
+                    return ChatMessage.RoleEnum.User;
+            }
         }
 
         public async Task<string> GenerateChatCompletionByAgentAsync(PromptMessageVO[] messages)
