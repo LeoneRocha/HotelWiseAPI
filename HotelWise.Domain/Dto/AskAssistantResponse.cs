@@ -1,7 +1,16 @@
-﻿namespace HotelWise.Domain.Dto
+﻿using HotelWise.Domain.Enuns.IA;
+
+namespace HotelWise.Domain.Dto
 {
     public class AskAssistantResponse
     {
-        public string Response { get; set; } = string.Empty;
+        public RoleAiPromptsType Role { get; set; }
+
+        public string Message { get; set; } = string.Empty;
+    } 
+    public class AskAssistantRequest
+    {
+        public RoleAiPromptsType Role { get; } = RoleAiPromptsType.User;
+        public string Message { get; set; }
     }
 }

@@ -23,21 +23,24 @@ namespace HotelWise.API.Controllers
         private long GetUserIdCurrent()
         {
             long idUser = SecurityHelperApi.GetUserIdApi(User);
-            return idUser; 
+            return idUser;
         }
 
         [HttpPost("ask")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)] 
-        public async Task<IActionResult> AskAssistant([FromBody] SearchCriteria searchCriteria)
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> AskAssistant([FromBody] AskAssistantRequest request)
         {
             setUserIdCurrent();
-            var result = await _assistantService.AskAssistant(searchCriteria);
-            if (result != null)
+            var result = await _assistantService.AskAssistant(request);
+            if (result != null && result.Length > 0)
             {
-                return Ok(result); 
+                return Ok(result);
             }
-            return BadRequest();
+            else
+            {
+                return BadRequest();
+            }
         }
     }
 }

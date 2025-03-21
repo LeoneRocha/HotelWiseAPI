@@ -1,5 +1,4 @@
 ﻿using HotelWise.Domain.Dto;
-using HotelWise.Domain.Model;
 
 namespace HotelWise.Domain.Interfaces
 {
@@ -7,7 +6,7 @@ namespace HotelWise.Domain.Interfaces
     {
         Task<float[]?> GenerateEmbeddingAsync(string text);
 
-        Task<AskAssistantResponse[]?> AskAssistant(SearchCriteria searchCriteria);
+        Task<AskAssistantResponse[]?> AskAssistant(AskAssistantRequest request);
         void SetUserId(long id);
     }
 }

@@ -27,6 +27,8 @@ namespace HotelWise.Domain.AI.Adapter
             _chatCompletionService = kernel.GetRequiredService<IChatCompletionService>();
             _embeddingGenerationService = kernel.GetRequiredService<ITextEmbeddingGenerationService>();
         }
+        
+        //FEATURE CREAT CHAT BY AGENT 
 
         public async Task<string> GenerateChatCompletionAsync(PromptMessageVO[] messages)
         {
