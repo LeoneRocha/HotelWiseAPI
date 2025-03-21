@@ -23,10 +23,7 @@ namespace HotelWise.Domain.AI.Adapter
         public SemanticKernelAdapter(IApplicationIAConfig applicationConfig, IServiceProvider serviceProvider)
         {
             var kernel = serviceProvider.GetRequiredService<Kernel>();
-            var config = applicationConfig.GetChatServiceConfig()
-                        ?? throw new InvalidOperationException("Semantic Kernel configuration is missing or invalid.");
-
-            _kernel = kernel ?? throw new ArgumentNullException(nameof(kernel));
+            _kernel = kernel ?? throw new InvalidOperationException("Kernel não foi inicializado corretamente.");
             _chatCompletionService = kernel.GetRequiredService<IChatCompletionService>();
             _embeddingGenerationService = kernel.GetRequiredService<ITextEmbeddingGenerationService>();
         }

@@ -37,20 +37,14 @@ namespace HotelWise.Service.Entity
                 //SQL BUT EXPECTED MONGO BD OR AZURE DATATABLE
                 //Feature 2) Get History add request if not great rule max token 
                 PromptMessageVO[] historyPrompts = CreatePrompts(request);
-
-                AskAssistantResponse[] askAssistantResponses = [];
-
-                if (historyPrompts.Length > 0 && historyPrompts.Count(x => x.RoleType == RoleAiPromptsType.Agent) > 0)
+                if (historyPrompts.Length > 0 && historyPrompts.Any(x => x.RoleType == RoleAiPromptsType.Agent))
                 {
-                    askAssistantResponses = await ChatCompletionByAgent(historyPrompts);
+                    return await ChatCompletionByAgent(historyPrompts);
                 }
                 else
                 {
-                    askAssistantResponses = await ChatCompletion(historyPrompts);
+                    return await ChatCompletion(historyPrompts);
                 }
-
-
-                return askAssistantResponses;
             }
             catch (Exception ex)
             {
