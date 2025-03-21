@@ -32,6 +32,9 @@ namespace HotelWise.Domain.AI.Adapter
         }
         public async Task<string> GenerateChatCompletionByAgentAsync(PromptMessageVO[] messages)
         {
+            if (messages == null || messages.Length <= 0)
+                throw new ArgumentException("Messages cannot be null or empty.");
+
             ChatHistory chatHistory = createChatHistory(messages);
             var agent = createAgent(messages.First(mg => mg.RoleType == RoleAiPromptsType.Agent));
 
