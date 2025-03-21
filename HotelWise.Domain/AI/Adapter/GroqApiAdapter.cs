@@ -35,7 +35,7 @@ namespace HotelWise.Domain.AI.Adapter
             return resultOut ?? string.Empty;
         }
 
-        private string getRole(RoleAiPromptsType roleType)
+        private static string getRole(RoleAiPromptsType roleType)
         {
             return roleType switch
             {
