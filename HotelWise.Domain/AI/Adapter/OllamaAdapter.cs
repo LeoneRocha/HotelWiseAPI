@@ -99,6 +99,10 @@ namespace HotelWise.Domain.AI.Adapter
                 "assistant" => "assistant",
                 _ => "user"
             };
+        } 
+        public async Task<string> GenerateChatCompletionByAgentAsync(PromptMessageVO[] messages)
+        {
+            return await GenerateChatCompletionAsync(messages);
         }
     }
 }

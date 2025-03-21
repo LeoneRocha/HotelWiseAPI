@@ -32,7 +32,12 @@ namespace HotelWise.Domain.AI.Adapter
 
             var response = await _client.Completions.GetCompletionAsync(request);
             return response.VarObject.ToString();
-        }  
+        }
+
+        public async Task<string> GenerateChatCompletionByAgentAsync(PromptMessageVO[] messages)
+        {
+            return await GenerateChatCompletionAsync(messages);
+        }
 
         public async Task<float[]> GenerateEmbeddingAsync(string text)
         {

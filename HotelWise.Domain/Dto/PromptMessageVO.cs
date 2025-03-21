@@ -10,6 +10,8 @@ namespace HotelWise.Domain.Dto
         public string Role => RoleType.GetDescription();
 
         public string Content { get; set; } = string.Empty;
+
+        public string AgentName { get; set; } = string.Empty;
     }
 
 }

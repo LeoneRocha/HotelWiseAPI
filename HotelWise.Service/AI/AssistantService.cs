@@ -3,6 +3,7 @@ using HotelWise.Domain.Enuns.IA;
 using HotelWise.Domain.Helpers;
 using HotelWise.Domain.Interfaces;
 using HotelWise.Domain.Interfaces.IA;
+using System.Text;
 
 namespace HotelWise.Service.Entity
 {
@@ -31,19 +32,25 @@ namespace HotelWise.Service.Entity
         public async Task<AskAssistantResponse[]?> AskAssistant(AskAssistantRequest request)
         {
             try
-            { 
+            {
                 //Feature 1) Save history by token (ID_Chat_Token 'guid', DataHistory 'json' , TotalTokens CountMenssage, DateTime, IdUser
                 //SQL BUT EXPECTED MONGO BD OR AZURE DATATABLE
                 //Feature 2) Get History add request if not great rule max token 
                 PromptMessageVO[] historyPrompts = CreatePrompts(request);
 
-                var result = await _aIInferenceService.GenerateChatCompletionAsync(historyPrompts, _eIAInferenceAdapterType);
-                return [
-                    new AskAssistantResponse() 
-                    {
-                        Message = result,
-                        Role = RoleAiPromptsType.Assistant 
-                    }];
+                AskAssistantResponse[] askAssistantResponses = [];
+
+                if (historyPrompts.Length > 0 && historyPrompts.Count(x => x.RoleType == RoleAiPromptsType.Agent) > 0)
+                {
+                    askAssistantResponses = await ChatCompletionByAgent(historyPrompts);
+                }
+                else
+                {
+                    askAssistantResponses = await ChatCompletion(historyPrompts);
+                }
+
+
+                return askAssistantResponses;
             }
             catch (Exception ex)
             {
@@ -52,34 +59,80 @@ namespace HotelWise.Service.Entity
             return null;
         }
 
+        private async Task<AskAssistantResponse[]> ChatCompletion(PromptMessageVO[] historyPrompts)
+        {
+            var result = await _aIInferenceService.GenerateChatCompletionAsync(historyPrompts, _eIAInferenceAdapterType);
+            return [
+                new AskAssistantResponse()
+                    {
+                        Message = result,
+                        Role = RoleAiPromptsType.Assistant
+                    }];
+        }
+
+        private async Task<AskAssistantResponse[]?> ChatCompletionByAgent(PromptMessageVO[] historyPrompts)
+        {
+            var result = await _aIInferenceService.GenerateChatCompletionByAgentAsync(historyPrompts, _eIAInferenceAdapterType);
+            return [
+                new AskAssistantResponse()
+                    {
+                        Message = result,
+                        Role = RoleAiPromptsType.Assistant
+                    }];
+        }
+
         private static PromptMessageVO[] CreatePrompts(AskAssistantRequest request)
         {
+            var sysMsgRuleAgent = new PromptMessageVO()
+            {
+                RoleType = RoleAiPromptsType.Agent,
+                Content = new StringBuilder()
+                .AppendLine("Você é um especializado em viagens e turismo. Responda exclusivamente a perguntas relacionadas a:")
+                .AppendLine("- Planejamento de viagens.")
+                .AppendLine("- Reservas de hotéis, voos e transporte.")
+                .AppendLine("- Recomendações de destinos turísticos, passeios, atrações e pacotes de viagem.")
+                .AppendLine()
+                .AppendLine("Diretrizes:")
+                .AppendLine("1. Forneça respostas completas e confiáveis sobre turismo.")
+                .AppendLine("2. Adote um tom positivo e amigável para encorajar o usuário.")
+                .AppendLine("3. Utilize formatos visuais (listas ou tabelas em Markdown/HTML) para apresentar informações, sempre em português brasileiro.")
+                .AppendLine()
+                .AppendLine("Limitações:")
+                .AppendLine("- Não forneça informações fora do escopo de viagens e turismo.")
+                .AppendLine("- Caso a pergunta esteja fora do escopo, responda com respeito e objetividade, indicando que não pode ajudar com o tópico abordado.")
+                .ToString()
+            };
             PromptMessageVO sysMsgRule01 = new PromptMessageVO()
             {
                 RoleType = RoleAiPromptsType.System,
-                Content = "Você é um assistente de viagens e turismo. Você só responde a perguntas relacionadas a viagens, reservas de hotéis e turismo. Se a pergunta estiver fora desse escopo, responda de forma objetiva que não pode ajudar com isso. Não forneca nehuma infomação fora do escopo sobre viagens, reservas de hotéis e turismo."
+                Content = "Você é um assistente especializado em viagens e turismo. Sua função é responder exclusivamente a perguntas relacionadas a viagens, reservas de hotéis e turismo. Caso receba perguntas fora desse escopo, responda de forma clara e objetiva que não pode ajudar com o tópico mencionado."
             };
+
             PromptMessageVO sysMsgRule02 = new PromptMessageVO()
             {
                 RoleType = RoleAiPromptsType.System,
-                Content = "Só responda exclusivamente em tópicos relacionados a viagens e turismo, e a responder de forma respeitosa e breve quando a pergunta estiver fora desse escopo."
+                Content = "Limite suas respostas exclusivamente a tópicos de viagens e turismo. Quando uma pergunta estiver fora desse escopo, responda de maneira educada, objetiva e concisa."
             };
+
             PromptMessageVO sysMsgLanguage = new PromptMessageVO()
             {
                 RoleType = RoleAiPromptsType.System,
-                Content = "Responda sempre em idioma português brasileiro em pt-br."
+                Content = "Responda sempre em português brasileiro (pt-BR) de forma clara e fluida."
             };
+
             PromptMessageVO sysMsgHtmlOut = new PromptMessageVO()
             {
                 RoleType = RoleAiPromptsType.System,
-                Content = "E responda em formato html com tags html ou em Markdown, formatando a resposta para ser renderizado no site."
+                Content = "Formate suas respostas para serem exibidas em HTML ou Markdown, utilizando tags adequadas para que sejam renderizadas corretamente no site."
             };
+
             PromptMessageVO userMsg = new PromptMessageVO()
             {
                 RoleType = RoleAiPromptsType.User,
                 Content = request.Message
             };
-            PromptMessageVO[] messages = [sysMsgRule01, sysMsgRule02, sysMsgLanguage, sysMsgHtmlOut, userMsg];
+
+            PromptMessageVO[] messages = [sysMsgRuleAgent, sysMsgRule01, sysMsgRule02, sysMsgLanguage, sysMsgHtmlOut, userMsg];
             return messages;
         }
     }

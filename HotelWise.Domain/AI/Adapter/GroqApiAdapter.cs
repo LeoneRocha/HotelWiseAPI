@@ -9,8 +9,8 @@ namespace HotelWise.Domain.AI.Adapter
     public class GroqApiAdapter : IAIInferenceAdapter
     {
         private readonly GroqApiClient _groqApiClient;
-        private readonly string _model; 
-         
+        private readonly string _model;
+
         public GroqApiAdapter(IApplicationIAConfig applicationConfig)
         {
             _groqApiClient = new GroqApiClient(applicationConfig.GroqApiConfig.ApiKey);
@@ -18,7 +18,7 @@ namespace HotelWise.Domain.AI.Adapter
         }
 
         public async Task<string> GenerateChatCompletionAsync(PromptMessageVO[] messages)
-        { 
+        {
             var request = new JsonObject
             {
                 ["model"] = _model,
@@ -32,7 +32,12 @@ namespace HotelWise.Domain.AI.Adapter
             var result = await _groqApiClient.CreateChatCompletionAsync(request);
             var resultOut = result?["choices"]?[0]?["message"]?["content"]?.ToString();
             return resultOut ?? string.Empty;
-        } 
+        }
+
+        public async Task<string> GenerateChatCompletionByAgentAsync(PromptMessageVO[] messages)
+        {
+            return await GenerateChatCompletionAsync(messages);
+        }
 
         public Task<float[]> GenerateEmbeddingAsync(string text)
         {

@@ -20,6 +20,12 @@ namespace HotelWise.Service.AI
             return await _adapter!.GenerateChatCompletionAsync(messages);
         }
 
+        public async Task<string> GenerateChatCompletionByAgentAsync(PromptMessageVO[] messages, InferenceAiAdapterType eIAInferenceAdapterType)
+        {
+            var _adapter = _adapterFactory.CreateAdapter(eIAInferenceAdapterType);
+            return await _adapter!.GenerateChatCompletionByAgentAsync(messages);
+        }
+
         public async Task<float[]> GenerateEmbeddingAsync(string text, InferenceAiAdapterType eIAInferenceAdapterType)
         { 
             var _adapter = _adapterFactory.CreateAdapter(eIAInferenceAdapterType);

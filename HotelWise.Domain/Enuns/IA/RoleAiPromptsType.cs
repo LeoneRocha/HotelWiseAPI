@@ -13,6 +13,10 @@ namespace HotelWise.Domain.Enuns.IA
         User = 2,
         [JsonPropertyName("assistant")]
         [Description("assistant")]
-        Assistant = 3
+        Assistant = 3,
+        [JsonPropertyName("agent")]
+        [Description("agent")]
+        Agent = 4
+
     }
 }
