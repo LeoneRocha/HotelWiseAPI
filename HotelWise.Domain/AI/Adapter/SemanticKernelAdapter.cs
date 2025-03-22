@@ -1,10 +1,8 @@
-﻿using Azure;
-using HotelWise.Domain.Dto;
+﻿using HotelWise.Domain.Dto;
 using HotelWise.Domain.Enuns.IA;
 using HotelWise.Domain.Helpers;
 using HotelWise.Domain.Interfaces;
 using HotelWise.Domain.Interfaces.IA;
-using Microsoft.AspNetCore.SignalR.Protocol;
 using Microsoft.Extensions.AI;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.SemanticKernel;
@@ -21,82 +19,59 @@ namespace HotelWise.Domain.AI.Adapter
         private readonly Kernel _kernel;
         private readonly IChatCompletionService _chatCompletionService;
         private readonly ITextEmbeddingGenerationService _embeddingGenerationService;
-        private const string LINE_SEPARATOR = "--------------------------------";
-
+        private const string LineSeparator = "--------------------------------";
         public SemanticKernelAdapter(IApplicationIAConfig applicationConfig, IServiceProvider serviceProvider)
         {
-            var kernel = serviceProvider.GetRequiredService<Kernel>();
-            _kernel = kernel ?? throw new InvalidOperationException("Kernel não foi inicializado corretamente.");
-            _chatCompletionService = kernel.GetRequiredService<IChatCompletionService>();
-            _embeddingGenerationService = kernel.GetRequiredService<ITextEmbeddingGenerationService>();
-        }
-        public async Task<string> GenerateChatCompletionByAgentAsync(PromptMessageVO[] messages)
-        {
-            if (messages == null || messages.Length <= 0)
-                throw new ArgumentException("Messages cannot be null or empty.");
-
-            ChatHistory chatHistory = createChatHistory(messages);
-            var agent = createAgent(messages.First(mg => mg.RoleType == RoleAiPromptsType.Agent));
-
-            var resultString = string.Empty;
-            await foreach (var message in agent.InvokeAsync(chatHistory))
-            {
-                resultString = message.Content;
-            }
-            resultString = MarkdownHelper.ConvertToHtmlIfMarkdown(resultString ?? string.Empty);
-            return resultString;
+            _kernel = serviceProvider.GetRequiredService<Kernel>()
+                ?? throw new InvalidOperationException("Kernel não foi inicializado corretamente.");
+            _chatCompletionService = _kernel.GetRequiredService<IChatCompletionService>();
+            _embeddingGenerationService = _kernel.GetRequiredService<ITextEmbeddingGenerationService>();
         }
 
         public async Task<string> GenerateChatCompletionAsync(PromptMessageVO[] messages)
         {
-            if (messages == null || messages.Length <= 0)
-                throw new ArgumentException("Messages cannot be null or empty.");
+            ValidateMessages(messages);
 
-            ChatHistory chatHistory = createChatHistory(messages);
+            var chatHistory = BuildChatHistory(messages);
 
-            var result = await _chatCompletionService.GetChatMessageContentAsync(chatHistory);
+            var resultInference = await _chatCompletionService.GetChatMessageContentAsync(chatHistory);
 
-            if (result == null)
-            {
-                return string.Empty;
-            }
-            var resultString = result.Content;
-            resultString = MarkdownHelper.ConvertToHtmlIfMarkdown(resultString ?? string.Empty);
-            return resultString;
+            var resultChat = ProcessResultContentToHtmlIfMarkdown(resultInference?.Content);
+
+            return resultChat;
+        }
+        public async Task<string> GenerateChatCompletionByAgentAsync(PromptMessageVO[] messages)
+        {
+            ValidateMessages(messages);
+
+            var chatHistory = BuildChatHistory(messages);
+
+            var agent = BuildAgent(messages.First(m => m.RoleType == RoleAiPromptsType.Agent));
+
+            var resultInference = await ProcessAgentResultAsync(agent, chatHistory);
+
+            var resultChat = ProcessResultContentToHtmlIfMarkdown(resultInference);
+
+            return resultChat;
         }
 
         public async Task<string> GenerateChatCompletionByAgentSimpleRagAsync(PromptMessageVO[] messages)
         {
-            if (messages == null || messages.Length <= 0)
-                throw new ArgumentException("Messages cannot be null or empty.");
+            ValidateMessages(messages);
 
-            ChatHistory chatHistory = createChatHistory(messages);
-            chatHistory = addContextMessage(chatHistory, messages);
+            var chatHistory = BuildChatHistory(messages);
 
-            var result = await _chatCompletionService.GetChatMessageContentAsync(chatHistory);
+            AddContextToChatHistory(chatHistory, messages);
 
-            if (result == null)
-            {
-                return string.Empty;
-            }
-            var resultString = result.Content;
-            resultString = MarkdownHelper.ConvertToHtmlIfMarkdown(resultString ?? string.Empty);
-            return resultString;
+            var agent = BuildAgent(messages.First(m => m.RoleType == RoleAiPromptsType.Agent));
+
+            var resultInference = await ProcessAgentResultAsync(agent, chatHistory);
+
+            var resultChat = ProcessResultContentToHtmlIfMarkdown(resultInference);
+
+            return resultChat;
         }
-        private ChatHistory addContextMessage(ChatHistory chatHistory, PromptMessageVO[] messages)
-        {
-            var promptRag = messages.First(p => p.RoleType == RoleAiPromptsType.Context);
 
-            StringBuilder stringBuilder = new();
-            foreach (var item in promptRag.DataContextRag)
-            {
-                stringBuilder.AppendLine(item.DataVector);
-                stringBuilder.AppendLine(LINE_SEPARATOR);
-            }
-            chatHistory.AddUserMessage($"Context:\n\n{stringBuilder.ToString()}");
-
-            return chatHistory;
-        }
         public async Task<float[]> GenerateEmbeddingAsync(string text)
         {
             if (string.IsNullOrWhiteSpace(text))
@@ -111,38 +86,82 @@ namespace HotelWise.Domain.AI.Adapter
 
             return embeddings[0].ToArray();
         }
-        private ChatCompletionAgent createAgent(PromptMessageVO promptMessageVO)
+
+        #region PRIVATE
+
+        private static void ValidateMessages(PromptMessageVO[] messages)
         {
-            return new ChatCompletionAgent()
-            {
-                Instructions = promptMessageVO.Content,
-                Name = promptMessageVO.AgentName,
-                Kernel = _kernel
-            };
+            if (messages == null || messages.Length == 0)
+                throw new ArgumentException("Messages cannot be null or empty.");
         }
-        private static ChatHistory createChatHistory(PromptMessageVO[] messages)
+
+        private static string ProcessResultContentToHtmlIfMarkdown(string content)
+        {
+            return MarkdownHelper.ConvertToHtmlIfMarkdown(content ?? string.Empty);
+        }
+
+        private async Task<string> ProcessAgentResultAsync(ChatCompletionAgent agent, ChatHistory chatHistory)
+        {
+            var resultBuilder = new StringBuilder();
+
+            await foreach (var message in agent.InvokeAsync(chatHistory))
+            {
+                resultBuilder.Append(message.Content);
+            }
+
+            var result = resultBuilder.ToString();
+            return result;
+        }
+
+        private static ChatHistory BuildChatHistory(PromptMessageVO[] messages)
         {
             var chatHistory = new ChatHistory();
             foreach (var message in messages)
             {
-                if (message.RoleType == RoleAiPromptsType.System)
+                switch (message.RoleType)
                 {
-                    // Define as instruções ou o contexto para guiar o comportamento da IA.
-                    chatHistory.AddSystemMessage(message.Content);
-                }
-                if (message.RoleType == RoleAiPromptsType.Assistant)
-                {
-                    // Adiciona uma resposta gerada pelo assistente ao histórico da conversa.
-                    chatHistory.AddAssistantMessage(message.Content);
-                }
-                if (message.RoleType == RoleAiPromptsType.User)
-                {
-                    // Adiciona a entrada fornecida pelo usuário ao histórico da conversa.
-                    chatHistory.AddUserMessage(message.Content);
+                    case RoleAiPromptsType.System:
+                        chatHistory.AddSystemMessage(message.Content);
+                        break;
+                    case RoleAiPromptsType.Assistant:
+                        chatHistory.AddAssistantMessage(message.Content);
+                        break;
+                    case RoleAiPromptsType.User:
+                        chatHistory.AddUserMessage(message.Content);
+                        break;
                 }
             }
             return chatHistory;
         }
+
+        private ChatCompletionAgent BuildAgent(PromptMessageVO agentMessage)
+        {
+            return new ChatCompletionAgent
+            {
+                Instructions = agentMessage.Content,
+                Name = agentMessage.AgentName,
+                Kernel = _kernel
+            };
+        }
+
+        private static void AddContextToChatHistory(ChatHistory chatHistory, PromptMessageVO[] messages)
+        {
+            var contextMessage = messages.FirstOrDefault(m => m.RoleType == RoleAiPromptsType.Context);
+
+            if (contextMessage?.DataContextRag != null)
+            {
+                var contextBuilder = new StringBuilder();
+
+                foreach (var item in contextMessage.DataContextRag)
+                {
+                    contextBuilder.AppendLine(item.DataVector);
+                    contextBuilder.AppendLine(LineSeparator);
+                }
+
+                chatHistory.AddUserMessage($"Context:\n\n{contextBuilder}");
+            }
+        }
+
+        #endregion PRIVATE
     }
-#pragma warning restore SKEXP0001
 }
