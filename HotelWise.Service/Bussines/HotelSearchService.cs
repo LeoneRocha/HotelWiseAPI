@@ -1,13 +1,27 @@
 ﻿using AutoMapper;
+using Azure;
+using Azure.Core;
+using DocumentFormat.OpenXml.Drawing.Charts;
+using DocumentFormat.OpenXml.Drawing;
+using DocumentFormat.OpenXml.Office2010.Excel;
 using HotelWise.Domain.Dto;
 using HotelWise.Domain.Dto.SemanticKernel;
+using HotelWise.Domain.Enuns.IA;
 using HotelWise.Domain.Helpers;
 using HotelWise.Domain.Interfaces;
 using HotelWise.Domain.Interfaces.Entity;
+using HotelWise.Domain.Interfaces.IA;
 using HotelWise.Domain.Interfaces.SemanticKernel;
 using HotelWise.Domain.Model;
+using HotelWise.Service.AI;
 using HotelWise.Service.Generic;
+using Markdig;
 using System.Collections.Concurrent;
+using System.Net;
+using System.Text;
+using UglyToad.PdfPig.Graphics.Operations.SpecialGraphicsState;
+using HotelWise.Service.Bussines;
+using HotelWise.Service.Prompts;
 
 namespace HotelWise.Service.Entity
 {
@@ -16,17 +30,23 @@ namespace HotelWise.Service.Entity
         private readonly IVectorStoreService<HotelVector> _hotelVectorStoreService;
         private readonly IApplicationIAConfig _applicationConfig;
         private readonly IHotelRepository _hotelRepository;
+        private readonly IAIInferenceService _aIInferenceService;
+        private readonly InferenceAiAdapterType _eIAInferenceAdapterType;
+
         public HotelSearchService(
             Serilog.ILogger logger,
             IMapper mapper,
             IApplicationIAConfig applicationConfig,
             IHotelRepository hotelRepository,
-            IVectorStoreService<HotelVector> hotelVectorStoreService)
+            IVectorStoreService<HotelVector> hotelVectorStoreService,
+            IAIInferenceService aIInferenceService)
             : base(hotelRepository, mapper, logger)
         {
             _applicationConfig = applicationConfig;
             _hotelVectorStoreService = hotelVectorStoreService;
             _hotelRepository = hotelRepository;
+            _eIAInferenceAdapterType = applicationConfig.RagConfig.GetAInferenceAdapterType();
+            _aIInferenceService = aIInferenceService;
         }
         public async Task<ServiceResponse<HotelSemanticResult>> SemanticSearch(SearchCriteria searchCriteria)
         {
@@ -42,16 +62,19 @@ namespace HotelWise.Service.Entity
                 }
                 //NEXSTEP: ENVIAR PARA UM CACHE to que pesquisar toda vez no banco de dados 
                 var allHotelsFromDb = (await fetchHotelsAsync()).Data;
-
-                // Aguardar o tempo configurado antes de buscar o vetor
-                await Task.Delay(_applicationConfig.RagConfig.SearchSettings.DelayBeforeSearchMilliseconds);
-
+                  
                 //Search Vector  
                 await searchFromVector(searchCriteria, response, allHotelsFromDb);
 
                 //SearchAndAnalyzePluginAsync GET FROM IA INTERFERENCE                  
-                await searchByPluguin(searchCriteria, response, allHotelsFromDb);
+                await searchByInterference(searchCriteria, response);
 
+                // Processa a resposta da IA para obter os IDs dos hotéis inferidos
+                var hotelsResultInterference = HotelResponseProcessor.ProcessResponse(response.Data!.PromptResultContent);
+
+                // Filtra os resultados de HotelsVectorResult com base nos IDs retornados pela inferência
+                FilterHotelsByIAResult(response.Data!, hotelsResultInterference);
+                 
                 if (response.Errors.Count == 0)
                 {
                     response.Success = true;
@@ -64,6 +87,23 @@ namespace HotelWise.Service.Entity
             }
             return response;
         }
+
+        public static void FilterHotelsByIAResult(HotelSemanticResult response, List<HotelInfo> hotelsResultInterference)
+        {
+            // Verifica se os dados de entrada estão válidos
+            if (response == null || response.HotelsVectorResult == null || hotelsResultInterference == null)
+                throw new ArgumentNullException("Os parâmetros de entrada não podem ser nulos.");
+
+            // Lista de IDs retornados pela inferência
+            var interferenceIds = new HashSet<long>(hotelsResultInterference.Select(h => h.Id));
+
+            // Filtra os hotéis do vetor com base nos IDs
+            response.HotelsIAResult = response.HotelsVectorResult
+                .Where(hotel => interferenceIds.Contains(hotel.HotelId))
+                .ToArray();
+        }
+
+
 
         private async Task<ServiceResponse<HotelDto[]>> fetchHotelsAsync()
         {
@@ -110,14 +150,16 @@ namespace HotelWise.Service.Entity
             response.Message = responseVector.Message;
         }
 
-        private async Task searchByPluguin(SearchCriteria searchCriteria, ServiceResponse<HotelSemanticResult> response, HotelDto[]? allHotelsFromDb)
-        {
-            var responseIAInterference = await _hotelVectorStoreService.SearchAndAnalyzePluginAsync(searchCriteria.SearchTextCriteria);
-            var hotelsIAInterference = responseIAInterference.Data;
-            HotelDto[] listHotelsIAInterference = changeHotelsVectorToHotelDtos(allHotelsFromDb, hotelsIAInterference);
+        private async Task searchByInterference(SearchCriteria searchCriteria, ServiceResponse<HotelSemanticResult> response )
+        { 
+            PromptMessageVO[] historyPrompts = createPrompts(searchCriteria, response.Data!.HotelsVectorResult);
+            var result = await _aIInferenceService.GenerateChatCompletionByAgentSimpleRagAsync(historyPrompts, _eIAInferenceAdapterType); 
+
+            response.Data!.PromptResultContent = result;  
+
+            HotelDto[] listHotelsIAInterference = changeHotelsVectorToHotelDtos(response.Data!.HotelsVectorResult, []);
             response.Data!.HotelsIAResult = listHotelsIAInterference;
-            response.Errors.AddRange(responseIAInterference.Errors);
-            response.Message = responseIAInterference.Message;
+          
         }
         private static HotelDto[] changeHotelsVectorToHotelDtos(HotelDto[]? allHotelsFromDb, HotelVector[]? hotelsVector)
         {
@@ -155,5 +197,41 @@ namespace HotelWise.Service.Entity
             }
             return [];
         }
+
+        private static PromptMessageVO[] createPrompts(SearchCriteria request, HotelDto[]? allHotelsFromDb)
+        {
+            PromptMessageVO sysMsgHotelAgent = StayMatePromptGenerator.CreateHotelAgentPrompt();
+            PromptMessageVO sysMsgHotelSearch = StayMatePromptGenerator.CreateHotelSystemPrompt();
+
+            PromptMessageVO ragMsg = new PromptMessageVO()
+            {
+                RoleType = RoleAiPromptsType.Context,
+                DataContextRag = convertDataContext(allHotelsFromDb)
+            };
+
+            PromptMessageVO userMsg = new PromptMessageVO()
+            {
+                RoleType = RoleAiPromptsType.User,
+                Content = request.SearchTextCriteria
+            };
+
+            PromptMessageVO[] messages = [sysMsgHotelAgent, sysMsgHotelSearch, userMsg, ragMsg];
+            return messages;
+        }
+
+        private static DataVectorVO[] convertDataContext(HotelDto[]? allHotelsFromDb)
+        {
+            List<DataVectorVO> dataVectorVOs = new List<DataVectorVO>();
+            foreach (var hotelDto in allHotelsFromDb)
+            {
+                dataVectorVOs.Add(new DataVectorVO()
+                {
+                    DataVector = string.Format("Hotel Description: {0} Hotel Id: {1}", hotelDto.Description, hotelDto.HotelId),
+                    KeyVector = hotelDto.HotelId.ToString()
+                });
+            }
+            return dataVectorVOs.ToArray();
+        }
+
     }
 }

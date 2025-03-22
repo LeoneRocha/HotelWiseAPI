@@ -117,6 +117,7 @@ namespace HotelWise.Service.AI
             {
                 //Get semantic search 
                 var embeddingSearchText = await _aIInferenceService.GenerateEmbeddingAsync(searchText, _eIAInferenceAdapterType);
+
                 var resultIA = await _adapter.SearchAndAnalyzePluginAsync(nameCollection, searchText, embeddingSearchText);
 
                 response.Success = true;

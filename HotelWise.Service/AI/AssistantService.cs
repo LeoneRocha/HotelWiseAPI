@@ -97,29 +97,11 @@ namespace HotelWise.Service.Entity
                 .AppendLine("- Caso a pergunta esteja fora do escopo, responda com respeito e objetividade, indicando que não pode ajudar com o tópico abordado.")
                 .ToString()
             };
-            PromptMessageVO sysMsgRule01 = new PromptMessageVO()
+            PromptMessageVO sysMsgUnified = new PromptMessageVO()
             {
                 RoleType = RoleAiPromptsType.System,
-                Content = "Você é um assistente especializado em viagens e turismo. Sua função é responder exclusivamente a perguntas relacionadas a viagens, reservas de hotéis e turismo. Caso receba perguntas fora desse escopo, responda de forma clara e objetiva que não pode ajudar com o tópico mencionado."
-            };
-
-            PromptMessageVO sysMsgRule02 = new PromptMessageVO()
-            {
-                RoleType = RoleAiPromptsType.System,
-                Content = "Limite suas respostas exclusivamente a tópicos de viagens e turismo. Quando uma pergunta estiver fora desse escopo, responda de maneira educada, objetiva e concisa."
-            };
-
-            PromptMessageVO sysMsgLanguage = new PromptMessageVO()
-            {
-                RoleType = RoleAiPromptsType.System,
-                Content = "Responda sempre em português brasileiro (pt-BR) de forma clara e fluida."
-            };
-
-            PromptMessageVO sysMsgHtmlOut = new PromptMessageVO()
-            {
-                RoleType = RoleAiPromptsType.System,
-                Content = "Formate suas respostas para serem exibidas em HTML ou Markdown, utilizando tags adequadas para que sejam renderizadas corretamente no site."
-            };
+                Content = "Você é um assistente especializado em viagens e turismo. Sua função é responder exclusivamente a perguntas relacionadas a viagens, reservas de hotéis e turismo. Limite suas respostas a esses tópicos, e quando uma pergunta estiver fora desse escopo, responda de forma educada, objetiva e concisa, informando que não pode ajudar com o tópico mencionado. Responda sempre em português brasileiro (pt-BR), utilizando linguagem clara e fluida. Formate suas respostas para exibição em HTML ou Markdown, utilizando tags adequadas para renderização correta no site."
+            }; 
 
             PromptMessageVO userMsg = new PromptMessageVO()
             {
@@ -127,7 +109,7 @@ namespace HotelWise.Service.Entity
                 Content = request.Message
             };
 
-            PromptMessageVO[] messages = [sysMsgRuleAgent, sysMsgRule01, sysMsgRule02, sysMsgLanguage, sysMsgHtmlOut, userMsg];
+            PromptMessageVO[] messages = [sysMsgRuleAgent, sysMsgUnified, userMsg];
             return messages;
         }
     }
