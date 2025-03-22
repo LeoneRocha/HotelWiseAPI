@@ -100,7 +100,7 @@ namespace HotelWise.Domain.AI.Adapter
             return MarkdownHelper.ConvertToHtmlIfMarkdown(content ?? string.Empty);
         }
 
-        private async Task<string> ProcessAgentResultAsync(ChatCompletionAgent agent, ChatHistory chatHistory)
+        private static async Task<string> ProcessAgentResultAsync(ChatCompletionAgent agent, ChatHistory chatHistory)
         {
             var resultBuilder = new StringBuilder();
 
