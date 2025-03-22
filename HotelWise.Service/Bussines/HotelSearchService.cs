@@ -62,7 +62,7 @@ namespace HotelWise.Service.Entity
                 }
                 //NEXSTEP: ENVIAR PARA UM CACHE to que pesquisar toda vez no banco de dados 
                 var allHotelsFromDb = (await fetchHotelsAsync()).Data;
-                  
+
                 //Search Vector  
                 await searchFromVector(searchCriteria, response, allHotelsFromDb);
 
@@ -73,8 +73,8 @@ namespace HotelWise.Service.Entity
                 var hotelsResultInterference = HotelResponseProcessor.ProcessResponse(response.Data!.PromptResultContent);
 
                 // Filtra os resultados de HotelsVectorResult com base nos IDs retornados pela inferência
-                FilterHotelsByIAResult(response.Data!, hotelsResultInterference);
-                 
+                response.Data = FilterHotelsByIAResult(response.Data!, hotelsResultInterference);
+
                 if (response.Errors.Count == 0)
                 {
                     response.Success = true;
@@ -88,7 +88,7 @@ namespace HotelWise.Service.Entity
             return response;
         }
 
-        public static void FilterHotelsByIAResult(HotelSemanticResult response, List<HotelInfo> hotelsResultInterference)
+        public static HotelSemanticResult FilterHotelsByIAResult(HotelSemanticResult response, List<HotelInfo> hotelsResultInterference)
         {
             // Verifica se os dados de entrada estão válidos
             if (response == null || response.HotelsVectorResult == null || hotelsResultInterference == null)
@@ -98,9 +98,9 @@ namespace HotelWise.Service.Entity
             var interferenceIds = new HashSet<long>(hotelsResultInterference.Select(h => h.Id));
 
             // Filtra os hotéis do vetor com base nos IDs
-            response.HotelsIAResult = response.HotelsVectorResult
-                .Where(hotel => interferenceIds.Contains(hotel.HotelId))
-                .ToArray();
+            var hotelsMatch = response.HotelsVectorResult.Where(hotel => interferenceIds.Contains(hotel.HotelId)).ToArray();
+            response.HotelsVectorResult = hotelsMatch;  
+            return response;
         }
 
 
@@ -150,16 +150,16 @@ namespace HotelWise.Service.Entity
             response.Message = responseVector.Message;
         }
 
-        private async Task searchByInterference(SearchCriteria searchCriteria, ServiceResponse<HotelSemanticResult> response )
-        { 
+        private async Task searchByInterference(SearchCriteria searchCriteria, ServiceResponse<HotelSemanticResult> response)
+        {
             PromptMessageVO[] historyPrompts = createPrompts(searchCriteria, response.Data!.HotelsVectorResult);
-            var result = await _aIInferenceService.GenerateChatCompletionByAgentSimpleRagAsync(historyPrompts, _eIAInferenceAdapterType); 
+            var result = await _aIInferenceService.GenerateChatCompletionByAgentSimpleRagAsync(historyPrompts, _eIAInferenceAdapterType);
 
-            response.Data!.PromptResultContent = result;  
+            response.Data!.PromptResultContent = result;
 
             HotelDto[] listHotelsIAInterference = changeHotelsVectorToHotelDtos(response.Data!.HotelsVectorResult, []);
             response.Data!.HotelsIAResult = listHotelsIAInterference;
-          
+
         }
         private static HotelDto[] changeHotelsVectorToHotelDtos(HotelDto[]? allHotelsFromDb, HotelVector[]? hotelsVector)
         {
