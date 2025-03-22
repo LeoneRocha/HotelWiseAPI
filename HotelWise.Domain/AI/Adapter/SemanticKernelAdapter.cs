@@ -4,12 +4,14 @@ using HotelWise.Domain.Enuns.IA;
 using HotelWise.Domain.Helpers;
 using HotelWise.Domain.Interfaces;
 using HotelWise.Domain.Interfaces.IA;
+using Microsoft.AspNetCore.SignalR.Protocol;
 using Microsoft.Extensions.AI;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.Agents;
 using Microsoft.SemanticKernel.ChatCompletion;
 using Microsoft.SemanticKernel.Embeddings;
+using System.Text;
 
 namespace HotelWise.Domain.AI.Adapter
 {
@@ -19,6 +21,7 @@ namespace HotelWise.Domain.AI.Adapter
         private readonly Kernel _kernel;
         private readonly IChatCompletionService _chatCompletionService;
         private readonly ITextEmbeddingGenerationService _embeddingGenerationService;
+        private const string LINE_SEPARATOR = "--------------------------------";
 
         public SemanticKernelAdapter(IApplicationIAConfig applicationConfig, IServiceProvider serviceProvider)
         {
@@ -62,6 +65,38 @@ namespace HotelWise.Domain.AI.Adapter
             return resultString;
         }
 
+        public async Task<string> GenerateChatCompletionByAgentSimpleRagAsync(PromptMessageVO[] messages)
+        {
+            if (messages == null || messages.Length <= 0)
+                throw new ArgumentException("Messages cannot be null or empty.");
+
+            ChatHistory chatHistory = createChatHistory(messages);
+            chatHistory = addContextMessage(chatHistory, messages);
+
+            var result = await _chatCompletionService.GetChatMessageContentAsync(chatHistory);
+
+            if (result == null)
+            {
+                return string.Empty;
+            }
+            var resultString = result.Content;
+            resultString = MarkdownHelper.ConvertToHtmlIfMarkdown(resultString ?? string.Empty);
+            return resultString;
+        }
+        private ChatHistory addContextMessage(ChatHistory chatHistory, PromptMessageVO[] messages)
+        {
+            var promptRag = messages.First(p => p.RoleType == RoleAiPromptsType.Context);
+
+            StringBuilder stringBuilder = new();
+            foreach (var item in promptRag.DataContextRag)
+            {
+                stringBuilder.AppendLine(item.DataVector);
+                stringBuilder.AppendLine(LINE_SEPARATOR);
+            }
+            chatHistory.AddUserMessage($"Context:\n\n{stringBuilder.ToString()}");
+
+            return chatHistory;
+        }
         public async Task<float[]> GenerateEmbeddingAsync(string text)
         {
             if (string.IsNullOrWhiteSpace(text))
@@ -105,7 +140,7 @@ namespace HotelWise.Domain.AI.Adapter
                     // Adiciona a entrada fornecida pelo usuário ao histórico da conversa.
                     chatHistory.AddUserMessage(message.Content);
                 }
-            } 
+            }
             return chatHistory;
         }
     }

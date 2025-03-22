@@ -67,5 +67,10 @@ namespace HotelWise.Domain.AI.Adapter
 
             return resultEmbedding.ToArray();
         }
+
+        public async Task<string> GenerateChatCompletionByAgentSimpleRagAsync(PromptMessageVO[] messages)
+        {
+            return await GenerateChatCompletionAsync(messages);
+        }
     }
 }

@@ -104,6 +104,10 @@ namespace HotelWise.Domain.AI.Adapter
         public async Task<string> GenerateChatCompletionByAgentAsync(PromptMessageVO[] messages)
         {
             return await GenerateChatCompletionAsync(messages);
+        } 
+        public async Task<string> GenerateChatCompletionByAgentSimpleRagAsync(PromptMessageVO[] messages)
+        {
+            return await GenerateChatCompletionAsync(messages);
         }
     }
 }

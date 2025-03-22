@@ -7,5 +7,6 @@ namespace HotelWise.Domain.Interfaces.IA
         Task<float[]> GenerateEmbeddingAsync(string text);
         Task<string> GenerateChatCompletionAsync(PromptMessageVO[] messages);
         Task<string> GenerateChatCompletionByAgentAsync(PromptMessageVO[] messages);
+        Task<string> GenerateChatCompletionByAgentSimpleRagAsync(PromptMessageVO[] messages);
     }
 }

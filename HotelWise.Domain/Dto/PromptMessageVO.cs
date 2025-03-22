@@ -5,6 +5,7 @@ namespace HotelWise.Domain.Dto
 {
     public class PromptMessageVO
     {
+        public DataVectorVO[] DataContextRag { get; set; }
         public RoleAiPromptsType RoleType { get; set; }
 
         public string Role => RoleType.GetDescription();
@@ -13,5 +14,9 @@ namespace HotelWise.Domain.Dto
 
         public string AgentName { get; set; } = string.Empty;
     }
-
+    public class DataVectorVO
+    {
+        public string KeyVector { get; set; } = string.Empty;
+        public string DataVector { get; set; } = string.Empty;
+    }
 }
