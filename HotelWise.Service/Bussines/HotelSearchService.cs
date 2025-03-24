@@ -1,9 +1,4 @@
 ﻿using AutoMapper;
-using Azure;
-using Azure.Core;
-using DocumentFormat.OpenXml.Drawing.Charts;
-using DocumentFormat.OpenXml.Drawing;
-using DocumentFormat.OpenXml.Office2010.Excel;
 using HotelWise.Domain.Dto;
 using HotelWise.Domain.Dto.SemanticKernel;
 using HotelWise.Domain.Enuns.IA;
@@ -13,15 +8,10 @@ using HotelWise.Domain.Interfaces.Entity;
 using HotelWise.Domain.Interfaces.IA;
 using HotelWise.Domain.Interfaces.SemanticKernel;
 using HotelWise.Domain.Model;
-using HotelWise.Service.AI;
-using HotelWise.Service.Generic;
-using Markdig;
-using System.Collections.Concurrent;
-using System.Net;
-using System.Text;
-using UglyToad.PdfPig.Graphics.Operations.SpecialGraphicsState;
 using HotelWise.Service.Bussines;
+using HotelWise.Service.Generic;
 using HotelWise.Service.Prompts;
+using System.Collections.Concurrent;
 
 namespace HotelWise.Service.Entity
 {
@@ -102,9 +92,7 @@ namespace HotelWise.Service.Entity
             response.HotelsVectorResult = hotelsMatch;  
             return response;
         }
-
-
-
+         
         private async Task<ServiceResponse<HotelDto[]>> fetchHotelsAsync()
         {
             ServiceResponse<HotelDto[]> response = new ServiceResponse<HotelDto[]>();
@@ -232,6 +220,5 @@ namespace HotelWise.Service.Entity
             }
             return dataVectorVOs.ToArray();
         }
-
     }
 }
