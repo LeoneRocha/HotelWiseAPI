@@ -74,6 +74,8 @@ namespace HotelWise.Service.Entity
             {
                 _logger.Error(ex, "SemanticSearch: {Message} at: {time}", ex.Message, DataHelper.GetDateTimeNowToLog());
                 response.Errors.Add(new ErrorResponse() { Message = ex.Message });
+                response.Data.HotelsVectorResult = [];
+                response.Data.HotelsIAResult = [];
             }
             return response;
         }
