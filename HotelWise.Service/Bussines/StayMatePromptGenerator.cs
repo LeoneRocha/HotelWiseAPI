@@ -18,16 +18,17 @@ namespace HotelWise.Service.Prompts
                 .AppendLine("- Avalie cuidadosamente os valores no contexto, como localização, preço, avaliação e quaisquer outros dados fornecidos.")
                 .AppendLine("- Responda apenas com hotéis que atendam exatamente ao que foi solicitado.")
                 .AppendLine("- Exiba apenas uma mensagem amigável confirmando que os resultados atendem ao filtro da busca, junto com identificadores ocultos (IDs) dos hotéis relevantes.")
-                .AppendLine("- Não inclua justificativas ou explicações adicionais sobre os critérios de exclusão dos demais hotéis.")
+                .AppendLine("- Não inclua justificativas, observaçoes ou explicações adicionais sobre os critérios de exclusão dos demais hotéis.")
                 .AppendLine("- Adicione identificadores ocultos (via comentários HTML) para rastreamento de IDs, que não serão visíveis para o usuário.")
                 .AppendLine("- Responda exclusivamente em português brasileiro (pt-BR), utilizando linguagem calorosa, amigável e direta.")
                 .AppendLine("- Caso nenhum hotel no contexto seja preciso o suficiente, exiba uma mensagem educada indicando que não há resultados disponíveis e sugira refinar a busca.")
+                .AppendLine("- Na frase do resultado gere criativo algo amigavel.")
                 .AppendLine()
                 .AppendLine("Formatação Exemplo em Markdown:")
                 .AppendLine("---")
                 .AppendLine("### Resultados da Sua Busca")
                 .AppendLine()
-                .AppendLine("Encontrei opções que atendem exatamente aos seus critérios. Confira abaixo:")
+                .AppendLine("Olá! Como seu agente de viagens, selecionei opções incríveis que atendem exatamente às suas necessidades. Veja abaixo: (seja criativo)")
                 .AppendLine()
                 .AppendLine("<!-- ID-Hotel: 1234 --> <!-- Oculto para rastreamento -->")
                 .AppendLine("<!-- ID-Hotel: 5678 --> <!-- Oculto para rastreamento -->")
@@ -52,12 +53,14 @@ Diretrizes:
 4. Não forneça justificativas ou explicações sobre os critérios de exclusão dos demais hotéis.
 5. Inclua identificadores ocultos (via comentários HTML) para rastrear os IDs.
 6. Caso não existam hotéis relevantes, exiba uma mensagem educada indicando que não há resultados disponíveis e sugira refinar a busca.
+7. Na frase do resultado gere criativo algo amigavel.
+8. Não inclua justificativas, observaçoes ou explicações adicionais sobre os critérios de exclusão dos demais hotéis.
 
 Exemplo de formatação em Markdown:
 ---
 ### Resultados da Sua Busca
 
-Encontrei opções que atendem exatamente aos seus critérios. Confira abaixo:
+Olá! Como seu agente de viagens, selecionei opções incríveis que atendem exatamente às suas necessidades. Veja abaixo: (seja criativo)
 
 <!-- ID-Hotel: 1234 --> <!-- Oculto para rastreamento -->
 <!-- ID-Hotel: 5678 --> <!-- Oculto para rastreamento -->
