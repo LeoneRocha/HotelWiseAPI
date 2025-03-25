@@ -1,11 +1,9 @@
 ﻿using AutoMapper;
-using Azure;
 using FluentValidation;
 using HotelWise.Domain.Constants;
 using HotelWise.Domain.Dto;
 using HotelWise.Domain.Helpers;
 using HotelWise.Domain.Interfaces.Entity.HotelWise.Domain.Interfaces.Entity;
-using Microsoft.AspNetCore.Identity;
 using System.Linq.Expressions;
 
 namespace HotelWise.Service.Generic

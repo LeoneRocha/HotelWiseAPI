@@ -1,8 +1,12 @@
-﻿using HotelWise.Domain.Dto;
+﻿using AutoMapper;
+using HotelWise.Domain.Dto;
+using HotelWise.Domain.Dto.IA;
 using HotelWise.Domain.Enuns.IA;
 using HotelWise.Domain.Helpers;
 using HotelWise.Domain.Interfaces;
+using HotelWise.Domain.Interfaces.Entity.IA;
 using HotelWise.Domain.Interfaces.IA;
+using HotelWise.Domain.Model.AI;
 using System.Text;
 
 namespace HotelWise.Service.Entity
@@ -11,13 +15,22 @@ namespace HotelWise.Service.Entity
     {
         private readonly IAIInferenceService _aIInferenceService;
         private readonly InferenceAiAdapterType _eIAInferenceAdapterType;
+        private readonly IChatSessionHistoryService _chatSessionHistoryService;
+        protected readonly IMapper _mapper;
+
         protected long UserId { get; private set; }
         private readonly Serilog.ILogger _logger;
-        public AssistantService(Serilog.ILogger logger, IApplicationIAConfig applicationConfig, IAIInferenceService aIInferenceService)
+        public AssistantService(Serilog.ILogger logger, IApplicationIAConfig applicationConfig,
+            IAIInferenceService aIInferenceService,
+            IChatSessionHistoryService chatSessionHistoryService,
+            IMapper mapper
+            )
         {
             _logger = logger;
             _eIAInferenceAdapterType = applicationConfig.RagConfig.GetAInferenceAdapterType();
             _aIInferenceService = aIInferenceService;
+            _chatSessionHistoryService = chatSessionHistoryService;
+            _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         }
 
         public void SetUserId(long id)
@@ -47,8 +60,8 @@ namespace HotelWise.Service.Entity
                 {
                     askAssistantResponses = await ChatCompletion(historyPrompts);
                 }
-                await persistChat(historyPrompts.First(mg => mg.RoleType == RoleAiPromptsType.User), askAssistantResponses);
-
+                await persistChat(request, historyPrompts.First(mg => mg.RoleType == RoleAiPromptsType.User), askAssistantResponses);
+                return askAssistantResponses;
             }
             catch (Exception ex)
             {
@@ -57,10 +70,69 @@ namespace HotelWise.Service.Entity
             return null;
         }
 
-        private async Task persistChat(PromptMessageVO request, AskAssistantResponse[]? askAssistantResponses)
+        private async Task persistChat(AskAssistantRequest request, PromptMessageVO promptMessageUser, AskAssistantResponse[] askAssistantResponses)
         {
+            var currentToken = Guid.NewGuid().ToString();
+            try
+            {
 
+                // Verifica se o token já existe no histórico
+                var existingSession = await _chatSessionHistoryService.GetByIdTokenAsync(request.Token);
 
+                if (existingSession != null)
+                {
+                    currentToken = existingSession.IdToken;
+                    // Atualiza o histórico existente adicionando novas mensagens
+                    var updatedHistory = existingSession.PromptMessageHistory.ToList(); // Converte para lista                    
+                    updatedHistory.Add(promptMessageUser);
+
+                    if (askAssistantResponses != null && askAssistantResponses.Length > 0)
+                    {
+                        updatedHistory.AddRange(askAssistantResponses.Select(r => new PromptMessageVO
+                        {
+                            Content = r.Message,
+                            RoleType = RoleAiPromptsType.Assistant
+                        }));
+                    }
+                    existingSession.PromptMessageHistory = updatedHistory.ToArray(); // Atualiza o array no histórico
+                    existingSession.CountMessages += 1; // Atualiza a contagem de mensagens 
+                    existingSession.SessionDateTime = DateTime.Now; // Atualiza a data da sessão
+                    var sessionAdd = _mapper.Map<ChatSessionHistoryDto>(existingSession);
+                    // Persistir no banco de dados
+                    await _chatSessionHistoryService.UpdateAsync(existingSession);
+                }
+                else
+                {
+                    // Criar novo histórico de sessão de chat
+                    var newSession = new ChatSessionHistory
+                    {
+                        IdToken = string.IsNullOrWhiteSpace(request.Token) ? currentToken : request.Token, // Token da sessão
+                        PromptMessageHistory = askAssistantResponses.Select(r => new PromptMessageVO
+                        {
+                            Content = r.Message,
+                            RoleType = RoleAiPromptsType.Assistant
+                        }).ToArray(),
+                        CountMessages = 1,
+
+                        SessionDateTime = DataHelper.GetDateTimeNow(), // Data da sessão
+                        IdUser = UserId // ID do usuário atual
+                    };
+
+                    var sessionAdd = _mapper.Map<ChatSessionHistoryDto>(newSession);
+
+                    // Persistir no banco de dados
+                    await _chatSessionHistoryService.AddAsync(sessionAdd);
+                }
+
+                foreach (var item in askAssistantResponses)
+                {
+                    item.Token = currentToken;
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.Error(ex, "AssistantService persistChat: {Message} at: {time}", ex.Message, DataHelper.GetDateTimeNowToLog());
+            }
         }
 
         private async Task<AskAssistantResponse[]> ChatCompletion(PromptMessageVO[] historyPrompts)

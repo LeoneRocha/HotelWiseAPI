@@ -40,6 +40,12 @@ Add-Migration InitialCreate -Context HotelWiseDbContextMysql -OutputDir Migratio
 
 Add-Migration ChatSessionHistory -Context HotelWiseDbContextMysql -OutputDir Migrations\MySql -Project HotelWise.Data
 
+Remove-Migration -Context HotelWiseDbContextMysql -Project HotelWise.Data
+
+
+
+
+
 https://qdrant.tech/documentation/quickstart/
 
 docker pull qdrant/qdrant

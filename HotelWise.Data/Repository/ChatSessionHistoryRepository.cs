@@ -19,7 +19,7 @@ namespace HotelWise.Data.Repository
 
         public async Task<ChatSessionHistory?> GetByIdTokenAsync(string token)
         {
-            return await _dataset.AsNoTracking().FirstOrDefaultAsync(et=> et.IdToken.Equals(token, StringComparison.OrdinalIgnoreCase));
+            return await _dataset.AsNoTracking().FirstOrDefaultAsync(et=> et.IdToken.Equals(token));
         }
     }
 } 

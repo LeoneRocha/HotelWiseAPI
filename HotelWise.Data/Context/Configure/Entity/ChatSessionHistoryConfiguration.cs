@@ -16,8 +16,11 @@ namespace HotelWise.Data.Context.Configure.Entity
             builder.ToTable("ChatSessionHistory");
             HelperCharSet.AddCharSet(builder);
 
-            // Definição de chave primária
+            // Definição de chave primária 
             builder.HasKey(e => e.Id);
+
+            builder.Property(e => e.Id)
+                .ValueGeneratedOnAdd();
 
             builder.Property(e => e.IdToken)
                 .HasMaxLength(50)
@@ -42,8 +45,7 @@ namespace HotelWise.Data.Context.Configure.Entity
             builder.Property(e => e.IdUser)
                 .IsRequired(false);
 
-            builder.HasIndex(e => e.IdToken).HasDatabaseName("IX_ChatSessionHistory_IdToken")
-                .IsUnique();
+            builder.HasIndex(e => e.IdToken).HasDatabaseName("IX_ChatSessionHistory_IdToken");
 
             builder.HasIndex(e => e.SessionDateTime).HasDatabaseName("IX_ChatSessionHistory_SessionDateTime");
         }

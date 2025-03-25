@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using HotelWise.Domain.Helpers;
 using HotelWise.Domain.Model;
 using HotelWise.Domain.Model.AI;
 
@@ -30,7 +31,7 @@ namespace HotelWise.Domain.Validator
             // Validação para SessionDateTime
             RuleFor(ch => ch.SessionDateTime)
                 .NotEmpty().WithMessage("A data e hora da sessão são obrigatórias.")
-                .LessThanOrEqualTo(DateTime.Now).WithMessage("A data e hora da sessão não podem estar no futuro.");
+                .GreaterThanOrEqualTo(DateTime.MinValue).WithMessage("A data e hora da sessão deve ser valida.");
 
             // Validação para IdUser (opcional)
             RuleFor(ch => ch.IdUser)
