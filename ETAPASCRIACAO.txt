@@ -38,7 +38,7 @@ https://learn.microsoft.com/en-us/training/modules/improve-search-results-vector
 
 Add-Migration InitialCreate -Context HotelWiseDbContextMysql -OutputDir Migrations\MySql -Project HotelWise.Data
 
-Add-Migration ChatSessionHistory -Context HotelWiseDbContextMysql -OutputDir Migrations\MySql -Project HotelWise.Data
+Add-Migration ChatSessionHistoryv3 -Context HotelWiseDbContextMysql -OutputDir Migrations\MySql -Project HotelWise.Data
 
 Remove-Migration -Context HotelWiseDbContextMysql -Project HotelWise.Data
 

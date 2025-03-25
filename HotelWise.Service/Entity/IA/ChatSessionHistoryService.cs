@@ -36,7 +36,8 @@ namespace HotelWise.Service.Entity
         public async Task<ChatSessionHistoryDto?> GetByIdTokenAsync(string token)
         {
             var result = await _entitylRepository.GetByIdTokenAsync(token);
-            var resultDto = _mapper.Map<ChatSessionHistoryDto?>(result);
+            if (result == null) { return null; }
+            var resultDto = _mapper.Map<ChatSessionHistoryDto>(result);
             return resultDto;
         }
     }

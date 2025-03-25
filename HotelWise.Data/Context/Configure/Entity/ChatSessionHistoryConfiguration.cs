@@ -21,6 +21,10 @@ namespace HotelWise.Data.Context.Configure.Entity
 
             builder.Property(e => e.Id)
                 .ValueGeneratedOnAdd();
+             
+            builder.Property(e => e.Title)
+                .HasMaxLength(100)
+                .IsRequired();
 
             builder.Property(e => e.IdToken)
                 .HasMaxLength(50)

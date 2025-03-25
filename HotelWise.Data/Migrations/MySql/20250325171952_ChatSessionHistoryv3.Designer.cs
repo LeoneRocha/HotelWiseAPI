@@ -4,6 +4,7 @@ using HotelWise.Data.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HotelWise.Data.Migrations.MySql
 {
     [DbContext(typeof(HotelWiseDbContextMysql))]
-    partial class HotelWiseDbContextMysqlModelSnapshot : ModelSnapshot
+    [Migration("20250325171952_ChatSessionHistoryv3")]
+    partial class ChatSessionHistoryv3
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

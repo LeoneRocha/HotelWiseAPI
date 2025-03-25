@@ -60,7 +60,7 @@ namespace HotelWise.Service.Entity
                 {
                     askAssistantResponses = await ChatCompletion(historyPrompts);
                 }
-                await persistChat(request, historyPrompts.First(mg => mg.RoleType == RoleAiPromptsType.User), askAssistantResponses);
+                await PersistChatAsync(request, historyPrompts.First(mg => mg.RoleType == RoleAiPromptsType.User), askAssistantResponses);
                 return askAssistantResponses;
             }
             catch (Exception ex)
@@ -69,71 +69,94 @@ namespace HotelWise.Service.Entity
             }
             return null;
         }
+        #region PersistChat
 
-        private async Task persistChat(AskAssistantRequest request, PromptMessageVO promptMessageUser, AskAssistantResponse[] askAssistantResponses)
+        private async Task PersistChatAsync(AskAssistantRequest request, PromptMessageVO promptMessageUser, AskAssistantResponse[] askAssistantResponses)
         {
-            var currentToken = Guid.NewGuid().ToString();
+            var currentToken = string.IsNullOrWhiteSpace(request.Token) ? Guid.NewGuid().ToString() : request.Token;
             try
             {
-
-                // Verifica se o token já existe no histórico
-                var existingSession = await _chatSessionHistoryService.GetByIdTokenAsync(request.Token);
+                // Verifica se já existe uma sessão para o token
+                var existingSession = await _chatSessionHistoryService.GetByIdTokenAsync(currentToken);
 
                 if (existingSession != null)
                 {
-                    currentToken = existingSession.IdToken;
-                    // Atualiza o histórico existente adicionando novas mensagens
-                    var updatedHistory = existingSession.PromptMessageHistory.ToList(); // Converte para lista                    
-                    updatedHistory.Add(promptMessageUser);
-
-                    if (askAssistantResponses != null && askAssistantResponses.Length > 0)
-                    {
-                        updatedHistory.AddRange(askAssistantResponses.Select(r => new PromptMessageVO
-                        {
-                            Content = r.Message,
-                            RoleType = RoleAiPromptsType.Assistant
-                        }));
-                    }
-                    existingSession.PromptMessageHistory = updatedHistory.ToArray(); // Atualiza o array no histórico
-                    existingSession.CountMessages += 1; // Atualiza a contagem de mensagens 
-                    existingSession.SessionDateTime = DateTime.Now; // Atualiza a data da sessão
-                    var sessionAdd = _mapper.Map<ChatSessionHistoryDto>(existingSession);
-                    // Persistir no banco de dados
-                    await _chatSessionHistoryService.UpdateAsync(existingSession);
+                    await UpdateExistingSession(existingSession, promptMessageUser, askAssistantResponses);
                 }
                 else
                 {
-                    // Criar novo histórico de sessão de chat
-                    var newSession = new ChatSessionHistory
-                    {
-                        IdToken = string.IsNullOrWhiteSpace(request.Token) ? currentToken : request.Token, // Token da sessão
-                        PromptMessageHistory = askAssistantResponses.Select(r => new PromptMessageVO
-                        {
-                            Content = r.Message,
-                            RoleType = RoleAiPromptsType.Assistant
-                        }).ToArray(),
-                        CountMessages = 1,
-
-                        SessionDateTime = DataHelper.GetDateTimeNow(), // Data da sessão
-                        IdUser = UserId // ID do usuário atual
-                    };
-
-                    var sessionAdd = _mapper.Map<ChatSessionHistoryDto>(newSession);
-
-                    // Persistir no banco de dados
-                    await _chatSessionHistoryService.AddAsync(sessionAdd);
+                    await CreateNewSession(currentToken, promptMessageUser, askAssistantResponses);
                 }
-
-                foreach (var item in askAssistantResponses)
-                {
-                    item.Token = currentToken;
-                }
+                // Atualiza o token nas respostas do assistente
+                UpdateTokenInResponses(currentToken, askAssistantResponses);
             }
             catch (Exception ex)
             {
-                _logger.Error(ex, "AssistantService persistChat: {Message} at: {time}", ex.Message, DataHelper.GetDateTimeNowToLog());
+                _logger.Error(ex, "PersistChatAsync - Erro ao persistir o chat: {Message} at {time}", ex.Message, DataHelper.GetDateTimeNowToLog());
             }
         }
+        private async Task UpdateExistingSession(ChatSessionHistory existingSession, PromptMessageVO promptMessageUser, AskAssistantResponse[] askAssistantResponses)
+        {
+            var updatedHistory = existingSession.PromptMessageHistory.ToList();
+
+            // Adiciona a nova mensagem do usuário
+            updatedHistory.Add(promptMessageUser);
+
+            // Adiciona as respostas do assistente
+            if (askAssistantResponses?.Length > 0)
+            {
+                updatedHistory.AddRange(askAssistantResponses.Select(response => new PromptMessageVO
+                {
+                    Content = response.Message,
+                    RoleType = RoleAiPromptsType.Assistant
+                }));
+            } 
+            // Atualiza os dados da sessão
+            existingSession.PromptMessageHistory = updatedHistory.ToArray();
+            existingSession.CountMessages = updatedHistory.Count(mg => mg.RoleType == RoleAiPromptsType.User);
+            var sessionUpdate = _mapper.Map<ChatSessionHistoryDto>(existingSession);
+            // Persistir alterações
+            await _chatSessionHistoryService.UpdateAsync(sessionUpdate);
+        }
+        private async Task CreateNewSession(string token, PromptMessageVO promptMessageUser, AskAssistantResponse[] askAssistantResponses)
+        {
+            var newSession = new ChatSessionHistoryDto
+            {
+                IdToken = token,
+                Title = promptMessageUser.Content.Length > 50 ? promptMessageUser.Content.Substring(0, 50) : promptMessageUser.Content,
+                PromptMessageHistory = BuildChatHistory(promptMessageUser, askAssistantResponses),
+                CountMessages = 1 + (askAssistantResponses?.Length ?? 0),
+                SessionDateTime = DataHelper.GetDateTimeNow(),
+                IdUser = UserId
+            };
+            // Persistir nova sessão
+            await _chatSessionHistoryService.AddAsync(newSession);
+        }
+        private PromptMessageVO[] BuildChatHistory(PromptMessageVO promptMessageUser, AskAssistantResponse[] askAssistantResponses)
+        {
+            var messages = new List<PromptMessageVO> { promptMessageUser };
+
+            if (askAssistantResponses?.Length > 0)
+            {
+                messages.AddRange(askAssistantResponses.Select(response => new PromptMessageVO
+                {
+                    Content = response.Message,
+                    RoleType = RoleAiPromptsType.Assistant
+                }));
+            }
+
+            return messages.ToArray();
+        }
+        private void UpdateTokenInResponses(string token, AskAssistantResponse[] askAssistantResponses)
+        {
+            if (askAssistantResponses == null) return;
+
+            foreach (var response in askAssistantResponses)
+            {
+                response.Token = token;
+            }
+        }
+        #endregion PersistChat
 
         private async Task<AskAssistantResponse[]> ChatCompletion(PromptMessageVO[] historyPrompts)
         {

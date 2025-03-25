@@ -1,6 +1,4 @@
 ﻿using FluentValidation;
-using HotelWise.Domain.Helpers;
-using HotelWise.Domain.Model;
 using HotelWise.Domain.Model.AI;
 
 namespace HotelWise.Domain.Validator
@@ -9,6 +7,10 @@ namespace HotelWise.Domain.Validator
     {
         public ChatSessionHistoryValidator()
         {
+            RuleFor(ch => ch.Title)
+                .NotEmpty().WithMessage("O Title é obrigatório.")
+                .MaximumLength(50).WithMessage("O Title deve ter no máximo 50 caracteres.");
+             
             // Validação para IdToken
             RuleFor(ch => ch.IdToken)
                 .NotEmpty().WithMessage("O IdToken é obrigatório.")
