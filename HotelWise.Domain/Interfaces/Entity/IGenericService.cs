@@ -1,4 +1,5 @@
-﻿using System.Linq.Expressions;
+﻿using HotelWise.Domain.Dto;
+using System.Linq.Expressions;
 
 namespace HotelWise.Service.Generic
 {
@@ -7,9 +8,9 @@ namespace HotelWise.Service.Generic
         Task<List<TDto>> GetAllAsync();
         Task<TDto?> GetByIdAsync(long id);
         Task<List<TDto>> FindAsync(Expression<Func<TDto, bool>> predicate);
-        Task<TDto> AddAsync(TDto entityDto);
+        Task<ServiceResponse<TDto>> AddAsync(TDto entityDto);
         Task AddRangeAsync(IEnumerable<TDto> entitiesDto);
-        Task<TDto> UpdateAsync(TDto entityDto);
+        Task<ServiceResponse<TDto>> UpdateAsync(TDto entityDto);
         Task UpdateRangeAsync(IEnumerable<TDto> entitiesDto);
         Task DeleteAsync(long id);
         Task<int> CountAsync();

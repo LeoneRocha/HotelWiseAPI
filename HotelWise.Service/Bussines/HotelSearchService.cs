@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using FluentValidation;
 using HotelWise.Domain.Dto;
 using HotelWise.Domain.Dto.SemanticKernel;
 using HotelWise.Domain.Enuns.IA;
@@ -29,8 +30,9 @@ namespace HotelWise.Service.Entity
             IApplicationIAConfig applicationConfig,
             IHotelRepository hotelRepository,
             IVectorStoreService<HotelVector> hotelVectorStoreService,
-            IAIInferenceService aIInferenceService)
-            : base(hotelRepository, mapper, logger)
+            IValidator<Hotel> entityValidator,
+            IAIInferenceService aIInferenceService) 
+            : base(hotelRepository, mapper, logger, entityValidator)
         {
             _applicationConfig = applicationConfig;
             _hotelVectorStoreService = hotelVectorStoreService;

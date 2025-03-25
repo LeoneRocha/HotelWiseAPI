@@ -37,20 +37,30 @@ namespace HotelWise.Service.Entity
                 //SQL BUT EXPECTED MONGO BD OR AZURE DATATABLE
                 //Feature 2) Get History add request if not great rule max token 
                 PromptMessageVO[] historyPrompts = CreatePrompts(request);
+
+                AskAssistantResponse[] askAssistantResponses = [];
                 if (historyPrompts.Length > 0 && historyPrompts.Any(x => x.RoleType == RoleAiPromptsType.Agent))
                 {
-                    return await ChatCompletionByAgent(historyPrompts);
+                    askAssistantResponses = await ChatCompletionByAgent(historyPrompts);
                 }
                 else
                 {
-                    return await ChatCompletion(historyPrompts);
+                    askAssistantResponses = await ChatCompletion(historyPrompts);
                 }
+                await persistChat(historyPrompts.First(mg => mg.RoleType == RoleAiPromptsType.User), askAssistantResponses);
+
             }
             catch (Exception ex)
             {
                 _logger.Error(ex, "AssistantService AskAssistant: {Message} at: {time}", ex.Message, DataHelper.GetDateTimeNowToLog());
             }
             return null;
+        }
+
+        private async Task persistChat(PromptMessageVO request, AskAssistantResponse[]? askAssistantResponses)
+        {
+
+
         }
 
         private async Task<AskAssistantResponse[]> ChatCompletion(PromptMessageVO[] historyPrompts)
@@ -101,7 +111,7 @@ namespace HotelWise.Service.Entity
             {
                 RoleType = RoleAiPromptsType.System,
                 Content = "Você é um assistente especializado em viagens e turismo. Sua função é responder exclusivamente a perguntas relacionadas a viagens, reservas de hotéis e turismo. Limite suas respostas a esses tópicos, e quando uma pergunta estiver fora desse escopo, responda de forma educada, objetiva e concisa, informando que não pode ajudar com o tópico mencionado. Responda sempre em português brasileiro (pt-BR), utilizando linguagem clara e fluida. Formate suas respostas para exibição em HTML ou Markdown, utilizando tags adequadas para renderização correta no site."
-            }; 
+            };
 
             PromptMessageVO userMsg = new PromptMessageVO()
             {

@@ -1,5 +1,11 @@
 ﻿using AutoMapper;
+using Azure;
+using FluentValidation;
+using HotelWise.Domain.Constants;
+using HotelWise.Domain.Dto;
+using HotelWise.Domain.Helpers;
 using HotelWise.Domain.Interfaces.Entity.HotelWise.Domain.Interfaces.Entity;
+using Microsoft.AspNetCore.Identity;
 using System.Linq.Expressions;
 
 namespace HotelWise.Service.Generic
@@ -11,7 +17,7 @@ namespace HotelWise.Service.Generic
         protected readonly IGenericRepository<T> _repository;
         protected readonly IMapper _mapper;
         protected readonly Serilog.ILogger _logger;
-
+        protected readonly IValidator<T> _entityValidator;
         protected long UserId { get; private set; }
 
         // Constantes para mensagens de erro
@@ -28,11 +34,12 @@ namespace HotelWise.Service.Generic
 
         private const string GeneralErrorOccurred = "An error occurred while processing the request.";
 
-        protected GenericEntityServiceBase(IGenericRepository<T> repository, IMapper mapper, Serilog.ILogger logger)
+        protected GenericEntityServiceBase(IGenericRepository<T> repository, IMapper mapper, Serilog.ILogger logger, IValidator<T> entityValidator)
         {
             _repository = repository ?? throw new ArgumentNullException(nameof(repository));
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _entityValidator = entityValidator;
         }
 
         public void SetUserId(long id)
@@ -83,19 +90,25 @@ namespace HotelWise.Service.Generic
             }
         }
 
-        public virtual async Task<TDto> AddAsync(TDto entityDto)
+        public virtual async Task<ServiceResponse<TDto>> AddAsync(TDto entityDto)
         {
+            ServiceResponse<TDto> response = new ServiceResponse<TDto>();
             try
             {
-                var entity = _mapper.Map<T>(entityDto);
-                var addedEntity = await _repository.AddAsync(entity);
-                return _mapper.Map<TDto>(addedEntity) ?? new TDto();
+                var entityAdd = _mapper.Map<T>(entityDto);
+
+                response = await Validate(entityAdd);
+                if (response.Success)
+                {
+                    var addedEntity = await _repository.AddAsync(entityAdd);
+                    response.Data = _mapper.Map<TDto>(addedEntity) ?? new TDto();
+                }
             }
             catch (Exception ex)
             {
                 LogAndThrow(ex, ErrorAddingEntity);
-                return new TDto();
             }
+            return response;
         }
 
         public virtual async Task AddRangeAsync(IEnumerable<TDto> entitiesDto)
@@ -111,19 +124,25 @@ namespace HotelWise.Service.Generic
             }
         }
 
-        public virtual async Task<TDto> UpdateAsync(TDto entityDto)
+        public virtual async Task<ServiceResponse<TDto>> UpdateAsync(TDto entityDto)
         {
+            ServiceResponse<TDto> response = new ServiceResponse<TDto>();
             try
             {
-                var entity = _mapper.Map<T>(entityDto);
-                var updatedEntity = await _repository.UpdateAsync(entity);
-                return _mapper.Map<TDto>(updatedEntity) ?? new TDto();
+                var entityAdd = _mapper.Map<T>(entityDto);
+
+                response = await Validate(entityAdd);
+                if (response.Success)
+                {
+                    var updatedEntity = await _repository.UpdateAsync(entityAdd);
+                    response.Data = _mapper.Map<TDto>(updatedEntity);
+                } 
             }
             catch (Exception ex)
             {
                 LogAndThrow(ex, ErrorUpdatingEntity);
-                return new TDto();
             }
+            return response;
         }
 
         public virtual async Task UpdateRangeAsync(IEnumerable<TDto> entitiesDto)
@@ -182,6 +201,48 @@ namespace HotelWise.Service.Generic
         {
             _logger.Error(ex, message);
             throw new InvalidOperationException(GeneralErrorOccurred, ex);
+        }
+        public virtual async Task<ServiceResponse<TDto>> Validate(T item)
+        {
+            ServiceResponse<TDto> response = new ServiceResponse<TDto>();
+            try
+            {
+
+                var validationResult = await _entityValidator.ValidateAsync(item);
+
+                response.Success = validationResult.IsValid;
+                response.Errors = HelperValidation.GetErrorsMap(validationResult).ToList();
+                //Translate Message  
+                if (response.Errors != null && response.Errors.Count > 0)
+                {
+                    List<ErrorResponse> errosTranslated = new List<ErrorResponse>();
+                    foreach (var errosItem in response.Errors)
+                    {
+                        var errosAdd = new ErrorResponse()
+                        {
+                            Name = errosItem.Name,
+                            Message = errosItem.DefaultMessage,
+
+                            ErrorCode = errosItem.ErrorCode,
+                        };
+
+                        errosTranslated.Add(errosAdd);
+                    }
+                    response.Errors = errosTranslated;
+                    response.Message = ValidatorConstants.ValidateErroMessage_Message;
+                }
+                else
+                {
+                    response.Message = ValidatorConstants.ValidateSuccessMessage_Message;
+                }
+            }
+            catch (Exception ex)
+            {
+                response.Success = false;
+                response.Message = ValidatorConstants.Generic_Erro_Message;
+                _logger.Error(ex, "Validate: {Message} at: {time}", ex.Message, DataHelper.GetDateTimeNowToLog());
+            }
+            return response;
         }
     }
 }

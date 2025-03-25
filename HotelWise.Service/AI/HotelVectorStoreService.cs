@@ -141,8 +141,6 @@ namespace HotelWise.Service.AI
         public async Task DeleteAsync(long dataKey)
         {
             await _adapter.DeleteAsync(nameCollection, dataKey);
-        }
-
-
+        } 
     }
 }

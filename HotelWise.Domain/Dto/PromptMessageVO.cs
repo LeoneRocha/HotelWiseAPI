@@ -7,11 +7,8 @@ namespace HotelWise.Domain.Dto
     {
         public DataVectorVO[] DataContextRag { get; set; }
         public RoleAiPromptsType RoleType { get; set; }
-
         public string Role => RoleType.GetDescription();
-
         public string Content { get; set; } = string.Empty;
-
         public string AgentName { get; set; } = string.Empty;
     }
     public class DataVectorVO

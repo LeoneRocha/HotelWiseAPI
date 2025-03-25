@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using FluentValidation;
 using HotelWise.Domain.Constants;
 using HotelWise.Domain.Dto;
 using HotelWise.Domain.Helpers;
@@ -14,8 +15,7 @@ namespace HotelWise.Service.Entity
     public class UserService : GenericEntityServiceBase<User, UserLoginDto>, IUserService
     {
         private readonly ITokenService _tokenService;
-        private readonly ITokenConfigurationDto _configurationToken;
-
+        private readonly ITokenConfigurationDto _configurationToken; 
         private readonly IUserRepository _userRepository;
 
         public UserService(
@@ -23,8 +23,9 @@ namespace HotelWise.Service.Entity
             IUserRepository repository,
             IMapper mapper,
             ITokenService tokenService,
-            ITokenConfigurationDto configurationToken
-        ) : base(repository, mapper, logger)
+            ITokenConfigurationDto configurationToken,
+            IValidator<User> entityValidator
+        ) : base(repository, mapper, logger, entityValidator)
         {
             _tokenService = tokenService;
             _configurationToken = configurationToken;
