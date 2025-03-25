@@ -45,10 +45,8 @@ namespace HotelWise.Service.Entity
         public async Task<AskAssistantResponse[]?> AskAssistant(AskAssistantRequest request)
         {
             try
-            {
-                //Feature 1) Save history by token (ID_Chat_Token 'guid', DataHistory 'json' , TotalTokens CountMenssage, DateTime, IdUser
-                //SQL BUT EXPECTED MONGO BD OR AZURE DATATABLE
-                //Feature 2) Get History add request if not great rule max token 
+            { 
+                //Feature 3) Get History add request if not great rule max token 
                 PromptMessageVO[] historyPrompts = CreatePrompts(request);
 
                 AskAssistantResponse[] askAssistantResponses = [];
