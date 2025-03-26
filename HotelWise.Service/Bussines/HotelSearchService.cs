@@ -80,7 +80,7 @@ namespace HotelWise.Service.Entity
             return response;
         }
 
-        public static HotelSemanticResult FilterHotelsByIAResult(HotelSemanticResult response, List<HotelInfo> hotelsResultInterference)
+        public static HotelSemanticResult FilterHotelsByIAResult(HotelSemanticResult response,  HotelInfo[] hotelsResultInterference)
         {
             // Verifica se os dados de entrada estão válidos
             if (response == null || response.HotelsVectorResult == null || hotelsResultInterference == null)
