@@ -22,8 +22,7 @@ namespace HotelWise.Service.Bussines
                 .Select(x => new HotelInfo
                 {
                     Id = x.HotelId.Value,
-                    IdType = "Hotel",
-                    LogMessage = $"Hotel ID encontrado: {x.HotelId.Value}"
+                    IdType = "Hotel", 
                 })
                 .ToArray();
 
