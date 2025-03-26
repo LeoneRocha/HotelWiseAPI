@@ -12,7 +12,7 @@ namespace HotelWise.Service.Bussines
 
             // Regex para encontrar os IDs ocultos nos comentários HTML
             string idPattern = @"<!--\s*ID-Hotel:\s*(\d+)\s*-->";
-            MatchCollection matches = Regex.Matches(markdownResponse, idPattern);
+            MatchCollection matches = Regex.Matches(markdownResponse, idPattern, RegexOptions.None, TimeSpan.FromMilliseconds(100));
 
             foreach (Match match in matches)
             {

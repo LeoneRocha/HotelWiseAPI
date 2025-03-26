@@ -45,11 +45,11 @@ namespace HotelWise.Service.Entity
         public async Task<AskAssistantResponse[]?> AskAssistant(AskAssistantRequest request)
         {
             try
-            { 
+            {
                 //Feature 3) Get History add request if not great rule max token 
                 PromptMessageVO[] historyPrompts = CreatePrompts(request);
 
-                AskAssistantResponse[] askAssistantResponses = [];
+                AskAssistantResponse[] askAssistantResponses;
                 if (historyPrompts.Length > 0 && historyPrompts.Any(x => x.RoleType == RoleAiPromptsType.Agent))
                 {
                     askAssistantResponses = await ChatCompletionByAgent(historyPrompts);
@@ -108,7 +108,7 @@ namespace HotelWise.Service.Entity
                     Content = response.Message,
                     RoleType = RoleAiPromptsType.Assistant
                 }));
-            } 
+            }
             // Atualiza os dados da sessão
             existingSession.PromptMessageHistory = updatedHistory.ToArray();
             existingSession.CountMessages = updatedHistory.Count(mg => mg.RoleType == RoleAiPromptsType.User);
@@ -145,7 +145,7 @@ namespace HotelWise.Service.Entity
 
             return messages.ToArray();
         }
-        private void UpdateTokenInResponses(string token, AskAssistantResponse[] askAssistantResponses)
+        private static void UpdateTokenInResponses(string token, AskAssistantResponse[] askAssistantResponses)
         {
             if (askAssistantResponses == null) return;
 

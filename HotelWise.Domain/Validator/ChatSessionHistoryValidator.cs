@@ -40,7 +40,7 @@ namespace HotelWise.Domain.Validator
                 .GreaterThan(0).When(ch => ch.IdUser.HasValue).WithMessage("O IdUser, se fornecido, deve ser maior que 0.");
         }
 
-        private bool BeAValidGuid(string idToken)
+        private static bool BeAValidGuid(string idToken)
         {
             return Guid.TryParse(idToken, out _); // Retorna true se for um GUID válido
         } 

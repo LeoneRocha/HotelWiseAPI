@@ -18,8 +18,7 @@ namespace HotelWise.Service.Entity
 {
     public class HotelSearchService : GenericEntityServiceBase<Hotel, HotelDto>, IHotelSearchService
     {
-        private readonly IVectorStoreService<HotelVector> _hotelVectorStoreService;
-        private readonly IApplicationIAConfig _applicationConfig;
+        private readonly IVectorStoreService<HotelVector> _hotelVectorStoreService; 
         private readonly IHotelRepository _hotelRepository;
         private readonly IAIInferenceService _aIInferenceService;
         private readonly InferenceAiAdapterType _eIAInferenceAdapterType;
@@ -33,8 +32,7 @@ namespace HotelWise.Service.Entity
             IValidator<Hotel> entityValidator,
             IAIInferenceService aIInferenceService) 
             : base(hotelRepository, mapper, logger, entityValidator)
-        {
-            _applicationConfig = applicationConfig;
+        { 
             _hotelVectorStoreService = hotelVectorStoreService;
             _hotelRepository = hotelRepository;
             _eIAInferenceAdapterType = applicationConfig.RagConfig.GetAInferenceAdapterType();
