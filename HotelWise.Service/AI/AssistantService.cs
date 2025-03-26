@@ -130,7 +130,7 @@ namespace HotelWise.Service.Entity
             // Persistir nova sessão
             await _chatSessionHistoryService.AddAsync(newSession);
         }
-        private PromptMessageVO[] BuildChatHistory(PromptMessageVO promptMessageUser, AskAssistantResponse[] askAssistantResponses)
+        private static PromptMessageVO[] BuildChatHistory(PromptMessageVO promptMessageUser, AskAssistantResponse[] askAssistantResponses)
         {
             var messages = new List<PromptMessageVO> { promptMessageUser };
 

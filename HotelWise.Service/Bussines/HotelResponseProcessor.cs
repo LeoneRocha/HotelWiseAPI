@@ -5,33 +5,32 @@ namespace HotelWise.Service.Bussines
 {
     public static class HotelResponseProcessor
     {
-        public static List<HotelInfo> ProcessResponse(string markdownResponse)
+        public static HotelInfo[] ProcessResponse(string markdownResponse)
         {
-            // Lista para armazenar os dados dos hotéis
-            List<HotelInfo> hotelInfos = new List<HotelInfo>();
-
             // Regex para encontrar os IDs ocultos nos comentários HTML
             string idPattern = @"<!--\s*ID-Hotel:\s*(\d+)\s*-->";
             MatchCollection matches = Regex.Matches(markdownResponse, idPattern, RegexOptions.None, TimeSpan.FromMilliseconds(100));
 
-            foreach (Match match in matches)
+            // Usa LINQ para simplificar o loop e processar os dados diretamente
+            var hotelInfos = matches
+                .Select(match => new
+                {
+                    Match = match,
+                    HotelId = long.TryParse(match.Groups[1].Value, out var id) ? id : (long?)null
+                })
+                .Where(x => x.HotelId.HasValue) // Filtra os IDs válidos
+                .Select(x => new HotelInfo
+                {
+                    Id = x.HotelId.Value,
+                    IdType = "Hotel",
+                    LogMessage = $"Hotel ID encontrado: {x.HotelId.Value}"
+                })
+                .ToArray();
+
+            // Log para IDs que falharam na conversão
+            foreach (var invalidMatch in matches.Where(match => !long.TryParse(match.Groups[1].Value, out _)))
             {
-                // Tenta converter o ID do hotel para o tipo long
-                if (long.TryParse(match.Groups[1].Value, out long hotelId))
-                {
-                    // Adiciona à lista com as informações do hotel
-                    hotelInfos.Add(new HotelInfo
-                    {
-                        Id = hotelId,
-                        IdType = "Hotel",
-                        LogMessage = $"Hotel ID encontrado: {hotelId}"
-                    });
-                }
-                else
-                {
-                    // Gera um log caso a conversão falhe
-                    Console.WriteLine($"Falha ao converter o ID do hotel: {match.Groups[1].Value}");
-                }
+                Console.WriteLine($"Falha ao converter o ID do hotel: {invalidMatch.Groups[1].Value}");
             }
 
             return hotelInfos;

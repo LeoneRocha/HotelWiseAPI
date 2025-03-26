@@ -8,6 +8,5 @@ namespace HotelWise.Domain.Interfaces.Entity.IA
         void SetUserId(long id);
         Task<ChatSessionHistoryDto?> GetByIdTokenAsync(string token);
         Task DeleteByIdTokenAsync(string token);
-
     }
 }

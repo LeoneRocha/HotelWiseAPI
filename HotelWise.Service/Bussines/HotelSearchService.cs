@@ -84,7 +84,7 @@ namespace HotelWise.Service.Entity
         {
             // Verifica se os dados de entrada estão válidos
             if (response == null || response.HotelsVectorResult == null || hotelsResultInterference == null)
-                throw new ArgumentNullException("Os parâmetros de entrada não podem ser nulos.");
+                throw new InvalidOperationException("Os parâmetros de entrada não podem ser nulos.");
 
             // Lista de IDs retornados pela inferência
             var interferenceIds = new HashSet<long>(hotelsResultInterference.Select(h => h.Id));
