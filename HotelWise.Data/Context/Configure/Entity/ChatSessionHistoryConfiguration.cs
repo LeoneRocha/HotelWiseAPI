@@ -43,6 +43,9 @@ namespace HotelWise.Data.Context.Configure.Entity
             builder.Property(e => e.CountMessages)
                 .IsRequired();
 
+            builder.Property(e => e.TotalTokensMessage)
+              .IsRequired();
+
             builder.Property(e => e.SessionDateTime)
                 .IsRequired();
 

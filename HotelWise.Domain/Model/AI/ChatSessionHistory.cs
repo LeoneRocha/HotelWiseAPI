@@ -14,7 +14,8 @@ namespace HotelWise.Domain.Model.AI
 
         public string IdToken { get; set; } = string.Empty;    // GUID será usado como chave primária
         public PromptMessageVO[] PromptMessageHistory { get; set; } = []; // Array de PromptMessageVO, EF cuidará da serialização        public int TotalTokens { get; set; }  // Total de tokens usados na sessão
-        public int CountMessages { get; set; } // Número de mensagens na sessão
+        public int CountMessages { get; set; }
+        public int TotalTokensMessage { get; set; }
         public DateTime SessionDateTime { get; set; } // Data e hora da sessão
         public long? IdUser { get; set; } // Opcional: pode armazenar o ID do usuário, se necessário
     }

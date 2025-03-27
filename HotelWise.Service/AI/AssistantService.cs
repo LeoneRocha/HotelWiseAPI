@@ -1,12 +1,15 @@
 ﻿using AutoMapper;
+using FluentValidation;
 using HotelWise.Domain.Dto;
 using HotelWise.Domain.Dto.IA;
 using HotelWise.Domain.Enuns.IA;
 using HotelWise.Domain.Helpers;
+using HotelWise.Domain.Helpers.AI;
 using HotelWise.Domain.Interfaces;
 using HotelWise.Domain.Interfaces.Entity.IA;
 using HotelWise.Domain.Interfaces.IA;
 using HotelWise.Domain.Model.AI;
+using HotelWise.Domain.Validator.AI;
 using System.Text;
 
 namespace HotelWise.Service.Entity
@@ -46,9 +49,30 @@ namespace HotelWise.Service.Entity
         {
             try
             {
-                //Feature 3) Get History add request if not great rule max token 
-                PromptMessageVO[] historyPrompts = CreatePrompts(request);
+                // Valida o request
+                var requestValidator = new AskAssistantRequestValidator();
+                var requestValidationResult = requestValidator.Validate(request);
 
+                if (!requestValidationResult.IsValid)
+                {
+                    throw new ValidationException(requestValidationResult.Errors);
+                }
+                var currentToken = string.IsNullOrWhiteSpace(request.Token) ? Guid.NewGuid().ToString() : request.Token;
+
+                // Verifica se já existe uma sessão para o token
+                ChatSessionHistoryDto existingSession = await _chatSessionHistoryService.GetByIdTokenAsync(currentToken);
+
+                //Feature 3) Get History add request if not great rule max token 
+                PromptMessageVO[] historyPrompts = CreatePrompts(request, existingSession);
+
+                // valida prompts  
+                var promptsValidator = new HistoryPromptsValidator();
+                var promptsValidationResult = promptsValidator.Validate(historyPrompts);
+
+                if (!promptsValidationResult.IsValid)
+                {
+                    throw new ValidationException(promptsValidationResult.Errors);
+                }
                 AskAssistantResponse[] askAssistantResponses;
                 if (historyPrompts.Length > 0 && historyPrompts.Any(x => x.RoleType == RoleAiPromptsType.Agent))
                 {
@@ -58,8 +82,15 @@ namespace HotelWise.Service.Entity
                 {
                     askAssistantResponses = await ChatCompletion(historyPrompts);
                 }
-                await PersistChatAsync(request, historyPrompts.First(mg => mg.RoleType == RoleAiPromptsType.User), askAssistantResponses);
+                var userCurrentPrompt = historyPrompts.First(mg => mg.RoleType == RoleAiPromptsType.User);
+
+                await PersistChatAsync(request, userCurrentPrompt, askAssistantResponses, existingSession, currentToken);
                 return askAssistantResponses;
+            }
+            catch (ValidationException ex)
+            {
+                _logger.Error(ex, "Erro de validação: {Message}", ex.Message);
+                throw;
             }
             catch (Exception ex)
             {
@@ -69,14 +100,10 @@ namespace HotelWise.Service.Entity
         }
         #region PersistChat
 
-        private async Task PersistChatAsync(AskAssistantRequest request, PromptMessageVO promptMessageUser, AskAssistantResponse[] askAssistantResponses)
+        private async Task PersistChatAsync(AskAssistantRequest request, PromptMessageVO promptMessageUser, AskAssistantResponse[] askAssistantResponses, ChatSessionHistoryDto? existingSession, string currentToken)
         {
-            var currentToken = string.IsNullOrWhiteSpace(request.Token) ? Guid.NewGuid().ToString() : request.Token;
             try
             {
-                // Verifica se já existe uma sessão para o token
-                var existingSession = await _chatSessionHistoryService.GetByIdTokenAsync(currentToken);
-
                 if (existingSession != null)
                 {
                     await UpdateExistingSession(existingSession, promptMessageUser, askAssistantResponses);
@@ -112,6 +139,7 @@ namespace HotelWise.Service.Entity
             // Atualiza os dados da sessão
             existingSession.PromptMessageHistory = updatedHistory.ToArray();
             existingSession.CountMessages = updatedHistory.Count(mg => mg.RoleType == RoleAiPromptsType.User);
+            existingSession.TotalTokensMessage = TokenCounterHelper.CalculateTotalTokens(updatedHistory.ToArray());
             var sessionUpdate = _mapper.Map<ChatSessionHistoryDto>(existingSession);
             // Persistir alterações
             await _chatSessionHistoryService.UpdateAsync(sessionUpdate);
@@ -127,6 +155,7 @@ namespace HotelWise.Service.Entity
                 SessionDateTime = DataHelper.GetDateTimeNow(),
                 IdUser = UserId
             };
+            newSession.TotalTokensMessage = TokenCounterHelper.CalculateTotalTokens([promptMessageUser]);
             // Persistir nova sessão
             await _chatSessionHistoryService.AddAsync(newSession);
         }
@@ -178,13 +207,9 @@ namespace HotelWise.Service.Entity
                     }];
         }
 
-        private static PromptMessageVO[] CreatePrompts(AskAssistantRequest request)
+        private static PromptMessageVO[] CreatePrompts(AskAssistantRequest request, ChatSessionHistoryDto? existingSession)
         {
-            var sysMsgRuleAgent = new PromptMessageVO()
-            {
-                RoleType = RoleAiPromptsType.Agent,
-                Content = new StringBuilder()
-                .AppendLine("Você é um especializado em viagens e turismo. Responda exclusivamente a perguntas relacionadas a:")
+            var msgAgent = new StringBuilder().AppendLine("Você é um especializado em viagens e turismo. Responda exclusivamente a perguntas relacionadas a:")
                 .AppendLine("- Planejamento de viagens.")
                 .AppendLine("- Reservas de hotéis, voos e transporte.")
                 .AppendLine("- Recomendações de destinos turísticos, passeios, atrações e pacotes de viagem.")
@@ -198,22 +223,39 @@ namespace HotelWise.Service.Entity
                 .AppendLine("Limitações:")
                 .AppendLine("- Não forneça informações fora do escopo de viagens e turismo.")
                 .AppendLine("- Caso a pergunta esteja fora do escopo, responda com respeito e objetividade, indicando que não pode ajudar com o tópico abordado.")
-                .ToString()
+                .ToString();
+
+            var msgSystem = "Você é um assistente especializado em viagens e turismo. Sua função é responder exclusivamente a perguntas relacionadas a viagens, reservas de hotéis e turismo. Limite suas respostas a esses tópicos, e quando uma pergunta estiver fora desse escopo, responda de forma educada, objetiva e concisa, informando que não pode ajudar com o tópico mencionado. Responda sempre em português brasileiro (pt-BR), utilizando linguagem clara e fluida. Formate suas respostas para exibição em HTML ou Markdown, utilizando tags adequadas para renderização correta no site.";
+            var sysMsgRuleAgent = new PromptMessageVO()
+            {
+                RoleType = RoleAiPromptsType.Agent,
+                Content = msgAgent,
             };
             PromptMessageVO sysMsgUnified = new PromptMessageVO()
             {
                 RoleType = RoleAiPromptsType.System,
-                Content = "Você é um assistente especializado em viagens e turismo. Sua função é responder exclusivamente a perguntas relacionadas a viagens, reservas de hotéis e turismo. Limite suas respostas a esses tópicos, e quando uma pergunta estiver fora desse escopo, responda de forma educada, objetiva e concisa, informando que não pode ajudar com o tópico mencionado. Responda sempre em português brasileiro (pt-BR), utilizando linguagem clara e fluida. Formate suas respostas para exibição em HTML ou Markdown, utilizando tags adequadas para renderização correta no site."
+                Content = msgSystem,
             };
-
             PromptMessageVO userMsg = new PromptMessageVO()
             {
                 RoleType = RoleAiPromptsType.User,
-                Content = request.Message
+                Content = request.Message,
             };
 
-            PromptMessageVO[] messages = [sysMsgRuleAgent, sysMsgUnified, userMsg];
-            return messages;
+            List<PromptMessageVO> promptMessageVOs = new List<PromptMessageVO>() { sysMsgRuleAgent, sysMsgUnified, userMsg };
+
+            if (existingSession != null)
+            {
+                string context = ChatSessionHelper.GetHistoryContext(existingSession);
+
+                PromptMessageVO histories = new PromptMessageVO()
+                {
+                    RoleType = RoleAiPromptsType.Context,
+                    Content = HtmlHelper.RemoveHtml(context),
+                };
+                promptMessageVOs.Add(histories);
+            }
+            return promptMessageVOs.ToArray();
         }
     }
 }

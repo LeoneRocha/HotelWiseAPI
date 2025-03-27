@@ -4,11 +4,13 @@ using HotelWise.Domain.Dto;
 using HotelWise.Domain.Dto.SemanticKernel;
 using HotelWise.Domain.Enuns.IA;
 using HotelWise.Domain.Helpers;
+using HotelWise.Domain.Helpers.AI;
 using HotelWise.Domain.Interfaces;
 using HotelWise.Domain.Interfaces.Entity;
 using HotelWise.Domain.Interfaces.IA;
 using HotelWise.Domain.Interfaces.SemanticKernel;
 using HotelWise.Domain.Model;
+using HotelWise.Domain.Validator.AI;
 using HotelWise.Service.Bussines;
 using HotelWise.Service.Generic;
 using HotelWise.Service.Prompts;
@@ -143,6 +145,15 @@ namespace HotelWise.Service.Entity
         private async Task searchByInterference(SearchCriteria searchCriteria, ServiceResponse<HotelSemanticResult> response)
         {
             PromptMessageVO[] historyPrompts = createPrompts(searchCriteria, response.Data!.HotelsVectorResult);
+
+            // valida prompts  
+            var promptsValidator = new HistoryPromptsValidator();
+            var promptsValidationResult = promptsValidator.Validate(historyPrompts);
+            if (!promptsValidationResult.IsValid)
+            {
+                throw new ValidationException(promptsValidationResult.Errors);
+            }
+
             var result = await _aIInferenceService.GenerateChatCompletionByAgentSimpleRagAsync(historyPrompts, _eIAInferenceAdapterType);
 
             response.Data!.PromptResultContent = result;
@@ -195,16 +206,15 @@ namespace HotelWise.Service.Entity
 
             PromptMessageVO ragMsg = new PromptMessageVO()
             {
-                RoleType = RoleAiPromptsType.Context,
+                RoleType = RoleAiPromptsType.Context, 
                 DataContextRag = convertDataContext(allHotelsFromDb)
-            };
+            }; 
 
             PromptMessageVO userMsg = new PromptMessageVO()
             {
                 RoleType = RoleAiPromptsType.User,
-                Content = request.SearchTextCriteria
-            };
-
+                Content = request.SearchTextCriteria, 
+            };  
             PromptMessageVO[] messages = [sysMsgHotelAgent, sysMsgHotelSearch, userMsg, ragMsg];
             return messages;
         }
