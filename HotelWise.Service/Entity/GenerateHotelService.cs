@@ -1,6 +1,8 @@
 ﻿using Bogus;
 using HotelWise.Domain.Dto;
+using HotelWise.Domain.Dto.AppConfig;
 using HotelWise.Domain.Enuns.IA;
+using HotelWise.Domain.Interfaces;
 using HotelWise.Domain.Interfaces.Entity;
 using HotelWise.Domain.Interfaces.IA;
 using HotelWise.Domain.Model;
@@ -11,9 +13,11 @@ namespace HotelWise.Service.Entity
     public class GenerateHotelService : IGenerateHotelService
     {
         private readonly IAIInferenceService _aIInferenceService;
+        private readonly InferenceAiAdapterType _eIAInferenceAdapterType;
 
-        public GenerateHotelService(IAIInferenceService aIInferenceService)
+        public GenerateHotelService(IAIInferenceService aIInferenceService, IApplicationIAConfig applicationIAConfig)
         {
+            _eIAInferenceAdapterType = applicationIAConfig.RagConfig.GetAInferenceAdapterType();
             _aIInferenceService = aIInferenceService;
         }
         public async Task<Hotel> GetHotelAsync()
@@ -111,9 +115,8 @@ namespace HotelWise.Service.Entity
 
         private async Task<string> GenerateDescriptionAndTags(string prompt)
         {
-            PromptMessageVO[] messages = [new PromptMessageVO() { RoleType = RoleAiPromptsType.User, Content = prompt }];
-
-            return await _aIInferenceService.GenerateChatCompletionAsync(messages, InferenceAiAdapterType.SemanticKernel);
+            PromptMessageVO[] messages = [new PromptMessageVO() { RoleType = RoleAiPromptsType.User, Content = prompt }]; 
+            return await _aIInferenceService.GenerateChatCompletionAsync(messages, _eIAInferenceAdapterType);
         }
 
         public static string[] ProcessTags(string[] tags)
