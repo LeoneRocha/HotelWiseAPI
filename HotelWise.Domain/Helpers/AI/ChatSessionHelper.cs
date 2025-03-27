@@ -13,7 +13,7 @@ namespace HotelWise.Domain.Helpers.AI
         /// <returns>Uma string contendo todos os conteúdos das mensagens concatenados.</returns>
         public static string GetHistoryContext(ChatSessionHistoryDto chatSession)
         {
-            if (chatSession?.PromptMessageHistory == null || !chatSession.PromptMessageHistory.Any())
+            if (chatSession.PromptMessageHistory.Length == 0 )
                 return string.Empty;
 
             var contextBuilder = new StringBuilder();
@@ -34,9 +34,7 @@ namespace HotelWise.Domain.Helpers.AI
                     contextBuilder.AppendLine($"{message.RoleType}: {message.Content}");
                 }
             }
-
             return contextBuilder.ToString().Trim();
         }
-
     }
 } 

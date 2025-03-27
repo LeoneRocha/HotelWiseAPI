@@ -30,9 +30,9 @@ namespace HotelWise.Domain.Helpers.AI
         /// </summary>
         /// <param name="promptMessages">Coleção de objetos PromptMessageVO.</param>
         /// <returns>Total de caracteres somados de todos os DataVectors.</returns>
-        public static int CalculateTotalDataVectorLength(IEnumerable<PromptMessageVO> promptMessages)
+        public static int CalculateTotalDataVectorLength(PromptMessageVO[] promptMessages)
         {
-            if (promptMessages == null || !promptMessages.Any())
+            if (promptMessages == null || promptMessages.Length == 0)
                 return 0;
 
             return promptMessages
@@ -47,7 +47,7 @@ namespace HotelWise.Domain.Helpers.AI
         /// <returns>Total de tokens.</returns>
         public static int CalculateTotalTokens(PromptMessageVO[] promptMessages)
         {
-            if (promptMessages == null || !promptMessages.Any())
+            if (promptMessages == null || promptMessages.Length == 0)
                 return 0;
 
             return promptMessages.Sum(p => CountTokensFromPrompt(p));

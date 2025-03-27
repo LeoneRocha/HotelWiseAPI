@@ -32,13 +32,13 @@ namespace HotelWise.Domain.Validator.AI
                 .When(x => x.RoleType == RoleAiPromptsType.Context);
         }
 
-        private bool BeWithinTokenLimitContext(string content)
+        private static bool BeWithinTokenLimitContext(string content)
         {
             // Verifica se o conteúdo está dentro do limite de tokens
             return TokenCounterHelper.CountTokens(content) <= ChatCompletionValidatorsConstants.MaxTokensPerMessageContext;
         }
 
-        private bool BeWithinTokenLimit(string content)
+        private static bool BeWithinTokenLimit(string content)
         {
             // Verifica se o conteúdo está dentro do limite de tokens
             return TokenCounterHelper.CountTokens(content) <= ChatCompletionValidatorsConstants.MaxTokensPerMessage;

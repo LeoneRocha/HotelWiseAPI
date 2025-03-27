@@ -84,14 +84,9 @@ namespace HotelWise.Service.Entity
                 }
                 var userCurrentPrompt = historyPrompts.First(mg => mg.RoleType == RoleAiPromptsType.User);
 
-                await PersistChatAsync(request, userCurrentPrompt, askAssistantResponses, existingSession, currentToken);
+                await PersistChatAsync(userCurrentPrompt, askAssistantResponses, existingSession, currentToken);
                 return askAssistantResponses;
-            }
-            catch (ValidationException ex)
-            {
-                _logger.Error(ex, "Erro de validação: {Message}", ex.Message);
-                throw;
-            }
+            } 
             catch (Exception ex)
             {
                 _logger.Error(ex, "AssistantService AskAssistant: {Message} at: {time}", ex.Message, DataHelper.GetDateTimeNowToLog());
@@ -100,7 +95,7 @@ namespace HotelWise.Service.Entity
         }
         #region PersistChat
 
-        private async Task PersistChatAsync(AskAssistantRequest request, PromptMessageVO promptMessageUser, AskAssistantResponse[] askAssistantResponses, ChatSessionHistoryDto? existingSession, string currentToken)
+        private async Task PersistChatAsync(PromptMessageVO promptMessageUser, AskAssistantResponse[] askAssistantResponses, ChatSessionHistoryDto? existingSession, string currentToken)
         {
             try
             {

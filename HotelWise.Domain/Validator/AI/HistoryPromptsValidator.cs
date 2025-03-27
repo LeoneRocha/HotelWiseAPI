@@ -5,7 +5,7 @@ using HotelWise.Domain.Dto;
 namespace HotelWise.Domain.Validator.AI
 {
     public class HistoryPromptsValidator : AbstractValidator<PromptMessageVO[]>
-    { 
+    {
         public HistoryPromptsValidator()
         {
             // Valida o tamanho máximo do array de prompts (por exemplo: máximo de 10 prompts)
@@ -26,12 +26,12 @@ namespace HotelWise.Domain.Validator.AI
         /// </summary>
         /// <param name="prompts">Array de PromptMessageVO.</param>
         /// <returns>True se a soma total de tokens estiver dentro do limite, caso contrário false.</returns>
-        private bool NotExceedMaxTokens(PromptMessageVO[] prompts)
+        private static bool NotExceedMaxTokens(PromptMessageVO[] prompts)
         {
             if (prompts == null || prompts.Length == 0) return true; // Nenhuma mensagem, válido
             return prompts.Sum(p => p.TokenCount) <= ChatCompletionValidatorsConstants.MaxTotalTokens;
         }
     }
 
-   
+
 }
