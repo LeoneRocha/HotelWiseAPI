@@ -7,6 +7,7 @@ using HotelWise.Domain.Interfaces;
 using HotelWise.Domain.Interfaces.Entity;
 using HotelWise.Domain.Interfaces.SemanticKernel;
 using HotelWise.Domain.Model;
+using HotelWise.Domain.Model.HotelModels;
 using HotelWise.Service.Generic;
 using System.Collections.Concurrent;
 

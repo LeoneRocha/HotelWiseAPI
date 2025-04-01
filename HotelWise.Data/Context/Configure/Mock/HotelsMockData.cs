@@ -1,5 +1,5 @@
 ﻿using Bogus;
-using HotelWise.Domain.Model;
+using HotelWise.Domain.Model.HotelModels;
 
 namespace HotelWise.Data.Context.Configure.Mock
 {

@@ -1,4 +1,6 @@
-﻿namespace HotelWise.Domain.Model
+﻿using HotelWise.Domain.Model.HotelModels; 
+
+namespace HotelWise.Domain.Model
 {
     public class HotelDto : Hotel
     {

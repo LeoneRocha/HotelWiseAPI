@@ -1,13 +1,21 @@
+------------------------------------------------------------
+
+NOVAS TABELAS 
+
+-- EF 
+-- FLENT VALIDATION 
+-- REPOSITORIO
+-- SERVICE 
+-- END POINT 
+-- TELA  CRUD
+
+------------------------------------------------------------
+
 
 --------- CRIAR NO JSON UMA CONFIG PARA O O OLLAMA 
-
 ------ VER O FLUXO 
-
-
 -------- IMPLEMENTAR O SEARCH VECTOR 
-
 --- IMPLEMENTAR O LLM LOCAL USANDO ANYTHIG E OLLAMA para rodar o emmbading localmente para os 100. 
-
 --- Uma alternativa na nuvem de armazenar os hoteis vetorizado (MONGO DB)
 --- LIMPAR BASE para ja 
 --- usar o qdrant online 
@@ -42,7 +50,7 @@ Add-Migration ChatSessionHistoryv4 -Context HotelWiseDbContextMysql -OutputDir M
 
 Remove-Migration -Context ChatSessionHistoryv4 -Project HotelWise.Data
 
-
+Add-Migration Room -Context HotelWiseDbContextMysql -OutputDir Migrations\MySql -Project HotelWise.Data
 
 
 

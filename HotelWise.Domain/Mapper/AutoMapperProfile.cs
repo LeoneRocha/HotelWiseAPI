@@ -4,6 +4,7 @@ using HotelWise.Domain.Dto.IA;
 using HotelWise.Domain.Dto.SemanticKernel;
 using HotelWise.Domain.Model;
 using HotelWise.Domain.Model.AI;
+using HotelWise.Domain.Model.HotelModels; 
 
 namespace HotelWise.Domain.Mapper
 {
@@ -23,9 +24,7 @@ namespace HotelWise.Domain.Mapper
             
             CreateMap<Hotel, HotelVector>();
             CreateMap<HotelVector, Hotel>();
-
-
-
+             
 
             CreateMap<ChatSessionHistory, ChatSessionHistoryDto>();
             CreateMap<ChatSessionHistoryDto, ChatSessionHistory>();

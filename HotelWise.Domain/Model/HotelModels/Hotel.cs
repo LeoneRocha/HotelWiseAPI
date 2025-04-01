@@ -1,6 +1,6 @@
 ﻿using HotelWise.Domain.Interfaces;
 
-namespace HotelWise.Domain.Model
+namespace HotelWise.Domain.Model.HotelModels
 {
     public class Hotel : IEntityBaseLog
     {
@@ -18,8 +18,8 @@ namespace HotelWise.Domain.Model
         public User? CreatedUser { get; set; }
         public long? CreatedUserId { get; set; }
         public User? ModifyUser { get; set; }
-        public long? ModifyUserId { get; set; }         
-        public DateTime CreatedDate { get; set; }         
-        public DateTime ModifyDate { get; set; } 
+        public long? ModifyUserId { get; set; }
+        public DateTime CreatedDate { get; set; }
+        public DateTime ModifyDate { get; set; }
     }
 }

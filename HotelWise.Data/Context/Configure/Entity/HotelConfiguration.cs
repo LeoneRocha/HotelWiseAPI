@@ -1,5 +1,5 @@
 ﻿using HotelWise.Data.Context.Configure.Mock;
-using HotelWise.Domain.Model;
+using HotelWise.Domain.Model.HotelModels;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
