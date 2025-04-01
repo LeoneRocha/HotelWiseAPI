@@ -2,23 +2,43 @@
 
 NOVAS TABELAS 
 
--- EF 
+-- EF -------------------------- FEITO 
 -- FLENT VALIDATION 
 -- REPOSITORIO
 -- SERVICE 
 -- END POINT 
 -- TELA  CRUD
 
+------- SERVICE DE PESQUISA 
+------- SERVICE DE RESERVA 
+-------- END POINT  DE PESQUISA 
+-------- END POINT DE RESERVA 
+
+---------- MELHORAR TELA DE PESQUISA INCLUIDO QUARTOS E PRECO 
+
+---------- CRIAR TELA DE RESERVA 
+
+------------ IMPLEMENTAR API DE PAGAMENTO PARA PROSSEGUIR RESERVAR E CRIA UM CAMPO ARMAZENAR OS PAGAMENTO 
+
+
+-------- MELHORAR CHAT BOT PARA LISTAR RESERVAS ATUAIS > today 
+
+-------- MELHORAR CHAT BOT PARA CANCELAR RESERVAS ATIVAS 
+
+
+-------- FUTURAMENTE UM CHAT QUE PESQUISE E RESERVE 
+
+
 ------------------------------------------------------------
 
 
---------- CRIAR NO JSON UMA CONFIG PARA O O OLLAMA 
------- VER O FLUXO 
--------- IMPLEMENTAR O SEARCH VECTOR 
---- IMPLEMENTAR O LLM LOCAL USANDO ANYTHIG E OLLAMA para rodar o emmbading localmente para os 100. 
+--------- CRIAR NO JSON UMA CONFIG PARA O O OLLAMA  ------ OK
+------ VER O FLUXO  ------ OK
+-------- IMPLEMENTAR O SEARCH VECTOR ------ OK  
+--- IMPLEMENTAR O LLM LOCAL USANDO ANYTHIG E OLLAMA para rodar o emmbading localmente para os 100.  ------ OK
 --- Uma alternativa na nuvem de armazenar os hoteis vetorizado (MONGO DB)
---- LIMPAR BASE para ja 
---- usar o qdrant online 
+--- LIMPAR BASE para ja ------ OK
+--- usar o qdrant online  ------ OK
 
 ------------------------------------------------ DASH BOARDS 
 
