@@ -19,6 +19,7 @@ namespace HotelWise.Domain.Validator.HotelValidators
 
         private void DefineRules()
         {
+            // Validações básicas dos campos
             RuleFor(r => r.RoomId)
                 .GreaterThan(0)
                 .WithMessage("O RoomId é obrigatório e deve ser maior que 0.");
@@ -55,73 +56,86 @@ namespace HotelWise.Domain.Validator.HotelValidators
                 .IsInEnum()
                 .WithMessage("O status da reserva é inválido.");
 
+            // Regra 1: verificar se o quarto existe
             RuleFor(r => r)
-                .MustAsync(RoomIsAvailableForPeriodAsync)
-                .WithMessage("O quarto não está disponível ou não possui disponibilidade para o período e moeda selecionados.");
+                .MustAsync(RoomExistenceAsync)
+                .WithMessage("O quarto informado não existe.");
+
+            // Regra 2: verificar se o objeto Room está carregado
+            RuleFor(r => r)
+                .Must(ReservationHasRoomLoaded)
+                .WithMessage("O objeto Room não foi carregado na reserva.");
+
+            // Regra 3: verificar se o quarto está disponível (status == Available)
+            RuleFor(r => r)
+                .Must(ReservationHasAvailableRoomStatus)
+                .WithMessage("O quarto não está disponível para reserva.");
+
+            // Regra 4: verificar se o número de noites da reserva atende ao mínimo exigido
+            RuleFor(r => r)
+                .Must(ReservationMeetsMinimumNights)
+                .WithMessage(r =>
+                {
+                    var min = r.Room?.MinimumNights ?? 0;
+                    return $"O período da reserva deve ter, no mínimo, {min} noites.";
+                });
+
+            // Regra 5: verificar se há disponibilidade para cada noite com a moeda selecionada
+            RuleFor(r => r)
+                .MustAsync(AvailabilityIsSufficientAsync)
+                .WithMessage("Não há disponibilidade para todas as noites, com a moeda selecionada, no período informado.");
         }
 
-        #region Validações de Disponibilidade e Quarto
+        #region Regras Customizadas
 
-        /// <summary>
-        /// Combina as validações que dependem do estado do quarto e da disponibilidade para o período de reserva.
-        /// </summary>
-        private async Task<bool> RoomIsAvailableForPeriodAsync(Reservation reservation, CancellationToken cancellationToken)
+        private async Task<bool> RoomExistenceAsync(Reservation reservation, CancellationToken cancellationToken)
         {
-            if (!await ValidateRoomExistenceAsync(reservation, cancellationToken))
-                return false;
-
-            if (!ValidateRoomLoaded(reservation))
-                return false;
-
-            if (!ValidateRoomStatus(reservation))
-                return false;
-
-            return await ValidateAvailabilityForEachNightAsync(reservation, cancellationToken);
+            // Verifica se o quarto existe no banco.
+            return await _roomRepository.ExistsAsync(r => r.Id == reservation.RoomId);
         }
 
-        /// <summary>
-        /// Verifica se o quarto existe no banco.
-        /// </summary>
-        private async Task<bool> ValidateRoomExistenceAsync(Reservation reservation, CancellationToken cancellationToken) => await _roomRepository.ExistsAsync(r => r.Id == reservation.RoomId);
+        private bool ReservationHasRoomLoaded(Reservation reservation)
+        {
+            // Verifica se o objeto Room foi carregado na entidade de reserva.
+            return reservation.Room is not null;
+        }
 
-        /// <summary>
-        /// Verifica se o objeto Room foi carregado na reserva.
-        /// </summary>
-        private bool ValidateRoomLoaded(Reservation reservation) => reservation.Room is not null;
+        private bool ReservationHasAvailableRoomStatus(Reservation reservation)
+        {
+            // Verifica se o objeto Room tem status Available.
+            return reservation.Room?.Status == RoomStatus.Available;
+        }
 
-        /// <summary>
-        /// Verifica se o quarto está com status Available.
-        /// </summary>
-        private bool ValidateRoomStatus(Reservation reservation) => reservation.Room?.Status == RoomStatus.Available;
+        private bool ReservationMeetsMinimumNights(Reservation reservation)
+        {
+            // Calcula o número de noites da reserva.
+            var nights = (reservation.CheckOutDate.Date - reservation.CheckInDate.Date).Days;
+            // Garante que o número de noites seja maior ou igual ao mínimo exigido pelo quarto.
+            return nights >= reservation.Room.MinimumNights;
+        }
 
-        /// <summary>
-        /// Para cada noite da reserva, valida se existe um item de disponibilidade com quantidade disponível e com a moeda compatível.
-        /// </summary>
-        private async Task<bool> ValidateAvailabilityForEachNightAsync(Reservation reservation, CancellationToken cancellationToken)
+        private async Task<bool> AvailabilityIsSufficientAsync(Reservation reservation, CancellationToken cancellationToken)
         {
             var nights = (reservation.CheckOutDate.Date - reservation.CheckInDate.Date).Days;
             if (nights <= 0)
                 return false;
 
-            // Obtém as disponibilidades dentro do intervalo de datas
+            // Obtém as disponibilidades para o período informado.
             var availabilities = await _roomAvailabilityRepository.GetAvailabilityByDateRange(reservation.RoomId, reservation.CheckInDate.Date, reservation.CheckOutDate.Date);
 
-            if (availabilities is null || availabilities.Length == 0)
+            if (availabilities == null || availabilities.Length == 0)
                 return false;
 
+            // Para cada noite, verifica se há um item de disponibilidade com quantidade disponível e moeda compatível.
             for (var day = 0; day < nights; day++)
             {
                 var targetDate = reservation.CheckInDate.Date.AddDays(day);
                 if (!IsDateAvailable(availabilities, targetDate, reservation.Currency))
                     return false;
             }
-
             return true;
         }
 
-        /// <summary>
-        /// Verifica se, para a data alvo, existe pelo menos um item de disponibilidade com quantidade disponível e moeda compatível.
-        /// </summary>
         private static bool IsDateAvailable(RoomAvailability[] availabilities, DateTime targetDate, string currency)
         {
             return availabilities.Any(av => av.StartDate.Date <= targetDate && av.EndDate.Date >= targetDate && av.AvailabilityWithPrice.Any(item => item.Date.Date == targetDate && item.QuantityAvailable > 0 && string.Equals(item.Currency, currency, StringComparison.OrdinalIgnoreCase)));

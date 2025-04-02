@@ -3,8 +3,8 @@
 NOVAS TABELAS 
 
 -- EF -------------------------- FEITO 
--- REPOSITORIO ------- XXX
--- FLENT VALIDATION   --- XXXXXXXX
+-- REPOSITORIO ------- FEITO
+-- FLENT VALIDATION --- FEITO
 -- SERVICE 
 -- END POINT 
 -- TELA  CRUD
