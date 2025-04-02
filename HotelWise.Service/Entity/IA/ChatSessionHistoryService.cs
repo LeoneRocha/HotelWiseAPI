@@ -3,7 +3,7 @@ using FluentValidation;
 using HotelWise.Domain.Dto.IA;
 using HotelWise.Domain.Dto.IA.SemanticKernel;
 using HotelWise.Domain.Interfaces.AppConfig;
-using HotelWise.Domain.Interfaces.Entity.HotelInterfaces;
+using HotelWise.Domain.Interfaces.Entity.HotelInterfaces.Service;
 using HotelWise.Domain.Interfaces.Entity.IA;
 using HotelWise.Domain.Interfaces.SemanticKernel;
 using HotelWise.Domain.Model.AI;

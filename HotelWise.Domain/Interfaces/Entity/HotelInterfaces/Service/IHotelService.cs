@@ -2,7 +2,7 @@
 using HotelWise.Domain.Dto.Enitty.HotelDtos;
 using HotelWise.Domain.Interfaces.Base;
 
-namespace HotelWise.Domain.Interfaces.Entity.HotelInterfaces
+namespace HotelWise.Domain.Interfaces.Entity.HotelInterfaces.Service
 {
     public interface IHotelService : IGenericService<HotelDto>
     {

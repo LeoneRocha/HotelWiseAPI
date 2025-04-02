@@ -1,6 +1,6 @@
 ﻿using FluentValidation;
 using HotelWise.Domain.Enuns.Hotel;
-using HotelWise.Domain.Interfaces.Entity.HotelInterfaces;
+using HotelWise.Domain.Interfaces.Entity.HotelInterfaces.Repository;
 using HotelWise.Domain.Model.HotelModels;
 
 namespace HotelWise.Domain.Validator.HotelValidators

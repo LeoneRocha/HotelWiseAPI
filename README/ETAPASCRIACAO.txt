@@ -5,7 +5,7 @@ NOVAS TABELAS
 -- EF -------------------------- FEITO 
 -- REPOSITORIO ------- FEITO
 -- FLENT VALIDATION --- FEITO
--- SERVICE 
+-- SERVICE  --- FEITO
 -- END POINT 
 -- TELA  CRUD
 
@@ -76,7 +76,7 @@ Add-Migration ChatSessionHistoryv4 -Context HotelWiseDbContextMysql -OutputDir M
 
 Remove-Migration -Context ChatSessionHistoryv4 -Project HotelWise.Data
 
-Add-Migration Room -Context HotelWiseDbContextMysql -OutputDir Migrations\MySql -Project HotelWise.Data
+Add-Migration Room2 -Context HotelWiseDbContextMysql -OutputDir Migrations\MySql -Project HotelWise.Data
 
 
 
