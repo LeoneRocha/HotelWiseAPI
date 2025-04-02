@@ -1,5 +1,4 @@
 ﻿using FluentValidation;
-using HotelWise.Domain.Interfaces.Entity;
 using HotelWise.Domain.Interfaces.Entity.HotelInterfaces;
 using HotelWise.Domain.Model.HotelModels;
 

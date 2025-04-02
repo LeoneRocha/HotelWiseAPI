@@ -1,7 +1,7 @@
 ﻿using HotelWise.Domain.Interfaces.Entity.HotelWise.Domain.Interfaces.Entity;
 using HotelWise.Domain.Model.HotelModels;
 
-namespace HotelWise.Domain.Interfaces.Entity
+namespace HotelWise.Domain.Interfaces.Entity.HotelInterfaces
 {
     public interface IReservationRepository : IGenericRepository<Reservation>
     {

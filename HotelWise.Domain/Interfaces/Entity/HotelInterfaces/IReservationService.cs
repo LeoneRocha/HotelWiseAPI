@@ -1,7 +1,7 @@
 ﻿using HotelWise.Domain.Dto;
 using HotelWise.Domain.Dto.Enitty.HotelDtos;
 
-namespace HotelWise.Service.Interfaces
+namespace HotelWise.Domain.Interfaces.Entity.HotelInterfaces
 {
     public interface IReservationService
     {

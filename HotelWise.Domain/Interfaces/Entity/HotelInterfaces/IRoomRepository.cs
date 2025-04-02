@@ -1,11 +1,12 @@
 ﻿using HotelWise.Domain.Interfaces.Entity.HotelWise.Domain.Interfaces.Entity;
 using HotelWise.Domain.Model.HotelModels;
 
-namespace HotelWise.Domain.Interfaces.Entity
+namespace HotelWise.Domain.Interfaces.Entity.HotelInterfaces
 {
     public interface IRoomRepository : IGenericRepository<Room>
     {
-        Task<Room?> FindByIdWithHotel(long roomId);
-        Task<Room[]> GetRoomsByHotel(long hotelId);
+        Task<Room?> FindByRoomIdAsNoTracking(long roomId);
+        Task<Room[]> GetRoomsByHotelAsNoTracking(long hotelId);
+        Task<Room[]> GetRoomsByHotelIdAsync(long hotelId);
     }
 }

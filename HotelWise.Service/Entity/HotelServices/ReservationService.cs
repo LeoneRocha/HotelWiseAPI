@@ -3,10 +3,9 @@ using FluentValidation;
 using HotelWise.Domain.Dto;
 using HotelWise.Domain.Dto.Enitty.HotelDtos;
 using HotelWise.Domain.Enuns.Hotel;
-using HotelWise.Domain.Interfaces.Entity;
+using HotelWise.Domain.Interfaces.Entity.HotelInterfaces;
 using HotelWise.Domain.Model.HotelModels;
 using HotelWise.Service.Generic;
-using HotelWise.Service.Interfaces;
 using Serilog;
 
 namespace HotelWise.Service.Entity

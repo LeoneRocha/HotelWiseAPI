@@ -1,6 +1,6 @@
 ﻿using HotelWise.Data.Context;
 using HotelWise.Data.Repository.Generic;
-using HotelWise.Domain.Interfaces.Entity;
+using HotelWise.Domain.Interfaces.Entity.HotelInterfaces;
 using HotelWise.Domain.Model.HotelModels;
 using Microsoft.EntityFrameworkCore;
 
@@ -18,9 +18,7 @@ namespace HotelWise.Data.Repository
                 .Where(r => r.RoomId == roomId)
                 .ToArrayAsync();
         }
-
-        
-
+         
         /// <summary>
         /// Recupera todas as reservas associadas a um quarto específico.
         /// </summary>
@@ -40,4 +38,4 @@ namespace HotelWise.Data.Repository
                 .ToArrayAsync();
         }
     }
-}
+} 
