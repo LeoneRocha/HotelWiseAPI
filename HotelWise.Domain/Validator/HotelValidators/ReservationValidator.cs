@@ -94,19 +94,19 @@ namespace HotelWise.Domain.Validator.HotelValidators
             return await _roomRepository.ExistsAsync(r => r.Id == reservation.RoomId);
         }
 
-        private bool ReservationHasRoomLoaded(Reservation reservation)
+        private static bool ReservationHasRoomLoaded(Reservation reservation)
         {
             // Verifica se o objeto Room foi carregado na entidade de reserva.
             return reservation.Room is not null;
         }
 
-        private bool ReservationHasAvailableRoomStatus(Reservation reservation)
+        private static bool ReservationHasAvailableRoomStatus(Reservation reservation)
         {
             // Verifica se o objeto Room tem status Available.
             return reservation.Room?.Status == RoomStatus.Available;
         }
 
-        private bool ReservationMeetsMinimumNights(Reservation reservation)
+        private static bool ReservationMeetsMinimumNights(Reservation reservation)
         {
             // Calcula o número de noites da reserva.
             var nights = (reservation.CheckOutDate.Date - reservation.CheckInDate.Date).Days;

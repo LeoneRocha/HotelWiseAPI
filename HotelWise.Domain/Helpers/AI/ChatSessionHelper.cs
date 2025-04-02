@@ -18,7 +18,7 @@ namespace HotelWise.Domain.Helpers.AI
 
             var contextBuilder = new StringBuilder();
 
-            contextBuilder.AppendLine(GenerateContextMessage(chatSession?.PromptMessageHistory));
+            contextBuilder.AppendLine(GenerateContextMessage(chatSession.PromptMessageHistory));
             var result = HtmlHelper.RemoveHtml(contextBuilder.ToString().Trim());
             return result; // Remove espaços e linhas extras
         }
