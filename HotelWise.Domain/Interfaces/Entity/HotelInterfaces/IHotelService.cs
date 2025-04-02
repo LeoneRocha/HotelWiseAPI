@@ -1,6 +1,6 @@
 ﻿using HotelWise.Domain.Dto;
+using HotelWise.Domain.Dto.Enitty.HotelDtos;
 using HotelWise.Domain.Interfaces.Base;
-using HotelWise.Domain.Model;
 
 namespace HotelWise.Domain.Interfaces.Entity.HotelInterfaces
 {

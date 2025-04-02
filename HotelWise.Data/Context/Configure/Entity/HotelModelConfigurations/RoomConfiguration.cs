@@ -13,12 +13,12 @@ namespace HotelWise.Data.Context.Configure.Entity.HotelModelConfigurations
             HelperCharSet.AddCharSet(builder);
 
             #region KEY
-            // Definição de chave primária 
+            // Definição de chave primária
             builder.HasKey(e => e.Id);
 
             builder.Property(e => e.Id)
                 .ValueGeneratedOnAdd();
-            #endregion  KEY
+            #endregion KEY
 
             builder.Property(r => r.RoomType)
                    .IsRequired()
@@ -37,18 +37,22 @@ namespace HotelWise.Data.Context.Configure.Entity.HotelModelConfigurations
 
             builder.Property(r => r.MinimumNights)
                 .IsRequired()
-                .HasDefaultValue(1); // Valor padrão: 1 noite mínim
+                .HasDefaultValue(1); // Valor padrão: 1 noite mínima
 
-
+            // Relacionamento com Hotel
             builder.HasOne(r => r.Hotel)
                    .WithMany()
                    .HasForeignKey(r => r.HotelId);
 
+            // Relacionamento com RoomAvailability
+            builder.HasMany(r => r.RoomAvailabilities)
+                   .WithOne(ra => ra.Room)
+                   .HasForeignKey(ra => ra.RoomId)
+                   .OnDelete(DeleteBehavior.Cascade); // Exclusão em cascata
 
             // Adicionando índices
             builder.HasIndex(r => r.HotelId).HasDatabaseName("IX_Room_HotelId");
             builder.HasIndex(r => r.RoomType).HasDatabaseName("IX_Room_RoomType");
         }
     }
-
 }

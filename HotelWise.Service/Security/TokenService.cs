@@ -1,4 +1,4 @@
-﻿using HotelWise.Domain.Dto;
+﻿using HotelWise.Domain.Dto.AppConfig;
 using HotelWise.Domain.Interfaces.AppConfig;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;

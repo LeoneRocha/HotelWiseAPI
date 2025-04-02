@@ -1,5 +1,5 @@
-﻿using HotelWise.Domain.Dto;
-using HotelWise.Domain.Dto.IA;
+﻿using HotelWise.Domain.Dto.IA;
+using HotelWise.Domain.Dto.IA.SemanticKernel;
 using System.Text;
 
 namespace HotelWise.Domain.Helpers.AI

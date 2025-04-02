@@ -1,5 +1,5 @@
 ﻿using HotelWise.Data.Repository;
-using HotelWise.Domain.Dto.SemanticKernel;
+using HotelWise.Domain.Dto.IA.SemanticKernel;
 using HotelWise.Domain.Interfaces.Entity.HotelInterfaces;
 using HotelWise.Domain.Interfaces.IA;
 using HotelWise.Domain.Interfaces.SemanticKernel;

@@ -1,4 +1,7 @@
-﻿namespace HotelWise.Domain.Dto
+﻿using HotelWise.Domain.Dto.AppConfig;
+using HotelWise.Domain.Dto.Base;
+
+namespace HotelWise.Domain.Dto
 {
     public class GetUserAuthenticatedDto : EntityDtoBase
     {

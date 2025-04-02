@@ -1,6 +1,6 @@
 ﻿using FluentValidation;
 using HotelWise.Domain.Constants.IA;
-using HotelWise.Domain.Dto;
+using HotelWise.Domain.Dto.IA.SemanticKernel;
 using HotelWise.Domain.Enuns.IA;
 using HotelWise.Domain.Helpers.AI;
 

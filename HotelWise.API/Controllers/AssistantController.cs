@@ -1,4 +1,4 @@
-﻿using HotelWise.Domain.Dto;
+﻿using HotelWise.Domain.Dto.IA;
 using HotelWise.Domain.Helpers;
 using HotelWise.Domain.Interfaces.IA;
 using Microsoft.AspNetCore.Authorization;

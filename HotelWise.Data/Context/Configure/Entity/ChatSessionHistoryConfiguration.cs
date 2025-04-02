@@ -1,6 +1,6 @@
 ﻿using HotelWise.Data.Context.Configure.Helper;
 using HotelWise.Domain.Constants;
-using HotelWise.Domain.Dto;
+using HotelWise.Domain.Dto.IA.SemanticKernel;
 using HotelWise.Domain.Enuns;
 using HotelWise.Domain.Model.AI;
 using Microsoft.EntityFrameworkCore;

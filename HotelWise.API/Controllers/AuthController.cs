@@ -1,4 +1,5 @@
 ﻿using HotelWise.Domain.Dto;
+using HotelWise.Domain.Dto.Enitty;
 using HotelWise.Domain.Interfaces.Entity;
 using Microsoft.AspNetCore.Mvc;
 

@@ -1,4 +1,4 @@
-﻿using HotelWise.Domain.Dto.AppConfig;
+﻿using HotelWise.Domain.Dto.AppConfig.Rag;
 using HotelWise.Domain.Enuns.IA;
 
 namespace HotelWise.Domain.Interfaces.AppConfig

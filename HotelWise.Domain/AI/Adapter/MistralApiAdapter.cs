@@ -1,4 +1,4 @@
-﻿using HotelWise.Domain.Dto;
+﻿using HotelWise.Domain.Dto.IA.SemanticKernel;
 using HotelWise.Domain.Interfaces.AppConfig;
 using HotelWise.Domain.Interfaces.IA;
 using Mistral.SDK;

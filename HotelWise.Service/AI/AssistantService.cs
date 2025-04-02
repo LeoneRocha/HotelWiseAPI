@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using FluentValidation;
-using HotelWise.Domain.Dto;
 using HotelWise.Domain.Dto.IA;
+using HotelWise.Domain.Dto.IA.SemanticKernel;
 using HotelWise.Domain.Enuns.IA;
 using HotelWise.Domain.Helpers;
 using HotelWise.Domain.Helpers.AI;

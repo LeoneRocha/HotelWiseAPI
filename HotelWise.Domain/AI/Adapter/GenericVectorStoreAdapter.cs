@@ -1,4 +1,4 @@
-﻿using HotelWise.Domain.Dto;
+﻿using HotelWise.Domain.Dto.Enitty;
 using HotelWise.Domain.Helpers;
 using HotelWise.Domain.Interfaces.AppConfig;
 using HotelWise.Domain.Interfaces.IA;

@@ -1,6 +1,6 @@
 ﻿using FluentValidation;
 using HotelWise.Domain.Constants.IA;
-using HotelWise.Domain.Dto;
+using HotelWise.Domain.Dto.IA;
 namespace HotelWise.Domain.Validator.AI
 {
     public class AskAssistantRequestValidator : AbstractValidator<AskAssistantRequest>

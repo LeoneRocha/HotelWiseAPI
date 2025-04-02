@@ -1,4 +1,4 @@
-﻿using HotelWise.Domain.Dto.SemanticKernel;
+﻿using HotelWise.Domain.Dto.IA.SemanticKernel;
 using System.Text.RegularExpressions;
 
 namespace HotelWise.Service.Bussines

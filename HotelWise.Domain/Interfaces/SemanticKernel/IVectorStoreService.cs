@@ -1,4 +1,5 @@
 ﻿using HotelWise.Domain.Dto;
+using HotelWise.Domain.Dto.Enitty;
 
 namespace HotelWise.Domain.Interfaces.SemanticKernel
 {

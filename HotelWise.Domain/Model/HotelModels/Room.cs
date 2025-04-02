@@ -23,6 +23,9 @@ namespace HotelWise.Domain.Model.HotelModels
         public long? ModifyUserId { get; set; }
         public DateTime CreatedDate { get; set; }
         public DateTime ModifyDate { get; set; }
+
+
+        public ICollection<RoomAvailability> RoomAvailabilities { get; set; } = new List<RoomAvailability>(); // Relação com disponibilidades
         #endregion
     }
 }

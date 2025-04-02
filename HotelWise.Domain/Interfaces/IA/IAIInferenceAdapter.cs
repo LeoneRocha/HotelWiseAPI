@@ -1,4 +1,4 @@
-﻿using HotelWise.Domain.Dto;
+﻿using HotelWise.Domain.Dto.IA.SemanticKernel;
 
 namespace HotelWise.Domain.Interfaces.IA
 {

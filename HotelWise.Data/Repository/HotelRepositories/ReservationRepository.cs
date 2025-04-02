@@ -19,6 +19,19 @@ namespace HotelWise.Data.Repository
                 .ToArrayAsync();
         }
 
+        
+
+        /// <summary>
+        /// Recupera todas as reservas associadas a um quarto específico.
+        /// </summary>
+        public async  Task<Reservation[]> GetReservationsByRoomIdAsync(long roomId)
+        {
+            return await _context.Reservations
+                .Where(r => r.RoomId == roomId)
+                .Include(r => r.Room) // Inclui os detalhes do quarto, se necessário
+                .ToArrayAsync();
+        }
+
         public async Task<Reservation[]> GetReservationsWithinDateRange(DateTime startDate, DateTime endDate)
         {
             return await _dataset

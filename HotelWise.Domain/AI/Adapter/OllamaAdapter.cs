@@ -1,5 +1,5 @@
-﻿using HotelWise.Domain.Dto;
-using HotelWise.Domain.Dto.AppConfig;
+﻿using HotelWise.Domain.Dto.AppConfig.Rag;
+using HotelWise.Domain.Dto.IA.SemanticKernel;
 using HotelWise.Domain.Enuns.IA;
 using HotelWise.Domain.Helpers;
 using HotelWise.Domain.Interfaces.AppConfig;
