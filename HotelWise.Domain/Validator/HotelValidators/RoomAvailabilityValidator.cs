@@ -123,8 +123,7 @@ namespace HotelWise.Domain.Validator.HotelValidators
             // Verifica duplicidade em registros existentes.
             var existingAvailabilities = await _roomAvailabilityRepository.GetAvailabilityByRoomId(availability.RoomId);
 
-            var hasExternalDuplicates = availability.AvailabilityWithPrice
-                .Any(newItem => existingAvailabilities.SelectMany(existing => existing.AvailabilityWithPrice).Any(existingItem => existingItem.Date.Date == newItem.Date.Date && existingItem.Currency == newItem.Currency));
+            var hasExternalDuplicates = availability.AvailabilityWithPrice.Any(newItem => existingAvailabilities.SelectMany(existing => existing.AvailabilityWithPrice).Any(existingItem => existingItem.Date.Date == newItem.Date.Date && existingItem.Currency == newItem.Currency ));
 
             if (hasExternalDuplicates)
                 return false;
