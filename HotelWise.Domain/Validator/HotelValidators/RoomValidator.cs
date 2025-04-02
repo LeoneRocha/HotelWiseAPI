@@ -1,16 +1,22 @@
 ﻿using FluentValidation;
+using HotelWise.Domain.Interfaces.Entity;
+using HotelWise.Domain.Interfaces.Entity.HotelInterfaces;
 using HotelWise.Domain.Model.HotelModels;
 
 namespace HotelWise.Domain.Validator.HotelValidators
 {
     public class RoomValidator : AbstractValidator<Room>
-    {
-        public RoomValidator()
-        {
+    { 
+        private readonly IHotelRepository _hotelRepository;
+
+        public RoomValidator(IRoomRepository roomRepository, IHotelRepository hotelRepository)
+        { 
+            _hotelRepository = hotelRepository ?? throw new ArgumentNullException(nameof(hotelRepository));
+
             // Validação para HotelId
             RuleFor(r => r.HotelId)
                 .GreaterThan(0).WithMessage("O ID do hotel é obrigatório e deve ser maior que 0.")
-                .Must(HotelExists).WithMessage("O ID do hotel fornecido não existe no sistema.");
+                .MustAsync(HotelExistsAsync).WithMessage("O ID do hotel fornecido não existe no sistema.");
 
             // Validação para RoomType (Enum)
             RuleFor(r => r.RoomType)
@@ -41,17 +47,15 @@ namespace HotelWise.Domain.Validator.HotelValidators
 
             // Validação para ModifyDate
             RuleFor(r => r.ModifyDate)
-                .GreaterThan(r => r.CreatedDate).WithMessage("A data de modificação deve ser maior que a data de criação.");
+                .GreaterThan(r => r.CreatedDate).WithMessage("A data de modificação deve ser maior que a data de criação."); 
         }
 
         /// <summary>
         /// Método para verificar se o HotelId existe no sistema.
         /// </summary>
-        private bool HotelExists(long hotelId)
+        private async Task<bool> HotelExistsAsync(long hotelId, CancellationToken cancellationToken)
         {
-            // Aqui você pode integrar uma lógica que verifica no banco de dados
-            // Exemplo fictício: return _hotelRepository.Exists(hotelId);
-            return true; // Retorna true por padrão
-        }
+            return await _hotelRepository.ExistsAsync(h => h.HotelId == hotelId);
+        } 
     }
 }

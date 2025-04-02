@@ -6,7 +6,6 @@ namespace HotelWise.Domain.Interfaces.Entity
     public interface IRoomRepository : IGenericRepository<Room>
     {
         Task<Room?> FindByIdWithHotel(long roomId);
-        Task<bool> RoomExists(long roomId);
         Task<Room[]> GetRoomsByHotel(long hotelId);
     }
 }

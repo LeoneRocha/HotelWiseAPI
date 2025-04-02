@@ -4,7 +4,7 @@ using HotelWise.Domain.Interfaces.Entity;
 using HotelWise.Domain.Model.HotelModels;
 using Microsoft.EntityFrameworkCore;
 
-namespace HotelWise.Data.Repository
+namespace HotelWise.Data.Repository.HotelRepositories
 {
     public class RoomAvailabilityRepository : GenericRepositoryBase<RoomAvailability, HotelWiseDbContextMysql>, IRoomAvailabilityRepository
     {

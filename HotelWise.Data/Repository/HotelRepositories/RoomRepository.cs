@@ -18,12 +18,7 @@ namespace HotelWise.Data.Repository
                 .AsNoTracking()
                 .FirstOrDefaultAsync(r => r.Id == roomId);
         }
-
-        public async Task<bool> RoomExists(long roomId)
-        {
-            return await _dataset.AsNoTracking().AnyAsync(r => r.Id == roomId);
-        }
-
+         
         public async Task<Room[]> GetRoomsByHotel(long hotelId)
         {
             return await _dataset

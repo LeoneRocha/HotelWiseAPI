@@ -16,6 +16,7 @@
             Task DeleteAsync(long id);
             Task<int> CountAsync();
             Task<List<T>> FetchAsync(int offset, int limit);
+            Task<bool> ExistsAsync(Expression<Func<T, bool>> predicate);  
         }
     }
 

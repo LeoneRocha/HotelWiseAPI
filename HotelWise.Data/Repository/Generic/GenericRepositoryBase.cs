@@ -84,6 +84,12 @@ namespace HotelWise.Data.Repository.Generic
             return await _dataset.CountAsync();
         }
 
+        public virtual async Task<bool> ExistsAsync(Expression<Func<T, bool>> predicate)
+        {
+            return await _dataset.AsNoTracking().AnyAsync(predicate);
+        }
+
+
         public virtual async Task<List<T>> FetchAsync(int offset, int limit)
         {
             return await _dataset.AsNoTracking().Skip(offset).Take(limit).ToListAsync();
