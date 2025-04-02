@@ -3,7 +3,7 @@ using HotelWise.Domain.Model.HotelModels;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace HotelWise.Data.Context.Configure.Entity
+namespace HotelWise.Data.Context.Configure.Entity.HotelModelConfigurations
 {
     public class RoomConfiguration : IEntityTypeConfiguration<Room>
     {

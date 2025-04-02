@@ -4,13 +4,13 @@ using HotelWise.Domain.Interfaces.Entity.HotelInterfaces;
 using HotelWise.Domain.Model.HotelModels;
 using Microsoft.EntityFrameworkCore;
 
-namespace HotelWise.Data.Repository
+namespace HotelWise.Data.Repository.HotelRepositories
 {
     public class HotelRepository : GenericRepositoryBase<Hotel, HotelWiseDbContextMysql>, IHotelRepository
     {
         public HotelRepository(HotelWiseDbContextMysql context, DbContextOptions<HotelWiseDbContextMysql> options) : base(context, options)
         {
-        } 
+        }
         public async Task<int> GetTotalHotelsCountAsync()
         {
             return await _dataset.AsNoTracking().CountAsync();
@@ -34,6 +34,6 @@ namespace HotelWise.Data.Repository
 
                 return resultRange;
             }
-        } 
+        }
     }
 }

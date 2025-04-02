@@ -1,4 +1,5 @@
 ﻿using HotelWise.Data.Context.Configure.Entity;
+using HotelWise.Data.Context.Configure.Entity.HotelModelConfigurations;
 using Microsoft.EntityFrameworkCore;
 using System.Reflection;
 
