@@ -1,8 +1,8 @@
 ﻿using HotelWise.Domain.Model;
 
-namespace HotelWise.Domain.Interfaces
+namespace HotelWise.Domain.Interfaces.Base
 {
-    public interface IEntityBaseLog
+    public interface IEntityFieldBaseLog
     {
         User? CreatedUser { get; set; }
         User? ModifyUser { get; set; }

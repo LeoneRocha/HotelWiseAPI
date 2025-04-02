@@ -5,7 +5,7 @@ using HotelWise.Domain.Dto.IA;
 using HotelWise.Domain.Enuns.IA;
 using HotelWise.Domain.Helpers;
 using HotelWise.Domain.Helpers.AI;
-using HotelWise.Domain.Interfaces;
+using HotelWise.Domain.Interfaces.AppConfig;
 using HotelWise.Domain.Interfaces.Entity.IA;
 using HotelWise.Domain.Interfaces.IA;
 using HotelWise.Domain.Model.AI;

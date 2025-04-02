@@ -1,9 +1,9 @@
 ﻿using HotelWise.Domain.Enuns.Hotel;
-using HotelWise.Domain.Interfaces;
+using HotelWise.Domain.Interfaces.Base;
 
 namespace HotelWise.Domain.Model.HotelModels
 {
-    public class Room : IEntityBaseLog
+    public class Room : IEntityFieldBaseLog
     {
         public long Id { get; set; } // Chave primária
         public long HotelId { get; set; } // Relacionamento com Hotel 

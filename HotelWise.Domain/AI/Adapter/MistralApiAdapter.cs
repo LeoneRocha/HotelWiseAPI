@@ -1,5 +1,5 @@
 ﻿using HotelWise.Domain.Dto;
-using HotelWise.Domain.Interfaces;
+using HotelWise.Domain.Interfaces.AppConfig;
 using HotelWise.Domain.Interfaces.IA;
 using Mistral.SDK;
 using Mistral.SDK.DTOs;

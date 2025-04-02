@@ -3,7 +3,7 @@ using FluentValidation;
 using HotelWise.Domain.Constants;
 using HotelWise.Domain.Dto;
 using HotelWise.Domain.Helpers;
-using HotelWise.Domain.Interfaces;
+using HotelWise.Domain.Interfaces.AppConfig;
 using HotelWise.Domain.Interfaces.Entity;
 using HotelWise.Domain.Model;
 using HotelWise.Service.Generic;

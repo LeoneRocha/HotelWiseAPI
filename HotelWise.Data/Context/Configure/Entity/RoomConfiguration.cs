@@ -26,11 +26,11 @@ namespace HotelWise.Data.Context.Configure.Entity
 
             builder.Property(r => r.Capacity)
                    .IsRequired();
-             
+
             builder.Property(r => r.Description)
                    .HasMaxLength(1000)
                    .HasColumnType("varchar(1000)");
-            
+
             builder.Property(r => r.Status)
                    .IsRequired()
                    .HasConversion<byte>();

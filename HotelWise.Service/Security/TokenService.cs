@@ -1,5 +1,5 @@
 ﻿using HotelWise.Domain.Dto;
-using HotelWise.Domain.Interfaces;
+using HotelWise.Domain.Interfaces.AppConfig;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;

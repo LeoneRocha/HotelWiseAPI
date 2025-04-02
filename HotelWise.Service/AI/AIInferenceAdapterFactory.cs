@@ -1,6 +1,6 @@
 ﻿using HotelWise.Domain.AI.Adapter;
 using HotelWise.Domain.Enuns.IA;
-using HotelWise.Domain.Interfaces;
+using HotelWise.Domain.Interfaces.AppConfig;
 using HotelWise.Domain.Interfaces.IA;
 
 namespace HotelWise.Service.AI

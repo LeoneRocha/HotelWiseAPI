@@ -1,7 +1,7 @@
 ﻿using GroqApiLibrary;
 using HotelWise.Domain.Dto;
 using HotelWise.Domain.Enuns.IA;
-using HotelWise.Domain.Interfaces;
+using HotelWise.Domain.Interfaces.AppConfig;
 using HotelWise.Domain.Interfaces.IA;
 using System.Text.Json.Nodes;
 

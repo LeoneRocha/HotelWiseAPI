@@ -1,7 +1,7 @@
 ﻿using HotelWise.Domain.Dto;
 using System.Linq.Expressions;
 
-namespace HotelWise.Service.Generic
+namespace HotelWise.Domain.Interfaces.Base
 {
     public interface IGenericService<TDto> where TDto : class
     {

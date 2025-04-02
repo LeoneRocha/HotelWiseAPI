@@ -23,13 +23,13 @@ namespace HotelWise.Data.Context.Configure.Entity
             builder.Property(e => e.Id)
                 .ValueGeneratedOnAdd();
             #endregion  KEY
-            
+
             builder.Property(ra => ra.StartDate)
                        .IsRequired();
 
             builder.Property(ra => ra.EndDate)
                    .IsRequired();
-             
+
             builder.Property(ra => ra.AvailabilityWithPrice)
                    .IsRequired()
                    .HasMaxLength(EntityTypeConfigurationConstants.GetMaxLengthByTypeDataBase(ETypeDataBase.Mysql))

@@ -1,5 +1,5 @@
 ﻿using HotelWise.Domain.AI.Adapter;
-using HotelWise.Domain.Interfaces;
+using HotelWise.Domain.Interfaces.AppConfig;
 using HotelWise.Domain.Interfaces.IA;
 using HotelWise.Domain.Interfaces.SemanticKernel;
 using Microsoft.Extensions.VectorData;

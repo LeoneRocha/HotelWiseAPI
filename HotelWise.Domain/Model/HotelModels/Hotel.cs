@@ -1,8 +1,8 @@
-﻿using HotelWise.Domain.Interfaces;
+﻿using HotelWise.Domain.Interfaces.Base;
 
 namespace HotelWise.Domain.Model.HotelModels
 {
-    public class Hotel : IEntityBaseLog
+    public class Hotel : IEntityFieldBaseLog
     {
         public long HotelId { get; set; }
         public string HotelName { get; set; } = string.Empty;

@@ -1,6 +1,6 @@
 ﻿using System.Security.Claims;
 
-namespace HotelWise.Domain.Interfaces
+namespace HotelWise.Domain.Interfaces.AppConfig
 {
     public interface ITokenService
     {

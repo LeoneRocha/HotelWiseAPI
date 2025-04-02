@@ -1,8 +1,8 @@
 ﻿using HotelWise.Domain.Dto;
+using HotelWise.Domain.Interfaces.Base;
 using HotelWise.Domain.Model;
-using HotelWise.Service.Generic;
 
-namespace HotelWise.Domain.Interfaces.Entity
+namespace HotelWise.Domain.Interfaces.Entity.HotelInterfaces
 {
     public interface IHotelService : IGenericService<HotelDto>
     {
@@ -13,7 +13,7 @@ namespace HotelWise.Domain.Interfaces.Entity
         Task<ServiceResponse<HotelDto[]>> GetAllHotelsAsync();
         Task<ServiceResponse<HotelDto?>> GetHotelByIdAsync(long id);
         Task<ServiceResponse<bool>> UpdateHotelAsync(HotelDto hotelDto);
-        Task<ServiceResponse<HotelDto>> GenerateHotelByIA(); 
+        Task<ServiceResponse<HotelDto>> GenerateHotelByIA();
         Task<string[]> GetAllTags();
-    } 
+    }
 }

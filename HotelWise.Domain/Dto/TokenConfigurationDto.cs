@@ -1,4 +1,4 @@
-﻿using HotelWise.Domain.Interfaces;
+﻿using HotelWise.Domain.Interfaces.AppConfig;
 
 namespace HotelWise.Domain.Dto
 {

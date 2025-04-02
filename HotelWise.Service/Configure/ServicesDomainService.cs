@@ -1,6 +1,7 @@
 ﻿using HotelWise.Domain.Helpers;
-using HotelWise.Domain.Interfaces;
+using HotelWise.Domain.Interfaces.AppConfig;
 using HotelWise.Domain.Interfaces.Entity;
+using HotelWise.Domain.Interfaces.Entity.HotelInterfaces;
 using HotelWise.Service.Entity;
 using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;

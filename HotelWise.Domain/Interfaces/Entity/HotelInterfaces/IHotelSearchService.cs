@@ -1,8 +1,8 @@
 ﻿using HotelWise.Domain.Dto;
+using HotelWise.Domain.Interfaces.Base;
 using HotelWise.Domain.Model;
-using HotelWise.Service.Generic;
 
-namespace HotelWise.Domain.Interfaces.Entity
+namespace HotelWise.Domain.Interfaces.Entity.HotelInterfaces
 {
     public interface IHotelSearchService : IGenericService<HotelDto>
     {

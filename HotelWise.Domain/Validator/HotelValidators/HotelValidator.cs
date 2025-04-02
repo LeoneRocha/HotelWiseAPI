@@ -1,7 +1,7 @@
 ﻿using FluentValidation;
 using HotelWise.Domain.Model.HotelModels;
 
-namespace HotelWise.Domain.Validator
+namespace HotelWise.Domain.Validator.HotelValidators
 {
     public class HotelValidator : AbstractValidator<Hotel>
     {
@@ -16,5 +16,5 @@ namespace HotelWise.Domain.Validator
             RuleFor(h => h.Location).MaximumLength(200);
             RuleFor(h => h.City).MaximumLength(200);
         }
-    } 
+    }
 }

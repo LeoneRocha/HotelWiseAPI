@@ -1,6 +1,6 @@
 ﻿using HotelWise.Domain.Dto;
 
-namespace HotelWise.Domain.Interfaces
+namespace HotelWise.Domain.Interfaces.IA
 {
     public interface IAssistantService
     {

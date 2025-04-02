@@ -1,6 +1,6 @@
 ﻿using HotelWise.Domain.Dto;
 using HotelWise.Domain.Helpers;
-using HotelWise.Domain.Interfaces;
+using HotelWise.Domain.Interfaces.IA;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 

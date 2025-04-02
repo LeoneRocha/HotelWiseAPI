@@ -1,7 +1,7 @@
 ﻿using HotelWise.Domain.Dto;
 using HotelWise.Domain.Enuns.IA;
 using HotelWise.Domain.Helpers;
-using HotelWise.Domain.Interfaces;
+using HotelWise.Domain.Interfaces.AppConfig;
 using HotelWise.Domain.Interfaces.IA;
 using Microsoft.Extensions.AI;
 using Microsoft.Extensions.DependencyInjection;

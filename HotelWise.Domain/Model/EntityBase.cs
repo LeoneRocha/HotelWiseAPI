@@ -1,4 +1,4 @@
-﻿using HotelWise.Domain.Interfaces.Entity;
+﻿using HotelWise.Domain.Interfaces.Base;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;

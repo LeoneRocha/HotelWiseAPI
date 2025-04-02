@@ -1,5 +1,4 @@
 ﻿using HotelWise.Domain.Enuns.IA;
-using HotelWise.Domain.Interfaces;
 using HotelWise.Domain.Interfaces.AppConfig;
 using Microsoft.Extensions.Configuration;
 using System;

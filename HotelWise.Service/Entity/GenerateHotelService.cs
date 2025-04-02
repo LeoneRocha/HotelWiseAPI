@@ -1,8 +1,8 @@
 ﻿using Bogus;
 using HotelWise.Domain.Dto;
 using HotelWise.Domain.Enuns.IA;
-using HotelWise.Domain.Interfaces;
-using HotelWise.Domain.Interfaces.Entity;
+using HotelWise.Domain.Interfaces.AppConfig;
+using HotelWise.Domain.Interfaces.Entity.HotelInterfaces;
 using HotelWise.Domain.Interfaces.IA;
 using HotelWise.Domain.Model.HotelModels;
 using System.Text.RegularExpressions;

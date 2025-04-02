@@ -1,5 +1,5 @@
 ﻿using HotelWise.Domain.Dto;
-using HotelWise.Domain.Interfaces;
+using HotelWise.Domain.Interfaces.Entity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HotelWise.API.Controllers

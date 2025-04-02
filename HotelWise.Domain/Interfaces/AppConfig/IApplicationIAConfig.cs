@@ -1,10 +1,7 @@
-﻿
-
-using HotelWise.Domain.Dto.AppConfig;
+﻿using HotelWise.Domain.Dto.AppConfig;
 using HotelWise.Domain.Enuns.IA;
-using HotelWise.Domain.Interfaces.AppConfig;
 
-namespace HotelWise.Domain.Interfaces
+namespace HotelWise.Domain.Interfaces.AppConfig
 {
     public interface IApplicationIAConfig
     {

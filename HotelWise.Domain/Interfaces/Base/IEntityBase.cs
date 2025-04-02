@@ -1,4 +1,4 @@
-﻿namespace HotelWise.Domain.Interfaces.Entity
+﻿namespace HotelWise.Domain.Interfaces.Base
 {
     public interface IEntityBase
     {

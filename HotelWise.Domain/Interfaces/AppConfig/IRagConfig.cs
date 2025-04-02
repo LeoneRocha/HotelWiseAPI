@@ -1,7 +1,7 @@
 ﻿using HotelWise.Domain.Dto.AppConfig;
 using HotelWise.Domain.Enuns.IA;
 
-namespace HotelWise.Domain.Interfaces
+namespace HotelWise.Domain.Interfaces.AppConfig
 {
     public interface IRagConfig
     {
@@ -17,7 +17,7 @@ namespace HotelWise.Domain.Interfaces
         string[]? PdfFilePaths { get; }
         VectorStoreType VectorStoreType { get; }
         SearchSettings SearchSettings { get; }
-         
+
         InferenceAiAdapterType GetAInferenceAdapterType();
     }
 }

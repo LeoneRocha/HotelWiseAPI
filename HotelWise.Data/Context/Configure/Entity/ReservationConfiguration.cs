@@ -19,7 +19,7 @@ namespace HotelWise.Data.Context.Configure.Entity
             builder.Property(e => e.Id)
                 .ValueGeneratedOnAdd();
             #endregion  KEY
-             
+
             builder.Property(r => r.CheckInDate)
                    .IsRequired();
             builder.Property(r => r.CheckOutDate)

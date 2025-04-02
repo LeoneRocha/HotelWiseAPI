@@ -3,6 +3,7 @@ using FluentValidation;
 using HotelWise.Domain.Constants;
 using HotelWise.Domain.Dto;
 using HotelWise.Domain.Helpers;
+using HotelWise.Domain.Interfaces.Base;
 using HotelWise.Domain.Interfaces.Entity.HotelWise.Domain.Interfaces.Entity;
 using System.Linq.Expressions;
 

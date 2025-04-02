@@ -8,7 +8,7 @@ namespace HotelWise.Data.Context.Configure.Entity
     public class HotelConfiguration : IEntityTypeConfiguration<Hotel>
     {
         public void Configure(EntityTypeBuilder<Hotel> builder)
-        { 
+        {
             builder.HasKey(e => e.HotelId);
             builder.Property(e => e.HotelName).IsRequired().HasMaxLength(100).HasColumnType("varchar(100)");
 
@@ -29,7 +29,7 @@ namespace HotelWise.Data.Context.Configure.Entity
             builder.Property(e => e.StateCode).HasMaxLength(2).HasColumnType("varchar(2)");
             builder.Property(e => e.Location).HasMaxLength(200).HasColumnType("varchar(200)");
             builder.Property(e => e.City).HasMaxLength(200).HasColumnType("varchar(200)");
-             
+
             builder.Property(e => e.CreatedUserId).IsRequired(false).HasDefaultValue((long)1);
             builder.Property(e => e.ModifyUserId).IsRequired(false).HasDefaultValue((long)1);
 
