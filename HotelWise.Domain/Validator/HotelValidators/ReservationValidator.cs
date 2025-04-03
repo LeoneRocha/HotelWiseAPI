@@ -84,6 +84,12 @@ namespace HotelWise.Domain.Validator.HotelValidators
             RuleFor(r => r)
                 .MustAsync(AvailabilityIsSufficientAsync)
                 .WithMessage("Não há disponibilidade para todas as noites, com a moeda selecionada, no período informado.");
+
+            // Regra 6: validar antecedência mínima de 3 dias úteis para cancelamento
+            RuleFor(r => r)
+                .Must(CancellationHasValidBusinessDays)
+                .When(r => r.Status == ReservationStatus.Cancelled)
+                .WithMessage("A reserva só pode ser cancelada com pelo menos 3 dias úteis de antecedência.");
         }
 
         #region Regras Customizadas
@@ -138,7 +144,39 @@ namespace HotelWise.Domain.Validator.HotelValidators
 
         private static bool IsDateAvailable(RoomAvailability[] availabilities, DateTime targetDate, string currency)
         {
-            return availabilities.Any(av => av.StartDate.Date <= targetDate && av.EndDate.Date >= targetDate && av.AvailabilityWithPrice.Any(item => item.Date.Date == targetDate && item.QuantityAvailable > 0 && string.Equals(item.Currency, currency, StringComparison.OrdinalIgnoreCase)));
+            return availabilities.Any(av => av.StartDate.Date <= targetDate &&
+                                            av.EndDate.Date >= targetDate &&
+                                            av.AvailabilityWithPrice.Any(item =>
+                                                item.Date.Date == targetDate &&
+                                                item.QuantityAvailable > 0 &&
+                                                string.Equals(item.Currency, currency, StringComparison.OrdinalIgnoreCase)));
+        }
+
+        private static bool CancellationHasValidBusinessDays(Reservation reservation)
+        {
+            var currentDate = DateTime.UtcNow.Date;
+            var checkInDate = reservation.CheckInDate.Date;
+
+            // Calcula o número de dias úteis entre a data atual e a data de entrada
+            return CalculateBusinessDaysBetween(currentDate, checkInDate) >= 3;
+        }
+
+        private static int CalculateBusinessDaysBetween(DateTime start, DateTime end)
+        {
+            if (end <= start)
+                return 0;
+
+            int totalDays = (end - start).Days;
+            int businessDays = 0;
+
+            for (int i = 0; i < totalDays; i++)
+            {
+                var day = start.AddDays(i).DayOfWeek;
+                if (day != DayOfWeek.Saturday && day != DayOfWeek.Sunday)
+                    businessDays++;
+            }
+
+            return businessDays;
         }
 
         #endregion
