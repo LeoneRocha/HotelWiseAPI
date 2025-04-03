@@ -26,7 +26,7 @@ namespace HotelWise.API.Controllers.ReservationEndpoints
         private long GetUserIdCurrent()
         {
             return SecurityHelperApi.GetUserIdApi(User);
-        } 
+        }
 
         /// <summary>
         /// Obtém uma reserva pelo ID.
@@ -58,7 +58,7 @@ namespace HotelWise.API.Controllers.ReservationEndpoints
             var response = await _reservationService.CreateAsync(reservationDto);
             return Ok(response);
         }
-          
+
         /// <summary>
         /// Cancela uma reserva pelo ID.
         /// </summary>
@@ -71,7 +71,7 @@ namespace HotelWise.API.Controllers.ReservationEndpoints
             var response = await _reservationService.CancelReservationAsync(id);
             return Ok(response);
         }
-         
+
         /// <summary>
         /// Obtém reservas associadas a um quarto específico.
         /// </summary>
@@ -83,7 +83,7 @@ namespace HotelWise.API.Controllers.ReservationEndpoints
         {
             SetUserIdCurrent();
             var reservations = await _reservationService.GetReservationsByRoomIdAsync(roomId);
-            if (reservations.Data == null || !reservations.Data.Any())
+            if (reservations.Data == null || reservations.Data.Length == 0)
             {
                 return NotFound(new { Message = "Nenhuma reserva encontrada para o quarto informado." });
             }

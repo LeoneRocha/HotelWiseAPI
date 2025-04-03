@@ -7,8 +7,7 @@ using HotelWise.Domain.Interfaces.Base;
 namespace HotelWise.Domain.Interfaces.Entity.HotelInterfaces.Service
 {
     public interface IHotelSearchService : IGenericService<HotelDto>
-    {
-        void SetUserId(long id); 
+    { 
         Task<ServiceResponse<HotelSemanticResult>> SemanticSearch(SearchCriteria searchCriteria);
     }
 }

@@ -97,12 +97,12 @@ namespace HotelWise.Service.Entity
         /// <summary>
         /// Exclui uma disponibilidade de quarto existente.
         /// </summary>
-        public override async Task<ServiceResponse<string>> DeleteAsync(long availabilityId)
+        public override async Task<ServiceResponse<string>> DeleteAsync(long id)
         {
             var response = new ServiceResponse<string>();
 
             // Busca a disponibilidade pelo ID
-            var existingAvailability = await _roomAvailabilityRepository.GetByIdAsync(availabilityId);
+            var existingAvailability = await _roomAvailabilityRepository.GetByIdAsync(id);
             if (existingAvailability == null)
             {
                 response.Success = false;
@@ -111,7 +111,7 @@ namespace HotelWise.Service.Entity
             }
 
             // Exclui a disponibilidade
-            await _repository.DeleteAsync(availabilityId);
+            await _repository.DeleteAsync(id);
 
             response.Success = true;
             response.Message = "Disponibilidade excluída com sucesso.";

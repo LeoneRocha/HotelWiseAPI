@@ -13,21 +13,18 @@ namespace HotelWise.Service.Entity
 {
     public class ReservationService : GenericEntityServiceBase<Reservation, ReservationDto>, IReservationService
     {
-        private readonly IRoomRepository _roomRepository;
-        private readonly IRoomAvailabilityRepository _roomAvailabilityRepository;
+        private readonly IRoomRepository _roomRepository; 
         private readonly IReservationRepository _reservationRepository;
 
         public ReservationService(
               ILogger logger,
               IReservationRepository repository,
-              IRoomRepository roomRepository,
-              IRoomAvailabilityRepository roomAvailabilityRepository,
+              IRoomRepository roomRepository, 
               IMapper mapper,
               IValidator<Reservation> entityValidator
         ) : base(repository, mapper, logger, entityValidator)
         {
-            _roomRepository = roomRepository;
-            _roomAvailabilityRepository = roomAvailabilityRepository;
+            _roomRepository = roomRepository; 
             _reservationRepository = repository;
         }
         public override Task<ServiceResponse<ReservationDto>> UpdateAsync(ReservationDto entityDto)

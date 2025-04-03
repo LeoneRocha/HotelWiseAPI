@@ -13,18 +13,15 @@ namespace HotelWise.Service.Entity.HotelServices
     public class RoomService : GenericEntityServiceBase<Room, RoomDto>, IRoomService
     {
         private readonly IRoomRepository _roomRepository;
-        private readonly IRoomAvailabilityRepository _roomAvailabilityRepository;
 
         public RoomService(
               ILogger logger,
               IRoomRepository repository,
-              IRoomAvailabilityRepository roomAvailabilityRepository,
               IMapper mapper,
               IValidator<Room> entityValidator
         ) : base(repository, mapper, logger, entityValidator)
         {
             _roomRepository = repository;
-            _roomAvailabilityRepository = roomAvailabilityRepository;
         }
 
 
@@ -100,12 +97,12 @@ namespace HotelWise.Service.Entity.HotelServices
         /// <summary>
         /// Exclui um quarto pelo ID.
         /// </summary>
-        public override async Task<ServiceResponse<string>> DeleteAsync(long roomId)
+        public override async Task<ServiceResponse<string>> DeleteAsync(long id)
         {
             var response = new ServiceResponse<string>();
 
             // Busca o quarto pelo ID
-            var existingRoom = await _roomRepository.GetByIdAsync(roomId);
+            var existingRoom = await _roomRepository.GetByIdAsync(id);
             if (existingRoom == null)
             {
                 response.Success = false;
@@ -114,7 +111,7 @@ namespace HotelWise.Service.Entity.HotelServices
             }
 
             // Exclui o quarto
-            await _repository.DeleteAsync(roomId);
+            await _repository.DeleteAsync(id);
 
             response.Success = true;
             response.Message = "Quarto excluído com sucesso.";
@@ -130,7 +127,7 @@ namespace HotelWise.Service.Entity.HotelServices
 
             // Busca todos os quartos associados ao hotel
             var rooms = await _roomRepository.GetRoomsByHotelIdAsync(hotelId);
-            if (rooms == null || !rooms.Any())
+            if (rooms == null || rooms.Length == 0)
             {
                 response.Success = false;
                 response.Message = "Nenhum quarto encontrado para o hotel informado.";
