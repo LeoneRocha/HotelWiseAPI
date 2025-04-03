@@ -152,7 +152,7 @@ namespace HotelWise.Service.Entity
             };
             newSession.TotalTokensMessage = TokenCounterHelper.CalculateTotalTokens([promptMessageUser]);
             // Persistir nova sessão
-            await _chatSessionHistoryService.AddAsync(newSession);
+            await _chatSessionHistoryService.CreateAsync(newSession);
         }
         private static PromptMessageVO[] BuildChatHistory(PromptMessageVO promptMessageUser, AskAssistantResponse[] askAssistantResponses)
         {

@@ -27,10 +27,11 @@ namespace HotelWise.Service.Entity.HotelServices
             _roomAvailabilityRepository = roomAvailabilityRepository;
         }
 
+
         /// <summary>
         /// Cria um novo quarto após validação de negócios.
         /// </summary>
-        public async Task<ServiceResponse<RoomDto>> CreateRoomAsync(RoomDto roomDto)
+        public override async Task<ServiceResponse<RoomDto>> CreateAsync(RoomDto roomDto)
         {
             var response = new ServiceResponse<RoomDto>();
 
@@ -59,9 +60,10 @@ namespace HotelWise.Service.Entity.HotelServices
         /// <summary>
         /// Atualiza um quarto existente.
         /// </summary>
-        public async Task<ServiceResponse<RoomDto>> UpdateRoomAsync(long roomId, RoomDto roomDto)
+        public override async Task<ServiceResponse<RoomDto>> UpdateAsync(RoomDto roomDto)
         {
             var response = new ServiceResponse<RoomDto>();
+            var roomId = roomDto.Id;
 
             // Busca o quarto pelo ID
             var existingRoom = await _roomRepository.GetByIdAsync(roomId);
@@ -98,7 +100,7 @@ namespace HotelWise.Service.Entity.HotelServices
         /// <summary>
         /// Exclui um quarto pelo ID.
         /// </summary>
-        public async Task<ServiceResponse<string>> DeleteRoomAsync(long roomId)
+        public override async Task<ServiceResponse<string>> DeleteAsync(long roomId)
         {
             var response = new ServiceResponse<string>();
 

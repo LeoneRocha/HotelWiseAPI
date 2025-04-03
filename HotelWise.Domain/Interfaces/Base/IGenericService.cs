@@ -8,7 +8,7 @@ namespace HotelWise.Domain.Interfaces.Base
         Task<List<TDto>> GetAllAsync();
         Task<TDto?> GetByIdAsync(long id);
         Task<List<TDto>> FindAsync(Expression<Func<TDto, bool>> predicate);
-        Task<ServiceResponse<TDto>> AddAsync(TDto entityDto);
+        Task<ServiceResponse<TDto>> CreateAsync(TDto entityDto);
         Task AddRangeAsync(IEnumerable<TDto> entitiesDto);
         Task<ServiceResponse<TDto>> UpdateAsync(TDto entityDto);
         Task UpdateRangeAsync(IEnumerable<TDto> entitiesDto);

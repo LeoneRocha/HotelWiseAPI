@@ -89,7 +89,7 @@ namespace HotelWise.Service.Generic
             }
         }
 
-        public virtual async Task<ServiceResponse<TDto>> AddAsync(TDto entityDto)
+        public virtual async Task<ServiceResponse<TDto>> CreateAsync(TDto entityDto)
         {
             ServiceResponse<TDto> response = new ServiceResponse<TDto>();
             try

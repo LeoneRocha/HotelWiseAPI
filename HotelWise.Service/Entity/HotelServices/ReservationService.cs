@@ -30,11 +30,20 @@ namespace HotelWise.Service.Entity
             _roomAvailabilityRepository = roomAvailabilityRepository;
             _reservationRepository = repository;
         }
+        public override Task<ServiceResponse<ReservationDto>> UpdateAsync(ReservationDto entityDto)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override Task DeleteAsync(long id)
+        {
+            throw new NotImplementedException();
+        }
 
         /// <summary>
         /// Cria uma nova reserva após validação de negócios.
         /// </summary>
-        public async Task<ServiceResponse<ReservationDto>> CreateReservationAsync(ReservationDto reservationDto)
+        public override async Task<ServiceResponse<ReservationDto>> CreateAsync(ReservationDto reservationDto)
         {
             var response = new ServiceResponse<ReservationDto>();
 
@@ -68,7 +77,7 @@ namespace HotelWise.Service.Entity
             var response = new ServiceResponse<string>();
 
             // Busca a reserva pelo ID
-            var reservation = await _reservationRepository.GetByIdAsync(reservationId);
+            var reservation = await _repository.GetByIdAsync(reservationId);
             if (reservation == null)
             {
                 response.Success = false;
@@ -76,22 +85,25 @@ namespace HotelWise.Service.Entity
                 return response;
             }
 
-            // Verifica se pode ser cancelada
-            if (!CanReservationBeCancelled(reservation))
+            // Altera o status para cancelado e valida novamente
+            reservation.Status = ReservationStatus.Cancelled;
+
+            var validationResult = await _entityValidator.ValidateAsync(reservation);
+            if (!validationResult.IsValid)
             {
                 response.Success = false;
-                response.Message = "A reserva só pode ser cancelada com pelo menos 3 dias úteis de antecedência.";
+                response.Message = string.Join("; ", validationResult.Errors.Select(e => e.ErrorMessage));
                 return response;
             }
 
-            // Altera o status para cancelado e atualiza
-            reservation.Status = ReservationStatus.Cancelled;
+            // Atualiza a reserva no banco
             await _repository.UpdateAsync(reservation);
 
             response.Success = true;
             response.Message = "Reserva cancelada com sucesso.";
             return response;
         }
+
 
         /// <summary>
         /// Busca a reserva pelo ID.
@@ -119,9 +131,9 @@ namespace HotelWise.Service.Entity
         /// <summary>
         /// Busca todas as reservas de um quarto específico.
         /// </summary>
-        public async Task<ServiceResponse<IEnumerable<ReservationDto>>> GetReservationsByRoomIdAsync(long roomId)
+        public async Task<ServiceResponse<ReservationDto[]>> GetReservationsByRoomIdAsync(long roomId)
         {
-            var response = new ServiceResponse<IEnumerable<ReservationDto>>();
+            var response = new ServiceResponse<ReservationDto[]>();
 
             // Verifica se o quarto existe
             var roomExists = await _roomRepository.ExistsAsync(r => r.Id == roomId);
@@ -136,44 +148,12 @@ namespace HotelWise.Service.Entity
             var reservations = await _reservationRepository.GetReservationsByRoomIdAsync(roomId);
 
             // Retorna as reservas no formato DTO
-            response.Data = _mapper.Map<IEnumerable<ReservationDto>>(reservations);
+            response.Data = _mapper.Map<ReservationDto[]>(reservations);
             response.Success = true;
             response.Message = "Reservas recuperadas com sucesso.";
             return response;
         }
 
-        /// <summary>
-        /// Verifica se uma reserva pode ser cancelada com base na regra de 3 dias úteis.
-        /// </summary>
-        private static bool CanReservationBeCancelled(Reservation reservation)
-        {
-            if (reservation.Status == ReservationStatus.Cancelled)
-                return false;
 
-            var currentDate = DateTime.UtcNow.Date;
-            var businessDays = CalculateBusinessDaysBetween(currentDate, reservation.CheckInDate.Date);
-            return businessDays >= 3;
-        }
-
-        /// <summary>
-        /// Calcula o número de dias úteis entre duas datas.
-        /// </summary>
-        private static int CalculateBusinessDaysBetween(DateTime start, DateTime end)
-        {
-            if (end <= start)
-                return 0;
-
-            int totalDays = (end - start).Days;
-            int businessDays = 0;
-
-            for (int i = 0; i < totalDays; i++)
-            {
-                var day = start.AddDays(i).DayOfWeek;
-                if (day != DayOfWeek.Saturday && day != DayOfWeek.Sunday)
-                    businessDays++;
-            }
-
-            return businessDays;
-        }
     }
 }
