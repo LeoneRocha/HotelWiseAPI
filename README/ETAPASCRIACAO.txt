@@ -24,6 +24,11 @@ NOVAS TABELAS
 +---------------------------------------------------------------------------+
 
 
+abela de Quartos e Preços Cada linha da tabela representa as informações de um quarto:
+
+Quarto	Quantidade Disponível	Moeda	Preço Segunda-feira	Preço Terça-feira	Preço Quarta-feira	Preço Quinta-feira	Preço Sexta-feira	Preço Sábado	Preço Domingo
+Quarto 1	Quantidade	Moeda	  Botões de Ação
+Quarto 2	Quantidade	[Dropdown]	  Botões de Ação
 
 
 
@@ -43,7 +48,7 @@ NOVAS TABELAS
 
 -------- MELHORAR CHAT BOT PARA CANCELAR RESERVAS ATIVAS 
 
-
+---------------- COLOCAR QUANTIDADE NO QUARTO PARA O CADASTRO DE DISPONIBLIDADE NAO EXCEDER 
 -------- FUTURAMENTE UM CHAT QUE PESQUISE E RESERVE 
 
 ----------------------------------------
