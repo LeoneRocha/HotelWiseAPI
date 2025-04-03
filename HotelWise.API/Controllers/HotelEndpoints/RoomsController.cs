@@ -27,7 +27,7 @@ namespace HotelWise.API.Controllers.RoomEndpoints
         {
             return SecurityHelperApi.GetUserIdApi(User);
         }
-          
+
         /// <summary>
         /// Obtém um quarto pelo ID.
         /// </summary>
@@ -41,9 +41,27 @@ namespace HotelWise.API.Controllers.RoomEndpoints
             var room = await _roomService.GetByIdAsync(id);
             if (room == null)
             {
-                return NotFound();
+                return NotFound(new { Message = "Quarto não encontrado." });
             }
             return Ok(room);
+        }
+
+        /// <summary>
+        /// Pesquisa quartos por um hotel.
+        /// </summary>
+        /// <param name="hotelId">ID do hotel</param>
+        [HttpGet("hotel/{hotelId}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> GetRoomsByHotel(long hotelId)
+        {
+            setUserIdCurrent();
+            var response = await _roomService.GetRoomsByHotelIdAsync(hotelId);
+            if (response == null || response.Data == null || response.Data.Length == 0)
+            {
+                return NotFound(new { Message = "Nenhum quarto encontrado para o hotel informado." });
+            }
+            return Ok(response);
         }
 
         /// <summary>
@@ -71,7 +89,7 @@ namespace HotelWise.API.Controllers.RoomEndpoints
         {
             if (id != room.Id)
             {
-                return BadRequest();
+                return BadRequest(new { Message = "O ID do quarto não corresponde ao fornecido." });
             }
             setUserIdCurrent();
             var response = await _roomService.UpdateAsync(room);
