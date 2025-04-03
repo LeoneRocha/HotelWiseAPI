@@ -5,7 +5,7 @@ using HotelWise.Domain.Interfaces.Entity.HotelInterfaces.Service;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace HotelWise.API.Controllers
+namespace HotelWise.API.Controllers.HotelEndpoints
 {
     [Authorize("Bearer")]
     [ApiController]
@@ -14,7 +14,7 @@ namespace HotelWise.API.Controllers
     {
         private readonly IHotelService _hotelService;
         private readonly IHotelSearchService _hotelSearchService;
-        public HotelsController(IHotelService hotelService, IHotelSearchService  hotelSearchService)
+        public HotelsController(IHotelService hotelService, IHotelSearchService hotelSearchService)
         {
             _hotelService = hotelService;
             _hotelSearchService = hotelSearchService;

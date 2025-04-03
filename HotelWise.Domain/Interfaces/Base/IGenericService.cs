@@ -5,6 +5,7 @@ namespace HotelWise.Domain.Interfaces.Base
 {
     public interface IGenericService<TDto> where TDto : class
     {
+        void SetUserId(long id);
         Task<List<TDto>> GetAllAsync();
         Task<TDto?> GetByIdAsync(long id);
         Task<List<TDto>> FindAsync(Expression<Func<TDto, bool>> predicate);

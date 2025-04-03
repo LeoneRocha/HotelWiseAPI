@@ -4,7 +4,7 @@ using HotelWise.Domain.Interfaces.IA;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace HotelWise.API.Controllers
+namespace HotelWise.API.Controllers.Ai
 {
     [Authorize("Bearer")]
     [ApiController]
