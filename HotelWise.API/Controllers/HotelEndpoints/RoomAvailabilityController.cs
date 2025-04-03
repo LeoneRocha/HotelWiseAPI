@@ -65,6 +65,23 @@ namespace HotelWise.API.Controllers.RoomAvailabilityEndpoints
         }
 
         /// <summary>
+        /// Cria múltiplas disponibilidades em lote.
+        /// </summary>
+        /// <param name="availabilitiesDto">Array de disponibilidades</param>
+        [HttpPost("batch")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<IActionResult> CreateBatch([FromBody] RoomAvailabilityDto[] availabilitiesDto)
+        {
+            if (availabilitiesDto == null || availabilitiesDto.Length == 0)
+            {
+                return BadRequest(new { Message = "Nenhuma disponibilidade fornecida." });
+            }
+
+            await _roomAvailabilityService.CreateBatchAsync(availabilitiesDto);
+            return Ok(new { Message = "Disponibilidades criadas em lote com sucesso." });
+        } 
+
+        /// <summary>
         /// Atualiza uma disponibilidade existente.
         /// </summary>
         /// <param name="id">ID da disponibilidade</param>

@@ -9,6 +9,24 @@ NOVAS TABELAS
 -- END POINT  --- FEITO
 -- TELA  CRUD ---------------- XXXXXXXXXXXXXXXXXX
 
+
+++-------------------------------------------------------+
+|           Cadastro de Disponibilidade de Quartos      |
++-------------------------------------------------------+
+| Data Inicial: [Campo Data]   Data Final: [Campo Data] |
++-------------------------------------------------------+
+| Quarto    | Quantidade | Moeda | Preços Diários                           |
+|-----------|------------|-------|-----------------------------------------|
+| Quarto 1  | [Numérico] | [Dropdown]| [Seg] | [Ter] | [Qua] | [Qui] | [Sex] | [Sáb] | [Dom] |
+| Quarto 2  | [Numérico] | [Dropdown]| [Seg] | [Ter] | [Qua] | [Qui] | [Sex] | [Sáb] | [Dom] |
++---------------------------------------------------------------------------+
+|          [Salvar]            [Cancelar]                                  |
++---------------------------------------------------------------------------+
+
+
+
+
+
 ------- SERVICE DE PESQUISA 
 ------- SERVICE DE RESERVA 
 -------- END POINT  DE PESQUISA 

@@ -55,6 +55,37 @@ namespace HotelWise.Service.Entity
         }
 
         /// <summary>
+        /// Cria múltiplas disponibilidades em lote.
+        /// </summary>
+        /// <param name="availabilitiesDto">Lista de disponibilidades</param>
+        public async Task<ServiceResponse<string>> CreateBatchAsync(RoomAvailabilityDto[] availabilitiesDto)
+        {
+            var response = new ServiceResponse<string>();
+
+            // Mapeia os DTOs para entidades
+            var roomAvailabilities = _mapper.Map<RoomAvailability[]>(availabilitiesDto);
+
+            // Valida cada disponibilidade antes de adicionar
+            foreach (var availability in roomAvailabilities)
+            {
+                var validationResult = await _entityValidator.ValidateAsync(availability);
+                if (!validationResult.IsValid)
+                {
+                    response.Success = false;
+                    response.Message = string.Join("; ", validationResult.Errors.Select(e => e.ErrorMessage));
+                    return response;
+                }
+            }
+
+            // Insere no banco em lote
+            await _repository.AddRangeAsync(roomAvailabilities);
+
+            response.Success = true;
+            response.Message = "Disponibilidades criadas em lote com sucesso.";
+            return response;
+        }
+         
+        /// <summary>
         /// Atualiza uma disponibilidade de quarto existente.
         /// </summary>
         public override async Task<ServiceResponse<RoomAvailabilityDto>> UpdateAsync(RoomAvailabilityDto availabilityDto)
