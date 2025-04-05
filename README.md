@@ -29,10 +29,15 @@ A pilot project showcasing the concept of AI integration both for semantic searc
 - Vite
 - Bootstrap
 - TypeScript
-
-### Backend
 - Node.js
 - Nginx Server
+
+### Backend
+ - C#
+ - .Net 8
+ - Entity Framework Core
+ - MySql
+ - Swagger
 
 ### DevOps & Tools
 - GitHub
