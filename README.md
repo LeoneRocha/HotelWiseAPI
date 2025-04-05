@@ -1,4 +1,4 @@
-# HotelWiseAPI
+# Hotel Wise 
 
 ## About
 A pilot project showcasing the concept of AI integration both for semantic search and customer support via chatbot. The system manages hotel registration, rooms, availability, and pricing, leveraging AI technologies such as Semantic Search Kernel and Mistral Inference, Qdrant for enhanced search capabilities, and payment API integration.
