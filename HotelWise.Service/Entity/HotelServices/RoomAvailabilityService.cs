@@ -174,5 +174,28 @@ namespace HotelWise.Service.Entity
             response.Message = "Disponibilidades recuperadas com sucesso.";
             return response;
         }
+
+        /// <summary>
+        /// Lista as disponibilidades com base no hotel e no período opcional informado.
+        /// </summary>
+        /// <param name="searchDto">Parâmetros de busca encapsulados em DTO</param>
+        /// <returns>Array de RoomAvailabilityDto</returns>
+        public async Task<ServiceResponse<RoomAvailabilityDto[]>> GetAvailabilitiesBySearchCriteriaAsync(RoomAvailabilitySearchDto searchDto)
+        {
+            var response = new ServiceResponse<RoomAvailabilityDto[]>();
+
+            // Busca diretamente no repositório as disponibilidades com base nos critérios informados
+            var availabilities = await _roomAvailabilityRepository.GetAvailabilitiesByHotelAndPeriodAsync(
+                searchDto.HotelId,
+                searchDto.StartDate,
+                searchDto.EndDate
+            );
+
+            // Retorna as disponibilidades no formato DTO
+            response.Data = _mapper.Map<RoomAvailabilityDto[]>(availabilities);
+            response.Success = true;
+            response.Message = "Disponibilidades recuperadas com sucesso.";
+            return response;
+        } 
     }
 }

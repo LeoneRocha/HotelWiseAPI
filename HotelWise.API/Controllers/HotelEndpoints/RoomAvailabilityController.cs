@@ -52,6 +52,19 @@ namespace HotelWise.API.Controllers.RoomAvailabilityEndpoints
             return Ok(response);
         }
 
+        [HttpPost("availabilities")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> GetAvailabilitiesBySearchCriteriaAsync(RoomAvailabilitySearchDto searchDto)
+        {
+            var response = await _roomAvailabilityService.GetAvailabilitiesBySearchCriteriaAsync(searchDto);
+            if (response == null || response.Data == null || response.Data.Length == 0)
+            {
+                return NotFound(new { Message = "Nenhuma disponibilidade encontrada para o quarto informado." });
+            }
+            return Ok(response);
+        }
+
         /// <summary>
         /// Cria uma nova disponibilidade.
         /// </summary>
@@ -79,7 +92,7 @@ namespace HotelWise.API.Controllers.RoomAvailabilityEndpoints
 
             await _roomAvailabilityService.CreateBatchAsync(availabilitiesDto);
             return Ok(new { Message = "Disponibilidades criadas em lote com sucesso." });
-        } 
+        }
 
         /// <summary>
         /// Atualiza uma disponibilidade existente.

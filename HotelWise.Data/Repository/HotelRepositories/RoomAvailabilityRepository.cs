@@ -34,5 +34,23 @@ namespace HotelWise.Data.Repository.HotelRepositories
                              ra.EndDate >= startDate)
                 .ToArrayAsync(); // Agora retorna como array
         }
+
+        /// <summary>
+        /// Busca disponibilidades com base no hotel e no período informado.
+        /// </summary>
+        /// <param name="hotelId">ID do hotel</param>
+        /// <param name="startDate">Data inicial</param>
+        /// <param name="endDate">Data final (opcional)</param>
+        /// <returns>Lista de RoomAvailability</returns>
+        public async Task<RoomAvailability[]> GetAvailabilitiesByHotelAndPeriodAsync(long hotelId, DateTime startDate, DateTime? endDate = null)
+        {
+            return await _context.RoomAvailabilities
+                .Where(availability =>
+                    availability.Room.HotelId == hotelId &&
+                    availability.StartDate >= startDate &&
+                    (endDate == null || availability.EndDate <= endDate))
+                .Include(availability => availability.Room) // Inclui dados do quarto, caso necessário
+                .ToArrayAsync();
+        } 
     }
 }

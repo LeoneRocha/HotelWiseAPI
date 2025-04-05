@@ -14,5 +14,6 @@ namespace HotelWise.Domain.Interfaces.Entity.HotelInterfaces.Repository
         /// Retorna a disponibilidade de quartos dentro de um intervalo de datas como um array.
         /// </summary>
         Task<RoomAvailability[]> GetAvailabilityByDateRange(long roomId, DateTime startDate, DateTime endDate);
+        Task<RoomAvailability[]> GetAvailabilitiesByHotelAndPeriodAsync(long hotelId, DateTime startDate, DateTime? endDate);
     }
 }
