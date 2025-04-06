@@ -1,4 +1,6 @@
-﻿namespace HotelWise.Domain.Dto.Enitty.HotelDtos
+﻿using HotelWise.Domain.Enuns.Hotel;
+
+namespace HotelWise.Domain.Dto.Enitty.HotelDtos
 {
     public class ReservationDto
     {
@@ -9,7 +11,7 @@
         public DateTime ReservationDate { get; set; } // Data em que a reserva foi feita
         public decimal TotalAmount { get; set; } // Valor total da reserva
         public string Currency { get; set; } = string.Empty; // Moeda utilizada na reserva (ex.: USD, BRL)
-        public string Status { get; set; } = string.Empty; // Status da reserva (ex.: Confirmed, Cancelled)
+        public ReservationStatus Status { get; set; } =  ReservationStatus.Pending; // Status da reserva (ex.: Confirmed, Cancelled)
         public RoomDto? RoomDetails { get; set; } // Detalhes do quarto associado
     }
 }

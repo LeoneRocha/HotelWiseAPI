@@ -1,4 +1,6 @@
-﻿namespace HotelWise.Domain.Dto.Enitty.HotelDtos
+﻿using HotelWise.Domain.Enuns.Hotel;
+
+namespace HotelWise.Domain.Dto.Enitty.HotelDtos
 {
     public class RoomDto
     {
@@ -9,7 +11,7 @@
         public string Description { get; set; } = string.Empty; // Descrição detalhada do quarto
         public decimal PricePerNight { get; set; } // Preço por noite
         public string Currency { get; set; } = "USD"; // Moeda do preço (ex.: USD, BRL)
-        public string Status { get; set; } = string.Empty; // Status do quarto (ex.: Available, Unavailable)
+        public RoomStatus Status { get; set; } =  RoomStatus.Available; // Status do quarto (ex.: Available, Unavailable)
         public int MinimumNights { get; set; } // Mínimo de noites exigido para reserva
         public RoomAvailabilityDto[] Availabilities { get; set; } // Lista de disponibilidades do quarto
     }
