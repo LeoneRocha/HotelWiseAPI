@@ -7,6 +7,7 @@ using HotelWise.Domain.Model.HotelModels;
 using Serilog;
 using HotelWise.Domain.Interfaces.Entity.HotelInterfaces.Repository;
 using HotelWise.Domain.Interfaces.Entity.HotelInterfaces.Service;
+using HotelWise.Domain.Helpers;
 
 namespace HotelWise.Service.Entity.HotelServices
 {
@@ -34,6 +35,11 @@ namespace HotelWise.Service.Entity.HotelServices
 
             // Mapeia o DTO para a entidade
             var room = _mapper.Map<Room>(roomDto);
+
+            room.CreatedDate = DataHelper.GetDateTimeNow();
+            room.CreatedUserId = base.UserId;
+            room.ModifyDate = DataHelper.GetDateTimeNow();
+            room.ModifyUserId = base.UserId;
 
             // Valida o quarto antes de criar
             var validationResult = await _entityValidator.ValidateAsync(room);
@@ -74,7 +80,8 @@ namespace HotelWise.Service.Entity.HotelServices
             // Atualiza os dados do quarto com os valores do DTO
             var room = _mapper.Map<Room>(roomDto);
             room.Id = roomId;
-
+            room.ModifyDate = DataHelper.GetDateTimeNow();
+            room.ModifyUserId = base.UserId;
             // Valida o quarto antes de atualizar
             var validationResult = await _entityValidator.ValidateAsync(room);
             if (!validationResult.IsValid)

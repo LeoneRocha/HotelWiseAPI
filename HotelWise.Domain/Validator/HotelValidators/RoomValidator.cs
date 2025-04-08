@@ -1,4 +1,6 @@
-﻿using FluentValidation;
+﻿using DocumentFormat.OpenXml.Drawing.Charts;
+using FluentValidation;
+using HotelWise.Domain.Helpers;
 using HotelWise.Domain.Interfaces.Entity.HotelInterfaces.Repository;
 using HotelWise.Domain.Model.HotelModels;
 
@@ -42,7 +44,7 @@ namespace HotelWise.Domain.Validator.HotelValidators
 
             // Validação para CreatedDate
             RuleFor(r => r.CreatedDate)
-                .LessThanOrEqualTo(DateTime.UtcNow).WithMessage("A data de criação do registro não pode ser no futuro.");
+                .GreaterThan(DateTime.MinValue).WithMessage("A data de criação do registro deve ser válida.");
 
             // Validação para ModifyDate
             RuleFor(r => r.ModifyDate)

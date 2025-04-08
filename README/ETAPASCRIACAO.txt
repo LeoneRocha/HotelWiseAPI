@@ -35,6 +35,16 @@ Quarto 2	Quantidade	[Dropdown]	  Botões de Ação
 
 
 
+
+
+
+
+
+
+
+
+
+
 ------- SERVICE DE PESQUISA 
 ------- SERVICE DE RESERVA 
 -------- END POINT  DE PESQUISA 
