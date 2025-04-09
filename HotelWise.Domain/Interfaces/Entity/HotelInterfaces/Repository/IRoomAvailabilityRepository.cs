@@ -1,4 +1,5 @@
-﻿using HotelWise.Domain.Interfaces.Entity.HotelWise.Domain.Interfaces.Entity;
+﻿using HotelWise.Domain.Dto.Enitty.HotelDtos;
+using HotelWise.Domain.Interfaces.Entity.HotelWise.Domain.Interfaces.Entity;
 using HotelWise.Domain.Model.HotelModels;
 
 namespace HotelWise.Domain.Interfaces.Entity.HotelInterfaces.Repository
@@ -14,6 +15,6 @@ namespace HotelWise.Domain.Interfaces.Entity.HotelInterfaces.Repository
         /// Retorna a disponibilidade de quartos dentro de um intervalo de datas como um array.
         /// </summary>
         Task<RoomAvailability[]> GetAvailabilityByDateRange(long roomId, DateTime startDate, DateTime endDate);
-        Task<RoomAvailability[]> GetAvailabilitiesByHotelAndPeriodAsync(long hotelId, DateTime startDate, DateTime? endDate);
+        Task<RoomAvailability[]> GetAvailabilitiesByHotelAndPeriodAsync(HotelAvailabilityRequestDto request);
     }
 }

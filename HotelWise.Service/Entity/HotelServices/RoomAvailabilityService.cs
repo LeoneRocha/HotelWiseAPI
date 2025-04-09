@@ -84,7 +84,7 @@ namespace HotelWise.Service.Entity
             response.Message = "Disponibilidades criadas em lote com sucesso.";
             return response;
         }
-         
+
         /// <summary>
         /// Atualiza uma disponibilidade de quarto existente.
         /// </summary>
@@ -185,10 +185,12 @@ namespace HotelWise.Service.Entity
             var response = new ServiceResponse<RoomAvailabilityDto[]>();
 
             // Busca diretamente no repositório as disponibilidades com base nos critérios informados
-            var availabilities = await _roomAvailabilityRepository.GetAvailabilitiesByHotelAndPeriodAsync(
-                searchDto.HotelId,
-                searchDto.StartDate,
-                searchDto.EndDate
+            var availabilities = await _roomAvailabilityRepository.GetAvailabilitiesByHotelAndPeriodAsync(new HotelAvailabilityRequestDto()
+            {
+                HotelId = searchDto.HotelId,
+                StartDate = searchDto.StartDate,
+                EndDate = searchDto.EndDate
+            }
             );
 
             // Retorna as disponibilidades no formato DTO
@@ -196,6 +198,6 @@ namespace HotelWise.Service.Entity
             response.Success = true;
             response.Message = "Disponibilidades recuperadas com sucesso.";
             return response;
-        } 
+        }
     }
 }

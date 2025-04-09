@@ -1,5 +1,6 @@
 ﻿using HotelWise.Data.Context;
 using HotelWise.Data.Repository.Generic;
+using HotelWise.Domain.Dto.Enitty.HotelDtos;
 using HotelWise.Domain.Interfaces.Entity.HotelInterfaces.Repository;
 using HotelWise.Domain.Model.HotelModels;
 using Microsoft.EntityFrameworkCore;
@@ -42,13 +43,13 @@ namespace HotelWise.Data.Repository.HotelRepositories
         /// <param name="startDate">Data inicial</param>
         /// <param name="endDate">Data final (opcional)</param>
         /// <returns>Lista de RoomAvailability</returns>
-        public async Task<RoomAvailability[]> GetAvailabilitiesByHotelAndPeriodAsync(long hotelId, DateTime startDate, DateTime? endDate = null)
+        public async Task<RoomAvailability[]> GetAvailabilitiesByHotelAndPeriodAsync(HotelAvailabilityRequestDto request)
         {
             return await _context.RoomAvailabilities
                 .Where(availability =>
-                    availability.Room.HotelId == hotelId &&
-                    availability.StartDate >= startDate &&
-                    (endDate == null || availability.EndDate <= endDate))
+                    availability.Room.HotelId == request.HotelId &&
+                    availability.StartDate >= request.StartDate &&
+                    (request.EndDate == null || availability.EndDate <= request.EndDate))
                 .Include(availability => availability.Room) // Inclui dados do quarto, caso necessário
                 .ToArrayAsync();
         } 
