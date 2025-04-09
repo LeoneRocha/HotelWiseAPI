@@ -69,8 +69,8 @@ namespace HotelWise.Service.Entity.HotelServices
             var roomId = roomDto.Id;
 
             // Busca o quarto pelo ID
-            var existingRoom = await _roomRepository.GetByIdAsync(roomId);
-            if (existingRoom == null)
+            var existingRoom = await _roomRepository.ExistsAsync(x => x.Id == roomId);
+            if (!existingRoom)
             {
                 response.Success = false;
                 response.Message = "Quarto não encontrado.";
@@ -80,8 +80,11 @@ namespace HotelWise.Service.Entity.HotelServices
             // Atualiza os dados do quarto com os valores do DTO
             var room = _mapper.Map<Room>(roomDto);
             room.Id = roomId;
+            room.CreatedDate = DataHelper.GetDateTimeNow();
+            room.CreatedUserId = base.UserId;
             room.ModifyDate = DataHelper.GetDateTimeNow();
             room.ModifyUserId = base.UserId;
+             
             // Valida o quarto antes de atualizar
             var validationResult = await _entityValidator.ValidateAsync(room);
             if (!validationResult.IsValid)
