@@ -12,6 +12,11 @@ NOVAS TABELAS
 
 -- TELA  CRUD ---------------- XXXXXXXXXXXXXXXXXX
 
+--------- CADASTRO E LISTAGEM DE QUARTO  - ok 
+
+--------- CADASTRO E LISTAGEM DE DISPONIBILIDADE  - ok 
+
+
 
 ++-------------------------------------------------------+
 |           Cadastro de Disponibilidade de Quartos      |
@@ -38,7 +43,9 @@ Quarto 2	Quantidade	[Dropdown]	  Botões de Ação
 
 
 
+------------------ MOCKUP MELHOR 
 
+https://preview--room-haven-booking-system.lovable.app/
 
 
 
