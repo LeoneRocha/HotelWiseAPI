@@ -51,17 +51,7 @@ namespace HotelWise.Domain.Validator.HotelValidators
                     .WithMessage("É necessário pelo menos um período de disponibilidade.")
                 .Must(HaveValidPrices)
                     .WithMessage("Todos os preços devem ser positivos.");
-
-            // Validação para que as datas dos itens estejam dentro do período definido.
-            RuleFor(ra => ra)
-                .Must(HaveItemsWithinPeriod)
-                    .WithMessage("Todas as datas dos itens devem estar entre a data inicial e a data final do período.");
-
-            // Validação para que cada item tenha o DayOfWeek correto.
-            RuleFor(ra => ra.AvailabilityWithPrice)
-                .Must(HaveMatchingDayOfWeek)
-                    .WithMessage("O dia da semana informado não corresponde à data do item de disponibilidade.");
-
+              
             // Validação para evitar períodos conflitantes com registros já cadastrados.
             RuleFor(ra => ra)
                 .MustAsync(NoPeriodOverlapAsync)
@@ -87,16 +77,8 @@ namespace HotelWise.Domain.Validator.HotelValidators
         /// Verifica se todos os preços dos itens são positivos.
         /// </summary>
         private static bool HaveValidPrices(RoomPriceAndAvailabilityItem[] items) => items.All(item => item.Price > 0);
-
-        /// <summary>
-        /// Garante que todas as datas dos itens estejam entre a StartDate e EndDate definidos na disponibilidade.
-        /// </summary>
-        private static bool HaveItemsWithinPeriod(RoomAvailability availability) => availability.AvailabilityWithPrice.All(item => item.Date.Date >= availability.StartDate.Date && item.Date.Date <= availability.EndDate.Date);
-
-        /// <summary>
-        /// Verifica que, para cada item, o DayOfWeek informado é igual ao DayOfWeek derivado da data.
-        /// </summary>
-        private static bool HaveMatchingDayOfWeek(RoomPriceAndAvailabilityItem[] items) => items.All(item => item.Date.DayOfWeek == item.DayOfWeek);
+         
+         
 
         /// <summary>
         /// Valida se o período (StartDate/EndDate) do registro não conflita com períodos já cadastrados para o mesmo quarto.
@@ -115,7 +97,7 @@ namespace HotelWise.Domain.Validator.HotelValidators
         private async Task<bool> ValidateNoDuplicateAvailabilityItemsAsync(RoomAvailability availability, CancellationToken cancellationToken)
         {
             // Verifica duplicatas internas no registro atual.
-            var hasInternalDuplicates = availability.AvailabilityWithPrice.GroupBy(item => new { item.Date, item.Currency }).Any(group => group.Count() > 1);
+            var hasInternalDuplicates = availability.AvailabilityWithPrice.GroupBy(item => new { item.DayOfWeek, item.Currency }).Any(group => group.Count() > 1);
 
             if (hasInternalDuplicates)
                 return false;
@@ -123,7 +105,7 @@ namespace HotelWise.Domain.Validator.HotelValidators
             // Verifica duplicidade em registros existentes.
             var existingAvailabilities = await _roomAvailabilityRepository.GetAvailabilityByRoomId(availability.RoomId);
 
-            var hasExternalDuplicates = availability.AvailabilityWithPrice.Any(newItem => existingAvailabilities.SelectMany(existing => existing.AvailabilityWithPrice).Any(existingItem => existingItem.Date.Date == newItem.Date.Date && existingItem.Currency == newItem.Currency ));
+            var hasExternalDuplicates = availability.AvailabilityWithPrice.Any(newItem => existingAvailabilities.SelectMany(existing => existing.AvailabilityWithPrice).Any(existingItem => existingItem.DayOfWeek == newItem.DayOfWeek && existingItem.Currency == newItem.Currency ));
 
             if (hasExternalDuplicates)
                 return false;

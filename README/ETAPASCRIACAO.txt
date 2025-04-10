@@ -40,7 +40,27 @@ Quarto 2	Quantidade	[Dropdown]	  Botões de Ação
 
 
 
-Melhore o prompt abaixo para solicitar ao Cody que gere uma componente em React Type Script e bootstrap para cadastras a disponibilidade e precos dos qaurto seguindo o wire frame abaixo , os componentes deve ser a logica em 1 componente e o html em outro componente seguindo o exemplo de RoomList e RoomListTemplatee de utilizar o service RoomAvailabilityService usando o getAvailabilitiesBySearchCriteria para buscar e createBatch para salvar 
+Crie uma funcionalidade em React TypeScript com Bootstrap para gerenciar a disponibilidade e preços de quartos de hotel, seguindo o wireframe fornecido. Essa funcionalidade deve ser dividida em dois componentes:
+
+Um componente responsável pela lógica.
+
+Um componente dedicado ao layout HTML.
+
+Siga o exemplo de estrutura de componentes utilizado por 'RoomList' e 'RoomListTemplate'. Utilize os seguintes serviços:
+
+RoomAvailabilityService:
+
+getAvailabilitiesBySearchCriteria: para buscar as disponibilidades de quartos.
+
+createBatch: para salvar e atualizar as informações de disponibilidade e preço dos quartos.
+
+RoomService:
+
+getRoomsByHotelId: para listar os quartos associados ao hotel.
+
+A funcionalidade deve exibir todos os quartos com o nome e o ID (este último deverá ser oculto, mas enviado nas requisições para o método createBatch).
+
+Certifique-se de que o layout seja esteticamente agradável, harmonioso e siga as melhores práticas de design. Assegure-se de incluir boas práticas de codificação e design na implementação
 
 
 

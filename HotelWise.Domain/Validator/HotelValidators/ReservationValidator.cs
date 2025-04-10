@@ -146,8 +146,7 @@ namespace HotelWise.Domain.Validator.HotelValidators
         {
             return availabilities.Any(av => av.StartDate.Date <= targetDate &&
                                             av.EndDate.Date >= targetDate &&
-                                            av.AvailabilityWithPrice.Any(item =>
-                                                item.Date.Date == targetDate &&
+                                            av.AvailabilityWithPrice.Any(item => 
                                                 item.QuantityAvailable > 0 &&
                                                 string.Equals(item.Currency, currency, StringComparison.OrdinalIgnoreCase)));
         }
