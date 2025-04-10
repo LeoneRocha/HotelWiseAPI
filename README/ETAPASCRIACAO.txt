@@ -40,6 +40,7 @@ Quarto 2	Quantidade	[Dropdown]	  Botões de Ação
 
 
 
+Melhore o prompt abaixo para solicitar ao Cody que gere uma componente em React Type Script e bootstrap para cadastras a disponibilidade e precos dos qaurto seguindo o wire frame abaixo , os componentes deve ser a logica em 1 componente e o html em outro componente seguindo o exemplo de RoomList e RoomListTemplatee de utilizar o service RoomAvailabilityService usando o getAvailabilitiesBySearchCriteria para buscar e createBatch para salvar 
 
 
 

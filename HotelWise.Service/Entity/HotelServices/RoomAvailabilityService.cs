@@ -55,35 +55,147 @@ namespace HotelWise.Service.Entity
         }
 
         /// <summary>
-        /// Cria múltiplas disponibilidades em lote.
+        /// Cria ou atualiza múltiplas disponibilidades em lote.
         /// </summary>
         /// <param name="availabilitiesDto">Lista de disponibilidades</param>
         public async Task<ServiceResponse<string>> CreateBatchAsync(RoomAvailabilityDto[] availabilitiesDto)
         {
             var response = new ServiceResponse<string>();
 
+            try
+            {
+                // Separar itens para criação e atualização
+                var itemsToCreate = availabilitiesDto.Where(a => a.Id == 0).ToArray();
+                var itemsToUpdate = availabilitiesDto.Where(a => a.Id > 0).ToArray();
+
+                // Processar criações e atualizações
+                var createResult = await ProcessCreationsAsync(itemsToCreate);
+                if (!createResult.Success)
+                {
+                    return createResult;
+                }
+
+                var updateResult = await ProcessUpdatesAsync(itemsToUpdate);
+                if (!updateResult.Success)
+                {
+                    return updateResult;
+                }
+
+                // Construir mensagem de sucesso
+                response.Success = true;
+                response.Message = $"Operação em lote concluída com sucesso: {itemsToCreate.Length} itens criados e {itemsToUpdate.Length} itens atualizados.";
+                return response;
+            }
+            catch (Exception ex)
+            {
+                _logger.Error(ex, "Erro ao processar operação em lote de disponibilidades: {Message}", ex.Message);
+                return BuildErrorResponse($"Erro ao processar operação em lote: {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// Processa a criação em lote de disponibilidades
+        /// </summary>
+        private async Task<ServiceResponse<string>> ProcessCreationsAsync(RoomAvailabilityDto[] itemsToCreate)
+        {
+            if (!itemsToCreate.Any())
+            {
+                return BuildSuccessResponse("Nenhum item para criar");
+            }
+
             // Mapeia os DTOs para entidades
-            var roomAvailabilities = _mapper.Map<RoomAvailability[]>(availabilitiesDto);
+            var newAvailabilities = _mapper.Map<RoomAvailability[]>(itemsToCreate);
 
             // Valida cada disponibilidade antes de adicionar
-            foreach (var availability in roomAvailabilities)
+            foreach (var availability in newAvailabilities)
             {
-                var validationResult = await _entityValidator.ValidateAsync(availability);
+                var validationResult = await ValidateAvailabilityAsync(availability);
                 if (!validationResult.IsValid)
                 {
-                    response.Success = false;
-                    response.Message = string.Join("; ", validationResult.Errors.Select(e => e.ErrorMessage));
-                    return response;
+                    return BuildErrorResponse($"Erro ao criar item: {FormatValidationErrors(validationResult)}");
                 }
             }
 
             // Insere no banco em lote
-            await _repository.AddRangeAsync(roomAvailabilities);
-
-            response.Success = true;
-            response.Message = "Disponibilidades criadas em lote com sucesso.";
-            return response;
+            await _repository.AddRangeAsync(newAvailabilities);
+            return BuildSuccessResponse($"{itemsToCreate.Length} itens criados com sucesso");
         }
+
+        /// <summary>
+        /// Processa a atualização em lote de disponibilidades
+        /// </summary>
+        private async Task<ServiceResponse<string>> ProcessUpdatesAsync(RoomAvailabilityDto[] itemsToUpdate)
+        {
+            if (!itemsToUpdate.Any())
+            {
+                return BuildSuccessResponse("Nenhum item para atualizar");
+            }
+
+            foreach (var availabilityDto in itemsToUpdate)
+            {
+                // Verifica se a disponibilidade existe
+                var existingAvailability = await _roomAvailabilityRepository.GetByIdAsync(availabilityDto.Id);
+                if (existingAvailability == null)
+                {
+                    return BuildErrorResponse($"Disponibilidade com ID {availabilityDto.Id} não encontrada");
+                }
+
+                // Mapeia e valida a disponibilidade
+                var roomAvailability = _mapper.Map<RoomAvailability>(availabilityDto);
+                var validationResult = await ValidateAvailabilityAsync(roomAvailability);
+
+                if (!validationResult.IsValid)
+                {
+                    return BuildErrorResponse($"Erro ao atualizar item {roomAvailability.Id}: {FormatValidationErrors(validationResult)}");
+                }
+
+                // Atualiza no banco
+                await _repository.UpdateAsync(roomAvailability);
+            }
+
+            return BuildSuccessResponse($"{itemsToUpdate.Length} itens atualizados com sucesso");
+        }
+
+        /// <summary>
+        /// Valida uma disponibilidade usando o validator configurado
+        /// </summary>
+        private async Task<FluentValidation.Results.ValidationResult> ValidateAvailabilityAsync(RoomAvailability availability)
+        {
+            return await _entityValidator.ValidateAsync(availability);
+        }
+
+        /// <summary>
+        /// Formata as mensagens de erro de validação
+        /// </summary>
+        private static string FormatValidationErrors(FluentValidation.Results.ValidationResult validationResult)
+        {
+            return string.Join("; ", validationResult.Errors.Select(e => e.ErrorMessage));
+        }
+
+        /// <summary>
+        /// Constrói uma resposta de sucesso
+        /// </summary>
+        private static ServiceResponse<string> BuildSuccessResponse(string message)
+        {
+            return new ServiceResponse<string>
+            {
+                Success = true,
+                Message = message
+            };
+        }
+
+        /// <summary>
+        /// Constrói uma resposta de erro
+        /// </summary>
+        private static ServiceResponse<string> BuildErrorResponse(string message)
+        {
+            return new ServiceResponse<string>
+            {
+                Success = false,
+                Message = message
+            };
+        }
+
 
         /// <summary>
         /// Atualiza uma disponibilidade de quarto existente.
