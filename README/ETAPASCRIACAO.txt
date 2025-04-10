@@ -16,6 +16,23 @@ NOVAS TABELAS
 
 --------- CADASTRO E LISTAGEM DE DISPONIBILIDADE  - ok 
 
+---------- CRIAR ESQUELETO 
+
+------ AJUSTAR LAYOUT 
+
+--- PASSAR O HOTEL POR PÀRAMENTRO 
+-- DEVE LISTAR OS QUARTOS 
+
+
+
+
+
+
+Tabela de Quartos e Preços Cada linha da tabela representa as informações de um quarto:
+
+Quarto	Quantidade Disponível	Moeda	Preço Segunda-feira	Preço Terça-feira	Preço Quarta-feira	Preço Quinta-feira	Preço Sexta-feira	Preço Sábado	Preço Domingo
+Quarto 1	Quantidade	Moeda	  Botões de Ação
+Quarto 2	Quantidade	[Dropdown]	  Botões de Ação
 
 
 ++-------------------------------------------------------+
@@ -23,7 +40,7 @@ NOVAS TABELAS
 +-------------------------------------------------------+
 | Data Inicial: [Campo Data]   Data Final: [Campo Data] |
 +-------------------------------------------------------+
-| Quarto    | Quantidade | Moeda | Preços Diários                           |
+| Quarto    | Quantidade Por Dia | Moeda | Preços Diários                           |
 |-----------|------------|-------|-----------------------------------------|
 | Quarto 1  | [Numérico] | [Dropdown]| [Seg] | [Ter] | [Qua] | [Qui] | [Sex] | [Sáb] | [Dom] |
 | Quarto 2  | [Numérico] | [Dropdown]| [Seg] | [Ter] | [Qua] | [Qui] | [Sex] | [Sáb] | [Dom] |
@@ -32,38 +49,87 @@ NOVAS TABELAS
 +---------------------------------------------------------------------------+
 
 
-abela de Quartos e Preços Cada linha da tabela representa as informações de um quarto:
-
-Quarto	Quantidade Disponível	Moeda	Preço Segunda-feira	Preço Terça-feira	Preço Quarta-feira	Preço Quinta-feira	Preço Sexta-feira	Preço Sábado	Preço Domingo
-Quarto 1	Quantidade	Moeda	  Botões de Ação
-Quarto 2	Quantidade	[Dropdown]	  Botões de Ação
 
 
 
-Crie uma funcionalidade em React TypeScript com Bootstrap para gerenciar a disponibilidade e preços de quartos de hotel, seguindo o wireframe fornecido. Essa funcionalidade deve ser dividida em dois componentes:
+    Crie uma funcionalidade em React TypeScript com Bootstrap para gerenciar a disponibilidade e preços de quartos de hotel, seguindo o wireframe fornecido. Essa funcionalidade deve ser dividida em dois componentes:
 
-Um componente responsável pela lógica.
+    Um componente responsável pela lógica.
 
-Um componente dedicado ao layout HTML.
+    Um componente dedicado ao layout HTML.
 
-Siga o exemplo de estrutura de componentes utilizado por 'RoomList' e 'RoomListTemplate'. Utilize os seguintes serviços:
+    Siga o exemplo de estrutura de componentes utilizado por 'RoomList' e 'RoomListTemplate'. Utilize os seguintes serviços:
 
-RoomAvailabilityService:
+    RoomAvailabilityService:
 
-getAvailabilitiesBySearchCriteria: para buscar as disponibilidades de quartos.
+    getAvailabilitiesBySearchCriteria: para buscar as disponibilidades de quartos.
 
-createBatch: para salvar e atualizar as informações de disponibilidade e preço dos quartos.
+    createBatch: para salvar e atualizar as informações de disponibilidade e preço dos quartos.
 
-RoomService:
+    RoomService:
 
-getRoomsByHotelId: para listar os quartos associados ao hotel.
+    getRoomsByHotelId: para listar os quartos associados ao hotel.
 
-A funcionalidade deve exibir todos os quartos com o nome e o ID (este último deverá ser oculto, mas enviado nas requisições para o método createBatch).
+    A funcionalidade deve exibir todos os quartos com o nome e o ID (este último deverá ser oculto, mas enviado nas requisições para o método createBatch).
 
-Certifique-se de que o layout seja esteticamente agradável, harmonioso e siga as melhores práticas de design. Assegure-se de incluir boas práticas de codificação e design na implementação
+    Certifique-se de que o layout seja esteticamente agradável, harmonioso e siga as melhores práticas de design. Assegure-se de incluir boas práticas de codificação e design na implementação
 
 
+    Objetivo: Criar um componente em React com TypeScript e Bootstrap para o cadastro de disponibilidade e preços de quartos, com base no wireframe fornecido. A estrutura do componente deve separar a lógica (em um componente) e o HTML (em outro componente), seguindo as melhores práticas de design e o exemplo de RoomList e RoomListTemplate. O layout deve ser harmonioso, visualmente atraente e funcional.
 
+ 
+     Objetivo: Desenvolver uma funcionalidade em React TypeScript utilizando Bootstrap para gerenciar a disponibilidade e preços de quartos de hotel, com base no wireframe fornecido. A estrutura da funcionalidade deve ser dividida em dois componentes distintos: um componente responsável pela lógica e outro componente dedicado ao layout HTML.
+
+    Requisitos Técnicos:
+
+    Estrutura de Componentes:
+
+    Siga o exemplo de estrutura utilizada pelos componentes RoomList e RoomListTemplate.
+
+    Serviços Utilizados:
+
+    RoomAvailabilityService:
+
+    getAvailabilitiesBySearchCriteria: Para buscar as disponibilidades de quartos.
+
+    createBatch: Para salvar e atualizar as informações de disponibilidade e preço dos quartos.
+
+    RoomService:
+
+    getRoomsByHotelId: Para listar os quartos associados ao hotel.
+
+    Detalhes da Funcionalidade:
+
+    Exiba todos os quartos retornados pelo serviço, mostrando o nome e mantendo o ID oculto (o ID será utilizado nas requisições enviadas para o método createBatch).
+
+    Certifique-se de que o layout seja harmonioso, visualmente atraente e siga as melhores práticas de design.
+
+    Os campos para entrada de dados devem ser fáceis de usar e organizados de forma funcional.
+
+    Boas Práticas de Implementação:
+
+    A lógica (busca, manipulação e envio de dados) deve ser implementada em um componente TypeScript separado.
+
+    O layout HTML e a exibição das informações devem ser implementados em outro componente.
+
+    O design deve ser harmonioso e funcional, proporcionando uma excelente experiência ao usuário.
+
+    Use Bootstrap para estilizar os elementos e garantir responsividade.
+
+    Adote boas práticas de codificação, como reutilização de componentes, organização e modularidade.
+
+    ++-------------------------------------------------------+
+    |           Cadastro de Disponibilidade de Quartos      |
+    +-------------------------------------------------------+
+    | Data Inicial: [Campo Data]   Data Final: [Campo Data] |
+    +-------------------------------------------------------+
+    | Quarto    | Quantidade Por Dia | Moeda | Preços Diários                           |
+    |-----------|------------|-------|-----------------------------------------|
+    | Quarto 1  | [Numérico] | [Dropdown]| [Seg] | [Ter] | [Qua] | [Qui] | [Sex] | [Sáb] | [Dom] |
+    | Quarto 2  | [Numérico] | [Dropdown]| [Seg] | [Ter] | [Qua] | [Qui] | [Sex] | [Sáb] | [Dom] |
+    +---------------------------------------------------------------------------+
+    |          [Salvar]            [Cancelar]                                  |
+    +---------------------------------------------------------------------------+
 ------------------ MOCKUP MELHOR 
 
 https://preview--room-haven-booking-system.lovable.app/
