@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace HotelWise.API.Controllers.RoomEndpoints
 {
-    //[Authorize("Bearer")]
+    [Authorize("Bearer")]
     [ApiController]
     [Route("api/[controller]/v1")]
     public class RoomsController : ControllerBase
