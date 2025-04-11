@@ -1,5 +1,4 @@
-﻿using Azure;
-using HotelWise.Domain.Dto.Enitty.HotelDtos;
+﻿using HotelWise.Domain.Dto.Enitty.HotelDtos;
 using HotelWise.Domain.Interfaces.Entity.HotelInterfaces.Service;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -53,14 +52,13 @@ namespace HotelWise.API.Controllers.RoomAvailabilityEndpoints
         }
 
         [HttpPost("availabilities")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status200OK)] 
         public async Task<IActionResult> GetAvailabilitiesBySearchCriteriaAsync(RoomAvailabilitySearchDto searchDto)
         {
             var response = await _roomAvailabilityService.GetAvailabilitiesBySearchCriteriaAsync(searchDto);
             if (response == null || response.Data == null || response.Data.Length == 0)
             {
-                return NotFound(new { Message = "Nenhuma disponibilidade encontrada para o quarto informado." });
+                response.Message = "Nenhuma disponibilidade encontrada para o quarto informado.";
             }
             return Ok(response);
         }
