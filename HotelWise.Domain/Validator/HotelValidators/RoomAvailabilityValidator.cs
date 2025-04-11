@@ -1,7 +1,6 @@
 ﻿using FluentValidation;
 using HotelWise.Domain.Interfaces.Entity.HotelInterfaces.Repository;
 using HotelWise.Domain.Model.HotelModels;
-
 namespace HotelWise.Domain.Validator.HotelValidators
 {
     public class RoomAvailabilityValidator : AbstractValidator<RoomAvailability>
@@ -17,8 +16,7 @@ namespace HotelWise.Domain.Validator.HotelValidators
             _roomAvailabilityRepository = roomAvailabilityRepository ?? throw new ArgumentNullException(nameof(roomAvailabilityRepository));
 
             DefineRules();
-        }
-
+        } 
         private void DefineRules()
         {
             // Validação para o ID do quarto
@@ -28,7 +26,7 @@ namespace HotelWise.Domain.Validator.HotelValidators
                 .MustAsync(RoomExistsAsync)
                     .WithMessage("O ID do quarto fornecido não existe no sistema.");
 
-            // Validação do período: datas não vazias, em ordem e sem estar no passado.
+            // Validação do período
             RuleFor(ra => ra.StartDate)
                 .NotEmpty()
                     .WithMessage("A data inicial é obrigatória.")
@@ -43,6 +41,15 @@ namespace HotelWise.Domain.Validator.HotelValidators
                 .GreaterThan(ra => ra.StartDate)
                     .WithMessage("A data final deve ser posterior à data inicial.");
 
+            // Validação para Currency
+            RuleFor(ra => ra.Currency)
+                .NotEmpty()
+                    .WithMessage("A moeda é obrigatória.")
+                .Length(3)
+                    .WithMessage("A moeda deve ter exatamente 3 caracteres.")
+                .Must(BeValidCurrency)
+                    .WithMessage("A moeda fornecida não é válida.");
+
             // Validação do array de disponibilidade
             RuleFor(ra => ra.AvailabilityWithPrice)
                 .NotNull()
@@ -51,13 +58,13 @@ namespace HotelWise.Domain.Validator.HotelValidators
                     .WithMessage("É necessário pelo menos um período de disponibilidade.")
                 .Must(HaveValidPrices)
                     .WithMessage("Todos os preços devem ser positivos.");
-              
-            // Validação para evitar períodos conflitantes com registros já cadastrados.
+
+            // Validação de conflitos no período
             RuleFor(ra => ra)
                 .MustAsync(NoPeriodOverlapAsync)
                     .WithMessage("O período de disponibilidade conflita com registros existentes para o mesmo quarto.");
 
-            // Validação para evitar duplicidade de itens (mesma data e moeda) entre o novo registro e os já cadastrados.
+            // Validação para evitar duplicidade de itens
             RuleFor(ra => ra)
                 .MustAsync(ValidateNoDuplicateAvailabilityItemsAsync)
                     .WithMessage("Já existe um item cadastrado com a mesma data e moeda para este quarto.");
@@ -76,44 +83,44 @@ namespace HotelWise.Domain.Validator.HotelValidators
         /// <summary>
         /// Verifica se todos os preços dos itens são positivos.
         /// </summary>
-        private static bool HaveValidPrices(RoomPriceAndAvailabilityItem[] items) => items.All(item => item.Price > 0);
-         
-         
+        private static bool HaveValidPrices(RoomPriceAndAvailabilityItem[] items) =>
+            items.All(item => item.Price > 0);
 
         /// <summary>
-        /// Valida se o período (StartDate/EndDate) do registro não conflita com períodos já cadastrados para o mesmo quarto.
+        /// Valida se o código de moeda é válido (ISO 4217).
+        /// </summary>
+        private static bool BeValidCurrency(string currency)
+        {
+            // Liste as moedas válidas conforme necessidade.
+            var validCurrencies = new[] { "USD", "BRL", "EUR", "JPY" }; // Exemplos
+            return validCurrencies.Contains(currency);
+        }
+
+        /// <summary>
+        /// Valida se o período (StartDate/EndDate) do registro não conflita com períodos já cadastrados.
         /// </summary>
         private async Task<bool> NoPeriodOverlapAsync(RoomAvailability availability, CancellationToken cancellationToken)
         {
             var existingAvailabilities = await _roomAvailabilityRepository.GetAvailabilityByRoomId(availability.RoomId);
-            // Há conflito de período se o novo registro se sobrepõe a um registro já existente
-            return !existingAvailabilities.Any(existing => availability.StartDate < existing.EndDate && availability.EndDate > existing.StartDate);
+            return !existingAvailabilities.Any(existing =>
+                availability.StartDate < existing.EndDate && availability.EndDate > existing.StartDate);
         }
 
         /// <summary>
-        /// Verifica que não há duplicatas de itens, considerando duplicidade interna (mesma data e moeda no registro atual)
-        /// e duplicidade com registros existentes para o mesmo quarto.
+        /// Verifica que não há duplicatas de itens entre registros.
         /// </summary>
         private async Task<bool> ValidateNoDuplicateAvailabilityItemsAsync(RoomAvailability availability, CancellationToken cancellationToken)
         {
-            // Verifica duplicatas internas no registro atual.
             var hasInternalDuplicates = availability.AvailabilityWithPrice.GroupBy(item => new { item.DayOfWeek, item.Currency }).Any(group => group.Count() > 1);
 
             if (hasInternalDuplicates)
                 return false;
 
-            // Verifica duplicidade em registros existentes.
             var existingAvailabilities = await _roomAvailabilityRepository.GetAvailabilityByRoomId(availability.RoomId);
-
-            var hasExternalDuplicates = availability.AvailabilityWithPrice.Any(newItem => existingAvailabilities.SelectMany(existing => existing.AvailabilityWithPrice).Any(existingItem => existingItem.DayOfWeek == newItem.DayOfWeek && existingItem.Currency == newItem.Currency ));
-
-            if (hasExternalDuplicates)
-                return false;
-
-            return true;
-        }
-
-
+            return !availability.AvailabilityWithPrice.Any(newItem =>
+                existingAvailabilities.SelectMany(existing => existing.AvailabilityWithPrice).Any(existingItem =>
+                    existingItem.DayOfWeek == newItem.DayOfWeek && existingItem.Currency == newItem.Currency));
+        } 
         #endregion
     }
 }

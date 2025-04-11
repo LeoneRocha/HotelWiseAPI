@@ -48,10 +48,17 @@ namespace HotelWise.Data.Repository.HotelRepositories
             return await _context.RoomAvailabilities
                 .Where(availability =>
                     availability.Room.HotelId == request.HotelId &&
-                    availability.StartDate >= request.StartDate &&
-                    (request.EndDate == null || availability.EndDate <= request.EndDate))
+                    (
+                        (availability.StartDate >= request.StartDate && availability.StartDate <= request.EndDate) || // StartDate dentro do intervalo
+                        (availability.EndDate >= request.StartDate && availability.EndDate <= request.EndDate) || // EndDate dentro do intervalo
+                        (availability.StartDate <= request.StartDate && availability.EndDate >= request.EndDate) // Período contém o intervalo
+                    ) &&
+                    availability.Currency == request.Currency // Verifica se a moeda corresponde
+                )
                 .Include(availability => availability.Room) // Inclui dados do quarto, caso necessário
                 .ToArrayAsync();
-        } 
+        }
+
+
     }
 }

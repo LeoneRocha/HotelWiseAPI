@@ -28,6 +28,10 @@ namespace HotelWise.Data.Context.Configure.Entity.HotelModelConfigurations
                        .IsRequired();
 
             builder.Property(ra => ra.EndDate)
+                .IsRequired();
+
+            builder.Property(ra => ra.Currency)
+                         .HasMaxLength(3)
                    .IsRequired();
 
             builder.Property(ra => ra.AvailabilityWithPrice)
@@ -47,6 +51,5 @@ namespace HotelWise.Data.Context.Configure.Entity.HotelModelConfigurations
             builder.HasIndex(ra => ra.EndDate).HasDatabaseName("IX_RoomAvailability_EndDate");
             builder.HasIndex(ra => ra.RoomId).HasDatabaseName("IX_RoomAvailability_RoomId");
         }
-    }
-
+    } 
 }

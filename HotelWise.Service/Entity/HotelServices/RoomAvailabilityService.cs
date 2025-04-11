@@ -105,7 +105,7 @@ namespace HotelWise.Service.Entity
                 {
                     return ResponseBuilder<string>.BuildError($"Erro ao criar item: {FormatValidationErrors(validationResult)}");
                 }
-            } 
+            }
             await _repository.AddRangeAsync(newAvailabilities);
             return ResponseBuilder<string>.BuildSuccess($"{itemsToCreate.Length} itens criados com sucesso");
         }
@@ -115,7 +115,7 @@ namespace HotelWise.Service.Entity
         /// </summary>
         private async Task<ServiceResponse<string>> ProcessUpdatesAsync(RoomAvailabilityDto[] itemsToUpdate)
         {
-            List<RoomAvailability> roomAvailabilitiesUpdates = new List<RoomAvailability>(); 
+            List<RoomAvailability> roomAvailabilitiesUpdates = new List<RoomAvailability>();
 
             foreach (var availabilityDto in itemsToUpdate)
             {
@@ -133,7 +133,7 @@ namespace HotelWise.Service.Entity
                         $"Erro ao atualizar item {roomAvailability.Id}: {FormatValidationErrors(validationResult)}"
                     );
                 }
-                roomAvailabilitiesUpdates.Add(roomAvailability);    
+                roomAvailabilitiesUpdates.Add(roomAvailability);
             }
             await _repository.UpdateRangeAsync(roomAvailabilitiesUpdates);
 
@@ -271,11 +271,11 @@ namespace HotelWise.Service.Entity
             // Busca diretamente no repositório as disponibilidades com base nos critérios informados
             var availabilities = await _roomAvailabilityRepository.GetAvailabilitiesByHotelAndPeriodAsync(new HotelAvailabilityRequestDto()
             {
+                Currency = searchDto.Currency,
                 HotelId = searchDto.HotelId,
                 StartDate = searchDto.StartDate,
                 EndDate = searchDto.EndDate
-            }
-            );
+            });
 
             // Retorna as disponibilidades no formato DTO
             response.Data = _mapper.Map<RoomAvailabilityDto[]>(availabilities);
