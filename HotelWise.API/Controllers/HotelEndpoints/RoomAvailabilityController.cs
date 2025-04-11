@@ -88,8 +88,8 @@ namespace HotelWise.API.Controllers.RoomAvailabilityEndpoints
                 return BadRequest(new { Message = "Nenhuma disponibilidade fornecida." });
             }
 
-            await _roomAvailabilityService.CreateBatchAsync(availabilitiesDto);
-            return Ok(new { Message = "Disponibilidades criadas em lote com sucesso." });
+            var response = await _roomAvailabilityService.CreateBatchAsync(availabilitiesDto);
+            return Ok(response);
         }
 
         /// <summary>
