@@ -27,6 +27,10 @@ namespace HotelWise.Data.Context.Configure.Entity.HotelModelConfigurations
             builder.Property(r => r.Capacity)
                    .IsRequired();
 
+            builder.Property(r => r.Name)
+                .HasMaxLength(50)
+                .HasColumnType("varchar(50)");
+             
             builder.Property(r => r.Description)
                    .HasMaxLength(1000)
                    .HasColumnType("varchar(1000)");

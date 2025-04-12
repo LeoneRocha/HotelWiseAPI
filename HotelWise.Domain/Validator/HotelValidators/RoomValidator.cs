@@ -7,11 +7,11 @@ using HotelWise.Domain.Model.HotelModels;
 namespace HotelWise.Domain.Validator.HotelValidators
 {
     public class RoomValidator : AbstractValidator<Room>
-    { 
+    {
         private readonly IHotelRepository _hotelRepository;
 
         public RoomValidator(IRoomRepository roomRepository, IHotelRepository hotelRepository)
-        { 
+        {
             _hotelRepository = hotelRepository ?? throw new ArgumentNullException(nameof(hotelRepository));
 
             // Validação para HotelId
@@ -27,6 +27,11 @@ namespace HotelWise.Domain.Validator.HotelValidators
             RuleFor(r => (int)r.Capacity)
                 .GreaterThan(0).WithMessage("A capacidade do quarto deve ser maior que 0.")
                 .LessThanOrEqualTo(100).WithMessage("A capacidade do quarto não pode exceder 100 pessoas.");
+
+            // Validação para Description
+            RuleFor(r => r.Name)
+                .NotEmpty().WithMessage("A nome do quarto é obrigatória.")
+                .MaximumLength(50).WithMessage("A nome do quarto não pode ultrapassar 50 caracteres.");
 
             // Validação para Description
             RuleFor(r => r.Description)
@@ -48,7 +53,7 @@ namespace HotelWise.Domain.Validator.HotelValidators
 
             // Validação para ModifyDate
             RuleFor(r => r.ModifyDate)
-                .GreaterThan(r => r.CreatedDate).WithMessage("A data de modificação deve ser maior que a data de criação."); 
+                .GreaterThan(r => r.CreatedDate).WithMessage("A data de modificação deve ser maior que a data de criação.");
         }
 
         /// <summary>
@@ -57,6 +62,6 @@ namespace HotelWise.Domain.Validator.HotelValidators
         private async Task<bool> HotelExistsAsync(long hotelId, CancellationToken cancellationToken)
         {
             return await _hotelRepository.ExistsAsync(h => h.HotelId == hotelId);
-        } 
+        }
     }
 }

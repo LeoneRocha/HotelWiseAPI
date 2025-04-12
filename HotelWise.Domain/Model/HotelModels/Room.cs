@@ -26,6 +26,7 @@ namespace HotelWise.Domain.Model.HotelModels
 
 
         public ICollection<RoomAvailability> RoomAvailabilities { get; set; } = new List<RoomAvailability>(); // Relação com disponibilidades
+        public string Name { get; set; } = string.Empty;
         #endregion
     }
 }

@@ -9,7 +9,7 @@ namespace HotelWise.Domain.Dto.Enitty.HotelDtos
         public RoomType RoomType { get; set; } = RoomType.Single; // Tipo do quarto (Ex.: Standard, Deluxe, Suite)
         public short Capacity { get; set; } // Capacidade máxima do quarto (número de pessoas)
         public string Description { get; set; } = string.Empty; // Descrição detalhada do quarto
-         
+        public string Name { get; set; } = string.Empty;
         public RoomStatus Status { get; set; } = RoomStatus.Available; // Status do quarto (ex.: Available, Unavailable)
         public int MinimumNights { get; set; } // Mínimo de noites exigido para reserva
         public RoomAvailabilityDto[] Availabilities { get; set; } = []; // Lista de disponibilidades do quarto

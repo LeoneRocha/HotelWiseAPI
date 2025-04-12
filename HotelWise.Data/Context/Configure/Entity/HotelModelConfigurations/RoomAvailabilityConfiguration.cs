@@ -47,9 +47,12 @@ namespace HotelWise.Data.Context.Configure.Entity.HotelModelConfigurations
                    .HasForeignKey(ra => ra.RoomId);
 
             // Adicionando índices para otimização
+            builder.HasIndex(ra => ra.RoomId).HasDatabaseName("IX_RoomAvailability_RoomId");
+            builder.HasIndex(ra => ra.Currency).HasDatabaseName("IX_RoomAvailability_Currency");
             builder.HasIndex(ra => ra.StartDate).HasDatabaseName("IX_RoomAvailability_StartDate");
             builder.HasIndex(ra => ra.EndDate).HasDatabaseName("IX_RoomAvailability_EndDate");
-            builder.HasIndex(ra => ra.RoomId).HasDatabaseName("IX_RoomAvailability_RoomId");
+            builder.HasIndex(ra => new { ra.RoomId, ra.StartDate, ra.EndDate, ra.Currency }).HasDatabaseName("IX_RoomAvailability_RoomId_StartDate_EndDate_Currency");
+
         }
-    } 
+    }
 }

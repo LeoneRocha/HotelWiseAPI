@@ -1,4 +1,5 @@
-﻿using HotelWise.Domain.Dto.Enitty.HotelDtos;
+﻿using HotelWise.Domain.Dto;
+using HotelWise.Domain.Dto.Enitty.HotelDtos;
 using HotelWise.Domain.Interfaces.Entity.HotelInterfaces.Service;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -82,12 +83,12 @@ namespace HotelWise.API.Controllers.RoomAvailabilityEndpoints
         [HttpPost("batch")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> CreateBatch([FromBody] RoomAvailabilityDto[] availabilitiesDto)
-        {
+        { 
             if (availabilitiesDto == null || availabilitiesDto.Length == 0)
             {
-                return BadRequest(new { Message = "Nenhuma disponibilidade fornecida." });
-            }
-
+                var result = new ServiceResponse<string>() { Data = "Nenhuma disponibilidade fornecida.", Message = "Nenhuma disponibilidade fornecida." };
+                return Ok(result);
+            } 
             var response = await _roomAvailabilityService.CreateBatchAsync(availabilitiesDto);
             return Ok(response);
         }
