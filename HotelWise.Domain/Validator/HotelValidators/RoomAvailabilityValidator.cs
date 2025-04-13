@@ -151,16 +151,24 @@ namespace HotelWise.Domain.Validator.HotelValidators
         /// </summary>
         private async Task<bool> ValidateNoDuplicateAvailabilityItemsAsync(RoomAvailability availability, CancellationToken cancellationToken)
         {
-            var hasInternalDuplicates = availability.AvailabilityWithPrice.GroupBy(item => new { item.DayOfWeek, item.Currency }).Any(group => group.Count() > 1);
+            var hasInternalDuplicates = availability.AvailabilityWithPrice
+                .GroupBy(item => new { item.DayOfWeek, item.Currency })
+                .Any(group => group.Count() > 1);
 
             if (hasInternalDuplicates)
                 return false;
 
             var existingAvailabilities = await _roomAvailabilityRepository.GetAvailabilityByRoomId(availability.RoomId);
+
             return !availability.AvailabilityWithPrice.Any(newItem =>
-                existingAvailabilities.SelectMany(existing => existing.AvailabilityWithPrice).Any(existingItem =>
-                    existingItem.DayOfWeek == newItem.DayOfWeek && existingItem.Currency == newItem.Currency));
+                existingAvailabilities.Any(existing =>
+                    existing.StartDate == availability.StartDate &&
+                    existing.EndDate == availability.EndDate &&
+                    existing.AvailabilityWithPrice.Any(existingItem =>
+                        existingItem.DayOfWeek == newItem.DayOfWeek &&
+                        existingItem.Currency == newItem.Currency)));
         }
+
         #endregion
     }
 }
