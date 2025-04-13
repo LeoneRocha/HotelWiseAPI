@@ -123,17 +123,16 @@ namespace HotelWise.Service.Entity
                 if (existingAvailability == null)
                 {
                     return ResponseBuilder<string>.BuildError($"Disponibilidade com ID {availabilityDto.Id} não encontrada");
-                }
-
-                var roomAvailability = _mapper.Map<RoomAvailability>(availabilityDto);
-                var validationResult = await ValidateAvailabilityAsync(roomAvailability);
+                } 
+                existingAvailability.AvailabilityWithPrice = availabilityDto.AvailabilityWithPrice; 
+                var validationResult = await ValidateAvailabilityAsync(existingAvailability);
                 if (!validationResult.IsValid)
                 {
                     return ResponseBuilder<string>.BuildError(
-                        $"Erro ao atualizar item {roomAvailability.Id}: {FormatValidationErrors(validationResult)}"
+                        $"Erro ao atualizar item {existingAvailability.Id}: {FormatValidationErrors(validationResult)}"
                     );
                 }
-                roomAvailabilitiesUpdates.Add(roomAvailability);
+                roomAvailabilitiesUpdates.Add(existingAvailability);
             }
             await _repository.UpdateRangeAsync(roomAvailabilitiesUpdates);
 

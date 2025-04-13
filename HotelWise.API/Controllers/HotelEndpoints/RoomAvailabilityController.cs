@@ -17,8 +17,7 @@ namespace HotelWise.API.Controllers.RoomAvailabilityEndpoints
         public RoomAvailabilityController(IRoomAvailabilityService roomAvailabilityService)
         {
             _roomAvailabilityService = roomAvailabilityService;
-        }
-
+        } 
         /// <summary>
         /// Obtém uma disponibilidade pelo ID.
         /// </summary>
@@ -35,24 +34,7 @@ namespace HotelWise.API.Controllers.RoomAvailabilityEndpoints
             }
             return Ok(availability);
         }
-
-        /// <summary>
-        /// Busca disponibilidades de um quarto específico pelo ID.
-        /// </summary>
-        /// <param name="roomId">ID do quarto</param>
-        [HttpGet("room/{roomId}")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> GetAvailabilityByRoomId(long roomId)
-        {
-            var response = await _roomAvailabilityService.GetAvailabilitiesByRoomIdAsync(roomId);
-            if (response == null || response.Data == null || response.Data.Length == 0)
-            {
-                return NotFound(new { Message = "Nenhuma disponibilidade encontrada para o quarto informado." });
-            }
-            return Ok(response);
-        }
-
+  
         [HttpPost("availabilities")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> GetAvailabilitiesBySearchCriteriaAsync(RoomAvailabilitySearchDto searchDto)
@@ -68,19 +50,7 @@ namespace HotelWise.API.Controllers.RoomAvailabilityEndpoints
             return Ok(response);
         }
 
-
-        /// <summary>
-        /// Cria uma nova disponibilidade.
-        /// </summary>
-        /// <param name="availabilityDto">Dados da disponibilidade</param>
-        [HttpPost]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<IActionResult> Create([FromBody] RoomAvailabilityDto availabilityDto)
-        {
-            var response = await _roomAvailabilityService.CreateAsync(availabilityDto);
-            return Ok(response);
-        }
-
+         
         /// <summary>
         /// Cria múltiplas disponibilidades em lote.
         /// </summary>
@@ -88,7 +58,7 @@ namespace HotelWise.API.Controllers.RoomAvailabilityEndpoints
         [HttpPost("batch")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> CreateBatch([FromBody] RoomAvailabilityDto[] availabilitiesDto)
-        {
+        { 
             if (availabilitiesDto == null || availabilitiesDto.Length == 0)
             {
                 var result = new ServiceResponse<string>() { Data = "Nenhuma disponibilidade fornecida.", Message = "Nenhuma disponibilidade fornecida." };
@@ -97,25 +67,7 @@ namespace HotelWise.API.Controllers.RoomAvailabilityEndpoints
             var response = await _roomAvailabilityService.CreateBatchAsync(availabilitiesDto);
             return Ok(response);
         }
-
-        /// <summary>
-        /// Atualiza uma disponibilidade existente.
-        /// </summary>
-        /// <param name="id">ID da disponibilidade</param>
-        /// <param name="availabilityDto">Dados atualizados</param>
-        [HttpPut("{id}")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> Update(long id, [FromBody] RoomAvailabilityDto availabilityDto)
-        {
-            if (id != availabilityDto.Id)
-            {
-                return BadRequest(new { Message = "O ID informado não corresponde ao ID da disponibilidade." });
-            }
-            var response = await _roomAvailabilityService.UpdateAsync(availabilityDto);
-            return Ok(response);
-        }
-
+ 
         /// <summary>
         /// Deleta uma disponibilidade pelo ID.
         /// </summary>

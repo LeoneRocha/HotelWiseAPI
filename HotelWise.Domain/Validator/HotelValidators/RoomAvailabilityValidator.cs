@@ -16,7 +16,7 @@ namespace HotelWise.Domain.Validator.HotelValidators
             _roomAvailabilityRepository = roomAvailabilityRepository ?? throw new ArgumentNullException(nameof(roomAvailabilityRepository));
 
             DefineRules();
-        } 
+        }
         private void DefineRules()
         {
             // Validação para o ID do quarto
@@ -33,6 +33,7 @@ namespace HotelWise.Domain.Validator.HotelValidators
                 .LessThan(ra => ra.EndDate)
                     .WithMessage("A data inicial deve ser anterior à data final.")
                 .Must(date => date.Date >= DateTime.UtcNow.Date)
+                .When(x => x.Id == 0)
                     .WithMessage("A data inicial não pode ser no passado.");
 
             RuleFor(ra => ra.EndDate)
@@ -50,6 +51,12 @@ namespace HotelWise.Domain.Validator.HotelValidators
                 .Must(BeValidCurrency)
                     .WithMessage("A moeda fornecida não é válida.");
 
+            // Validação para evitar Currency de itens
+            RuleFor(ra => ra)
+                .MustAsync(ValidateCurrencyAvailabilityItemsAsync)
+                .WithMessage("A moeda deve ser igual para os precos do periodo.");
+
+
             // Validação do array de disponibilidade
             RuleFor(ra => ra.AvailabilityWithPrice)
                 .NotNull()
@@ -62,15 +69,48 @@ namespace HotelWise.Domain.Validator.HotelValidators
             // Validação de conflitos no período
             RuleFor(ra => ra)
                 .MustAsync(NoPeriodOverlapAsync)
-                    .WithMessage("O período de disponibilidade conflita com registros existentes para o mesmo quarto.");
+                .When(x => x.Id == 0)
+                .WithMessage("O período de disponibilidade conflita com registros existentes para o mesmo quarto.");
 
             // Validação para evitar duplicidade de itens
             RuleFor(ra => ra)
                 .MustAsync(ValidateNoDuplicateAvailabilityItemsAsync)
-                    .WithMessage("Já existe um item cadastrado com a mesma data e moeda para este quarto.");
+                .When(x => x.Id == 0)
+                .WithMessage("Já existe um item cadastrado com a mesma data e moeda para este quarto.");
+
+            RuleFor(ra => ra)
+              .MustAsync((ra, cancellationToken) => PeriodCannotBeModifiedAsync(ra, cancellationToken))
+              .When(ra => ra.Id > 0) // Aplicado apenas em casos de edição
+              .WithMessage("O período não pode ser alterado ao editar uma disponibilidade existente.");
         }
 
         #region Métodos de Validação Auxiliar
+        /// <summary>
+        /// Verifica se o período não foi modificado em uma edição.
+        /// </summary>
+        private async Task<bool> PeriodCannotBeModifiedAsync(RoomAvailability availability, CancellationToken cancellationToken)
+        {
+            var existingAvailability = await _roomAvailabilityRepository.GetByIdAsync(availability.Id);
+
+            if (existingAvailability == null)
+                return false; // Caso não encontre o registro existente, considere inválido.
+
+            // Compara os períodos do registro existente com os valores novos
+            return existingAvailability.StartDate == availability.StartDate &&
+                   existingAvailability.EndDate == availability.EndDate;
+        }
+        /// <summary>
+        /// Valida se todos os itens de disponibilidade têm a mesma moeda que a definida na disponibilidade principal.
+        /// </summary>
+        private static async Task<bool> ValidateCurrencyAvailabilityItemsAsync(RoomAvailability availability, CancellationToken cancellationToken)
+        {
+            if (availability.AvailabilityWithPrice == null || availability.AvailabilityWithPrice.Length == 0)
+            {
+                return true; // Se não há itens, consideramos válido.
+            }
+            // Verifica se todos os itens têm a mesma moeda que a definida na propriedade Currency da disponibilidade.
+            return availability.AvailabilityWithPrice.All(item => item.Currency == availability.Currency);
+        }
 
         /// <summary>
         /// Verifica se o quarto existe no banco.
@@ -120,7 +160,7 @@ namespace HotelWise.Domain.Validator.HotelValidators
             return !availability.AvailabilityWithPrice.Any(newItem =>
                 existingAvailabilities.SelectMany(existing => existing.AvailabilityWithPrice).Any(existingItem =>
                     existingItem.DayOfWeek == newItem.DayOfWeek && existingItem.Currency == newItem.Currency));
-        } 
+        }
         #endregion
     }
 }
