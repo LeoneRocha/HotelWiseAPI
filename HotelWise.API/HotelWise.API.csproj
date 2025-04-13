@@ -4,8 +4,8 @@
     <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-    <AssemblyVersion>2025.04.08.01</AssemblyVersion>
-    <FileVersion>2025.04.08.01</FileVersion>
+    <AssemblyVersion>2025.04.12.01</AssemblyVersion>
+    <FileVersion>2025.04.12.01</FileVersion>
     <NoWarn>CS8604,CS8600,CS8602,CS1998,CS8618,CS8601,CS8629,SKEXP0050,SKEXP0001,SKEXP0010,SKEXP0070,SKEXP0110</NoWarn>
   </PropertyGroup>
 
