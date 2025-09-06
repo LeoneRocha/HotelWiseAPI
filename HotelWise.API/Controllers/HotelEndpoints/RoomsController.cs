@@ -57,10 +57,15 @@ namespace HotelWise.API.Controllers.RoomEndpoints
         {
             setUserIdCurrent();
             var response = await _roomService.GetRoomsByHotelIdAsync(hotelId);
-            if (response == null || response.Data == null || response.Data.Length == 0)
+            if (response == null)
             {
                 return NotFound(new { Message = "Nenhum quarto encontrado para o hotel informado." });
+            }else if (response.Data == null || response.Data.Length == 0)
+            { 
+                response.Message = "Nenhum quarto encontrado para o hotel informado.";
+                return Ok(response);
             }
+
             return Ok(response);
         }
 

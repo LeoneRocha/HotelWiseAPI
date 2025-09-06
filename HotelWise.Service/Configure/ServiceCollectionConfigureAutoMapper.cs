@@ -8,7 +8,7 @@ namespace HotelWise.Service.Configure
         public static void Configure(IServiceCollection services)
         {
             // Auto Mapper 
-            services.AddAutoMapper(typeof(AutoMapperProfile));
+            services.AddAutoMapper(cfg => cfg.AddProfile<AutoMapperProfile>());
         }
     }
 }
