@@ -17,8 +17,8 @@ A pilot project showcasing the concept of AI integration both for semantic searc
   - [Backend Analysis](https://sonarcloud.io/summary/new_code?id=lionscorp_hotelwiseapi&branch=master)
   - [Frontend Analysis](https://sonarcloud.io/summary/new_code?id=lionscorp_hotelwiseui&branch=master)
 - **Go Live:**
-  - [API](https://hotelwiseapi-hbcca8d5a7fae7hp.brazilsouth-01.azurewebsites.net/swagger/index.html)
-  - [Frontend](https://hotelwiseui-f7a7b5gqf0amdfdg.brazilsouth-01.azurewebsites.net/)
+  - [API](https://hotelwiseapi.azurewebsites.net/swagger/index.html)
+  - [Frontend](https://hotelwiseui.azurewebsites.net/)
 - **Source Code:**
   - [Backend Repository](https://github.com/LeoneRocha/HotelWiseAPI)
   - [Frontend Repository](https://github.com/LeoneRocha/HotelWiseUI)
