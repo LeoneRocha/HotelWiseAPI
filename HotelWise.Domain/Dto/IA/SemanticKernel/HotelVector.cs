@@ -4,12 +4,11 @@ namespace HotelWise.Domain.Dto.IA.SemanticKernel
 {
     public class HotelVector : DataVectorBase
     {
-        [VectorStoreRecordData(IsFilterable = true)]
+        [VectorStoreData(IsIndexed = true)]
         public string HotelName { get; set; } = string.Empty;
 
-        [VectorStoreRecordData(IsFullTextSearchable = true)]
+        [VectorStoreData(IsFullTextIndexed = true)]
         public string Description { get; set; } = string.Empty;
 
     }
 }
-

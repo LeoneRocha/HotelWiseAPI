@@ -1,7 +1,12 @@
 ﻿using Microsoft.AspNetCore.Http;
+using System.Diagnostics;
 
 namespace HotelWise.Domain.CustomMiddleware
 {
+    /// <summary>
+    /// Lightweight request log without secrets. Prefer SerilogRequestLogging for HTTP access metrics;
+    /// this middleware keeps a simple start/end breadcrumb with correlation.
+    /// </summary>
     public class RequestLoggingMiddleware
     {
         private readonly RequestDelegate _next;
@@ -15,15 +20,25 @@ namespace HotelWise.Domain.CustomMiddleware
 
         public async Task InvokeAsync(HttpContext context)
         {
-            var headers = context.Request.Headers.Where(x => x.Key.Contains("Authorization"));
+            var stopwatch = Stopwatch.StartNew();
+            var correlationId = context.Items[CorrelationIdMiddleware.ItemKey]?.ToString()
+                ?? context.TraceIdentifier;
 
-            // Logando os cabeçalhos da requisição
-            foreach (var header in headers)
+            try
             {
-                _logger.Information("header Key: {headerKey} -  header Value: {headerValue}", header.Key, header.Value);
+                await _next(context);
             }
-            // Chamando o próximo middleware na pipeline
-            await _next(context);
+            finally
+            {
+                stopwatch.Stop();
+                _logger.Information(
+                    "HTTP {Method} {Path} responded {StatusCode} in {ElapsedMs} ms (CorrelationId={CorrelationId})",
+                    context.Request.Method,
+                    context.Request.Path.Value,
+                    context.Response.StatusCode,
+                    stopwatch.ElapsedMilliseconds,
+                    correlationId);
+            }
         }
     }
 }

@@ -106,7 +106,7 @@ namespace HotelWise.Domain.AI.Adapter
 
             await foreach (var message in agent.InvokeAsync(chatHistory))
             {
-                resultBuilder.Append(message.Content);
+                resultBuilder.Append(message.Message.Content);
             }
 
             var result = resultBuilder.ToString();

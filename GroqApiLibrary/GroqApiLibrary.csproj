@@ -1,13 +1,13 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
-		<TargetFramework>net8.0</TargetFramework>
+		<TargetFrameworks>net8.0;net10.0</TargetFrameworks>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
 		<Title>Groq API Library</Title>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<Authors>J. Gravelle</Authors>
-		<Description>This library provides a simple interface to interact with the Groq AI API. It allows you to send requests to the API and receive responses asynchronously using .NET 8. Now with Whisper text-to-speech AND tool support!</Description>
+		<Description>This library provides a simple interface to interact with the Groq AI API. It allows you to send requests to the API and receive responses asynchronously using .NET 8 and .NET 10. Now with Whisper text-to-speech AND tool support!</Description>
 		<Copyright>©2024 - J. Gravelle</Copyright>
 		<PackageProjectUrl>https://console.groq.com/docs/libraries</PackageProjectUrl>
 		<RepositoryUrl>https://github.com/jgravelle/GroqApiLibrary</RepositoryUrl>
@@ -19,8 +19,13 @@
 		<Version>1.0.8</Version>
 	</PropertyGroup>
 
+	<ItemGroup Condition="'$(TargetFramework)' == 'net8.0'">
+		<PackageReference Include="Microsoft.AspNetCore.Components" VersionOverride="8.0.22" />
+	</ItemGroup>
+	<ItemGroup Condition="'$(TargetFramework)' == 'net10.0'">
+		<PackageReference Include="Microsoft.AspNetCore.Components" />
+	</ItemGroup>
 	<ItemGroup>
-		<PackageReference Include="Microsoft.AspNetCore.Components" Version="8.0.19" />
 		<None Include="README.md" Pack="True" PackagePath="\" />
 		<None Include="g_icon.png" Pack="True" PackagePath="\" />
 	</ItemGroup>

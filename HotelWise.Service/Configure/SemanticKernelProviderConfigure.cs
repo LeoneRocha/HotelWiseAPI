@@ -162,7 +162,7 @@ namespace HotelWise.Service.Configure
         {
             #region VectorStores
 
-            IVectorStore vectorStore = kernel.GetRequiredService<IVectorStore>();
+            VectorStore vectorStore = kernel.GetRequiredService<VectorStore>();
             services.AddSingleton(vectorStore);
 
             #endregion VectorStores
@@ -234,9 +234,19 @@ namespace HotelWise.Service.Configure
 
             var qdrantConfig = appConfig.QdrantConfig;
 
-            builder.AddQdrantVectorStoreRecordCollection<ulong, HotelVector>(appConfig.RagConfig.VectorStoreCollectionPrefixName, qdrantConfig.Host, qdrantConfig.Port, qdrantConfig.Https, qdrantConfig.ApiKey);
+            builder.Services.AddQdrantCollection<ulong, HotelVector>(
+                appConfig.RagConfig.VectorStoreCollectionPrefixName,
+                qdrantConfig.Host,
+                qdrantConfig.Port,
+                qdrantConfig.Https,
+                qdrantConfig.ApiKey);
 
-            builder.AddQdrantVectorStore(qdrantConfig.Host, qdrantConfig.Port, qdrantConfig.Https, qdrantConfig.ApiKey, options: new QdrantVectorStoreOptions { HasNamedVectors = true });
+            builder.Services.AddQdrantVectorStore(
+                qdrantConfig.Host,
+                qdrantConfig.Port,
+                qdrantConfig.Https,
+                qdrantConfig.ApiKey,
+                options: new QdrantVectorStoreOptions { HasNamedVectors = true });
             #endregion Vector Store
 #pragma warning restore SKEXP0020
         }

@@ -3,7 +3,7 @@ using HotelWise.Domain.Interfaces.IA;
 
 namespace HotelWise.Domain.Interfaces.SemanticKernel
 {
-    public interface IVectorStoreAdapter<TVector> where TVector : IDataVector
+    public interface IVectorStoreAdapter<TVector> where TVector : class, IDataVector
     {
         Task UpsertDataAsync(string nameCollection, TVector dataVector);
         Task UpsertDatasAsync(string nameCollection, TVector[] dataVectors);

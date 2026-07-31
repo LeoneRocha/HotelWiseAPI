@@ -8,10 +8,10 @@ namespace HotelWise.Domain.Dto.IA.SemanticKernel
 {
     public abstract class DataVectorBase : IDataVector
     {
-        [VectorStoreRecordKey]
+        [VectorStoreKey]
         public ulong DataKey { get; set; } = ulong.MinValue;
 
-        [VectorStoreRecordVector(Dimensions: 1024)]// Dimensions: 1024 BERT-base 768 (Bidirectional Encoder Representations from Transformers) 
+        [VectorStoreVector(1024)]// Dimensions: 1024 BERT-base 768 (Bidirectional Encoder Representations from Transformers) 
         public virtual ReadOnlyMemory<float> Embedding { get; set; } = new ReadOnlyMemory<float>();
 
         [NotMapped]
@@ -19,7 +19,7 @@ namespace HotelWise.Domain.Dto.IA.SemanticKernel
         [JsonIgnore]
         public double Score { get; set; } = 0d;
 
-        [VectorStoreRecordData(IsFilterable = true)]
+        [VectorStoreData(IsIndexed = true)]
         public List<string> Tags { get; set; } = new List<string>();
     }
 }

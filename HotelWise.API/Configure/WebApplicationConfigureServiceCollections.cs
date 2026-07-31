@@ -1,7 +1,7 @@
 ﻿using HotelWise.API.Configure;
 using HotelWise.Service.Configure;
 using Microsoft.Net.Http.Headers;
-using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi;
 using Swashbuckle.AspNetCore.Filters;
 
 namespace HotelWise.API
@@ -11,6 +11,20 @@ namespace HotelWise.API
         public static void Configure(IServiceCollection services, IConfiguration configuration, Serilog.Core.Logger _logger)
         {
             ServiceCollectionConfigureCors.Configure(services);
+
+            services.AddHealthChecks();
+
+            var appInsightsConnectionString =
+                configuration["APPLICATIONINSIGHTS_CONNECTION_STRING"]
+                ?? configuration["ApplicationInsights:ConnectionString"];
+
+            if (!string.IsNullOrWhiteSpace(appInsightsConnectionString))
+            {
+                services.AddApplicationInsightsTelemetry(options =>
+                {
+                    options.ConnectionString = appInsightsConnectionString;
+                });
+            }
 
             services.AddSwaggerGen(c =>
             {

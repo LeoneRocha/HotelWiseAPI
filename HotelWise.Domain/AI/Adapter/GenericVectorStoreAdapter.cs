@@ -12,16 +12,16 @@ using System.Diagnostics;
 
 namespace HotelWise.Domain.AI.Adapter
 {
-    public class GenericVectorStoreAdapter<TVector> : IVectorStoreAdapter<TVector> where TVector : IDataVector
+    public class GenericVectorStoreAdapter<TVector> : IVectorStoreAdapter<TVector> where TVector : class, IDataVector
     {
-        private readonly IVectorStore _vectorStore;
-        private IVectorStoreRecordCollection<ulong, TVector>? collection;
+        private readonly VectorStore _vectorStore;
+        private VectorStoreCollection<ulong, TVector>? collection;
         private readonly Kernel _kernel;
         private readonly Serilog.ILogger _logger;
 
         public GenericVectorStoreAdapter(Serilog.ILogger logger,
             IApplicationIAConfig applicationConfig
-            , IVectorStore vectorStore
+            , VectorStore vectorStore
             , Kernel kernel)
         {
             _vectorStore = vectorStore;
@@ -36,7 +36,7 @@ namespace HotelWise.Domain.AI.Adapter
         }
         private async Task CreateCollection()
         {
-            await collection!.CreateCollectionIfNotExistsAsync();
+            await collection!.EnsureCollectionExistsAsync();
         }
 
         public async Task UpsertDataAsync(string nameCollection, TVector dataVector)
@@ -84,17 +84,13 @@ namespace HotelWise.Domain.AI.Adapter
 
             var searchEmbeddingCriteria = EmbeddingHelper.ConvertToReadOnlyMemory(searchEmbedding);
 
-            // Combina os filtros usando lógica OR
             VectorSearchOptions<TVector> vectorSearchOptions = createOptions(searchCriteria);
 
-            // Realiza a busca
-            var searchResult = await collection!.VectorizedSearchAsync(searchEmbeddingCriteria, vectorSearchOptions);
-
-            var dataSearchResult = searchResult.Results.ToBlockingEnumerable().ToArray();
+            var searchResult = collection!.SearchAsync(searchEmbeddingCriteria, searchCriteria.MaxHotelRetrieve, vectorSearchOptions);
 
             List<TVector> dataVectors = new List<TVector>();
 
-            foreach (var item in dataSearchResult)
+            await foreach (var item in searchResult)
             {
                 var addVect = item.Record;
                 addVect.Score = item.Score.GetValueOrDefault();
@@ -108,22 +104,18 @@ namespace HotelWise.Domain.AI.Adapter
         //https://learn.microsoft.com/en-us/dotnet/ai/quickstarts/build-vector-search-app?tabs=azd&pivots=openai
         private static VectorSearchOptions<TVector> createOptions(SearchCriteria searchCriteria)
         {
-            var vectorSearchOptions = new VectorSearchOptions<TVector>() { Top = searchCriteria.MaxHotelRetrieve };
+            var vectorSearchOptions = new VectorSearchOptions<TVector>()
+            {
+                VectorProperty = r => r.Embedding
+            };
 
             if (searchCriteria.TagsCriteria.Length > 0)
             {
-                var combinedFilter = new VectorSearchFilter();
-                foreach (var tagValue in searchCriteria.TagsCriteria)
-                {
-                    combinedFilter.AnyTagEqualTo(nameof(IDataVector.Tags), tagValue);
-                }
-
+                var tagsCriteria = searchCriteria.TagsCriteria.ToList();
                 vectorSearchOptions = new VectorSearchOptions<TVector>()
                 {
-                    Top = searchCriteria.MaxHotelRetrieve,
-                    OldFilter = combinedFilter,
-                    VectorPropertyName = "Embedding",
-                    //Filter = combinedFilter // Aplica o filtro combinado
+                    Filter = r => r.Tags.Any(tag => tagsCriteria.Contains(tag)),
+                    VectorProperty = r => r.Embedding
                 };
             }
 
@@ -154,7 +146,7 @@ namespace HotelWise.Domain.AI.Adapter
 
             insertLogVectorizedSearchAsync(results);
 
-            KernelArguments arguments = CreateArgments(searchQuery, results.SearchResult);
+            KernelArguments arguments = CreateArgments(searchQuery, results);
 
             HandlebarsPromptTemplateFactory promptTemplateFactory = new();
 
@@ -175,9 +167,9 @@ namespace HotelWise.Domain.AI.Adapter
             return dataVectors.ToArray();
         }
 
-        private void insertLogVectorizedSearchAsync((VectorSearchResults<TVector> SearchResult, VectorSearchResult<TVector>[] DataSearchResult) results)
+        private void insertLogVectorizedSearchAsync(VectorSearchResult<TVector>[] results)
         {
-            _logger.Information("VectorizedSearchAsync : {dataSearchResult}", results.DataSearchResult);
+            _logger.Information("VectorizedSearchAsync : {dataSearchResult}", results);
         }
 
         private void insertLogStarterSearchPluginAsync()
@@ -236,7 +228,7 @@ namespace HotelWise.Domain.AI.Adapter
 
         }
 
-        private static KernelArguments CreateArgments(string searchQuery, VectorSearchResults<TVector> searchResult)
+        private static KernelArguments CreateArgments(string searchQuery, VectorSearchResult<TVector>[] searchResult)
         {
             return new KernelArguments
             {
@@ -245,7 +237,7 @@ namespace HotelWise.Domain.AI.Adapter
             };
         }
 
-        private async Task<string> RenderPrompt(string searchQuery, string template, (VectorSearchResults<TVector> SearchResult, VectorSearchResult<TVector>[] DataSearchResult) results, HandlebarsPromptTemplateFactory promptTemplateFactory)
+        private async Task<string> RenderPrompt(string searchQuery, string template, VectorSearchResult<TVector>[] results, HandlebarsPromptTemplateFactory promptTemplateFactory)
         {
             string templateResult = await promptTemplateFactory.Create(new PromptTemplateConfig()
             {
@@ -253,7 +245,7 @@ namespace HotelWise.Domain.AI.Adapter
                 TemplateFormat = HandlebarsPromptTemplateFactory.HandlebarsTemplateFormat,
                 InputVariables = new List<InputVariable> {
                     new InputVariable() { Name = "query", Default = searchQuery },
-                    new InputVariable() { Name = "results", Default = results.SearchResult }
+                    new InputVariable() { Name = "results", Default = results }
                 }
             }).RenderAsync(_kernel);
 
@@ -262,18 +254,21 @@ namespace HotelWise.Domain.AI.Adapter
             return templateResult;
         }
 
-        private async Task<(VectorSearchResults<TVector> SearchResult, VectorSearchResult<TVector>[] DataSearchResult)> GetVectorsResults(float[] searchEmbedding)
+        private async Task<VectorSearchResult<TVector>[]> GetVectorsResults(float[] searchEmbedding)
         {
             var searchEmbeddingCriteria = EmbeddingHelper.ConvertToReadOnlyMemory(searchEmbedding);
-            // Do the search.
-            var searchResult = await collection!.VectorizedSearchAsync(searchEmbeddingCriteria, new()
+            var searchResult = collection!.SearchAsync(searchEmbeddingCriteria, top: 2, new VectorSearchOptions<TVector>
             {
-                Top = 2,
-                //Filter = new VectorSearchFilter().AnyTagEqualTo(nameof(TVector.Tags), "classe:alta") // ENRIQUECANDO O DADO PARA TORNAR MAIS RELEVANT
+                VectorProperty = r => r.Embedding
             });
-            var dataSearchResult = searchResult.Results.ToBlockingEnumerable().ToArray();
 
-            return (SearchResult: searchResult!, DataSearchResult: dataSearchResult);
+            var dataSearchResult = new List<VectorSearchResult<TVector>>();
+            await foreach (var item in searchResult)
+            {
+                dataSearchResult.Add(item);
+            }
+
+            return dataSearchResult.ToArray();
         }
 
         public async Task DeleteAsync(string nameCollection, long dataKey)

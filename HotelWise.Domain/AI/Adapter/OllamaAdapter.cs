@@ -76,16 +76,12 @@ namespace HotelWise.Domain.AI.Adapter
             if (string.IsNullOrWhiteSpace(text))
                 throw new ArgumentException("Text cannot be null or empty.");
 
-            // Chama o método GenerateEmbeddingAsync com os tipos explicitamente definidos
-            var embedding = await _clientChat.GenerateEmbeddingAsync(
-                text,
-                options: null, // Pode passar opções se necessário
-                cancellationToken: CancellationToken.None
-            );
+            // Chama o método EmbedAsync (OllamaSharp 5.x)
+            var embedding = await _clientChat.EmbedAsync(text, CancellationToken.None);
 
             // Converte os embeddings em um array de floats
-            // Converte o Vector para um array de float
-            float[] floatArray = embedding.Vector.ToArray();
+            float[] floatArray = embedding.Embeddings?.FirstOrDefault()?.ToArray()
+                ?? Array.Empty<float>();
 
             return floatArray;
         }
