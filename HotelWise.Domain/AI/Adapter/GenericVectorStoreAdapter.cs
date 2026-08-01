@@ -3,10 +3,10 @@ using HotelWise.Domain.Helpers;
 using HotelWise.Domain.Interfaces.AppConfig;
 using HotelWise.Domain.Interfaces.IA;
 using HotelWise.Domain.Interfaces.SemanticKernel;
+using Microsoft.Extensions.AI;
 using Microsoft.Extensions.VectorData;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.Data;
-using Microsoft.SemanticKernel.Embeddings;
 using Microsoft.SemanticKernel.PromptTemplates.Handlebars;
 using System.Diagnostics;
 
@@ -131,12 +131,9 @@ namespace HotelWise.Domain.AI.Adapter
             insertLogStarterSearchPluginAsync();
             await LoadCollection(nameCollection);
 
-#pragma warning disable SKEXP0001
-
-            ITextEmbeddingGenerationService embeddingService = _kernel.GetRequiredService<ITextEmbeddingGenerationService>();
-            var vectorStoreTextSearch = new VectorStoreTextSearch<TVector>(collection!, embeddingService);
-
-#pragma warning restore SKEXP0001
+            IEmbeddingGenerator<string, Embedding<float>> embeddingGenerator =
+                _kernel.GetRequiredService<IEmbeddingGenerator<string, Embedding<float>>>();
+            var vectorStoreTextSearch = new VectorStoreTextSearch<TVector>(collection!, embeddingGenerator);
 
             string pluginName = CreatePlugin(vectorStoreTextSearch);
 

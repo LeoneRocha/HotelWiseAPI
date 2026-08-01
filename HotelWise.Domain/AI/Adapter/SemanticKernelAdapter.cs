@@ -8,24 +8,22 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.Agents;
 using Microsoft.SemanticKernel.ChatCompletion;
-using Microsoft.SemanticKernel.Embeddings;
 using System.Text;
 
 namespace HotelWise.Domain.AI.Adapter
 {
-#pragma warning disable SKEXP0001
     public class SemanticKernelAdapter : IAIInferenceAdapter
     {
         private readonly Kernel _kernel;
         private readonly IChatCompletionService _chatCompletionService;
-        private readonly ITextEmbeddingGenerationService _embeddingGenerationService;
+        private readonly IEmbeddingGenerator<string, Embedding<float>> _embeddingGenerator;
         private const string LineSeparator = "--------------------------------";
         public SemanticKernelAdapter(IApplicationIAConfig applicationConfig, IServiceProvider serviceProvider)
         {
             _kernel = serviceProvider.GetRequiredService<Kernel>()
                 ?? throw new InvalidOperationException("Kernel não foi inicializado corretamente.");
             _chatCompletionService = _kernel.GetRequiredService<IChatCompletionService>();
-            _embeddingGenerationService = _kernel.GetRequiredService<ITextEmbeddingGenerationService>();
+            _embeddingGenerator = _kernel.GetRequiredService<IEmbeddingGenerator<string, Embedding<float>>>();
         }
 
         public async Task<string> GenerateChatCompletionAsync(PromptMessageVO[] messages)
@@ -77,14 +75,14 @@ namespace HotelWise.Domain.AI.Adapter
             if (string.IsNullOrWhiteSpace(text))
                 throw new ArgumentException("Text cannot be null or empty.");
 
-            var embeddings = await _embeddingGenerationService.GenerateEmbeddingsAsync(new List<string> { text });
+            var embedding = await _embeddingGenerator.GenerateAsync(text);
 
-            if (embeddings == null || embeddings.Count == 0 || embeddings[0].Length == 0)
+            if (embedding.Vector.Length == 0)
             {
                 return Array.Empty<float>();
             }
 
-            return embeddings[0].ToArray();
+            return embedding.Vector.ToArray();
         }
 
         #region PRIVATE

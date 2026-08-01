@@ -18,7 +18,6 @@
     <PackageReference Include="HtmlAgilityPack" />
     <PackageReference Include="Markdig" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" />
-    <PackageReference Include="Microsoft.AspNetCore.Components" />
     <PackageReference Include="Microsoft.Extensions.Caching.Memory" />
     <PackageReference Include="Microsoft.Extensions.Configuration" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Binder" />
@@ -30,15 +29,12 @@
     <PackageReference Include="Microsoft.Extensions.VectorData.Abstractions" />
     <PackageReference Include="Microsoft.Identity.Web" />
     <PackageReference Include="Microsoft.IdentityModel.JsonWebTokens" />
-    <PackageReference Include="Microsoft.KernelMemory.AI.Ollama" />
-    <PackageReference Include="Microsoft.KernelMemory.Core" />
-    <PackageReference Include="Microsoft.KernelMemory.SemanticKernelPlugin" />
+    <PackageReference Include="CommunityToolkit.VectorData.InMemory" />
+    <PackageReference Include="CommunityToolkit.VectorData.Qdrant" />
     <PackageReference Include="Microsoft.SemanticKernel" />
     <PackageReference Include="Microsoft.SemanticKernel.Abstractions" />
     <PackageReference Include="Microsoft.SemanticKernel.Agents.Abstractions" />
     <PackageReference Include="Microsoft.SemanticKernel.Agents.Core" />
-    <PackageReference Include="Microsoft.SemanticKernel.Connectors.InMemory" />
-    <PackageReference Include="Microsoft.SemanticKernel.Connectors.Qdrant" />
     <PackageReference Include="Microsoft.SemanticKernel.Core" />
     <PackageReference Include="Microsoft.SemanticKernel.Plugins.Memory" />
     <PackageReference Include="Microsoft.SemanticKernel.PromptTemplates.Handlebars" />

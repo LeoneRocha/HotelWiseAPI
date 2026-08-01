@@ -4,6 +4,7 @@ using HotelWise.Domain.Dto.IA.SemanticKernel;
 using HotelWise.Domain.Enuns.IA;
 using HotelWise.Domain.Helpers;
 using HotelWise.Domain.Interfaces.AppConfig;
+using Microsoft.Extensions.AI;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -12,8 +13,7 @@ using Microsoft.Extensions.VectorData;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.ChatCompletion;
 using Microsoft.SemanticKernel.Connectors.Ollama;
-using Microsoft.SemanticKernel.Connectors.Qdrant;
-using Microsoft.SemanticKernel.Embeddings;
+using CommunityToolkit.VectorData.Qdrant;
 using Microsoft.SemanticKernel.TextGeneration;
 using OllamaSharp;
 
@@ -111,7 +111,7 @@ namespace HotelWise.Service.Configure
 
             var mistralEmbeddings = appConfig.MistralApiEmbeddingsConfig;
 
-            builder.AddMistralTextEmbeddingGeneration(modelId: mistralEmbeddings.ModelId, apiKey: mistralEmbeddings.ApiKey);
+            builder.AddMistralEmbeddingGenerator(modelId: mistralEmbeddings.ModelId, apiKey: mistralEmbeddings.ApiKey);
 
             builder.Services.AddTransient((serviceProvider) => {
                 return new Kernel(serviceProvider);
@@ -129,7 +129,7 @@ namespace HotelWise.Service.Configure
             //https://ollama.com/library/llama3.2
             builder.AddOllamaChatCompletion(modelId: modelConfig.ModelId, endpoint: new Uri(modelConfig.Endpoint));
             //https://ollama.com/library/nomic-embed-text
-            builder.AddOllamaTextEmbeddingGeneration(modelId: modelConfig.ModelIdEmbeddings, endpoint: new Uri(modelConfig.EndpointEmbeddings));
+            builder.AddOllamaEmbeddingGenerator(modelId: modelConfig.ModelIdEmbeddings, endpoint: new Uri(modelConfig.EndpointEmbeddings));
 
             builder.Services.AddTransient((serviceProvider) => { return new Kernel(serviceProvider); });
 
@@ -217,12 +217,9 @@ namespace HotelWise.Service.Configure
 
         private static void addDefaultTextEmbeddingGenerationService(IServiceCollection services, Kernel kernel)
         {
-#pragma warning disable SKEXP0001
-
-            ITextEmbeddingGenerationService embeddingService = kernel.GetRequiredService<ITextEmbeddingGenerationService>();
-            services.AddSingleton(embeddingService);
-
-#pragma warning restore SKEXP0001
+            IEmbeddingGenerator<string, Embedding<float>> embeddingGenerator =
+                kernel.GetRequiredService<IEmbeddingGenerator<string, Embedding<float>>>();
+            services.AddSingleton(embeddingGenerator);
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "SKEXP0070", Justification = "Usar interface para promover desacoplamento é intencional.")]
