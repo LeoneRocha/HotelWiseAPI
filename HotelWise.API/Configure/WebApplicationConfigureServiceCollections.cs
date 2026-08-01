@@ -1,4 +1,5 @@
 ﻿using HotelWise.API.Configure;
+using HotelWise.Domain.Helpers;
 using HotelWise.Service.Configure;
 using Microsoft.Net.Http.Headers;
 using Microsoft.OpenApi;
@@ -26,9 +27,14 @@ namespace HotelWise.API
                 });
             }
 
+            var appVersionInfo = LogAppHelper.GetInformationVersionProduct();
+            var apiVersion = string.IsNullOrWhiteSpace(appVersionInfo.Version) || appVersionInfo.Version is "Unknown" or "Undefined"
+                ? "v1"
+                : appVersionInfo.Version;
+
             services.AddSwaggerGen(c =>
             {
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "HotelWise.API", Version = "v1" });
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "HotelWise.API", Version = apiVersion });
                 c.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme
                 {
                     Description = "Standard Authorization header using the Bearer scheme. Example: \"bearer {token}\"",
