@@ -33,6 +33,9 @@ namespace HotelWise.Domain.Helpers
             return new LoggerConfiguration()
                       .ReadFrom.Configuration(configuration)
                       .Enrich.FromLogContext()
+                      .Enrich.WithEnvironmentName()
+                      .Enrich.WithMachineName()
+                      .Enrich.WithProperty("Application", "HotelWise.API")
                       .CreateLogger();
         } 
 

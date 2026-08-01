@@ -43,7 +43,7 @@ namespace HotelWise.API.Configure
                     LogAppHelper.PrintLogInformationVersionProduct(_logger);
 
                     _logger.Information("Web API Loading at: {time}", DateTime.UtcNow);
-                      
+
                     app.Run();
                 }
                 catch (Exception ex)
@@ -55,20 +55,32 @@ namespace HotelWise.API.Configure
 
         public static void Configure(IApplicationBuilder app, IWebHostEnvironment env, IConfiguration configuration)
         {
-            app.UseMiddleware<RequestLoggingMiddleware>(); // Adicione esta linha
+            app.UseMiddleware<CorrelationIdMiddleware>();
 
-            // Adiciona o middleware de logs de requisições integrado
-
-            // Configure the HTTP request pipeline.
-            if (env.IsDevelopment())
+            app.UseSerilogRequestLogging(options =>
             {
-                app.UseDeveloperExceptionPage();
-            }
+                options.EnrichDiagnosticContext = (diagnosticContext, httpContext) =>
+                {
+                    var correlationId = httpContext.Items[CorrelationIdMiddleware.ItemKey]?.ToString()
+                        ?? httpContext.TraceIdentifier;
+                    diagnosticContext.Set("CorrelationId", correlationId);
+                };
+                options.GetLevel = (httpContext, elapsed, ex) =>
+                    ex != null || httpContext.Response.StatusCode >= 500
+                        ? Serilog.Events.LogEventLevel.Error
+                        : httpContext.Response.StatusCode >= 400
+                            ? Serilog.Events.LogEventLevel.Warning
+                            : Serilog.Events.LogEventLevel.Information;
+            });
+
+            app.UseMiddleware<GlobalExceptionMiddleware>();
+            app.UseMiddleware<RequestLoggingMiddleware>();
+
             // Migrate latest database changes during startup
             addAutoMigrate(app);
 
             app.UseHttpsRedirection();
-              
+
             app.UseRouting();
 
             app.UseCors("AllowAnyOrigin");
@@ -77,9 +89,7 @@ namespace HotelWise.API.Configure
             app.UseSwaggerUI(c =>
             {
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "HotelWise.API v1");
-                //c.RoutePrefix = string.Empty; // Para acessar o Swagger na raiz do aplicativo
-            }
-            );
+            });
 
             var option = new RewriteOptions();
             option.AddRedirect("^$", "swagger");
@@ -93,11 +103,9 @@ namespace HotelWise.API.Configure
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
-                //HyperMedia
+                endpoints.MapHealthChecks("/health");
                 endpoints.MapControllerRoute("DefaultApi", "{controller=values}/{id?}");
             });
-
-      
         }
 
 

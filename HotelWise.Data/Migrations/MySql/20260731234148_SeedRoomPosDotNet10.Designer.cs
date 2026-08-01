@@ -4,6 +4,7 @@ using HotelWise.Data.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HotelWise.Data.Migrations.MySql
 {
     [DbContext(typeof(HotelWiseDbContextMysql))]
-    partial class HotelWiseDbContextMysqlModelSnapshot : ModelSnapshot
+    [Migration("20260731234148_SeedRoomPosDotNet10")]
+    partial class SeedRoomPosDotNet10
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -447,8 +450,8 @@ namespace HotelWise.Data.Migrations.MySql
                             Login = "admin",
                             ModifyDate = new DateTime(2025, 4, 12, 0, 49, 26, 432, DateTimeKind.Utc).AddTicks(4734),
                             Name = "User MOCK ",
-                            PasswordHash = new byte[] { 70, 201, 186, 81, 50, 62, 196, 162, 13, 116, 187, 123, 20, 91, 162, 177, 220, 6, 243, 231, 7, 22, 162, 101, 77, 211, 53, 98, 95, 233, 93, 246, 173, 217, 249, 114, 32, 211, 32, 16, 146, 232, 40, 42, 217, 244, 121, 117, 212, 32, 159, 20, 133, 9, 40, 36, 112, 31, 174, 140, 168, 126, 214, 50 },
-                            PasswordSalt = new byte[] { 118, 163, 138, 243, 56, 33, 187, 238, 154, 10, 102, 122, 98, 90, 84, 134, 89, 107, 231, 74, 202, 165, 254, 23, 22, 178, 94, 231, 165, 206, 15, 192, 155, 167, 13, 246, 107, 138, 221, 201, 208, 119, 137, 243, 241, 186, 88, 223, 253, 63, 101, 90, 73, 246, 216, 87, 176, 204, 150, 123, 71, 210, 223, 42, 90, 194, 84, 238, 185, 198, 250, 93, 236, 24, 48, 203, 26, 66, 173, 106, 150, 190, 3, 98, 79, 89, 133, 115, 78, 22, 101, 231, 223, 103, 44, 176, 183, 71, 146, 234, 187, 208, 36, 81, 85, 79, 187, 36, 46, 12, 206, 205, 25, 225, 53, 126, 120, 92, 51, 206, 194, 47, 4, 67, 10, 53, 95, 56 },
+                            PasswordHash = new byte[] { 30, 247, 136, 135, 205, 208, 14, 65, 141, 142, 181, 85, 147, 48, 124, 124, 134, 40, 66, 225, 229, 191, 214, 55, 79, 103, 1, 108, 249, 128, 134, 250, 172, 128, 32, 251, 235, 95, 123, 61, 97, 173, 246, 119, 125, 72, 47, 190, 75, 21, 125, 23, 7, 122, 29, 48, 189, 54, 82, 80, 16, 99, 153, 232 },
+                            PasswordSalt = new byte[] { 53, 90, 45, 101, 238, 159, 120, 237, 139, 200, 29, 239, 128, 104, 208, 207, 79, 158, 115, 110, 97, 89, 54, 25, 231, 145, 242, 195, 242, 15, 191, 169, 73, 192, 184, 78, 117, 230, 89, 45, 128, 46, 63, 83, 58, 99, 83, 168, 100, 211, 64, 163, 238, 14, 69, 80, 157, 146, 254, 137, 175, 120, 148, 50, 122, 17, 115, 207, 223, 92, 128, 5, 195, 211, 90, 219, 206, 201, 242, 69, 207, 202, 254, 84, 219, 22, 57, 124, 199, 208, 91, 146, 234, 202, 61, 67, 71, 75, 46, 93, 44, 35, 211, 127, 249, 235, 231, 179, 72, 176, 2, 26, 47, 89, 73, 42, 85, 69, 189, 82, 142, 234, 59, 69, 202, 65, 30, 250 },
                             RefreshToken = "",
                             Role = "Admin",
                             TimeZone = "E. South America Standard Time"

@@ -1,4 +1,5 @@
 ﻿using HotelWise.Data.Context.Configure.Helper;
+using HotelWise.Data.Context.Configure.Mock;
 using HotelWise.Domain.Model.HotelModels;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -57,6 +58,8 @@ namespace HotelWise.Data.Context.Configure.Entity.HotelModelConfigurations
             // Adicionando índices
             builder.HasIndex(r => r.HotelId).HasDatabaseName("IX_Room_HotelId");
             builder.HasIndex(r => r.RoomType).HasDatabaseName("IX_Room_RoomType");
+
+            builder.HasData(RoomsMockData.GetRooms());
         }
     }
 }
