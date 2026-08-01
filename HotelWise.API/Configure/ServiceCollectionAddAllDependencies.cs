@@ -22,13 +22,22 @@ namespace HotelWise.API.Configure
         private static void addORM(IServiceCollection services, IConfiguration configuration)
         {
             var connection = ConfigurationAppSettingsHelper.GetConnectionStringMySQL(configuration);
+            if (string.IsNullOrWhiteSpace(connection))
+            {
+                throw new InvalidOperationException(
+                    "Connection string MySQL ausente: 'ConnectionStrings:DBConnectionMySQL'. " +
+                    "Defina no appsettings do ambiente de publicação ou na variável 'ConnectionStrings__DBConnectionMySQL'. " +
+                    "Sem isso a API falha no startup (HTTP 500.30 no IIS).");
+            }
 
-            services.AddPooledDbContextFactory<HotelWiseDbContextMysql>(options => options.UseMySql(connection, new MySqlServerVersion(new Version(8, 0, 21))));
+            var serverVersion = new MySqlServerVersion(new Version(8, 0, 21));
 
+            services.AddPooledDbContextFactory<HotelWiseDbContextMysql>(options =>
+                options.UseMySql(connection, serverVersion));
 
             services.AddDbContext<HotelWiseDbContextMysql>((serviceProvider, optionsBuilder) =>
             {
-                optionsBuilder.UseMySql(connection, ServerVersion.AutoDetect(connection),
+                optionsBuilder.UseMySql(connection, serverVersion,
                 optionsMySQL =>
                 {
                     optionsMySQL.MigrationsAssembly("HotelWise.Data");

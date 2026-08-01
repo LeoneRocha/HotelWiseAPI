@@ -584,3 +584,5 @@ FodyWeavers.xsd
 /HotelWise.API/appsettings.Development.json
 /QdrantDockerFile/qdrant_storage/collections/skhotels/0/segments
 /QdrantDockerFile/qdrant_storage
+/DOCUMENTACAO/API/DevOps-ApplicationIAConfig-Variaveis.md
+/publish-test

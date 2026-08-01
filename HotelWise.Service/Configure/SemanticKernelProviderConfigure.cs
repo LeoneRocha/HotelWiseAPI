@@ -106,10 +106,18 @@ namespace HotelWise.Service.Configure
         {
 #pragma warning disable SKEXP0070
             var mistral = appConfig.MistralApiConfig;
-            // Optional; for targeting specific services within Semantic Kernel    httpClient: new HttpClient() // Optional; for customizing HTTP client , endpoint: new Uri("YOUR_ENDPOINT"), serviceId: "SERVICE_ID"
+            EnsureConfigured(
+                mistral.ApiKey,
+                "ApplicationIAConfig:AIServices:MistralApi:ApiKey",
+                "ApplicationIAConfig__AIServices__MistralApi__ApiKey");
+
             builder.AddMistralChatCompletion(modelId: mistral.ModelId, apiKey: mistral.ApiKey);
 
             var mistralEmbeddings = appConfig.MistralApiEmbeddingsConfig;
+            EnsureConfigured(
+                mistralEmbeddings.ApiKey,
+                "ApplicationIAConfig:AIServices:MistralApiEmbeddings:ApiKey",
+                "ApplicationIAConfig__AIServices__MistralApiEmbeddings__ApiKey");
 
             builder.AddMistralEmbeddingGenerator(modelId: mistralEmbeddings.ModelId, apiKey: mistralEmbeddings.ApiKey);
 
@@ -120,20 +128,31 @@ namespace HotelWise.Service.Configure
 #pragma warning restore SKEXP0070
         }
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "SKEXP0070", Justification = "Usar interface para promover desacoplamento é intencional.")]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1859", Justification = "Usar interface para promover desacoplamento é intencional.")]
         private static void addOllama(IApplicationIAConfig appConfig, IKernelBuilder builder)
         {
             var modelConfig = appConfig.OllamaConfig;
+            EnsureConfigured(
+                modelConfig.Endpoint,
+                "ApplicationIAConfig:AIServices:OllamaApi:Endpoint",
+                "ApplicationIAConfig__AIServices__OllamaApi__Endpoint");
 #pragma warning disable SKEXP0070
-            //https://ollama.com/library/llama3.2
             builder.AddOllamaChatCompletion(modelId: modelConfig.ModelId, endpoint: new Uri(modelConfig.Endpoint));
-            //https://ollama.com/library/nomic-embed-text
             builder.AddOllamaEmbeddingGenerator(modelId: modelConfig.ModelIdEmbeddings, endpoint: new Uri(modelConfig.EndpointEmbeddings));
 
             builder.Services.AddTransient((serviceProvider) => { return new Kernel(serviceProvider); });
 
 #pragma warning restore SKEXP0070
+        }
+
+        private static void EnsureConfigured(string? value, string configPath, string envVarHint)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                throw new InvalidOperationException(
+                    $"Configuração obrigatória ausente: '{configPath}'. " +
+                    $"Defina no appsettings do ambiente de publicação ou na variável de ambiente '{envVarHint}'. " +
+                    "Sem isso a API falha no startup (HTTP 500.30 no IIS).");
+            }
         }
 
         private static void addServicesDependecies(IServiceCollection services, Kernel kernel, IApplicationIAConfig configuration)

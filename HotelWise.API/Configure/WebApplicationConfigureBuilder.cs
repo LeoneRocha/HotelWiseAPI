@@ -29,27 +29,30 @@ namespace HotelWise.API.Configure
 
         public static void BuildAndRunAPP(WebApplicationBuilder builder, Serilog.Core.Logger? _logger)
         {
-            if (_logger != null)
+            if (_logger == null)
             {
-                try
-                {
-                    LogAppHelper.Set_ASPNETCORE_ENVIRONMENT(builder.Configuration);
+                throw new InvalidOperationException("Logger Serilog não foi inicializado. Verifique a seção Serilog em appsettings.");
+            }
 
-                    var app = builder.Build();
+            try
+            {
+                LogAppHelper.Set_ASPNETCORE_ENVIRONMENT(builder.Configuration);
 
-                    //Application Builder
-                    Configure(app, builder.Environment, builder.Configuration);
+                var app = builder.Build();
 
-                    LogAppHelper.PrintLogInformationVersionProduct(_logger);
+                Configure(app, builder.Environment, builder.Configuration);
 
-                    _logger.Information("Web API Loading at: {time}", DateTime.UtcNow);
+                LogAppHelper.PrintLogInformationVersionProduct(_logger);
 
-                    app.Run();
-                }
-                catch (Exception ex)
-                {
-                    _logger.Error(ex, "Web API Error Loading at: {Message} at: {time}", ex.Message, DateTime.UtcNow);
-                }
+                _logger.Information("Web API Loading at: {time}", DateTime.UtcNow);
+
+                app.Run();
+            }
+            catch (Exception ex)
+            {
+                _logger.Error(ex, "Web API Error Loading at: {Message} at: {time}", ex.Message, DateTime.UtcNow);
+                Console.Error.WriteLine($"FATAL STARTUP: {ex}");
+                throw;
             }
         }
 
@@ -111,13 +114,21 @@ namespace HotelWise.API.Configure
 
         private static void addAutoMigrate(IApplicationBuilder app)
         {
-            // Migrate latest database changes during startup
-            using (var serviceScope = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>().CreateScope())
+            using var serviceScope = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>().CreateScope();
+            using var context = serviceScope.ServiceProvider.GetService<HotelWiseDbContextMysql>();
+            if (context == null)
             {
-                using (var context = serviceScope.ServiceProvider.GetService<HotelWiseDbContextMysql>())
-                {
-                    context?.Database.Migrate();
-                }
+                return;
+            }
+
+            try
+            {
+                context.Database.Migrate();
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Falha ao aplicar migrations no startup. Verifique ConnectionStrings:DBConnectionMySQL e acesso ao MySQL.");
+                throw;
             }
         }
     }

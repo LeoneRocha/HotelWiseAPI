@@ -6,10 +6,17 @@ namespace HotelWise.API
     {
         public static void Main(string[] args)
         {
-
-            var hostBuilder = WebApplicationConfigureBuilder.CreateHostBuilder(args);
-
-            WebApplicationConfigureBuilder.BuildAndRunAPP(hostBuilder.Item1, hostBuilder.Item2);
+            try
+            {
+                var hostBuilder = WebApplicationConfigureBuilder.CreateHostBuilder(args);
+                WebApplicationConfigureBuilder.BuildAndRunAPP(hostBuilder.Item1, hostBuilder.Item2);
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine("FATAL: HotelWise.API failed to start.");
+                Console.Error.WriteLine(ex.ToString());
+                throw;
+            }
         }
     }
 }
