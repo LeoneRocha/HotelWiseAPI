@@ -1,114 +1,102 @@
-# Guia Genérico — Atualização de Pacotes (.NET NuGet e Frontend companion npm)
+# Guia Genérico — Atualização de Pacotes (.NET NuGet e Frontend npm)
 
-**Documento:** Guia operacional reutilizável  
-**Baseado em:** [RascunhoPlanoUpdateDotNet10.md](file:///c:/git/HotelWise/HotelWiseAPI/DOCUMENTACAO/UpdateDotNet10/RascunhoPlanoUpdateDotNet10.md), [PlanoAcaoMigracaoDotNet10.md](file:///c:/git/HotelWise/HotelWiseAPI/DOCUMENTACAO/UpdateDotNet10/PlanoAcaoMigracaoDotNet10.md) e [RelatorioMigracaoDotNet10.md](file:///c:/git/HotelWise/HotelWiseAPI/DOCUMENTACAO/UpdateDotNet10/RelatorioMigracaoDotNet10.md)  
+**Documento:** Guia operacional padronizado e reutilizável  
+**Aplicabilidade:** Qualquer repositório de software baseado em ecossistema .NET (com ou sem frontend npm/companion, Central Package Management, SDKs packable, EF Core, Docker e CI/CD).  
 **Data:** 2026-08-22  
-**Aplicabilidade:** Qualquer ciclo de atualização de dependências deste repositório (rotina periódica, upgrade de major, migração de runtime/framework). Aplicar a seção de npm quando coordenando atualizações com o frontend companion ([HotelWiseUI](https://github.com/LeoneRocha/HotelWiseUI)).  
-
-**Solução:** [HotelWiseAPI.sln](file:///c:/git/HotelWise/HotelWiseAPI/HotelWiseAPI.sln)  
 
 ---
 
 ## 1. Objetivo
 
-Padronizar como atualizar dependências de pacotes em todo o ecossistema da solução **HotelWiseAPI**, preservando:
+Padronizar o processo de atualização de dependências e gerenciamento de ciclo de vida de pacotes em soluções de software, garantindo:
 
-- Compatibilidade dos artefatos distribuídos externamente (pacote NuGet publicável [GroqApiLibrary](file:///c:/git/HotelWise/HotelWiseAPI/GroqApiLibrary/GroqApiLibrary.csproj) com multi-targeting `net8.0;net10.0`)
-- Integridade de migrations EF Core, seeds, constraints e schemas de banco de dados (MySQL via Pomelo / SQL Server)
-- Funcionamento e estabilidade da API REST ([HotelWise.API](file:///c:/git/HotelWise/HotelWiseAPI/HotelWise.API/HotelWise.API.csproj)), POCs de console ([HotelWise.ConsolePOC](file:///c:/git/HotelWise/HotelWiseAPI/HotelWise.ConsolePOC/HotelWise.ConsolePOC.csproj)), Injeção de Dependências (DI), logging (Serilog), telemetria (Application Insights) e middlewares
-- Ecossistema de Inteligência Artificial e RAG: **Semantic Kernel**, conectores (Mistral AI, Ollama, Groq), Vector Stores (**Qdrant**, InMemory) e manipulação de documentos
-- Build local, containers Docker ([QdrantDockerFile](file:///c:/git/HotelWise/HotelWiseAPI/QdrantDockerFile/docker-compose.yml)), stacks locais em `IA_Local/`, scripts de auditoria ([check_packages.ps1](file:///c:/git/HotelWise/HotelWiseAPI/check_packages.ps1)) e pipelines CI/CD
-- Zero alteração de regra de negócio ou contrato público durante o ciclo de atualização
+- **Estabilidade e continuidade:** Zero quebra de contratos públicos (APIs REST/gRPC), regras de negócio e interfaces de domínio durante ciclos de atualização de dependências.
+- **Integridade de dados e schemas:** Preservação rigorosa de migrations de banco de dados, seeds e estruturas relacionais/NoSQL.
+- **Compatibilidade retroativa de artefatos distribuídos:** Preservação de compatibilidade e multi-targeting em bibliotecas e SDKs públicos distribuídos externamente.
+- **Segurança contínua:** Identificação, mitigação e eliminação proativa de vulnerabilidades em dependências diretas e transitivas.
+- **Reprodutibilidade:** Builds limpos, determinísticos e consistentes entre ambiente local de desenvolvimento, containers Docker e esteiras de CI/CD.
 
-Este guia é genérico: as versões concretas de cada ciclo devem ser registradas em um documento filho por execução (o "Conjunto Homologado" daquele ciclo — ver Seção 5), nunca hardcoded aqui.
+Este guia define as diretrizes e procedimentos padrão. As versões concretas a serem aplicadas em uma determinada execução devem ser formalizadas em um documento filho de **"Conjunto Homologado"** específico daquele ciclo.
 
 ---
 
-## 2. Escopo e não escopo
+## 2. Escopo e Não Escopo
 
 ### 2.1 Escopo
 
 | Categoria | Ação |
 | --------- | ---- |
-| Projetos .NET da solução (`HotelWise.API`, `HotelWise.Service`, `HotelWise.Data`, `HotelWise.Domain`, `HotelWise.ConsolePOC`) | Atualizar pacotes NuGet via Central Package Management ([Directory.Packages.props](file:///c:/git/HotelWise/HotelWiseAPI/Directory.Packages.props)); atualizar TFM apenas em ciclos de migração de runtime |
-| Pacote NuGet publicável ([GroqApiLibrary](file:///c:/git/HotelWise/HotelWiseAPI/GroqApiLibrary/GroqApiLibrary.csproj)) | Atualizar dependências preservando multi-targeting (`net8.0;net10.0`) e validação via `dotnet pack` |
-| Frontend companion ([HotelWiseUI](https://github.com/LeoneRocha/HotelWiseUI) - React + Vite + TypeScript) | Coordenar alinhamento de contratos de API e dependências npm quando em ciclo conjunto |
-| Dockerfiles e docker-compose ([QdrantDockerFile](file:///c:/git/HotelWise/HotelWiseAPI/QdrantDockerFile/docker-compose.yml), `IA_Local/`) | Atualizar imagens base e definições de serviços de suporte (Qdrant, Ollama) |
-| Scripts de auditoria ([check_packages.ps1](file:///c:/git/HotelWise/HotelWiseAPI/check_packages.ps1)) | Atualizar referências e comandos caso necessário |
-| Pipelines CI/CD e SDK ([global.json](file:///c:/git/HotelWise/HotelWiseAPI/global.json), Azure DevOps Pipelines) | Alinhar versão de SDK .NET (`UseDotNet@2`) e Node.js |
+| **Projetos .NET** (APIs, bibliotecas, workers, consoles, suítes de teste) | Atualização de versões de pacotes NuGet via Central Package Management (`Directory.Packages.props`); atualização de Target Framework Moniker (TFM) quando o ciclo abranger upgrade de runtime/framework. |
+| **Bibliotecas e SDKs publicáveis** | Atualização de dependências preservando contratos públicos e multi-targeting (`TargetFrameworks`) para consumidores legados. |
+| **Projetos Frontend e SDKs TypeScript/npm** (quando existirem) | Atualização de `dependencies` e `devDependencies`, respeitando `engines`, `peerDependencies` e lockfiles. |
+| **Docker e Infraestrutura local** | Atualização de imagens base de runtime/SDK (`aspnet`, `sdk`, `node`) e serviços auxiliares (bancos, vector stores, caches). |
+| **Scripts e Automações** | Alinhamento de comandos, paths e filtros em scripts PowerShell, Bash e Node.js. |
+| **Pipelines de Integração Contínua (CI/CD)** | Alinhamento de tasks de SDK (`UseDotNet`, `NodeTool`, etc.) e imagens de build runners. |
 
-### 2.2 Não escopo
+### 2.2 Não Escopo
 
-- Alteração de regras de negócio, contratos REST, payloads JSON ou schemas de banco sem necessidade técnica
-- Refatoração de domínio ou preferências arquiteturais não relacionadas à atualização
-- Projetos órfãos não incluídos na solução (ex.: [GroqToolLibrary.csproj](file:///c:/git/HotelWise/HotelWiseAPI/GroqApiLibrary/GroqToolLibrary.csproj))
-- Troca de bibliotecas por equivalentes (ex.: substituição de ORM ou provider — decisão arquitetural separada, com RFC própria)
-
-Qualquer mudança fora do escopo deve ser registrada e tratada em PR separado.
+- Modificação de regras de negócio, contratos de API ou schemas de banco sem justificativa técnica indispensável.
+- Refatorações arquiteturais extensas ou reestruturação de camadas não relacionadas à atualização de pacotes.
+- Reescrita ampla de testes automatizados além do estritamente necessário para compatibilidade com versões atualizadas.
+- Substituição de bibliotecas por tecnologias equivalentes (ex.: troca de ORM, framework de testes ou biblioteca de serialização) — tais iniciativas demandam RFC e planejamento arquitetural dedicado.
 
 ---
 
-## 3. Princípios obrigatórios (valem para NuGet e npm)
+## 3. Princípios Obrigatórios
 
-1. **Inventário antes de alterar** — nunca atualizar sem primeiro gerar a lista do que está desatualizado e vulnerável (Seção 4).
-2. **Conjunto Homologado por ciclo** — cada ciclo de atualização produz uma tabela "pacote / versão atual / versão a aplicar / latest disponível / justificativa quando não for a latest". Só entram versões estáveis (sem `preview`, `rc`, `beta`, `next`, `canary`) em produção, exceto pacotes de IA que exigem sincronismo em previews coordenadas (ex.: SK connectors).
-3. **Atualizar por blocos coesos, nunca pacote a pacote isolado** — pacotes do mesmo ecossistema sobem juntos (ex.: todos `Microsoft.AspNetCore.*` e `Microsoft.Extensions.*` no mesmo patch; família `Microsoft.EntityFrameworkCore.*` alinhada; ferramentas `Microsoft.SemanticKernel.*` coordenadas).
-4. **Respeitar dependências rígidas do grafo** — quando um pacote trava a major de outro (ex.: provider de banco `Pomelo.EntityFrameworkCore.MySql` travando a major do `Microsoft.EntityFrameworkCore`), documentar a trava e NÃO forçar a latest. Registrar a condição de destrave para o próximo ciclo ("Conjunto v2 futuro").
-5. **Abordagem incremental por fases** — validar build e smoke ao final de cada fase; nunca alterar tudo de uma vez.
-6. **Centralização de versões via CPM** — .NET usa Central Package Management ([Directory.Packages.props](file:///c:/git/HotelWise/HotelWiseAPI/Directory.Packages.props) como fonte única; `.csproj` sem atributo `Version`). npm usa o `package.json` de cada projeto + lockfile commitado.
-7. **Não remover compatibilidade de artefatos publicáveis** — [GroqApiLibrary](file:///c:/git/HotelWise/HotelWiseAPI/GroqApiLibrary/GroqApiLibrary.csproj) mantém multi-targeting (`TargetFrameworks: net8.0;net10.0`) com validação de binários em `lib/` no pacote `.nupkg`.
-8. **Branch dedicada com commits por fase** — ex.: `chore/update-packages-YYYY-MM` ou `chore/update-packages-hotelwiseapi-dotnet10`.
-9. **Major bump exige atenção individual** — ler changelog/breaking changes antes de aplicar; um major de terceiro nunca sobe "de carona" no lote.
-10. **Nenhuma migration/schema novo por causa de atualização** — se a atualização gerar migration não-vazia ou diff de schema não intencional, investigar antes de commitar.
+1. **Inventário antes de qualquer alteração:** Nunca atualizar dependências sem antes mapear o estado atual, listando versões em uso, versões mais recentes disponíveis e vulnerabilidades conhecidas.
+2. **Formalização do Conjunto Homologado:** Cada ciclo de atualização deve gerar uma matriz declarativa contendo `Pacote / Versão Atual / Versão Alvo / Latest Disponível / Justificativa de Retenção`. Versões `preview`, `rc`, `beta` ou `canary` são vedadas em ambientes de produção, exceto quando houver exigência técnica explícita documentada.
+3. **Atualização por blocos coesos:** Pacotes pertencentes à mesma família ou ecossistema tecnológico devem ser atualizados em conjunto (ex.: toda a família `Microsoft.AspNetCore.*` e `Microsoft.Extensions.*` alinhada; ferramentas de teste coordenadas).
+4. **Respeito rigoroso às travas de grafo:** Quando uma dependência intermediária travar a versão de outra (ex.: provider de banco travando a major do ORM), o bloco correspondente deve ser retido na versão compatível, documentando o motivo e a condição futura de destrave.
+5. **Execução incremental por fases:** A aplicação das mudanças deve ocorrer em etapas sequenciais por camada, validando restauração, compilação e testes ao término de cada fase.
+6. **Centralização de versões via Central Package Management (CPM):** Em soluções .NET, as versões devem ser declaradas exclusivamente no arquivo central `Directory.Packages.props`, mantendo os arquivos de projeto (`.csproj`) sem atributos de versão direta. Em ambientes npm, manter `package-lock.json` rigorosamente sincronizado.
+7. **Preservação de compatibilidade de pacotes distribuídos:** Bibliotecas packable distribuídas via NuGet ou npm devem manter suporte às versões anteriores necessárias para seus consumidores.
+8. **Trabalho em branch dedicada:** Todas as alterações devem ocorrer em branch isolada (ex.: `chore/update-packages-YYYY-MM`), realizando commits semânticos por fase.
+9. **Tratamento criterioso de Major Bumps:** Atualizações de versão maior (major) exigem leitura prévia de notas de release (*breaking changes*) e testes dirigidos.
+10. **Garantia de integridade de schemas:** Se uma atualização de pacotes de persistência induzir alterações DDL não planejadas ou gerar migrations indesejadas, a causa deve ser investigada e neutralizada antes da integração.
 
 ---
 
-## 4. Fase de inventário (sempre a primeira)
+## 4. Fase de Inventário
 
-### 4.1 .NET / NuGet
+### 4.1 Inventário .NET / NuGet
 
-Comandos para inventário da solução:
+Comandos padrão para auditoria completa da solução:
 
 ```powershell
+# Listar SDKs instalados no ambiente
 dotnet --list-sdks
-dotnet list HotelWiseAPI.sln package --outdated
-dotnet list HotelWiseAPI.sln package --vulnerable --include-transitive
-dotnet list HotelWiseAPI.sln package
+
+# Listar pacotes com atualizações disponíveis
+dotnet list <Solucao>.sln package --outdated
+
+# Listar pacotes com vulnerabilidades conhecidas (diretas e transitivas)
+dotnet list <Solucao>.sln package --vulnerable --include-transitive
+
+# Listar árvore consolidada de dependências
+dotnet list <Solucao>.sln package
 ```
 
-Ou através do script utilitário:
+Matriz de inventário de projetos:
+
+| Projeto | Caminho | Tipo | TFM Atual | Publicável? | Status no .sln |
+| ------- | ------- | ---- | --------- | ----------- | -------------- |
+| Exemplo.API | `src/Exemplo.API/` | Web API | netX.0 | Não | Sim |
+| Exemplo.Domain | `src/Exemplo.Domain/` | Class Library | netX.0 | Não | Sim |
+| Exemplo.Data | `src/Exemplo.Data/` | Class Library | netX.0 | Não | Sim |
+| Exemplo.SDK | `src/Exemplo.SDK/` | Class Library | netX.0;netY.0 | **Sim (NuGet)** | Sim |
+
+Matriz de inventário de pacotes:
+
+| Pacote | Versão Atual | Latest Estável | Versão a Aplicar | Justificativa se retido |
+| ------ | ------------ | -------------- | ---------------- | ----------------------- |
+
+### 4.2 Inventário Frontend / npm (quando aplicável)
+
+Para cada projeto frontend ou módulo TypeScript presente no repositório:
 
 ```powershell
-.\check_packages.ps1
-```
-
-Gerar tabelas:
-
-| Projeto | Caminho | Tipo | TFM atual | Publicável? | No .sln? |
-| ------- | ------- | ---- | --------- | ----------- | -------- |
-| [HotelWise.API](file:///c:/git/HotelWise/HotelWiseAPI/HotelWise.API/HotelWise.API.csproj) | `HotelWise.API/` | ASP.NET Core Web API (Host) | net10.0 | Não | Sim |
-| [HotelWise.Service](file:///c:/git/HotelWise/HotelWiseAPI/HotelWise.Service/HotelWise.Service.csproj) | `HotelWise.Service/` | Class Library (Services / AI wiring) | net10.0 | Não | Sim |
-| [HotelWise.Data](file:///c:/git/HotelWise/HotelWiseAPI/HotelWise.Data/HotelWise.Data.csproj) | `HotelWise.Data/` | Class Library (EF Core / MySQL / SqlServer) | net10.0 | Não | Sim |
-| [HotelWise.Domain](file:///c:/git/HotelWise/HotelWiseAPI/HotelWise.Domain/HotelWise.Domain.csproj) | `HotelWise.Domain/` | Class Library (Domain / Entities / SK) | net10.0 | Não | Sim |
-| [GroqApiLibrary](file:///c:/git/HotelWise/HotelWiseAPI/GroqApiLibrary/GroqApiLibrary.csproj) | `GroqApiLibrary/` | Class Library (Cliente Groq) | net8.0;net10.0 | **Sim (NuGet)** | Sim |
-| [HotelWise.ConsolePOC](file:///c:/git/HotelWise/HotelWiseAPI/HotelWise.ConsolePOC/HotelWise.ConsolePOC.csproj) | `HotelWise.ConsolePOC/` | Console Application (POC Ollama) | net10.0 | Não | Sim |
-| [GroqToolLibrary](file:///c:/git/HotelWise/HotelWiseAPI/GroqApiLibrary/GroqToolLibrary.csproj) | `GroqApiLibrary/` | Class Library (Órfão) | net8.0 | Não | Não |
-
-| Pacote | Versão atual | Latest stable | Versão a aplicar | Justificativa se diferente da latest |
-| ------ | ------------ | ------------- | ---------------- | ------------------------------------ |
-
-### 4.2 Frontend / npm (repositório companion HotelWiseUI)
-
-Quando o ciclo de atualização envolver sincronização com a interface frontend [HotelWiseUI](https://github.com/LeoneRocha/HotelWiseUI):
-
-| Projeto | Caminho | Stack | Publicável? |
-| ------- | ------- | ----- | ----------- |
-| HotelWiseUI | Repositório externo (`HotelWiseUI/`) | React + Vite + TypeScript + Tailwind | Não (App SPA) |
-
-Comandos no repositório frontend:
-
-```powershell
-cd ..\HotelWiseUI
+cd <diretorio-do-projeto>
 node --version
 npm outdated
 npm audit --omit=dev
@@ -117,213 +105,206 @@ npm ls --depth=0
 
 ---
 
-## 5. Conjunto Homologado — regras de montagem
+## 5. Montagem do Conjunto Homologado
 
-### 5.1 Blocos .NET (modelo)
+### 5.1 Organização dos Blocos .NET
 
-Organizar o conjunto em blocos, na ordem de dependência:
+As dependências devem ser organizadas em blocos lógicos estruturados:
 
-- **Bloco A — Plataforma** (`Microsoft.AspNetCore.Authentication.JwtBearer`, `Microsoft.Extensions.*`, `System.Text.Json`, `Microsoft.Kiota.*`): todos no MESMO patch do ciclo do runtime alvo (.NET 10).
-- **Bloco B — Persistência** (`Microsoft.EntityFrameworkCore.*` + providers `Pomelo.EntityFrameworkCore.MySql`, `Microsoft.EntityFrameworkCore.SqlServer`): todos na MESMA major, limitada pela major suportada pelo provider mais restritivo. Documentar a trava (ex.: "Pomelo 9.x exige EF Core <= 9.x") e a condição de destrave.
-- **Bloco C — OpenAPI, logging, tokens e segurança** (`Swashbuckle.AspNetCore`, `Swashbuckle.AspNetCore.Filters`, `Serilog.*`, `Microsoft.IdentityModel.JsonWebTokens`, `Microsoft.Identity.Web`, `Microsoft.ApplicationInsights.AspNetCore`): Swashbuckle segue compatibilidade com ASP.NET Core e Serilog alinhado.
-- **Bloco D — Domínio, utilitários, nuvem e documentos** (`AutoMapper`, `FluentValidation`, `Newtonsoft.Json`, `Polly`, `Bogus`, `HtmlAgilityPack`, `Markdig`, `DocumentFormat.OpenXml`, `PDFsharp`, `QuestPDF`, `Azure.*`, `Microsoft.Graph`): latest estável, com atenção a licenças em majors novos (ex.: AutoMapper 15+).
-- **Bloco AI — Inteligência Artificial e Vector Store** (`Microsoft.SemanticKernel.*`, `Microsoft.Extensions.AI`, `Microsoft.Extensions.VectorData.Abstractions`, `CommunityToolkit.VectorData.*`, `OllamaSharp`, `Mistral.SDK`): família Semantic Kernel alinhada na mesma versão/preview coordenada.
+- **Bloco A — Plataforma e Runtime:** `Microsoft.AspNetCore.*`, `Microsoft.Extensions.*`, `System.Text.Json`, utilitários de injeção de dependências e abstrações fundamentais. Devem estar todos alinhados no mesmo patch release compatível com o runtime alvo.
+- **Bloco B — Persistência e Dados:** `Microsoft.EntityFrameworkCore.*`, provedores de banco de dados (MySQL, PostgreSQL, SQL Server, SQLite, InMemory) e ferramentas de migração. O bloco é balizado pela versão máxima suportada pelo provider mais restritivo.
+- **Bloco C — OpenAPI, Observabilidade e Segurança:** Geradores OpenAPI/Swagger, frameworks de logging (`Serilog.*`), bibliotecas de autenticação/tokens JWT (`Microsoft.IdentityModel.*`, `Microsoft.Identity.Web`) e telemetria (`ApplicationInsights`, `OpenTelemetry`).
+- **Bloco D — Domínio, Utilitários e Nuvem:** Mapeadores de objetos (`AutoMapper`), validadores (`FluentValidation`), serializadores, clientes de mensageria/cloud (`Azure.*`, `AWS.*`), bibliotecas de resiliência (`Polly`) e manipuladores de documentos.
+- **Bloco AI — Inteligência Artificial e Vetores (se aplicável):** Orquestradores de IA (`Microsoft.SemanticKernel.*`, `Microsoft.Extensions.AI`), conectores LLM e provedores de vector store (`VectorData`, `Qdrant`, etc.).
+- **Bloco E — Suíte de Testes:** Runners (`Microsoft.NET.Test.Sdk`), frameworks de teste (xUnit, NUnit, MSTest), ferramentas de mock (`Moq`, `NSubstitute`), asserções e coletores de cobertura (`coverlet.*`).
 
-Dependências rígidas típicas (validar a cada ciclo):
+Tabela de dependências rígidas comuns:
 
-| Se usar | Então obrigatoriamente |
-| ------- | ---------------------- |
-| Provider `Pomelo.EntityFrameworkCore.MySql` na major N (ex.: 9.0.0) | Todos `Microsoft.EntityFrameworkCore.*` na major N (ex.: 9.0.18) |
-| Runtime `net10.0` em Web API / Hosts | Todos `Microsoft.AspNetCore.*` / `Microsoft.Extensions.*` no patch do ciclo |
-| Swashbuckle v10+ | Namespaces atualizados (`Microsoft.OpenApi` em vez de `Microsoft.OpenApi.Models`) |
-| VectorData Abstractions (May 2025+) | Atributos `[VectorStoreRecordKey]`, `[VectorStoreRecordData]`, `[VectorStoreRecordVector]` |
-| `GroqApiLibrary` multi-target `net8.0;net10.0` | `dotnet pack` deve gerar pastas `lib/net8.0/` e `lib/net10.0/` válidas |
+| Se a solução utilizar | Regra obrigatória correspondente |
+| --------------------- | -------------------------------- |
+| Provider de banco de dados na versão N | Todos os pacotes `Microsoft.EntityFrameworkCore.*` mantidos na versão compatível N |
+| Runtime .NET versão X | Bibliotecas de plataforma `Microsoft.AspNetCore.*` / `Microsoft.Extensions.*` alinhadas na release X |
+| Framework de mock com integração a ORM | Versão do mock alinhada à major correspondente do ORM em uso |
+| Multi-targeting em biblioteca publicável | Compilação e empacotamento validados individualmente em cada TFM suportado |
 
-Aplicação: todas as versões entram/atualizam em [Directory.Packages.props](file:///c:/git/HotelWise/HotelWiseAPI/Directory.Packages.props); os arquivos `.csproj` permanecem sem o atributo `Version=`.
+### 5.2 Organização dos Blocos npm (quando aplicável)
 
-### 5.2 Blocos npm (quando coordenando com HotelWiseUI)
-
-- **Bloco F — Core UI & Build**: `react`, `react-dom`, `@types/react*`, `vite`, `typescript`.
-- **Bloco G — Utilitários e Estilização**: `tailwindcss`, `lucide-react`, `axios`, etc.
-- **Bloco H — Tooling e Lint**: `eslint`, `prettier`, plugins.
-
-Regras npm:
-1. Atualizar via `npm install <pkg>@<versao>` ou editando o `package.json` + `npm install` — SEMPRE commitar o `package-lock.json` resultante.
-2. `npm audit fix` sem `--force`.
+- **Bloco F — Core de Framework:** Framework principal (`react`, `angular`, `vue`), bibliotecas fundamentais e adaptadores de renderização.
+- **Bloco G — Componentes UI e Ecossistema:** Bibliotecas de interface, ícones, utilitários de estilo e internacionalização.
+- **Bloco H — Ferramental de Build e Lint:** Bundlers (`vite`, `webpack`, `tsup`), compilador `typescript`, `eslint`, `prettier` e plugins.
+- **Bloco I — Testes Frontend:** Frameworks de teste (`jest`, `vitest`), adaptadores de ambiente DOM e bibliotecas de asserção.
 
 ---
 
-## 6. Plano de execução por fases
+## 6. Plano de Execução por Fases
 
 ```mermaid
 flowchart TD
-    F0[Fase 0 - Preparação e baseline] --> F1[Fase 1 - CPM e GroqApiLibrary packable]
-    F1 --> F2[Fase 2 - Camadas internas Domain / Data / Service]
-    F2 --> F3[Fase 3 - Hosts executáveis HotelWise.API e ConsolePOC]
-    F3 --> F4[Fase 4 - Persistência e EF Core Migrations]
-    F4 --> F5[Fase 5 - Docker e Scripts de auditoria]
-    F5 --> F6[Fase 6 - Frontend companion HotelWiseUI opcional]
-    F6 --> F7[Fase 7 - CI/CD e Evidências]
+    F0[Fase 0 - Preparação e Baseline] --> F1[Fase 1 - Central Package Management e Artefatos Publicáveis]
+    F1 --> F2[Fase 2 - Bibliotecas Internas de Domínio e Dados]
+    F2 --> F3[Fase 3 - Camadas de Serviço e Infraestrutura]
+    F3 --> F4[Fase 4 - Hosts Executáveis e APIs]
+    F4 --> F5[Fase 5 - Suíte de Testes e Validação de Persistência]
+    F5 --> F6[Fase 6 - Containers, Scripts e Frontend Companion]
+    F6 --> F7[Fase 7 - CI/CD e Emissão de Evidências]
 ```
 
-- **Fase 0 — Preparação**: branch dedicada; inventário (Seção 4); montar Conjunto Homologado (Seção 5); commit baseline com build verde no estado atual.
-- **Fase 1 — CPM e Packable**: atualizar [Directory.Packages.props](file:///c:/git/HotelWise/HotelWiseAPI/Directory.Packages.props) e validar o build/pack de [GroqApiLibrary](file:///c:/git/HotelWise/HotelWiseAPI/GroqApiLibrary/GroqApiLibrary.csproj) (`net8.0;net10.0`).
-- **Fase 2 — Camadas internas**: aplicar blocos A, B, D e AI em [HotelWise.Domain](file:///c:/git/HotelWise/HotelWiseAPI/HotelWise.Domain/HotelWise.Domain.csproj), [HotelWise.Data](file:///c:/git/HotelWise/HotelWiseAPI/HotelWise.Data/HotelWise.Data.csproj) e [HotelWise.Service](file:///c:/git/HotelWise/HotelWiseAPI/HotelWise.Service/HotelWise.Service.csproj).
-- **Fase 3 — Hosts executáveis**: aplicar blocos A, C e AI em [HotelWise.API](file:///c:/git/HotelWise/HotelWiseAPI/HotelWise.API/HotelWise.API.csproj) e [HotelWise.ConsolePOC](file:///c:/git/HotelWise/HotelWiseAPI/HotelWise.ConsolePOC/HotelWise.ConsolePOC.csproj).
-- **Fase 4 — Persistência e Migrations**: validar migrations EF Core com `HotelWiseDbContextMysql`, gerar migration temporária para validar integridade DDL e aplicar seeds.
-- **Fase 5 — Containers e scripts**: verificar [QdrantDockerFile/docker-compose.yml](file:///c:/git/HotelWise/HotelWiseAPI/QdrantDockerFile/docker-compose.yml), stacks `IA_Local/` e script [check_packages.ps1](file:///c:/git/HotelWise/HotelWiseAPI/check_packages.ps1).
-- **Fase 6 — Frontend companion (opcional)**: quando aplicável, validar build de produção e lint em `HotelWiseUI`.
-- **Fase 7 — CI/CD e evidências**: alinhar [global.json](file:///c:/git/HotelWise/HotelWiseAPI/global.json) e pipelines do Azure DevOps; gerar relatório final do ciclo.
+- **Fase 0 — Preparação e Baseline:** Criação da branch dedicada; consolidação do inventário; compilação baseline com execução de testes para certificar estabilidade prévia.
+- **Fase 1 — Central Package Management e Publicáveis:** Configuração do `Directory.Packages.props`; atualização e validação de empacotamento (`dotnet pack` / `npm pack`) de bibliotecas distribuídas.
+- **Fase 2 — Camadas Internas de Domínio e Dados:** Aplicação de dependências em projetos base (Domain, Data/Entities); validação de compilação intermediária.
+- **Fase 3 — Camadas de Serviço e Infraestrutura:** Atualização das regras de negócio, orquestrações e integrações externas.
+- **Fase 4 — Hosts Executáveis e APIs:** Atualização de projetos de inicialização (Web APIs, workers, consoles); ajuste de middlewares e injeção de dependências.
+- **Fase 5 — Testes e Persistência:** Atualização da suíte de testes; execução de validação de migrations de banco de dados.
+- **Fase 6 — Containers, Scripts e Frontend:** Validação de Dockerfiles, scripts de apoio e módulos frontend companion.
+- **Fase 7 — CI/CD e Emissão de Evidências:** Alinhamento de configurações de pipeline de integração contínua; emissão do relatório consolidado de conclusão.
 
 ---
 
-## 7. Checklist de validação
+## 7. Checklist de Validação
 
-### 7.1 .NET — build e restore
+### 7.1 .NET — Restauração e Compilação
 
 ```powershell
-dotnet restore HotelWiseAPI.sln
-dotnet build HotelWiseAPI.sln -c Release
+dotnet restore <Solucao>.sln
+dotnet build <Solucao>.sln -c Release
 ```
 
-- [ ] Restore sem `NU1107` (conflito de versão) e `NU1202` (TFM incompatível)
-- [ ] Build Release com 0 erros; warnings novos de obsolescência corrigidos ou justificados
-- [ ] Pins transitivos aplicados para suprimir vulnerabilidades `NU1903`/`NU1904`
+- [ ] `dotnet restore` executado sem erros de incompatibilidade (`NU1107`, `NU1202`).
+- [ ] Compilação em modo Release concluída com 0 erros.
+- [ ] Avisos de obsolescência (`CS0618`) avaliados e tratados ou justificados.
+- [ ] Alertas de segurança (`NU1903`, `NU1904`) saneados através de pins transitivos no CPM.
 
-### 7.2 .NET — EF Core / migrations
+### 7.2 .NET — Testes Automatizados e Cobertura
 
 ```powershell
-$env:ASPNETCORE_ENVIRONMENT = "Development"
-
-dotnet ef migrations list `
-  --project HotelWise.Data/HotelWise.Data.csproj `
-  --startup-project HotelWise.API/HotelWise.API.csproj `
-  --context HotelWiseDbContextMysql
-
-dotnet ef database update `
-  --project HotelWise.Data/HotelWise.Data.csproj `
-  --startup-project HotelWise.API/HotelWise.API.csproj `
-  --context HotelWiseDbContextMysql
+dotnet test <Solucao>.sln -c Release --no-build
+dotnet test <Solucao>.sln -c Release /p:CollectCoverage=true /p:CoverletOutputFormat=opencover
 ```
 
-- [ ] `migrations list` e `database update` em banco local sem erro
-- [ ] Técnica da migration temporária: gerar migration `ValidacaoPosUpdate`; se vier com `Up`/`Down` vazios (ou apenas updates estáveis de seed), a atualização não alterou schema estrutural DDL (esperado) — remover com `dotnet ef migrations remove --force`
-- [ ] Seeds verificados no banco: User `admin`, Hotel `Hotel Example`, Room `Quarto Example`
+- [ ] 100% dos testes automatizados aprovados em todas as suítes.
+- [ ] Cobertura de código mantida dentro das metas estabelecidas pelo repositório.
 
-### 7.3 .NET — pack do SDK publicável (GroqApiLibrary)
+### 7.3 .NET — Validação de Persistência e Migrations
 
 ```powershell
-dotnet pack GroqApiLibrary/GroqApiLibrary.csproj -c Release -o ./artifacts/nupkg
+dotnet ef migrations list --project <ProjetoData> --startup-project <ProjetoHost>
+dotnet ef database update --project <ProjetoData> --startup-project <ProjetoHost>
 ```
 
-- [ ] Pacote `.nupkg` gerado com sucesso em `./artifacts/nupkg`
-- [ ] Pacote contém pastas `lib/net8.0/` e `lib/net10.0/`
+- [ ] Listagem de migrations e atualização de banco de dados executadas com sucesso.
+- [ ] **Técnica da Migration Temporária:** Gerar migration transitória de verificação (`dotnet ef migrations add ValidacaoPosUpdate`). Se os métodos `Up()` e `Down()` resultarem vazios (ou contiverem apenas ajustes de seed estáveis), comprova-se a inexistência de impacto estrutural imprevisto. Remover em seguida via `dotnet ef migrations remove --force`.
 
-### 7.4 .NET — execução da API (smoke)
+### 7.4 .NET — Validação de Artefatos Distribuídos (Pack)
 
 ```powershell
-dotnet run --project HotelWise.API/HotelWise.API.csproj
+dotnet pack <ProjetoSDK>.csproj -c Release -o ./artifacts/nupkg
 ```
 
-- [ ] Startup sem `InvalidOperationException` de DI
-- [ ] Endpoint `GET /health` retornando 200
-- [ ] Swagger acessível (`/swagger` ou `/swagger/index.html`)
-- [ ] Headers de segurança e `X-Correlation-ID` operando nos logs
-- [ ] Endpoints de IA e Semantic Kernel respondendo normalmente
-- [ ] Logs do Serilog estruturados e sem credenciais expostas
+- [ ] Pacote `.nupkg` gerado com sucesso contendo as pastas correspondentes a cada TFM declarado (ex.: `lib/netX.0/`).
 
-### 7.5 npm — frontend companion (quando aplicável)
+### 7.5 .NET — Smoke Test dos Hosts e Serviços
 
 ```powershell
-cd ..\HotelWiseUI
+dotnet run --project <ProjetoHost>.csproj
+```
+
+- [ ] Inicialização sem falhas de resolução de Injeção de Dependências.
+- [ ] Endpoint de verificação de saúde (`/health`) retornando status 200 OK.
+- [ ] Documentação Swagger/OpenAPI acessível e operacional.
+- [ ] Fluxos de autenticação, autorização e middlewares operando conforme especificado.
+- [ ] Logs emitidos de forma estruturada, sem mascaramento indevido ou exposição de credenciais.
+
+### 7.6 Frontend / npm — Validação por Módulo
+
+```powershell
+cd <diretorio-do-projeto>
 npm ci
 npm run lint
+npm test
 npm run build
 ```
 
-- [ ] `npm ci` sem erros de peer dependency
-- [ ] Build de produção gerado com sucesso
+- [ ] Restauração via `npm ci` sem conflitos de resolução de dependências (`ERESOLVE`).
+- [ ] Execução de lint e testes automatizados sem erros.
+- [ ] Geração do bundle de produção validada.
 
 ---
 
-## 8. Docker, DevContainer, scripts e CI/CD (quando o runtime mudar)
+## 8. Infraestrutura, Containers, Scripts e CI/CD
 
-| Item | O que verificar |
-| ---- | --------------- |
-| Docker / Vector Store ([QdrantDockerFile](file:///c:/git/HotelWise/HotelWiseAPI/QdrantDockerFile/docker-compose.yml)) | `docker compose build --no-cache && docker compose up -d`; container Qdrant acessível nas portas `6333` e `6334` |
-| Stacks locais (`IA_Local/`) | Configurações do Ollama / modelos locais compatíveis com as versões das bibliotecas |
-| SDK .NET ([global.json](file:///c:/git/HotelWise/HotelWiseAPI/global.json)) | SDK pin `10.0.301` com `rollForward: latestFeature` |
-| Pipelines Azure DevOps | Task `UseDotNet@2` configurada para `10.x` |
-| Scripts de auditoria ([check_packages.ps1](file:///c:/git/HotelWise/HotelWiseAPI/check_packages.ps1)) | Execução sem erros de parsing ou codificação |
+| Componente | Ações de Validação |
+| ---------- | ------------------ |
+| **Dockerfiles** | Verificar imagens base (`aspnet`, `sdk`, `node`) alinhadas às versões alvo; assegurar execução como usuário sem privilégios administrativos (*non-root*). |
+| **docker-compose** | Executar `docker compose build --no-cache && docker compose up -d` e atestar saúde dos serviços agregados. |
+| **Versionamento de SDK** | Alinhar `global.json` com versão de SDK recomendada e política adequada de `rollForward`. |
+| **Pipelines CI/CD** | Alinhar tasks de runtime (`UseDotNet@2`, actions de setup) com as versões homologadas. |
+| **Scripts Utilitários** | Auditar arquivos `.ps1`, `.sh` e `.js` para atualizar eventuais referências a caminhos de binários ou versões prefixadas. |
 
 ---
 
-## 9. Evidências obrigatórias da entrega
+## 9. Evidências Obrigatórias da Entrega
 
-1. **Conjunto Homologado do ciclo** — documento em `DOCUMENTACAO/API/<AAAA-MM>-LevantamentoConjuntoHomologado-HotelWiseAPI.md` com tabelas aplicadas e justificativas.
-2. **Lista de arquivos alterados** — [Directory.Packages.props](file:///c:/git/HotelWise/HotelWiseAPI/Directory.Packages.props), `.csproj`, Dockerfiles, pipelines, scripts, [global.json](file:///c:/git/HotelWise/HotelWiseAPI/global.json).
-3. **Relatório quantitativo:**
+Ao concluir o ciclo, o responsável técnico ou agente deve produzir as seguintes evidências:
+
+1. **Documento de Conjunto Homologado:** Registro detalhado da matriz de pacotes, versões aplicadas e justificativas.
+2. **Inventário de Arquivos Modificados:** Relação dos manifests (`Directory.Packages.props`, `.csproj`, `package.json`, `global.json`, pipelines).
+3. **Resumo Métrico da Execução:**
 
 ```text
-Projetos .NET atualizados: 6 / 6
-Pacotes NuGet atualizados: N
-Testes automatizados: 0 (gap documentado; validação via smoke/build/pack)
-Vulnerabilidades resolvidas: N
-Falhas encontradas/corrigidas: N/N
-Migrations validadas: Sim
+Projetos atualizados: N
+Pacotes diretos atualizados: N
+Testes executados/aprovados: N / N
+Vulnerabilidades saneadas: N
+Comportamento de persistência validado: Sim
+Status da compilação: 0 erros / 0 warnings não justificados
 ```
 
-4. **Riscos residuais** — majors adiados (ex.: Pomelo 10 / EF Core 10), travas de grafo, warnings pendentes.
+4. **Registro de Riscos Residuais e Travas:** Documentação de dependências retidas para ciclos futuros e condições necessárias para sua liberação.
 
 ---
 
-## 10. Plano de rollback
+## 10. Plano de Rollback
+
+Em caso de inconsistência crítica intransponível durante o processo de homologação:
 
 ```powershell
+# Retornar ao estado baseline da branch
 git checkout <branch-do-ciclo>
 git reset --hard <commit-baseline>
 
-dotnet restore HotelWiseAPI.sln
-dotnet build HotelWiseAPI.sln -c Release
-dotnet pack GroqApiLibrary/GroqApiLibrary.csproj -c Release
+# Reverter e restaurar ambiente .NET
+dotnet restore <Solucao>.sln
+dotnet build <Solucao>.sln -c Release
+dotnet test <Solucao>.sln -c Release
+
+# Reverter e restaurar ambientes npm (se houver)
+cd <diretorio-do-projeto>
+npm ci
+npm test
 ```
 
-Restaurar em conjunto: [Directory.Packages.props](file:///c:/git/HotelWise/HotelWiseAPI/Directory.Packages.props), `.csproj`, [global.json](file:///c:/git/HotelWise/HotelWiseAPI/global.json), scripts e arquivos de configuração.
+Garantir que todos os arquivos modificados (`Directory.Packages.props`, `.csproj`, `package-lock.json`, `global.json`) sejam restaurados em conjunto.
 
 ---
 
-## 11. Riscos e mitigações recorrentes
+## 11. Riscos Recorrentes e Estratégias de Mitigação
 
-| Risco | Impacto | Mitigação |
-| ----- | ------- | --------- |
-| Provider trava major do ORM (`Pomelo` x `EF Core`) | Não é possível usar a latest do EF Core | Segurar o bloco inteiro na major 9.x; documentar destrave para ciclo futuro ("Conjunto v2") |
-| Mistura de patches `Microsoft.*` | `NU1107` / restore instável | CPM ([Directory.Packages.props](file:///c:/git/HotelWise/HotelWiseAPI/Directory.Packages.props)) + Bloco A no mesmo patch (10.0.10) |
-| Major bump silencioso de terceiro (ex.: AutoMapper 15+) | Breaking changes ou mudanças de licença | Major nunca sobe no lote; avaliar changelog e impacto |
-| Mudanças na API de Vector Data do Semantic Kernel | Erros de compilação em atributos e buscas | Alinhar modelo de atributos (`[VectorStoreRecordKey]`, etc.) conforme convenção da versão homologada |
-| Artefato publicável perde compatibilidade | Consumidores externos quebram | Multi-targeting `net8.0;net10.0` no `GroqApiLibrary` + validação de `dotnet pack` |
-| Migration não-vazia pós-update | Alteração de schema não intencional | Técnica da migration temporária (7.2); investigar antes de commitar |
-| Pipeline com SDK desalinhado | CI vermelho ou build divergente do local | Fase 7 obrigatória; alinhar `UseDotNet@2` para `10.x` |
-
----
-
-## 12. Modo de execução sugerido (para IA/agente)
-
-1. Ler este guia e gerar o inventário completo (Seção 4) sem alterar o código.
-2. Propor o Conjunto Homologado do ciclo em documento filho sob `DOCUMENTACAO/API/` (ex.: `DOCUMENTACAO/API/<AAAA-MM>-LevantamentoConjuntoHomologado-HotelWiseAPI.md`) e aguardar aprovação.
-3. Executar por fases (Seção 6), commitando por fase e preenchendo os checklists (Seção 7).
-4. Validar persistência, EF Core migrations e o pack do `GroqApiLibrary`.
-5. Atualizar infraestrutura e CI conforme necessário (Seção 8).
-6. Entregar relatório final com evidências (Seção 9) e abrir PR.
+| Risco Identificado | Impacto | Estratégia de Mitigação |
+| ------------------ | ------- | ----------------------- |
+| **Provider de persistência trava a versão do ORM** | Incompatibilidade ao tentar atualizar o ORM para a última versão disponível | Manter todo o bloco de dados na major suportada pelo provider e documentar a trava como meta futura. |
+| **Divergência de patches em bibliotecas de plataforma** | Restauração instável ou erro de grafo `NU1107` | Centralizar versões via CPM (`Directory.Packages.props`) e fixar todos os pacotes da família na mesma release. |
+| **Major Bump de terceiros com quebra de API ou licença** | Falha de compilação ou risco de conformidade legal | Tratar majors isoladamente, revisando release notes, termos de licença e realizando testes dirigidos. |
+| **Quebra de compatibilidade em SDKs distribuídos** | Consumidores externos quebram ao utilizar novas versões do pacote | Utilizar multi-targeting (`TargetFrameworks`), inspecionar conteúdo do `.nupkg` e executar testes com consumidores nas versões mínimas suportadas. |
+| **Alteração de schema DDL não intencional** | Impacto em tabelas de produção | Aplicar rigorosamente a técnica da migration temporária antes de integrar as alterações. |
+| **Dessincronização de lockfile em módulos npm** | Builds não reproduzíveis em esteiras de integração | Utilizar `npm ci` nos checklists e commitar `package.json` e `package-lock.json` simultaneamente. |
+| **Pipeline de CI/CD utilizando SDK desatualizado** | Quebra na esteira remota apesar de sucesso local | Alinhar tarefas de setup de SDK nos arquivos de pipeline na fase de encerramento do ciclo. |
 
 ---
 
-## Referências
+## 12. Modo de Execução Recomendado (para IA / Agentes / Automações)
 
-- [Directory.Packages.props](file:///c:/git/HotelWise/HotelWiseAPI/Directory.Packages.props) — fonte única de versões NuGet (CPM)
-- [global.json](file:///c:/git/HotelWise/HotelWiseAPI/global.json) — especificação do SDK .NET
-- [README.md](file:///c:/git/HotelWise/HotelWiseAPI/README.md) — visão geral da API e arquitetura
-- [RascunhoPlanoUpdateDotNet10.md](file:///c:/git/HotelWise/HotelWiseAPI/DOCUMENTACAO/UpdateDotNet10/RascunhoPlanoUpdateDotNet10.md) — RFC original do plano de atualização
-- [PlanoAcaoMigracaoDotNet10.md](file:///c:/git/HotelWise/HotelWiseAPI/DOCUMENTACAO/UpdateDotNet10/PlanoAcaoMigracaoDotNet10.md) — plano de ação operacional
-- [RelatorioMigracaoDotNet10.md](file:///c:/git/HotelWise/HotelWiseAPI/DOCUMENTACAO/UpdateDotNet10/RelatorioMigracaoDotNet10.md) — relatório de evidências de migração
-- [2026-07-LevantamentoConjuntoHomologado-HotelWiseAPI.md](file:///c:/git/HotelWise/HotelWiseAPI/DOCUMENTACAO/API/2026-07-LevantamentoConjuntoHomologado-HotelWiseAPI.md) — inventário e Conjunto Homologado v1
-- [PlanoImplementacaoMigracaoDotNet10-HotelWiseAPI.md](file:///c:/git/HotelWise/HotelWiseAPI/DOCUMENTACAO/API/PlanoImplementacaoMigracaoDotNet10-HotelWiseAPI.md) — execução detalhada fase a fase
+1. **Fase de Análise:** Ler este guia, inspecionar a solução e gerar o inventário completo (Seção 4) sem introduzir modificações de código.
+2. **Fase de Planejamento:** Elaborar a proposta do Conjunto Homologado (Seção 5) em documento de planejamento dedicado e solicitar validação.
+3. **Fase de Execução:** Aplicar alterações de forma estritamente sequencial pelas fases do plano (Seção 6), realizando commits ao final de cada etapa bem-sucedida.
+4. **Fase de Validação:** Executar os checklists práticos de build, testes, persistência e empacotamento (Seção 7).
+5. **Fase de Fechamento:** Atualizar artefatos de infraestrutura/CI quando aplicável (Seção 8), registrar as evidências de entrega (Seção 9) e submeter as alterações para integração.
