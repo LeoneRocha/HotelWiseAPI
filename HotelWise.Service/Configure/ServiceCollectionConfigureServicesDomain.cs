@@ -1,41 +1,54 @@
 using FluentValidation;
+using HotelWise.Core.SDK.Abstractions;
+using HotelWise.Core.SDK.Security;
 using HotelWise.Domain.Validator.HotelValidators;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
-namespace HotelWise.Service.Configure
+namespace HotelWise.Service.Configure;
+
+/// <summary>
+/// Registrador centralizado de dependências de domínio, repositórios, serviços, AutoMapper, validadores e pipeline de IA.
+/// </summary>
+public static class ServiceCollectionConfigureServicesDomain
 {
-    public static class ServiceCollectionConfigureServicesDomain
+    /// <summary>
+    /// Configura todos os serviços, repositórios, validadores e provedores de IA da aplicação.
+    /// </summary>
+    /// <param name="services">Coleção de serviços da aplicação.</param>
+    /// <param name="_configuration">Instância de configuração global (IConfiguration).</param>
+    public static void Configure(IServiceCollection services, IConfiguration _configuration)
     {
-        public static void Configure(IServiceCollection services, IConfiguration _configuration)
-        {
-            ////AutoMapper
-            ServiceCollectionConfigureAutoMapper.Configure(services);
-            addDependenciesSingleton(services);
-              
-            ServicesDomainRepository.AddDependenciesManually(services);
+        // AutoMapper
+        ServiceCollectionConfigureAutoMapper.Configure(services);
+        AddDependenciesSingleton(services);
+          
+        ServicesDomainRepository.AddDependenciesManually(services);
 
-            ServicesDomainService.AddDependenciesManually(services);
-             
-            ConfigureServicesAI.ConfigureServices(services);
-             
-            #region KERNEL  
-            SemanticKernelProviderConfigure.SetupSemanticKernelProvider(services, _configuration);
-            #endregion KERNEL
-   
-            //Validators
-            services.AddValidatorsFromAssemblyContaining<HotelValidator>();
+        ServicesDomainService.AddDependenciesManually(services);
+         
+        ConfigureServicesAI.ConfigureServices(services);
+         
+        #region KERNEL  
+        SemanticKernelProviderConfigure.SetupSemanticKernelProvider(services, _configuration);
+        #endregion KERNEL
 
-            ServicesDomainRepository.AddDependenciesAuto(services);
-            ServicesDomainService.AddDependenciesAuto(services);
-        } 
-        private static void addDependenciesSingleton(IServiceCollection services)
-        {
-            services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+        // Validators
+        services.AddValidatorsFromAssemblyContaining<HotelValidator>();
 
-            services.AddSingleton<ITokenService, TokenService>(); 
-        }
+        ServicesDomainRepository.AddDependenciesAuto(services);
+        ServicesDomainService.AddDependenciesAuto(services);
+    } 
+
+    /// <summary>
+    /// Registra dependências singleton utilitárias como HttpContextAccessor e TokenService.
+    /// </summary>
+    private static void AddDependenciesSingleton(IServiceCollection services)
+    {
+        services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+
+        services.AddSingleton<ITokenService, TokenService>(); 
     }
 }

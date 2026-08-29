@@ -1,23 +1,28 @@
+using HotelWise.Core.SDK.AI.Abstractions;
+using HotelWise.Core.SDK.AI.Services;
 using HotelWise.Domain.Dto.IA.SemanticKernel;
 using HotelWise.Domain.Interfaces.Entity.HotelInterfaces.Service;
 using HotelWise.Service.AI;
 using HotelWise.Service.Entity;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace HotelWise.Service.Configure
+namespace HotelWise.Service.Configure;
+
+/// <summary>
+/// Configuração de injeção de dependência para serviços de Inteligência Artificial do domínio hoteleiro.
+/// </summary>
+public static class ConfigureServicesAI
 {
     /// <summary>
-    /// DI de IA: regs genéricos via Core + serviços hotel (vector store, generate, assistant).
+    /// Registra os serviços genéricos de IA do SDK e as implementações específicas do host (gerador de hotéis, vector store e assistente).
     /// </summary>
-    public static class ConfigureServicesAI
+    /// <param name="services">Coleção de serviços da aplicação.</param>
+    public static void ConfigureServices(IServiceCollection services)
     {
-        public static void ConfigureServices(IServiceCollection services)
-        {
-            HotelWise.Core.SDK.AI.Configure.ConfigureServicesAI.RegisterGenericAiServices(services);
+        HotelWise.Core.SDK.AI.Configure.ConfigureServicesAI.RegisterGenericAiServices(services);
 
-            services.AddScoped<IGenerateHotelService, GenerateHotelService>();
-            services.AddScoped<IVectorStoreService<HotelVector>, HotelVectorStoreService>();
-            services.AddScoped<IAssistantService, AssistantService>();
-        }
+        services.AddScoped<IGenerateHotelService, GenerateHotelService>();
+        services.AddScoped<IVectorStoreService<HotelVector>, HotelVectorStoreService>();
+        services.AddScoped<IAssistantService, AssistantService>();
     }
 }

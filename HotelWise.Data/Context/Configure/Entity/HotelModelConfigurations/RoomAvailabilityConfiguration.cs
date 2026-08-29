@@ -1,56 +1,62 @@
+using HotelWise.Core.SDK.Common;
+using HotelWise.Core.SDK.Common.Constants;
 using HotelWise.Data.Context.Configure.Helper;
 using HotelWise.Domain.Model.HotelModels;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Newtonsoft.Json;
 
-namespace HotelWise.Data.Context.Configure.Entity.HotelModelConfigurations
+namespace HotelWise.Data.Context.Configure.Entity.HotelModelConfigurations;
+
+/// <summary>
+/// Mapeamento Fluent API para <see cref="RoomAvailability"/> no MySQL, incluindo serialização de grade de preços e índices compostos de disponibilidade.
+/// </summary>
+public class RoomAvailabilityConfiguration : IEntityTypeConfiguration<RoomAvailability>
 {
-    public class RoomAvailabilityConfiguration : IEntityTypeConfiguration<RoomAvailability>
+    /// <summary>
+    /// Aplica as regras de mapeamento e configuração de schema para <see cref="RoomAvailability"/>.
+    /// </summary>
+    /// <param name="builder">Construtor de configuração da entidade.</param>
+    public void Configure(EntityTypeBuilder<RoomAvailability> builder)
     {
-        public void Configure(EntityTypeBuilder<RoomAvailability> builder)
-        {
+        builder.ToTable("RoomAvailability");
+        PomeloCharSetHelper.AddCharSet(builder);
 
-            builder.ToTable("RoomAvailability");
-            PomeloCharSetHelper.AddCharSet(builder);
+        #region KEY
+        // Definição de chave primária 
+        builder.HasKey(e => e.Id);
 
-            #region KEY
-            // Definição de chave primária 
-            builder.HasKey(e => e.Id);
+        builder.Property(e => e.Id)
+            .ValueGeneratedOnAdd();
+        #endregion  KEY
 
-            builder.Property(e => e.Id)
-                .ValueGeneratedOnAdd();
-            #endregion  KEY
-
-            builder.Property(ra => ra.StartDate)
-                       .IsRequired();
-
-            builder.Property(ra => ra.EndDate)
-                .IsRequired();
-
-            builder.Property(ra => ra.Currency)
-                         .HasMaxLength(3)
+        builder.Property(ra => ra.StartDate)
                    .IsRequired();
 
-            builder.Property(ra => ra.AvailabilityWithPrice)
-                   .IsRequired()
-                   .HasMaxLength(EntityTypeConfigurationConstants.GetMaxLengthByTypeDataBase(ETypeDataBase.Mysql))
-                   .HasColumnType(EntityTypeConfigurationConstants.GetTypeTextByTypeDataBase(ETypeDataBase.Mysql))
-                   .HasConversion(
-                       v => JsonConvert.SerializeObject(v),
-                       v => JsonConvert.DeserializeObject<RoomPriceAndAvailabilityItem[]>(v)!);
+        builder.Property(ra => ra.EndDate)
+            .IsRequired();
 
-            builder.HasOne(ra => ra.Room)
-                   .WithMany()
-                   .HasForeignKey(ra => ra.RoomId);
+        builder.Property(ra => ra.Currency)
+                     .HasMaxLength(3)
+               .IsRequired();
 
-            // Adicionando índices para otimização
-            builder.HasIndex(ra => ra.RoomId).HasDatabaseName("IX_RoomAvailability_RoomId");
-            builder.HasIndex(ra => ra.Currency).HasDatabaseName("IX_RoomAvailability_Currency");
-            builder.HasIndex(ra => ra.StartDate).HasDatabaseName("IX_RoomAvailability_StartDate");
-            builder.HasIndex(ra => ra.EndDate).HasDatabaseName("IX_RoomAvailability_EndDate");
-            builder.HasIndex(ra => new { ra.RoomId, ra.StartDate, ra.EndDate, ra.Currency }).HasDatabaseName("IX_RoomAvailability_RoomId_StartDate_EndDate_Currency");
+        builder.Property(ra => ra.AvailabilityWithPrice)
+               .IsRequired()
+               .HasMaxLength(EntityTypeConfigurationConstants.GetMaxLengthByTypeDataBase(ETypeDataBase.Mysql))
+               .HasColumnType(EntityTypeConfigurationConstants.GetTypeTextByTypeDataBase(ETypeDataBase.Mysql))
+               .HasConversion(
+                   v => JsonConvert.SerializeObject(v),
+                   v => JsonConvert.DeserializeObject<RoomPriceAndAvailabilityItem[]>(v)!);
 
-        }
+        builder.HasOne(ra => ra.Room)
+               .WithMany()
+               .HasForeignKey(ra => ra.RoomId);
+
+        // Adicionando índices para otimização
+        builder.HasIndex(ra => ra.RoomId).HasDatabaseName("IX_RoomAvailability_RoomId");
+        builder.HasIndex(ra => ra.Currency).HasDatabaseName("IX_RoomAvailability_Currency");
+        builder.HasIndex(ra => ra.StartDate).HasDatabaseName("IX_RoomAvailability_StartDate");
+        builder.HasIndex(ra => ra.EndDate).HasDatabaseName("IX_RoomAvailability_EndDate");
+        builder.HasIndex(ra => new { ra.RoomId, ra.StartDate, ra.EndDate, ra.Currency }).HasDatabaseName("IX_RoomAvailability_RoomId_StartDate_EndDate_Currency");
     }
 }

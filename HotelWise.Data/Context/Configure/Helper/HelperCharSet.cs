@@ -1,17 +1,20 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace HotelWise.Data.Context.Configure.Helper
+namespace HotelWise.Data.Context.Configure.Helper;
+
+/// <summary>
+/// Classe auxiliar para aplicação do CharSet padrão do Pomelo MySQL nas entidades de banco.
+/// </summary>
+public static class PomeloCharSetHelper
 {
     /// <summary>
-    /// Aplicação Pomelo <c>HasCharSet</c> no host.
-    /// Charset canônico: <see cref="HotelWise.Core.SDK.Infrastructure.HelperCharSet.DefaultCharSet"/>.
+    /// Aplica o charset padrão canônico (<see cref="HotelWise.Core.SDK.Infrastructure.HelperCharSet.DefaultCharSet"/>) na tabela da entidade.
     /// </summary>
-    public static class PomeloCharSetHelper
+    /// <typeparam name="T">Tipo da entidade persistida.</typeparam>
+    /// <param name="builder">Construtor de tipo de entidade.</param>
+    public static void AddCharSet<T>(EntityTypeBuilder<T> builder) where T : class
     {
-        public static void AddCharSet<T>(EntityTypeBuilder<T> builder) where T : class
-        {
-            builder.HasCharSet(HotelWise.Core.SDK.Infrastructure.HelperCharSet.DefaultCharSet);
-        }
+        builder.HasCharSet(HotelWise.Core.SDK.Infrastructure.HelperCharSet.DefaultCharSet);
     }
 }

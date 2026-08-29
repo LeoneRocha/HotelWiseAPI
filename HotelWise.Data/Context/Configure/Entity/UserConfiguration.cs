@@ -1,35 +1,42 @@
+using HotelWise.Core.SDK.Common.Constants;
 using HotelWise.Data.Context.Configure.Helper;
 using HotelWise.Data.Context.Configure.Mock;
 using HotelWise.Domain.Model;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace HotelWise.Data.Context.Configure.Entity
+namespace HotelWise.Data.Context.Configure.Entity;
+
+/// <summary>
+/// Mapeamento Fluent API para a entidade <see cref="User"/> no MySQL, definindo constraints, tamanhos de colunas e carga inicial de seed.
+/// </summary>
+public class UserConfiguration : IEntityTypeConfiguration<User>
 {
-    public class UserConfiguration : IEntityTypeConfiguration<User>
+    /// <summary>
+    /// Aplica as regras de mapeamento e configuração de schema para <see cref="User"/>.
+    /// </summary>
+    /// <param name="builder">Construtor de configuração da entidade.</param>
+    public void Configure(EntityTypeBuilder<User> builder)
     {
-        public void Configure(EntityTypeBuilder<User> builder)
-        {
-            builder.ToTable("User");
-            PomeloCharSetHelper.AddCharSet(builder);
-            builder.HasKey(e => e.Id);
+        builder.ToTable("User");
+        PomeloCharSetHelper.AddCharSet(builder);
+        builder.HasKey(e => e.Id);
 
-            builder.Property(e => e.Id).ValueGeneratedOnAdd();
-            builder.Property(e => e.Enable);
-            builder.Property(e => e.Name).HasMaxLength(255).IsRequired().HasColumnType(EntityTypeConfigurationConstants.Type_Varchar_255);
+        builder.Property(e => e.Id).ValueGeneratedOnAdd();
+        builder.Property(e => e.Enable);
+        builder.Property(e => e.Name).HasMaxLength(255).IsRequired().HasColumnType(EntityTypeConfigurationConstants.Type_Varchar_255);
 
-            builder.Property(e => e.Email).HasMaxLength(100).IsRequired().HasColumnType("varchar(100)");
-            builder.Property(e => e.Login).HasMaxLength(25).IsRequired().HasColumnType("varchar(25)");
-            builder.Property(e => e.PasswordHash);
-            builder.Property(e => e.PasswordSalt);
-            builder.Property(e => e.Role).HasMaxLength(50).IsRequired().HasColumnType("varchar(50)");
-            builder.Property(e => e.Admin);
-            builder.Property(e => e.Language).HasMaxLength(10).HasColumnType("varchar(10)");
-            builder.Property(e => e.TimeZone).HasMaxLength(255).HasColumnType(EntityTypeConfigurationConstants.Type_Varchar_255);
-            builder.Property(e => e.RefreshToken);
-            builder.Property(e => e.RefreshTokenExpiryTime).HasColumnName("Refresh_token_expiry_time");
+        builder.Property(e => e.Email).HasMaxLength(100).IsRequired().HasColumnType("varchar(100)");
+        builder.Property(e => e.Login).HasMaxLength(25).IsRequired().HasColumnType("varchar(25)");
+        builder.Property(e => e.PasswordHash);
+        builder.Property(e => e.PasswordSalt);
+        builder.Property(e => e.Role).HasMaxLength(50).IsRequired().HasColumnType("varchar(50)");
+        builder.Property(e => e.Admin);
+        builder.Property(e => e.Language).HasMaxLength(10).HasColumnType("varchar(10)");
+        builder.Property(e => e.TimeZone).HasMaxLength(255).HasColumnType(EntityTypeConfigurationConstants.Type_Varchar_255);
+        builder.Property(e => e.RefreshToken);
+        builder.Property(e => e.RefreshTokenExpiryTime).HasColumnName("Refresh_token_expiry_time");
 
-            builder.HasData(UserMockData.GetMock());
-        }
+        builder.HasData(UserMockData.GetMock());
     }
 }

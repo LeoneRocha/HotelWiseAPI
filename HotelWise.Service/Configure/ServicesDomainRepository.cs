@@ -1,39 +1,49 @@
+using System.Reflection;
+using HotelWise.Core.SDK.Extensions;
 using HotelWise.Data.Repository;
 using HotelWise.Data.Repository.HotelRepositories;
 using HotelWise.Domain.Interfaces.Entity;
 using HotelWise.Domain.Interfaces.Entity.HotelInterfaces.Repository;
-using HotelWise.Domain.Interfaces.Entity.IA;
 using Microsoft.Extensions.DependencyInjection;
-using System.Reflection;
 
-namespace HotelWise.Service.Configure
+namespace HotelWise.Service.Configure;
+
+/// <summary>
+/// Configuração de injeção de dependência para os repositórios de dados do domínio.
+/// </summary>
+public static class ServicesDomainRepository
 {
-    public static class ServicesDomainRepository
+    private const string RepositorySuffix = "Repository";
+
+    /// <summary>
+    /// Registra manualmente as dependências principais de repositórios escopados.
+    /// </summary>
+    /// <param name="services">Coleção de serviços.</param>
+    public static void AddDependenciesManually(IServiceCollection services)
     {
-        private const string RepositorySuffix = "Repository";
+        services.AddScoped<IHotelRepository, HotelRepository>(); 
+        services.AddScoped<IUserRepository, UserRepository>();
+    }
 
-        public static void AddDependenciesManually(IServiceCollection services)
+    /// <summary>
+    /// Registra automaticamente os demais repositórios escaneando os assemblies de Domínio e Dados.
+    /// </summary>
+    /// <param name="services">Coleção de serviços.</param>
+    public static void AddDependenciesAuto(IServiceCollection services)
+    {
+        var assemblies = new[]
         {
-            services.AddScoped<IHotelRepository, HotelRepository>(); 
-            services.AddScoped<IUserRepository, UserRepository>();
-        }
+            Assembly.GetExecutingAssembly(),
+            Assembly.Load("HotelWise.Domain"),
+            Assembly.Load("HotelWise.Data")
+        };
 
-        public static void AddDependenciesAuto(IServiceCollection services)
+        var ignoredInterfaces = new List<Type>
         {
-            var assemblies = new[]
-            {
-                Assembly.GetExecutingAssembly(),
-                Assembly.Load("HotelWise.Domain"),
-                Assembly.Load("HotelWise.Data")
-            };
+            typeof(IHotelRepository),
+            typeof(IUserRepository),
+        };
 
-            var ignoredInterfaces = new List<Type>
-            {
-                typeof(IHotelRepository),
-                typeof(IUserRepository),
-            };
-
-            ServiceCollectionHelper.RegisterInterfaces(services, [RepositorySuffix], ignoredInterfaces, assemblies);
-        }
+        ServiceCollectionHelper.RegisterInterfaces(services, [RepositorySuffix], ignoredInterfaces, assemblies);
     }
 }

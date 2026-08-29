@@ -1,249 +1,319 @@
+using System.Text;
 using AutoMapper;
 using FluentValidation;
+using HotelWise.Core.SDK.AI.Abstractions;
+using HotelWise.Core.SDK.AI.DTO;
+using HotelWise.Core.SDK.AI.Enums;
+using HotelWise.Core.SDK.AI.Helpers;
+using HotelWise.Core.SDK.AI.Validation;
+using HotelWise.Core.SDK.Helpers;
 using HotelWise.Domain.Dto.IA;
 using HotelWise.Domain.Interfaces.Entity.IA;
 using HotelWise.Domain.Model.AI;
-using System.Text;
 
-namespace HotelWise.Service.Entity
+namespace HotelWise.Service.Entity;
+
+/// <summary>
+/// Serviço de assistente conversacional inteligente (StayMate), coordenando histórico de conversas, validação de tokens e execução de LLM.
+/// </summary>
+public class AssistantService : IAssistantService
 {
-    public class AssistantService : IAssistantService
+    private readonly IAIInferenceService _aIInferenceService;
+    private readonly InferenceAiAdapterType _eIAInferenceAdapterType;
+    private readonly IChatSessionHistoryService _chatSessionHistoryService;
+    
+    /// <summary>
+    /// Instância do AutoMapper para projeções entre entidades e DTOs de sessão.
+    /// </summary>
+    protected readonly IMapper _mapper;
+
+    /// <summary>
+    /// Identificador do usuário autenticado no contexto da conversa.
+    /// </summary>
+    protected long UserId { get; private set; }
+    
+    private readonly Serilog.ILogger _logger;
+
+    /// <summary>
+    /// Inicializa uma nova instância de <see cref="AssistantService"/> com os serviços de inferência, histórico e mapeamento.
+    /// </summary>
+    /// <param name="logger">Logger estruturado Serilog.</param>
+    /// <param name="applicationConfig">Configuração da aplicação e modelo de IA.</param>
+    /// <param name="aIInferenceService">Serviço de orquestração de inferência de IA.</param>
+    /// <param name="chatSessionHistoryService">Serviço de persistência de histórico de chat.</param>
+    /// <param name="mapper">Mapeador de objetos.</param>
+    public AssistantService(
+        Serilog.ILogger logger,
+        IApplicationIAConfig applicationConfig,
+        IAIInferenceService aIInferenceService,
+        IChatSessionHistoryService chatSessionHistoryService,
+        IMapper mapper)
     {
-        private readonly IAIInferenceService _aIInferenceService;
-        private readonly InferenceAiAdapterType _eIAInferenceAdapterType;
-        private readonly IChatSessionHistoryService _chatSessionHistoryService;
-        protected readonly IMapper _mapper;
+        _logger = logger;
+        _eIAInferenceAdapterType = applicationConfig.RagConfig.GetAInferenceAdapterType();
+        _aIInferenceService = aIInferenceService;
+        _chatSessionHistoryService = chatSessionHistoryService;
+        _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
+    }
 
-        protected long UserId { get; private set; }
-        private readonly Serilog.ILogger _logger;
-        public AssistantService(Serilog.ILogger logger, IApplicationIAConfig applicationConfig,
-            IAIInferenceService aIInferenceService,
-            IChatSessionHistoryService chatSessionHistoryService,
-            IMapper mapper
-            )
-        {
-            _logger = logger;
-            _eIAInferenceAdapterType = applicationConfig.RagConfig.GetAInferenceAdapterType();
-            _aIInferenceService = aIInferenceService;
-            _chatSessionHistoryService = chatSessionHistoryService;
-            _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
-        }
+    /// <summary>
+    /// Define o identificador do usuário autenticado para vinculação do histórico de mensagens.
+    /// </summary>
+    /// <param name="id">Identificador do usuário.</param>
+    public void SetUserId(long id)
+    {
+        UserId = id;
+    }
 
-        public void SetUserId(long id)
-        {
-            UserId = id;
-        }
-        public async Task<float[]?> GenerateEmbeddingAsync(string text)
-        {
-            return await _aIInferenceService.GenerateEmbeddingAsync(text, _eIAInferenceAdapterType);
-        }
+    /// <summary>
+    /// Gera o vetor de embeddings para o texto informado utilizando o modelo de embedding configurado.
+    /// </summary>
+    /// <param name="text">Texto a ser vetorizado.</param>
+    /// <returns>Array de float contendo o vetor gerado, ou <c>null</c> em caso de falha.</returns>
+    public async Task<float[]?> GenerateEmbeddingAsync(string text)
+    {
+        return await _aIInferenceService.GenerateEmbeddingAsync(text, _eIAInferenceAdapterType);
+    }
 
-        public async Task<AskAssistantResponse[]?> AskAssistant(AskAssistantRequest request)
+    /// <summary>
+    /// Processa a pergunta do usuário através do assistente conversacional StayMate, gerenciando sessão, contexto e persistência.
+    /// </summary>
+    /// <param name="request">Dados da solicitação com a mensagem do usuário e identificador de sessão.</param>
+    /// <returns>Array de respostas geradas pelo assistente, ou <c>null</c> se ocorrer um erro.</returns>
+    public async Task<AskAssistantResponse[]?> AskAssistant(AskAssistantRequest request)
+    {
+        try
         {
-            try
+            // Valida o request
+            var requestValidator = new AskAssistantRequestValidator();
+            var requestValidationResult = requestValidator.Validate(request);
+
+            if (!requestValidationResult.IsValid)
             {
-                // Valida o request
-                var requestValidator = new AskAssistantRequestValidator();
-                var requestValidationResult = requestValidator.Validate(request);
-
-                if (!requestValidationResult.IsValid)
-                {
-                    throw new ValidationException(requestValidationResult.Errors);
-                }
-                var currentToken = string.IsNullOrWhiteSpace(request.Token) ? Guid.NewGuid().ToString() : request.Token;
-
-                // Verifica se já existe uma sessão para o token
-                ChatSessionHistoryDto existingSession = await _chatSessionHistoryService.GetByIdTokenAsync(currentToken);
-
-                //Feature 3) Get History add request if not great rule max token 
-                PromptMessageVO[] historyPrompts = CreatePrompts(request, existingSession);
-
-                // valida prompts  
-                var promptsValidator = new HistoryPromptsValidator();
-                var promptsValidationResult = promptsValidator.Validate(historyPrompts);
-
-                if (!promptsValidationResult.IsValid)
-                {
-                    throw new ValidationException(promptsValidationResult.Errors);
-                }
-                AskAssistantResponse[] askAssistantResponses;
-                if (historyPrompts.Length > 0 && historyPrompts.Any(x => x.RoleType == RoleAiPromptsType.Agent))
-                {
-                    askAssistantResponses = await ChatCompletionByAgent(historyPrompts);
-                }
-                else
-                {
-                    askAssistantResponses = await ChatCompletion(historyPrompts);
-                }
-                var userCurrentPrompt = historyPrompts.First(mg => mg.RoleType == RoleAiPromptsType.User);
-
-                await PersistChatAsync(userCurrentPrompt, askAssistantResponses, existingSession, currentToken);
-                return askAssistantResponses;
-            } 
-            catch (Exception ex)
-            {
-                _logger.Error(ex, "AssistantService AskAssistant: {Message} at: {Time}", ex.Message, DataHelper.GetDateTimeNowToLog());
+                throw new ValidationException(requestValidationResult.Errors);
             }
-            return null;
-        }
-        #region PersistChat
+            var currentToken = string.IsNullOrWhiteSpace(request.Token) ? Guid.NewGuid().ToString() : request.Token;
 
-        private async Task PersistChatAsync(PromptMessageVO promptMessageUser, AskAssistantResponse[] askAssistantResponses, ChatSessionHistoryDto? existingSession, string currentToken)
-        {
-            try
+            // Verifica se já existe uma sessão para o token
+            ChatSessionHistoryDto existingSession = await _chatSessionHistoryService.GetByIdTokenAsync(currentToken);
+
+            // Feature 3) Get History add request if not great rule max token 
+            PromptMessageVO[] historyPrompts = CreatePrompts(request, existingSession);
+
+            // valida prompts  
+            var promptsValidator = new HistoryPromptsValidator();
+            var promptsValidationResult = promptsValidator.Validate(historyPrompts);
+
+            if (!promptsValidationResult.IsValid)
             {
-                if (existingSession != null)
-                {
-                    await UpdateExistingSession(existingSession, promptMessageUser, askAssistantResponses);
-                }
-                else
-                {
-                    await CreateNewSession(currentToken, promptMessageUser, askAssistantResponses);
-                }
-                // Atualiza o token nas respostas do assistente
-                UpdateTokenInResponses(currentToken, askAssistantResponses);
+                throw new ValidationException(promptsValidationResult.Errors);
             }
-            catch (Exception ex)
+            AskAssistantResponse[] askAssistantResponses;
+            if (historyPrompts.Length > 0 && historyPrompts.Any(x => x.RoleType == RoleAiPromptsType.Agent))
             {
-                _logger.Error(ex, "PersistChatAsync - Erro ao persistir o chat: {Message} at {Time}", ex.Message, DataHelper.GetDateTimeNowToLog());
+                askAssistantResponses = await ChatCompletionByAgent(historyPrompts);
             }
-        }
-        private async Task UpdateExistingSession(ChatSessionHistory existingSession, PromptMessageVO promptMessageUser, AskAssistantResponse[] askAssistantResponses)
-        {
-            var updatedHistory = existingSession.PromptMessageHistory.ToList();
-
-            // Adiciona a nova mensagem do usuário
-            updatedHistory.Add(promptMessageUser);
-
-            // Adiciona as respostas do assistente
-            if (askAssistantResponses?.Length > 0)
+            else
             {
-                updatedHistory.AddRange(askAssistantResponses.Select(response => new PromptMessageVO
-                {
-                    Content = response.Message,
-                    RoleType = RoleAiPromptsType.Assistant
-                }));
+                askAssistantResponses = await ChatCompletion(historyPrompts);
             }
-            // Atualiza os dados da sessão
-            existingSession.PromptMessageHistory = updatedHistory.ToArray();
-            existingSession.CountMessages = updatedHistory.Count(mg => mg.RoleType == RoleAiPromptsType.User);
-            existingSession.TotalTokensMessage = TokenCounterHelper.CalculateTotalTokens(updatedHistory.ToArray());
-            var sessionUpdate = _mapper.Map<ChatSessionHistoryDto>(existingSession);
-            // Persistir alterações
-            await _chatSessionHistoryService.UpdateAsync(sessionUpdate);
-        }
-        private async Task CreateNewSession(string token, PromptMessageVO promptMessageUser, AskAssistantResponse[] askAssistantResponses)
+            var userCurrentPrompt = historyPrompts.First(mg => mg.RoleType == RoleAiPromptsType.User);
+
+            await PersistChatAsync(userCurrentPrompt, askAssistantResponses, existingSession, currentToken);
+            return askAssistantResponses;
+        } 
+        catch (Exception ex)
         {
-            var newSession = new ChatSessionHistoryDto
-            {
-                IdToken = token,
-                Title = promptMessageUser.Content.Length > 50 ? promptMessageUser.Content.Substring(0, 50) : promptMessageUser.Content,
-                PromptMessageHistory = BuildChatHistory(promptMessageUser, askAssistantResponses),
-                CountMessages = 1 + (askAssistantResponses?.Length ?? 0),
-                SessionDateTime = DataHelper.GetDateTimeNow(),
-                IdUser = UserId
-            };
-            newSession.TotalTokensMessage = TokenCounterHelper.CalculateTotalTokens([promptMessageUser]);
-            // Persistir nova sessão
-            await _chatSessionHistoryService.CreateAsync(newSession);
+            _logger.Error(ex, "AssistantService AskAssistant: {Message} at: {Time}", ex.Message, DataHelper.GetDateTimeNowToLog());
         }
-        private static PromptMessageVO[] BuildChatHistory(PromptMessageVO promptMessageUser, AskAssistantResponse[] askAssistantResponses)
+        return null;
+    }
+
+    #region PersistChat
+
+    /// <summary>
+    /// Persiste ou atualiza o histórico da conversa no banco de dados.
+    /// </summary>
+    private async Task PersistChatAsync(PromptMessageVO promptMessageUser, AskAssistantResponse[] askAssistantResponses, ChatSessionHistoryDto? existingSession, string currentToken)
+    {
+        try
         {
-            var messages = new List<PromptMessageVO> { promptMessageUser };
-
-            if (askAssistantResponses?.Length > 0)
-            {
-                messages.AddRange(askAssistantResponses.Select(response => new PromptMessageVO
-                {
-                    Content = response.Message,
-                    RoleType = RoleAiPromptsType.Assistant
-                }));
-            }
-
-            return messages.ToArray();
-        }
-        private static void UpdateTokenInResponses(string token, AskAssistantResponse[] askAssistantResponses)
-        {
-            if (askAssistantResponses == null) return;
-
-            foreach (var response in askAssistantResponses)
-            {
-                response.Token = token;
-            }
-        }
-        #endregion PersistChat
-
-        private async Task<AskAssistantResponse[]> ChatCompletion(PromptMessageVO[] historyPrompts)
-        {
-            var result = await _aIInferenceService.GenerateChatCompletionAsync(historyPrompts, _eIAInferenceAdapterType);
-            return [
-                new AskAssistantResponse()
-                    {
-                        Message = result,
-                        Role = RoleAiPromptsType.Assistant
-                    }];
-        }
-
-        private async Task<AskAssistantResponse[]?> ChatCompletionByAgent(PromptMessageVO[] historyPrompts)
-        {
-            var result = await _aIInferenceService.GenerateChatCompletionByAgentAsync(historyPrompts, _eIAInferenceAdapterType);
-            return [
-                new AskAssistantResponse()
-                    {
-                        Message = result,
-                        Role = RoleAiPromptsType.Assistant
-                    }];
-        }
-
-        private static PromptMessageVO[] CreatePrompts(AskAssistantRequest request, ChatSessionHistoryDto? existingSession)
-        {
-            var msgAgent = new StringBuilder().AppendLine("Você é um especializado em viagens e turismo. Responda exclusivamente a perguntas relacionadas a:")
-                .AppendLine("- Planejamento de viagens.")
-                .AppendLine("- Reservas de hotéis, voos e transporte.")
-                .AppendLine("- Recomendações de destinos turísticos, passeios, atrações e pacotes de viagem.")
-                .AppendLine("- Seu nome é StayMate. Invente uma persona e personalidade para seu nome.")
-                .AppendLine()
-                .AppendLine("Diretrizes:")
-                .AppendLine("1. Forneça respostas completas e confiáveis sobre turismo.")
-                .AppendLine("2. Adote um tom positivo e amigável para encorajar o usuário.")
-                .AppendLine("3. Utilize formatos visuais em Markdown para apresentar informações, sempre em português brasileiro.")
-                .AppendLine()
-                .AppendLine("Limitações:")
-                .AppendLine("- Não forneça informações fora do escopo de viagens e turismo.")
-                .AppendLine("- Caso a pergunta esteja fora do escopo, responda com respeito e objetividade, indicando que não pode ajudar com o tópico abordado.")
-                .ToString();
-
-            var msgSystem = "Você é um assistente especializado em viagens e turismo. Sua função é responder exclusivamente a perguntas relacionadas a viagens, reservas de hotéis e turismo. Limite suas respostas a esses tópicos, e quando uma pergunta estiver fora desse escopo, responda de forma educada, objetiva e concisa, informando que não pode ajudar com o tópico mencionado. Responda sempre em português brasileiro (pt-BR), utilizando linguagem clara e fluida. Formate suas respostas para exibição em HTML ou Markdown, utilizando tags adequadas para renderização correta no site.";
-            var sysMsgRuleAgent = new PromptMessageVO()
-            {
-                RoleType = RoleAiPromptsType.Agent,
-                Content = msgAgent,
-            };
-            PromptMessageVO sysMsgUnified = new PromptMessageVO()
-            {
-                RoleType = RoleAiPromptsType.System,
-                Content = msgSystem,
-            };
-            PromptMessageVO userMsg = new PromptMessageVO()
-            {
-                RoleType = RoleAiPromptsType.User,
-                Content = request.Message,
-            };
-
-            List<PromptMessageVO> promptMessageVOs = new List<PromptMessageVO>() { sysMsgRuleAgent, sysMsgUnified, userMsg };
-
             if (existingSession != null)
             {
-                string context = ChatSessionHelper.GetHistoryContext(existingSession.PromptMessageHistory);
-
-                PromptMessageVO histories = new PromptMessageVO()
-                {
-                    RoleType = RoleAiPromptsType.Context,
-                    Content = HtmlHelper.RemoveHtml(context),
-                };
-                promptMessageVOs.Add(histories);
+                await UpdateExistingSession(existingSession, promptMessageUser, askAssistantResponses);
             }
-            return promptMessageVOs.ToArray();
+            else
+            {
+                await CreateNewSession(currentToken, promptMessageUser, askAssistantResponses);
+            }
+            // Atualiza o token nas respostas do assistente
+            UpdateTokenInResponses(currentToken, askAssistantResponses);
         }
+        catch (Exception ex)
+        {
+            _logger.Error(ex, "PersistChatAsync - Erro ao persistir o chat: {Message} at {Time}", ex.Message, DataHelper.GetDateTimeNowToLog());
+        }
+    }
+
+    /// <summary>
+    /// Atualiza uma sessão de conversa pré-existente adicionando novas mensagens e recalculando os tokens consumidos.
+    /// </summary>
+    private async Task UpdateExistingSession(ChatSessionHistory existingSession, PromptMessageVO promptMessageUser, AskAssistantResponse[] askAssistantResponses)
+    {
+        var updatedHistory = existingSession.PromptMessageHistory.ToList();
+
+        // Adiciona a nova mensagem do usuário
+        updatedHistory.Add(promptMessageUser);
+
+        // Adiciona as respostas do assistente
+        if (askAssistantResponses?.Length > 0)
+        {
+            updatedHistory.AddRange(askAssistantResponses.Select(response => new PromptMessageVO
+            {
+                Content = response.Message,
+                RoleType = RoleAiPromptsType.Assistant
+            }));
+        }
+        // Atualiza os dados da sessão
+        existingSession.PromptMessageHistory = updatedHistory.ToArray();
+        existingSession.CountMessages = updatedHistory.Count(mg => mg.RoleType == RoleAiPromptsType.User);
+        existingSession.TotalTokensMessage = TokenCounterHelper.CalculateTotalTokens(updatedHistory.ToArray());
+        var sessionUpdate = _mapper.Map<ChatSessionHistoryDto>(existingSession);
+        // Persistir alterações
+        await _chatSessionHistoryService.UpdateAsync(sessionUpdate);
+    }
+
+    /// <summary>
+    /// Cria uma nova sessão no banco com o token e a primeira mensagem da interação.
+    /// </summary>
+    private async Task CreateNewSession(string token, PromptMessageVO promptMessageUser, AskAssistantResponse[] askAssistantResponses)
+    {
+        var newSession = new ChatSessionHistoryDto
+        {
+            IdToken = token,
+            Title = promptMessageUser.Content.Length > 50 ? promptMessageUser.Content.Substring(0, 50) : promptMessageUser.Content,
+            PromptMessageHistory = BuildChatHistory(promptMessageUser, askAssistantResponses),
+            CountMessages = 1 + (askAssistantResponses?.Length ?? 0),
+            SessionDateTime = DataHelper.GetDateTimeNow(),
+            IdUser = UserId
+        };
+        newSession.TotalTokensMessage = TokenCounterHelper.CalculateTotalTokens([promptMessageUser]);
+        // Persistir nova sessão
+        await _chatSessionHistoryService.CreateAsync(newSession);
+    }
+
+    /// <summary>
+    /// Constrói o array sequencial de histórico de mensagens para a sessão.
+    /// </summary>
+    private static PromptMessageVO[] BuildChatHistory(PromptMessageVO promptMessageUser, AskAssistantResponse[] askAssistantResponses)
+    {
+        var messages = new List<PromptMessageVO> { promptMessageUser };
+
+        if (askAssistantResponses?.Length > 0)
+        {
+            messages.AddRange(askAssistantResponses.Select(response => new PromptMessageVO
+            {
+                Content = response.Message,
+                RoleType = RoleAiPromptsType.Assistant
+            }));
+        }
+
+        return messages.ToArray();
+    }
+
+    /// <summary>
+    /// Atualiza o token GUID de sessão nas respostas retornadas ao cliente.
+    /// </summary>
+    private static void UpdateTokenInResponses(string token, AskAssistantResponse[] askAssistantResponses)
+    {
+        if (askAssistantResponses == null) return;
+
+        foreach (var response in askAssistantResponses)
+        {
+            response.Token = token;
+        }
+    }
+    #endregion PersistChat
+
+    /// <summary>
+    /// Executa o chat completion padrão via adapter de inferência.
+    /// </summary>
+    private async Task<AskAssistantResponse[]> ChatCompletion(PromptMessageVO[] historyPrompts)
+    {
+        var result = await _aIInferenceService.GenerateChatCompletionAsync(historyPrompts, _eIAInferenceAdapterType);
+        return [
+            new AskAssistantResponse()
+                {
+                    Message = result,
+                    Role = RoleAiPromptsType.Assistant
+                }];
+    }
+
+    /// <summary>
+    /// Executa o chat completion orientado a agente especializado.
+    /// </summary>
+    private async Task<AskAssistantResponse[]?> ChatCompletionByAgent(PromptMessageVO[] historyPrompts)
+    {
+        var result = await _aIInferenceService.GenerateChatCompletionByAgentAsync(historyPrompts, _eIAInferenceAdapterType);
+        return [
+            new AskAssistantResponse()
+                {
+                    Message = result,
+                    Role = RoleAiPromptsType.Assistant
+                }];
+    }
+
+    /// <summary>
+    /// Constrói os prompts de sistema, regras de agente e histórico de contexto para envio ao LLM.
+    /// </summary>
+    private static PromptMessageVO[] CreatePrompts(AskAssistantRequest request, ChatSessionHistoryDto? existingSession)
+    {
+        var msgAgent = new StringBuilder().AppendLine("Você é um especializado em viagens e turismo. Responda exclusivamente a perguntas relacionadas a:")
+            .AppendLine("- Planejamento de viagens.")
+            .AppendLine("- Reservas de hotéis, voos e transporte.")
+            .AppendLine("- Recomendações de destinos turísticos, passeios, atrações e pacotes de viagem.")
+            .AppendLine("- Seu nome é StayMate. Invente uma persona e personalidade para seu nome.")
+            .AppendLine()
+            .AppendLine("Diretrizes:")
+            .AppendLine("1. Forneça respostas completas e confiáveis sobre turismo.")
+            .AppendLine("2. Adote um tom positivo e amigável para encorajar o usuário.")
+            .AppendLine("3. Utilize formatos visuais em Markdown para apresentar informações, sempre em português brasileiro.")
+            .AppendLine()
+            .AppendLine("Limitações:")
+            .AppendLine("- Não forneça informações fora do escopo de viagens e turismo.")
+            .AppendLine("- Caso a pergunta esteja fora do escopo, responda com respeito e objetividade, indicando que não pode ajudar com o tópico abordado.")
+            .ToString();
+
+        var msgSystem = "Você é um assistente especializado em viagens e turismo. Sua função é responder exclusivamente a perguntas relacionadas a viagens, reservas de hotéis e turismo. Limite suas respostas a esses tópicos, e quando uma pergunta estiver fora desse escopo, responda de forma educada, objetiva e concisa, informando que não pode ajudar com o tópico mencionado. Responda sempre em português brasileiro (pt-BR), utilizando linguagem clara e fluida. Formate suas respostas para exibição em HTML ou Markdown, utilizando tags adequadas para renderização correta no site.";
+        var sysMsgRuleAgent = new PromptMessageVO()
+        {
+            RoleType = RoleAiPromptsType.Agent,
+            Content = msgAgent,
+        };
+        PromptMessageVO sysMsgUnified = new PromptMessageVO()
+        {
+            RoleType = RoleAiPromptsType.System,
+            Content = msgSystem,
+        };
+        PromptMessageVO userMsg = new PromptMessageVO()
+        {
+            RoleType = RoleAiPromptsType.User,
+            Content = request.Message,
+        };
+
+        List<PromptMessageVO> promptMessageVOs = new List<PromptMessageVO>() { sysMsgRuleAgent, sysMsgUnified, userMsg };
+
+        if (existingSession != null)
+        {
+            string context = ChatSessionHelper.GetHistoryContext(existingSession.PromptMessageHistory);
+
+            PromptMessageVO histories = new PromptMessageVO()
+            {
+                RoleType = RoleAiPromptsType.Context,
+                Content = HtmlHelper.RemoveHtml(context),
+            };
+            promptMessageVOs.Add(histories);
+        }
+        return promptMessageVOs.ToArray();
     }
 }

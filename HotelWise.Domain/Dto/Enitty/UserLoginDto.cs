@@ -1,8 +1,17 @@
-﻿namespace HotelWise.Domain.Dto.Enitty
+namespace HotelWise.Domain.Dto.Enitty;
+
+/// <summary>
+/// DTO de entrada para autenticação de usuário contendo credenciais de login e senha.
+/// </summary>
+public class UserLoginDto
 {
-    public class UserLoginDto
-    {
-        public string Login { get; set; } = string.Empty;
-        public string Password { get; set; } = string.Empty;
-    }
+    /// <summary>
+    /// Identificador de login do usuário.
+    /// </summary>
+    public string Login { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Senha em texto simples para validação contra o hash persistido.
+    /// </summary>
+    public string Password { get; set; } = string.Empty;
 }

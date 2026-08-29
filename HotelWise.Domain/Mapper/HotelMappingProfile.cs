@@ -5,8 +5,14 @@ using HotelWise.Domain.Model.HotelModels;
 
 namespace HotelWise.Domain.Mapper;
 
+/// <summary>
+/// Perfil AutoMapper para mapeamento entre a entidade <see cref="Hotel"/>, o DTO <see cref="HotelDto"/> e o registro vetorial <see cref="HotelVector"/>.
+/// </summary>
 public class HotelMappingProfile : Profile
 {
+    /// <summary>
+    /// Configura as regras de mapeamento de entidades, DTOs e vetores de hotéis.
+    /// </summary>
     public HotelMappingProfile()
     {
         CreateMap<HotelDto, Hotel>();
