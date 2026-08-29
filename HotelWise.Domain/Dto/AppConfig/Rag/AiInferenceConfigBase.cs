@@ -1,25 +1,14 @@
-﻿using System.ComponentModel.DataAnnotations;
-using HotelWise.Domain.Interfaces.AppConfig;
+﻿using HotelWise.Domain.Interfaces.AppConfig;
+
 namespace HotelWise.Domain.Dto.AppConfig.Rag;
 
 /// <summary>
-/// Azure AI Search service settings.
+/// ⚠️ Movido para HotelWise.Core.SDK — implementação canônica no pacote Core.
 /// </summary>
-public abstract class AiInferenceConfigBase : IAiInferenceConfigBase
+[Obsolete(
+    "Movido para HotelWise.Core.SDK. Use HotelWise.Core.SDK.AI.Configuration.AiInferenceConfigBase.",
+    error: false,
+    DiagnosticId = "HW_CORE_SDK_AI")]
+public abstract class AiInferenceConfigBase : HotelWise.Core.SDK.AI.Configuration.AiInferenceConfigBase, IAiInferenceConfigBase
 {
-    // Propriedade estática protegida na classe base
-    [Required]
-    public static string ConfigSectionName { get; protected set; } = string.Empty;
-
-    public string Endpoint { get; set; } = string.Empty;
-
-    public string ApiKey { get; set; } = string.Empty;
-
-    public string ModelId { get; set; } = string.Empty;
-
-    public string? OrgId { get; set; } = null;
-
-    public string EndpointEmbeddings { get; set; } = string.Empty;
-
-    public string ModelIdEmbeddings { get; set; } = string.Empty;
 }

@@ -1,25 +1,15 @@
 ﻿using HotelWise.Domain.Interfaces.IA;
-using Microsoft.Extensions.VectorData;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Text.Json.Serialization;
-using System.Xml.Serialization;
 
 namespace HotelWise.Domain.Dto.IA.SemanticKernel
 {
-    public abstract class DataVectorBase : IDataVector
+    /// <summary>
+    /// ⚠️ Movido para HotelWise.Core.SDK — implementação canônica no pacote Core.
+    /// </summary>
+    [Obsolete(
+        "Movido para HotelWise.Core.SDK. Use HotelWise.Core.SDK.AI.DTO.DataVectorBase.",
+        error: false,
+        DiagnosticId = "HW_CORE_SDK_AI")]
+    public abstract class DataVectorBase : HotelWise.Core.SDK.AI.DTO.DataVectorBase, IDataVector
     {
-        [VectorStoreKey]
-        public ulong DataKey { get; set; } = ulong.MinValue;
-
-        [VectorStoreVector(1024)]// Dimensions: 1024 BERT-base 768 (Bidirectional Encoder Representations from Transformers) 
-        public virtual ReadOnlyMemory<float> Embedding { get; set; } = new ReadOnlyMemory<float>();
-
-        [NotMapped]
-        [XmlIgnore]
-        [JsonIgnore]
-        public double Score { get; set; } = 0d;
-
-        [VectorStoreData(IsIndexed = true)]
-        public List<string> Tags { get; set; } = new List<string>();
     }
 }

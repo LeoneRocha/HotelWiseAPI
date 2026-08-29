@@ -1,18 +1,13 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-
-namespace HotelWise.Domain.Model
+﻿namespace HotelWise.Domain.Model
 {
-    public abstract class EntityBaseWithNameEmail : EntityBase
+    /// <summary>
+    /// ⚠️ Movido para HotelWise.Core.SDK — implementação canônica no pacote Core.
+    /// </summary>
+    [Obsolete(
+        "Movido para HotelWise.Core.SDK. Use HotelWise.Core.SDK.Domain.EntityBaseWithNameEmail.",
+        error: false,
+        DiagnosticId = "HW_CORE_SDK_DOMAIN")]
+    public abstract class EntityBaseWithNameEmail : HotelWise.Core.SDK.Domain.EntityBaseWithNameEmail
     {
-        [Column("Name", TypeName = "varchar(255)", Order = 2)]
-        [MaxLength(255)]
-        [Required]
-        public string Name { get; set; } = string.Empty;
-
-        [Column("Email", TypeName = "varchar(100)", Order = 3)]
-        [MaxLength(100)]
-        [Required]
-        public string Email { get; set; } = string.Empty;
     }
 }

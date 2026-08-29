@@ -1,18 +1,13 @@
-﻿using System.ComponentModel.DataAnnotations;
-namespace HotelWise.Domain.Dto.AppConfig.Rag;
+﻿namespace HotelWise.Domain.Dto.AppConfig.Rag;
+
 /// <summary>
-/// Qdrant service settings.
+/// ⚠️ Movido para HotelWise.Core.SDK — implementação canônica no pacote Core.
 /// </summary>
-public sealed class QdrantConfig
+[Obsolete(
+    "Movido para HotelWise.Core.SDK. Use HotelWise.Core.SDK.AI.Configuration.QdrantConfig.",
+    error: false,
+    DiagnosticId = "HW_CORE_SDK_AI")]
+public class QdrantConfig : HotelWise.Core.SDK.AI.Configuration.QdrantConfig
 {
-    public const string ConfigSectionName = "Qdrant";
-
-    [Required]
-    public string Host { get; set; } = string.Empty;
-
-    public int Port { get; set; } = 6334;
-
-    public bool Https { get; set; } = false;
-
-    public string ApiKey { get; set; } = string.Empty;
+    public new const string ConfigSectionName = HotelWise.Core.SDK.AI.Configuration.QdrantConfig.ConfigSectionName;
 }

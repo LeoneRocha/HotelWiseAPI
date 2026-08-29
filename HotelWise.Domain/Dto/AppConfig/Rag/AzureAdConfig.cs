@@ -1,17 +1,14 @@
 ﻿using HotelWise.Domain.Interfaces.AppConfig;
 
-namespace HotelWise.Domain.Dto.AppConfig.Rag
+namespace HotelWise.Domain.Dto.AppConfig.Rag;
+
+/// <summary>
+/// ⚠️ Movido para HotelWise.Core.SDK — implementação canônica no pacote Core.
+/// </summary>
+[Obsolete(
+    "Movido para HotelWise.Core.SDK. Use HotelWise.Core.SDK.AI.Configuration.AzureAdConfig.",
+    error: false,
+    DiagnosticId = "HW_CORE_SDK_AI")]
+public class AzureAdConfig : HotelWise.Core.SDK.AI.Configuration.AzureAdConfig, IAzureAdConfig
 {
-    public class AzureAdConfig : IAzureAdConfig
-    {
-        public string Instance { get; set; } = string.Empty;
-        public string Domain { get; set; } = string.Empty;
-        public string TenantId { get; set; } = string.Empty;
-        public string ClientId { get; set; } = string.Empty;
-        public string Audience { get; set; } = string.Empty;
-        public string ClientSecret { get; set; } = string.Empty;
-        public string CallbackPath { get; set; } = string.Empty;
-        public string SignedOutCallbackPath { get; set; } = string.Empty;
-        public string Scopes { get; set; } = string.Empty;
-    }
 }

@@ -6,6 +6,13 @@ using Mistral.SDK.DTOs;
 
 namespace HotelWise.Domain.AI.Adapter
 {
+    /// <summary>
+    /// ⚠️ Movido para HotelWise.Core.SDK — cópia Obsolete no host (IApplicationIAConfig/PromptMessageVO Domain).
+    /// </summary>
+    [Obsolete(
+        "Movido para HotelWise.Core.SDK. Use HotelWise.Core.SDK.AI.Adapters.MistralApiAdapter.",
+        error: false,
+        DiagnosticId = "HW_CORE_SDK_AI")]
     public class MistralApiAdapter : IAIInferenceAdapter
     { 
         private readonly MistralClient _client;

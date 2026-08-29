@@ -12,6 +12,13 @@ using System.Diagnostics;
 
 namespace HotelWise.Domain.AI.Adapter
 {
+    /// <summary>
+    /// ⚠️ Movido para HotelWise.Core.SDK — cópia Obsolete no host (IApplicationIAConfig/tipos Domain).
+    /// </summary>
+    [Obsolete(
+        "Movido para HotelWise.Core.SDK. Use HotelWise.Core.SDK.AI.Adapters.GenericVectorStoreAdapter.",
+        error: false,
+        DiagnosticId = "HW_CORE_SDK_AI")]
     public class GenericVectorStoreAdapter<TVector> : IVectorStoreAdapter<TVector> where TVector : class, IDataVector
     {
         private readonly VectorStore _vectorStore;

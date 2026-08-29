@@ -1,8 +1,14 @@
-﻿namespace HotelWise.Domain.Dto.AppConfig.Rag;
+﻿using HotelWise.Domain.Interfaces.AppConfig;
+
+namespace HotelWise.Domain.Dto.AppConfig.Rag;
+
 /// <summary>
-/// Weaviate service settings.
+/// ⚠️ Movido para HotelWise.Core.SDK — implementação canônica no pacote Core.
 /// </summary>
-public sealed class WeaviateConfig : AiInferenceConfigBase
+[Obsolete(
+    "Movido para HotelWise.Core.SDK. Use HotelWise.Core.SDK.AI.Configuration.WeaviateConfig.",
+    error: false,
+    DiagnosticId = "HW_CORE_SDK_AI")]
+public class WeaviateConfig : HotelWise.Core.SDK.AI.Configuration.WeaviateConfig, IAiInferenceConfigBase
 {
-    public new static string ConfigSectionName => "Weaviate";
 }

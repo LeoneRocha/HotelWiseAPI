@@ -1,0 +1,25 @@
+using HotelWise.Core.SDK.AI.Configuration;
+using HotelWise.Core.SDK.AI.Enums;
+
+namespace HotelWise.Core.SDK.AI.Abstractions;
+
+/// <summary>
+/// Contrato de configuração RAG.
+/// </summary>
+public interface IRagConfig
+{
+    AIChatServiceType AIChatServiceApi { get; }
+    AIEmbeddingServiceType AIEmbeddingServiceApi { get; }
+    AIChatServiceType AIChatServiceAdapter { get; }
+    AIEmbeddingServiceType AIEmbeddingServiceAdapter { get; }
+    bool BuildCollection { get; }
+    string VectorStoreCollectionPrefixName { get; }
+    int VectorStoreDimensions { get; }
+    int DataLoadingBatchSize { get; }
+    int DataLoadingBetweenBatchDelayInMilliseconds { get; }
+    string[]? PdfFilePaths { get; }
+    VectorStoreType VectorStoreType { get; }
+    SearchSettings SearchSettings { get; }
+
+    InferenceAiAdapterType GetAInferenceAdapterType();
+}

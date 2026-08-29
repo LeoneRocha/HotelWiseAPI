@@ -3,6 +3,14 @@ using HotelWise.Domain.Enuns.IA;
 
 namespace HotelWise.Domain.Interfaces.AppConfig
 {
+    /// <summary>
+    /// ⚠️ Movido para HotelWise.Core.SDK — implementação canônica no pacote Core.
+    /// Shim em cópia (enums/DTOs do host ≠ tipos Core durante a migração).
+    /// </summary>
+    [Obsolete(
+        "Movido para HotelWise.Core.SDK. Use HotelWise.Core.SDK.AI.Abstractions.IRagConfig.",
+        error: false,
+        DiagnosticId = "HW_CORE_SDK_AI")]
     public interface IRagConfig
     {
         AIChatServiceType AIChatServiceApi { get; }

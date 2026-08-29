@@ -1,0 +1,48 @@
+name: HotelWise.Core.SDK
+
+on:
+  push:
+    paths:
+      - "HotelWise.Core.SDK/**"
+      - "HotelWise.Core.SDK.Tests/**"
+      - ".github/workflows/core-sdk.yml"
+  pull_request:
+    paths:
+      - "HotelWise.Core.SDK/**"
+      - "HotelWise.Core.SDK.Tests/**"
+      - ".github/workflows/core-sdk.yml"
+
+jobs:
+  build-test-pack:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: |
+            8.0.x
+            10.0.x
+
+      - name: Restore
+        run: |
+          dotnet restore HotelWise.Core.SDK/HotelWise.Core.SDK.csproj
+          dotnet restore HotelWise.Core.SDK.Tests/HotelWise.Core.SDK.Tests.csproj
+
+      - name: Build
+        run: |
+          dotnet build HotelWise.Core.SDK/HotelWise.Core.SDK.csproj -c Release --no-restore
+          dotnet build HotelWise.Core.SDK.Tests/HotelWise.Core.SDK.Tests.csproj -c Release --no-restore
+
+      - name: Test with Coverlet
+        run: >
+          dotnet test HotelWise.Core.SDK.Tests/HotelWise.Core.SDK.Tests.csproj
+          -c Release
+          --no-build
+          --collect:"XPlat Code Coverage"
+          --settings HotelWise.Core.SDK.Tests/coverlet.runsettings
+          --results-directory TestResults/coverage
+
+      - name: Pack
+        run: dotnet pack HotelWise.Core.SDK/HotelWise.Core.SDK.csproj -c Release --no-build -o artifacts

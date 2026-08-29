@@ -1,12 +1,13 @@
 ﻿namespace HotelWise.Domain.Interfaces.AppConfig
 {
-    public interface IAiInferenceConfigBase
+    /// <summary>
+    /// ⚠️ Movido para HotelWise.Core.SDK — implementação canônica no pacote Core.
+    /// </summary>
+    [Obsolete(
+        "Movido para HotelWise.Core.SDK. Use HotelWise.Core.SDK.AI.Abstractions.IAiInferenceConfigBase.",
+        error: false,
+        DiagnosticId = "HW_CORE_SDK_AI")]
+    public interface IAiInferenceConfigBase : HotelWise.Core.SDK.AI.Abstractions.IAiInferenceConfigBase
     {
-        string ApiKey { get; set; }
-        string Endpoint { get; set; }
-        public string ModelId { get; set; }
-        string? OrgId { get; set; }
-        string EndpointEmbeddings { get; set; }
-        string ModelIdEmbeddings { get; set; }
     }
 }

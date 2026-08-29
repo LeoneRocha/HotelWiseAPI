@@ -7,6 +7,13 @@ using System.Text.Json.Nodes;
 
 namespace HotelWise.Domain.AI.Adapter
 {
+    /// <summary>
+    /// ⚠️ Movido para HotelWise.Core.SDK — cópia Obsolete no host (IApplicationIAConfig/PromptMessageVO Domain).
+    /// </summary>
+    [Obsolete(
+        "Movido para HotelWise.Core.SDK. Use HotelWise.Core.SDK.AI.Adapters.GroqApiAdapter.",
+        error: false,
+        DiagnosticId = "HW_CORE_SDK_AI")]
     public class GroqApiAdapter : IAIInferenceAdapter
     {
         private readonly GroqApiClient _groqApiClient;

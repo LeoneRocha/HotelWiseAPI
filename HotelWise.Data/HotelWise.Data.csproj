@@ -1,11 +1,10 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
-
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <NoWarn>CS0618,HW_CORE_SDK_DOMAIN,HW_CORE_SDK_REPO,HW_CORE_SDK_COMMON,HW_CORE_SDK_SERVICE,HW_CORE_SDK_HELPER,HW_CORE_SDK_SECURITY,HW_CORE_SDK_AI,HW_CORE_SDK_MIDDLEWARE,HW_CORE_SDK_DI,HW_CORE_SDK_LOGGING</NoWarn>
   </PropertyGroup>
-
   <ItemGroup>
     <PackageReference Include="Azure.Data.Tables" />
     <PackageReference Include="Azure.Identity" />
@@ -35,13 +34,11 @@
     <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" />
     <PackageReference Include="System.Drawing.Common" />
   </ItemGroup>
-
   <ItemGroup>
     <Folder Include="Migrations\MySql\" />
   </ItemGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\HotelWise.Domain\HotelWise.Domain.csproj" />
+    <ProjectReference Include="..\HotelWise.Core.SDK\HotelWise.Core.SDK.csproj" />
   </ItemGroup>
-
 </Project>

@@ -12,6 +12,13 @@ using System.Text;
 
 namespace HotelWise.Domain.AI.Adapter
 {
+    /// <summary>
+    /// ⚠️ Movido para HotelWise.Core.SDK — cópia Obsolete no host (IApplicationIAConfig/PromptMessageVO Domain).
+    /// </summary>
+    [Obsolete(
+        "Movido para HotelWise.Core.SDK. Use HotelWise.Core.SDK.AI.Adapters.SemanticKernelAdapter.",
+        error: false,
+        DiagnosticId = "HW_CORE_SDK_AI")]
     public class SemanticKernelAdapter : IAIInferenceAdapter
     {
         private readonly Kernel _kernel;

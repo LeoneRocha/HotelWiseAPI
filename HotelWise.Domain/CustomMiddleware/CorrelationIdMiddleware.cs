@@ -1,40 +1,21 @@
 using Microsoft.AspNetCore.Http;
-using Serilog.Context;
 
 namespace HotelWise.Domain.CustomMiddleware
 {
-    public class CorrelationIdMiddleware
+    /// <summary>
+    /// ⚠️ Movido para HotelWise.Core.SDK — implementação canônica no pacote Core.
+    /// </summary>
+    [Obsolete(
+        "Movido para HotelWise.Core.SDK. Use HotelWise.Core.SDK.Infrastructure.Middleware.CorrelationIdMiddleware.",
+        error: false,
+        DiagnosticId = "HW_CORE_SDK_MIDDLEWARE")]
+    public class CorrelationIdMiddleware : HotelWise.Core.SDK.Infrastructure.Middleware.CorrelationIdMiddleware
     {
-        public const string HeaderName = "X-Correlation-ID";
-        public const string ItemKey = "CorrelationId";
+        public new const string HeaderName = HotelWise.Core.SDK.Infrastructure.Middleware.CorrelationIdMiddleware.HeaderName;
+        public new const string ItemKey = HotelWise.Core.SDK.Infrastructure.Middleware.CorrelationIdMiddleware.ItemKey;
 
-        private readonly RequestDelegate _next;
-
-        public CorrelationIdMiddleware(RequestDelegate next)
+        public CorrelationIdMiddleware(RequestDelegate next) : base(next)
         {
-            _next = next;
-        }
-
-        public async Task InvokeAsync(HttpContext context)
-        {
-            var correlationId = context.Request.Headers[HeaderName].FirstOrDefault();
-            if (string.IsNullOrWhiteSpace(correlationId))
-            {
-                correlationId = Guid.NewGuid().ToString("N");
-            }
-
-            context.TraceIdentifier = correlationId;
-            context.Items[ItemKey] = correlationId;
-            context.Response.OnStarting(() =>
-            {
-                context.Response.Headers[HeaderName] = correlationId;
-                return Task.CompletedTask;
-            });
-
-            using (LogContext.PushProperty(ItemKey, correlationId))
-            {
-                await _next(context);
-            }
         }
     }
 }

@@ -1,44 +1,19 @@
 ﻿using Microsoft.AspNetCore.Http;
-using System.Diagnostics;
 
 namespace HotelWise.Domain.CustomMiddleware
 {
     /// <summary>
-    /// Lightweight request log without secrets. Prefer SerilogRequestLogging for HTTP access metrics;
-    /// this middleware keeps a simple start/end breadcrumb with correlation.
+    /// ⚠️ Movido para HotelWise.Core.SDK — implementação canônica no pacote Core.
     /// </summary>
-    public class RequestLoggingMiddleware
+    [Obsolete(
+        "Movido para HotelWise.Core.SDK. Use HotelWise.Core.SDK.Infrastructure.Middleware.RequestLoggingMiddleware.",
+        error: false,
+        DiagnosticId = "HW_CORE_SDK_MIDDLEWARE")]
+    public class RequestLoggingMiddleware : HotelWise.Core.SDK.Infrastructure.Middleware.RequestLoggingMiddleware
     {
-        private readonly RequestDelegate _next;
-        private readonly Serilog.ILogger _logger;
-
         public RequestLoggingMiddleware(RequestDelegate next, Serilog.ILogger logger)
+            : base(next, logger)
         {
-            _next = next;
-            _logger = logger;
-        }
-
-        public async Task InvokeAsync(HttpContext context)
-        {
-            var stopwatch = Stopwatch.StartNew();
-            var correlationId = context.Items[CorrelationIdMiddleware.ItemKey]?.ToString()
-                ?? context.TraceIdentifier;
-
-            try
-            {
-                await _next(context);
-            }
-            finally
-            {
-                stopwatch.Stop();
-                _logger.Information(
-                    "HTTP {Method} {Path} responded {StatusCode} in {ElapsedMs} ms (CorrelationId={CorrelationId})",
-                    context.Request.Method,
-                    context.Request.Path.Value,
-                    context.Response.StatusCode,
-                    stopwatch.ElapsedMilliseconds,
-                    correlationId);
-            }
         }
     }
 }

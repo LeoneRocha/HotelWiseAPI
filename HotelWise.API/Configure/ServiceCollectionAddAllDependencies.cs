@@ -1,5 +1,5 @@
 ﻿using HotelWise.Data.Context;
-using HotelWise.Domain.Helpers;
+using HotelWise.Core.SDK.Helpers;
 using HotelWise.Service.Configure;
 using Microsoft.EntityFrameworkCore;
 using Pomelo.EntityFrameworkCore.MySql.Infrastructure;

@@ -1,8 +1,8 @@
-﻿using HotelWise.Domain.Dto;
-using HotelWise.Domain.Helpers;
+﻿using HotelWise.Core.SDK.Common;
+using HotelWise.Core.SDK.Logging;
 using Microsoft.AspNetCore.Mvc;
 
-namespace SmartDigitalPsico.WebAPI.Controllers.v1.SystemDomains
+namespace HotelWise.API.Controllers
 {
     [ApiController]
     [Route("api/[controller]/v1")]
@@ -11,6 +11,7 @@ namespace SmartDigitalPsico.WebAPI.Controllers.v1.SystemDomains
         public AppInformationVersionProductController()
         {
         }
+
         [HttpGet("GetAppInformationVersionProductString")]
         public async Task<ActionResult<string>> GetString()
         {

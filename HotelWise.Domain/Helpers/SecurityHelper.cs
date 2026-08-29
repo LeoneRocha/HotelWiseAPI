@@ -1,70 +1,26 @@
 ﻿using HotelWise.Domain.Dto;
-using Microsoft.IdentityModel.Tokens;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
 
 namespace HotelWise.Domain.Helpers
 {
+    /// <summary>
+    /// ⚠️ Movido para HotelWise.Core.SDK — implementação canônica no pacote Core.
+    /// </summary>
+    [Obsolete(
+        "Movido para HotelWise.Core.SDK. Use HotelWise.Core.SDK.Security.SecurityHelper.",
+        error: false,
+        DiagnosticId = "HW_CORE_SDK_SECURITY")]
     public static class SecurityHelper
     {
-        public static void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)
-        {
-            using (var hmac = new System.Security.Cryptography.HMACSHA512())
-            {
-                passwordSalt = hmac.Key;
-                passwordHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
-            }
-        }
-        public static bool VerifyPasswordHash(string password, byte[] passwordHash, byte[] passwordSalt)
-        {
-            using (var hmac = new System.Security.Cryptography.HMACSHA512(passwordSalt))
-            {
-                var computedHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
-                for (int i = 0; i < computedHash.Length; i++)
-                {
-                    if (computedHash[i] != passwordHash[i])
-                    {
-                        return false;
-                    }
-                }
-                return true;
-            }
-        }
+        public static void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt) =>
+            HotelWise.Core.SDK.Security.SecurityHelper.CreatePasswordHash(password, out passwordHash, out passwordSalt);
 
-        public static string CreateToken(SecurityDto secVo)
-        {
-            var claims = new List<Claim>
-            {
-                new Claim(ClaimTypes.NameIdentifier, secVo.Id),
-                new Claim(ClaimTypes.Name, secVo.Name),
-                new Claim(ClaimTypes.Role, secVo.Role)
-            };
-            var key = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(secVo.SecurityKeyConfig));
+        public static bool VerifyPasswordHash(string password, byte[] passwordHash, byte[] passwordSalt) =>
+            HotelWise.Core.SDK.Security.SecurityHelper.VerifyPasswordHash(password, passwordHash, passwordSalt);
 
-            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+        public static string CreateToken(SecurityDto secVo) =>
+            HotelWise.Core.SDK.Security.SecurityHelper.CreateToken(secVo);
 
-            var tokendDescriptor = new SecurityTokenDescriptor
-            {
-                Subject = new ClaimsIdentity(claims),
-                Expires = DataHelper.GetDateTimeNow().AddDays(1),
-                SigningCredentials = creds
-            };
-            var tokenHandler = new JwtSecurityTokenHandler();
-            var token = tokenHandler.CreateToken(tokendDescriptor);
-
-            return tokenHandler.WriteToken(token);
-        }
-
-        public static bool IsBase64String(string base64)
-        {
-            if (string.IsNullOrEmpty(base64))
-            {
-                return false;
-            }
-
-            Span<byte> buffer = new Span<byte>(new byte[base64.Length]);
-            return Convert.TryFromBase64String(base64, buffer, out _);
-        }
+        public static bool IsBase64String(string base64) =>
+            HotelWise.Core.SDK.Security.SecurityHelper.IsBase64String(base64);
     }
 }

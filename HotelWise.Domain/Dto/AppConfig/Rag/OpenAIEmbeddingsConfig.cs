@@ -1,9 +1,14 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using HotelWise.Domain.Interfaces.AppConfig;
+
 namespace HotelWise.Domain.Dto.AppConfig.Rag;
+
 /// <summary>
-/// OpenAI Embeddings service settings.
+/// ⚠️ Movido para HotelWise.Core.SDK — implementação canônica no pacote Core.
 /// </summary>
-public sealed class OpenAIEmbeddingsConfig : AiInferenceConfigBase
+[Obsolete(
+    "Movido para HotelWise.Core.SDK. Use HotelWise.Core.SDK.AI.Configuration.OpenAIEmbeddingsConfig.",
+    error: false,
+    DiagnosticId = "HW_CORE_SDK_AI")]
+public class OpenAIEmbeddingsConfig : HotelWise.Core.SDK.AI.Configuration.OpenAIEmbeddingsConfig, IAiInferenceConfigBase
 {
-    public new static string ConfigSectionName => "OpenAIEmbeddings";
 }

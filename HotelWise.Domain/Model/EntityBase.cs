@@ -1,28 +1,13 @@
-﻿using HotelWise.Domain.Interfaces.Base;
-using System.ComponentModel;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-
-namespace HotelWise.Domain.Model
+﻿namespace HotelWise.Domain.Model
 {
-    public abstract class EntityBase : IEntityBase, IEntityBaseLog
+    /// <summary>
+    /// ⚠️ Movido para HotelWise.Core.SDK — implementação canônica no pacote Core.
+    /// </summary>
+    [Obsolete(
+        "Movido para HotelWise.Core.SDK. Use HotelWise.Core.SDK.Domain.EntityBase.",
+        error: false,
+        DiagnosticId = "HW_CORE_SDK_DOMAIN")]
+    public abstract class EntityBase : HotelWise.Core.SDK.Domain.EntityBase
     {
-        [Column("Id", Order = 0)]
-        [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public long Id { get; set; }
-
-        [Column("Enable", Order = 1)]
-        [DefaultValue(true)]
-        public bool Enable { get; set; }
-
-        [Column("CreatedDate")]
-        public DateTime CreatedDate { get; set; }
-
-        [Column("ModifyDate")]
-        public DateTime ModifyDate { get; set; }
-
-        [Column("LastAccessDate")]
-        public DateTime LastAccessDate { get; set; }
     }
 }

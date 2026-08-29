@@ -1,5 +1,5 @@
 ﻿using HotelWise.Domain.Dto.IA;
-using HotelWise.Domain.Helpers;
+using HotelWise.Core.SDK.Security;
 using HotelWise.Domain.Interfaces.IA;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

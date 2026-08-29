@@ -1,18 +1,14 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace HotelWise.Domain.Dto.AppConfig.Rag;
+﻿namespace HotelWise.Domain.Dto.AppConfig.Rag;
 
 /// <summary>
-/// Azure CosmosDB service settings for use with AzureCosmosDBMongoDB and AzureCosmosDBNoSQL.
+/// ⚠️ Movido para HotelWise.Core.SDK — implementação canônica no pacote Core.
 /// </summary>
-public sealed class AzureCosmosDBConfig
+[Obsolete(
+    "Movido para HotelWise.Core.SDK. Use HotelWise.Core.SDK.AI.Configuration.AzureCosmosDBConfig.",
+    error: false,
+    DiagnosticId = "HW_CORE_SDK_AI")]
+public class AzureCosmosDBConfig : HotelWise.Core.SDK.AI.Configuration.AzureCosmosDBConfig
 {
-    public const string MongoDBConfigSectionName = "AzureCosmosDBMongoDB";
-    public const string NoSQLConfigSectionName = "AzureCosmosDBNoSQL";
-
-    [Required]
-    public string ConnectionString { get; set; } = string.Empty;
-
-    [Required]
-    public string DatabaseName { get; set; } = string.Empty;
+    public new const string MongoDBConfigSectionName = HotelWise.Core.SDK.AI.Configuration.AzureCosmosDBConfig.MongoDBConfigSectionName;
+    public new const string NoSQLConfigSectionName = HotelWise.Core.SDK.AI.Configuration.AzureCosmosDBConfig.NoSQLConfigSectionName;
 }

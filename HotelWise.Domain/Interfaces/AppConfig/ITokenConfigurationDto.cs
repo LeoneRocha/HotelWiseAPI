@@ -1,11 +1,13 @@
 ﻿namespace HotelWise.Domain.Interfaces.AppConfig
 {
-    public interface ITokenConfigurationDto
+    /// <summary>
+    /// ⚠️ Movido para HotelWise.Core.SDK — implementação canônica no pacote Core.
+    /// </summary>
+    [Obsolete(
+        "Movido para HotelWise.Core.SDK. Use HotelWise.Core.SDK.Abstractions.ITokenConfigurationDto.",
+        error: false,
+        DiagnosticId = "HW_CORE_SDK_SECURITY")]
+    public interface ITokenConfigurationDto : HotelWise.Core.SDK.Abstractions.ITokenConfigurationDto
     {
-        string Audience { get; set; }
-        string Issuer { get; set; }
-        string Secret { get; set; }
-        int Minutes { get; set; }
-        int DaysToExpiry { get; set; }
     }
 }

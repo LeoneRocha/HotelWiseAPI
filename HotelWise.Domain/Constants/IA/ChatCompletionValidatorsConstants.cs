@@ -1,15 +1,20 @@
-﻿using HotelWise.Domain.Dto;
-
-namespace HotelWise.Domain.Constants.IA
+﻿namespace HotelWise.Domain.Constants.IA
 {
+    /// <summary>
+    /// ⚠️ Movido para HotelWise.Core.SDK — implementação canônica no pacote Core.
+    /// </summary>
+    [Obsolete(
+        "Movido para HotelWise.Core.SDK. Use HotelWise.Core.SDK.AI.Constants.ChatCompletionValidatorsConstants.",
+        error: false,
+        DiagnosticId = "HW_CORE_SDK_AI")]
     public static class ChatCompletionValidatorsConstants
     {
-        public const int MaximumMessages = 10;
-        public const int MaxTextLength = 2500;
-        public const int MaximumLengthContent = MaxTextLength;
-        public const int MaxTokensPerMessage = 1000; // Defina o limite máximo de tokens por mensagem
-        public const int MaxTextToken = 1000;
-        public const int MaxTotalTokens = 150_000;
-        public const int MaxTokensPerMessageContext = 150_000;
+        public const int MaximumMessages = HotelWise.Core.SDK.AI.Constants.ChatCompletionValidatorsConstants.MaximumMessages;
+        public const int MaxTextLength = HotelWise.Core.SDK.AI.Constants.ChatCompletionValidatorsConstants.MaxTextLength;
+        public const int MaximumLengthContent = HotelWise.Core.SDK.AI.Constants.ChatCompletionValidatorsConstants.MaximumLengthContent;
+        public const int MaxTokensPerMessage = HotelWise.Core.SDK.AI.Constants.ChatCompletionValidatorsConstants.MaxTokensPerMessage;
+        public const int MaxTextToken = HotelWise.Core.SDK.AI.Constants.ChatCompletionValidatorsConstants.MaxTextToken;
+        public const int MaxTotalTokens = HotelWise.Core.SDK.AI.Constants.ChatCompletionValidatorsConstants.MaxTotalTokens;
+        public const int MaxTokensPerMessageContext = HotelWise.Core.SDK.AI.Constants.ChatCompletionValidatorsConstants.MaxTokensPerMessageContext;
     }
 }

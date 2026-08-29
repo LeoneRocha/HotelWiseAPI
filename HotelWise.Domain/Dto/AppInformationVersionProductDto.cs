@@ -1,11 +1,13 @@
 ﻿namespace HotelWise.Domain.Dto
 {
-    public class AppInformationVersionProductDto
+    /// <summary>
+    /// ⚠️ Movido para HotelWise.Core.SDK — implementação canônica no pacote Core.
+    /// </summary>
+    [Obsolete(
+        "Movido para HotelWise.Core.SDK. Use HotelWise.Core.SDK.Common.AppInformationVersionProductDto.",
+        error: false,
+        DiagnosticId = "HW_CORE_SDK_COMMON")]
+    public class AppInformationVersionProductDto : HotelWise.Core.SDK.Common.AppInformationVersionProductDto
     {
-        public string Id { get; set; } = string.Empty;
-        public string Name { get; set; } = string.Empty;
-        public string Version { get; set; } = string.Empty;
-        public string EnvironmentName { get; set; } = string.Empty;
-        public string Message { get; internal set; } = string.Empty;
     }
 }

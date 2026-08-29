@@ -4,6 +4,13 @@ using HotelWise.Domain.Helpers.AI;
 
 namespace HotelWise.Domain.Dto.IA.SemanticKernel
 {
+    /// <summary>
+    /// ⚠️ Movido para HotelWise.Core.SDK — cópia Obsolete no host (enums Domain ≠ Core durante migração).
+    /// </summary>
+    [Obsolete(
+        "Movido para HotelWise.Core.SDK. Use HotelWise.Core.SDK.AI.DTO.PromptMessageVO.",
+        error: false,
+        DiagnosticId = "HW_CORE_SDK_AI")]
     public class PromptMessageVO
     {
         public DataVectorVO[] DataContextRag { get; set; }
@@ -14,7 +21,6 @@ namespace HotelWise.Domain.Dto.IA.SemanticKernel
         public int TokenCount
         {
             get
-
             {
                 if (!string.IsNullOrWhiteSpace(Content))
                 {
@@ -29,6 +35,14 @@ namespace HotelWise.Domain.Dto.IA.SemanticKernel
         }
         public int ContentLenght { get { return Content.Length; } }
     }
+
+    /// <summary>
+    /// ⚠️ Movido para HotelWise.Core.SDK — cópia Obsolete no host.
+    /// </summary>
+    [Obsolete(
+        "Movido para HotelWise.Core.SDK. Use HotelWise.Core.SDK.AI.DTO.DataVectorVO.",
+        error: false,
+        DiagnosticId = "HW_CORE_SDK_AI")]
     public class DataVectorVO
     {
         public string KeyVector { get; set; } = string.Empty;

@@ -1,60 +1,35 @@
-﻿using HotelWise.Domain.Constants;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 
 namespace HotelWise.Domain.Helpers
 {
+    /// <summary>
+    /// ⚠️ Movido para HotelWise.Core.SDK — implementação canônica no pacote Core.
+    /// </summary>
+    [Obsolete(
+        "Movido para HotelWise.Core.SDK. Use HotelWise.Core.SDK.Helpers.ConfigurationAppSettingsHelper.",
+        error: false,
+        DiagnosticId = "HW_CORE_SDK_HELPER")]
     public static class ConfigurationAppSettingsHelper
     {
-        #region GENERIC
-        public static IConfiguration GetSectionApp(IConfiguration? configuration, string sectionName)
-        {
-            if (configuration == null)
-            {
-                throw new ArgumentNullException(nameof(configuration), AppConfigConstants.ConfigurationConfigurationNotBeNull);
-            }
-            return configuration.GetSection(sectionName);
-        }
+        public static IConfiguration GetSectionApp(IConfiguration? configuration, string sectionName) =>
+            HotelWise.Core.SDK.Helpers.ConfigurationAppSettingsHelper.GetSectionApp(configuration, sectionName);
 
-        public static string GetConnectionStringApp(IConfiguration? configuration, string connectionName)
-        {
-            if (configuration == null)
-            {
-                throw new ArgumentNullException(nameof(configuration), AppConfigConstants.ConfigurationConfigurationNotBeNull);
-            }
-            return configuration.GetConnectionString(connectionName) ?? string.Empty;
-        }
+        public static string GetConnectionStringApp(IConfiguration? configuration, string connectionName) =>
+            HotelWise.Core.SDK.Helpers.ConfigurationAppSettingsHelper.GetConnectionStringApp(configuration, connectionName);
 
-        public static string GetValueStringConfiguration(IConfiguration? configuration, string configurationName)
-        {
-            if (configuration == null)
-            {
-                throw new ArgumentNullException(nameof(configuration), AppConfigConstants.ConfigurationConfigurationNotBeNull);
-            }
-            string appsettingsValue = configuration[configurationName] ?? string.Empty;
+        public static string GetValueStringConfiguration(IConfiguration? configuration, string configurationName) =>
+            HotelWise.Core.SDK.Helpers.ConfigurationAppSettingsHelper.GetValueStringConfiguration(configuration, configurationName);
 
-            return appsettingsValue;
-        }
+        public static string GetConnectionStringMySQL(IConfiguration? configuration) =>
+            HotelWise.Core.SDK.Helpers.ConfigurationAppSettingsHelper.GetConnectionStringMySQL(configuration);
 
+        public static IConfiguration GetRagConfig(IConfiguration configuration) =>
+            HotelWise.Core.SDK.Helpers.ConfigurationAppSettingsHelper.GetRagConfig(configuration);
 
-        #endregion GENERIC 
-        public static string GetConnectionStringMySQL(IConfiguration? configuration)
-        {
-            return GetConnectionStringApp(configuration, "DBConnectionMySQL");
-        } 
+        public static IConfiguration GetTokenConfigurations(IConfiguration? configuration) =>
+            HotelWise.Core.SDK.Helpers.ConfigurationAppSettingsHelper.GetTokenConfigurations(configuration);
 
-        public static IConfiguration GetRagConfig(IConfiguration configuration)
-        {
-            return GetSectionApp(configuration, "Rag");
-        }
-
-        public static IConfiguration GetTokenConfigurations(IConfiguration? configuration)
-        {
-            return GetSectionApp(configuration, "TokenConfigurations");
-        }
-
-        public static IConfiguration GetAzureAdConfig(IConfiguration configuration)
-        {
-            return GetSectionApp(configuration, "AzureAd");
-        }
+        public static IConfiguration GetAzureAdConfig(IConfiguration configuration) =>
+            HotelWise.Core.SDK.Helpers.ConfigurationAppSettingsHelper.GetAzureAdConfig(configuration);
     }
 }

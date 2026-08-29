@@ -7,12 +7,20 @@ using Microsoft.SemanticKernel;
 
 namespace HotelWise.Service.AI
 {
+    /// <summary>
+    /// ⚠️ Movido para HotelWise.Core.SDK — cópia Obsolete (config/adapter Domain ≠ Core).
+    /// </summary>
+    [Obsolete(
+        "Movido para HotelWise.Core.SDK. Use HotelWise.Core.SDK.AI.Services.VectorStoreAdapterFactory.",
+        error: false,
+        DiagnosticId = "HW_CORE_SDK_AI")]
     public class VectorStoreAdapterFactory : IVectorStoreAdapterFactory
     {
         private readonly IApplicationIAConfig _applicationConfig;
         private readonly VectorStore _vectorStore;
         private readonly Kernel _kernel;
         private readonly Serilog.ILogger _logger;
+
         public VectorStoreAdapterFactory(IApplicationIAConfig applicationConfig, VectorStore vectorStore, Kernel kernel, Serilog.ILogger logger)
         {
             _applicationConfig = applicationConfig;
@@ -20,6 +28,7 @@ namespace HotelWise.Service.AI
             _kernel = kernel;
             _logger = logger;
         }
+
         public IVectorStoreAdapter<TVector> CreateAdapter<TVector>() where TVector : class, IDataVector
         {
             return new GenericVectorStoreAdapter<TVector>(_logger, _applicationConfig, _vectorStore, _kernel);

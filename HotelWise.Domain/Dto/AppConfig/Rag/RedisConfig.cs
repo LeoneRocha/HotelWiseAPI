@@ -1,13 +1,13 @@
-﻿using System.ComponentModel.DataAnnotations;
-namespace HotelWise.Domain.Dto.AppConfig.Rag;
+﻿namespace HotelWise.Domain.Dto.AppConfig.Rag;
 
 /// <summary>
-/// Redis service settings.
+/// ⚠️ Movido para HotelWise.Core.SDK — implementação canônica no pacote Core.
 /// </summary>
-public sealed class RedisConfig
+[Obsolete(
+    "Movido para HotelWise.Core.SDK. Use HotelWise.Core.SDK.AI.Configuration.RedisConfig.",
+    error: false,
+    DiagnosticId = "HW_CORE_SDK_AI")]
+public class RedisConfig : HotelWise.Core.SDK.AI.Configuration.RedisConfig
 {
-    public const string ConfigSectionName = "Redis";
-
-    [Required]
-    public string ConnectionConfiguration { get; set; } = string.Empty;
+    public new const string ConfigSectionName = HotelWise.Core.SDK.AI.Configuration.RedisConfig.ConfigSectionName;
 }

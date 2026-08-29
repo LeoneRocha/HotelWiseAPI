@@ -3,55 +3,32 @@ using HotelWise.Domain.Dto;
 
 namespace HotelWise.Domain.Helpers
 {
+    /// <summary>
+    /// ⚠️ Movido para HotelWise.Core.SDK — implementação canônica no pacote Core.
+    /// </summary>
+    [Obsolete(
+        "Movido para HotelWise.Core.SDK. Use HotelWise.Core.SDK.Validation.HelperValidation.",
+        error: false,
+        DiagnosticId = "HW_CORE_SDK_HELPER")]
     public static class HelperValidation
     {
-        public static ErrorResponse[] GetErrorsMap(FluentValidation.Results.ValidationResult? validationResult)
-        {
-            if (validationResult == null || validationResult.IsValid) return Array.Empty<ErrorResponse>();
+        public static ErrorResponse[] GetErrorsMap(ValidationResult? validationResult) =>
+            MapErrors(HotelWise.Core.SDK.Validation.HelperValidation.GetErrorsMap(validationResult));
 
-            return validationResult.Errors.Select(ConvertToErrorResponse).ToArray();
-        }
+        public static string TranslateErroCode(string message, string errorCode) =>
+            HotelWise.Core.SDK.Validation.HelperValidation.TranslateErroCode(message, errorCode);
 
-        private static ErrorResponse ConvertToErrorResponse(ValidationFailure errorItem)
-        {
-            var errorAdd = new ErrorResponse
+        public static List<ErrorResponse> ConvertValidationFailureListToErroResponse(List<ValidationFailure> errors) =>
+            MapErrors(HotelWise.Core.SDK.Validation.HelperValidation.ConvertValidationFailureListToErroResponse(errors).ToArray()).ToList();
+
+        private static ErrorResponse[] MapErrors(HotelWise.Core.SDK.Common.ErrorResponse[] errors) =>
+            errors.Select(e => new ErrorResponse
             {
-                FullMessage = errorItem.ErrorMessage,
-                DefaultMessage = errorItem.ErrorMessage,
-                Message = errorItem.ErrorMessage,
-                ErrorCode = errorItem.ErrorCode,
-                Name = errorItem.PropertyName
-            };
-
-            if (errorAdd.Message.Contains('|') && errorAdd.Message.Contains('_'))
-            {
-                var parts = errorAdd.Message.Split('|');
-                errorAdd.ErrorCode = parts[0];
-                errorAdd.DefaultMessage = parts.Length > 1 ? parts[1] : errorItem.ErrorMessage;
-            }
-            else if (!errorAdd.Message.Contains('_'))
-            {
-                // Remove todos os espaços e substitui por "_"
-                errorAdd.ErrorCode = errorAdd.Message.Replace(" ", "_");
-            }
-
-            return errorAdd;
-        }
-
-
-        public static string TranslateErroCode(string message, string errorCode)
-        {
-            if (!string.IsNullOrEmpty(errorCode))
-            {
-                message = message.Replace("[MaxLength]", errorCode.Replace("[", "").Replace("]", "").Replace(",", ""));
-
-            }
-            return message;
-        }
-
-        public static List<ErrorResponse> ConvertValidationFailureListToErroResponse(List<ValidationFailure> errors)
-        {
-            return errors.DistinctBy(d => d.PropertyName).Select(er => ConvertToErrorResponse(er)).ToList();
-        }
+                Name = e.Name,
+                Message = e.Message,
+                ErrorCode = e.ErrorCode,
+                DefaultMessage = e.DefaultMessage,
+                FullMessage = e.FullMessage
+            }).ToArray();
     }
 }

@@ -1,22 +1,15 @@
-﻿using HtmlAgilityPack;
-namespace HotelWise.Domain.Helpers.AI
+﻿namespace HotelWise.Domain.Helpers.AI
 {
+    /// <summary>
+    /// ⚠️ Movido para HotelWise.Core.SDK — implementação canônica no pacote Core.
+    /// </summary>
+    [Obsolete(
+        "Movido para HotelWise.Core.SDK. Use HotelWise.Core.SDK.Helpers.HtmlHelper.",
+        error: false,
+        DiagnosticId = "HW_CORE_SDK_HELPER")]
     public static class HtmlHelper
     {
-        /// <summary>
-        /// Remove o HTML do texto e retorna apenas o conteúdo de texto.
-        /// </summary>
-        /// <param name="html">Texto com HTML.</param>
-        /// <returns>Texto limpo.</returns>
-        public static string RemoveHtml(string html)
-        {
-            if (string.IsNullOrWhiteSpace(html)) return string.Empty;
-
-            var htmlDocument = new HtmlDocument();
-            htmlDocument.LoadHtml(html);
-
-            // Extrai apenas o texto limpo
-            return htmlDocument.DocumentNode.InnerText;
-        }
+        public static string RemoveHtml(string html) =>
+            HotelWise.Core.SDK.Helpers.HtmlHelper.RemoveHtml(html);
     }
 }

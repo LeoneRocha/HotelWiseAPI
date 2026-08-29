@@ -1,15 +1,14 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using HotelWise.Domain.Interfaces.AppConfig;
 
 namespace HotelWise.Domain.Dto.AppConfig.Rag;
 
 /// <summary>
-/// Azure OpenAI service settings.
+/// ⚠️ Movido para HotelWise.Core.SDK — implementação canônica no pacote Core.
 /// </summary>
-public sealed class AzureOpenAIConfig : AiInferenceConfigBase
+[Obsolete(
+    "Movido para HotelWise.Core.SDK. Use HotelWise.Core.SDK.AI.Configuration.AzureOpenAIConfig.",
+    error: false,
+    DiagnosticId = "HW_CORE_SDK_AI")]
+public class AzureOpenAIConfig : HotelWise.Core.SDK.AI.Configuration.AzureOpenAIConfig, IAiInferenceConfigBase
 {
-    public new static string ConfigSectionName => "AzureOpenAI";
-
-    [Required]
-    public string ChatDeploymentName { get; set; } = string.Empty;
-
 }

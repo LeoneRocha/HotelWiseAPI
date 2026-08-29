@@ -1,5 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.Web">
-
+<Project Sdk="Microsoft.NET.Sdk.Web">
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
     <Nullable>enable</Nullable>
@@ -8,9 +7,8 @@
     <BuildDate>$([System.DateTime]::UtcNow.ToString("yyyy.MM.dd.HH"))</BuildDate>
     <AssemblyVersion>$(BuildDate)</AssemblyVersion>
     <FileVersion>$(BuildDate)</FileVersion>
-    <NoWarn>CS8604,CS8600,CS8602,CS1998,CS8618,CS8601,CS8629,SKEXP0050,SKEXP0001,SKEXP0010,SKEXP0070,SKEXP0110</NoWarn>
+    <NoWarn>CS8604,CS8600,CS8602,CS1998,CS8618,CS8601,CS8629,CS0618,SKEXP0050,SKEXP0001,SKEXP0010,SKEXP0070,SKEXP0110,HW_CORE_SDK_DOMAIN,HW_CORE_SDK_REPO,HW_CORE_SDK_COMMON,HW_CORE_SDK_SERVICE,HW_CORE_SDK_HELPER,HW_CORE_SDK_SECURITY,HW_CORE_SDK_AI,HW_CORE_SDK_MIDDLEWARE,HW_CORE_SDK_DI,HW_CORE_SDK_LOGGING</NoWarn>
   </PropertyGroup>
-
   <ItemGroup>
     <PackageReference Include="Azure.Identity" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" />
@@ -39,9 +37,8 @@
     <PackageReference Include="Serilog.Sinks.Console" />
     <PackageReference Include="Serilog.Sinks.File" />
   </ItemGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\HotelWise.Service\HotelWise.Service.csproj" />
+    <ProjectReference Include="..\HotelWise.Core.SDK\HotelWise.Core.SDK.csproj" />
   </ItemGroup>
-
 </Project>

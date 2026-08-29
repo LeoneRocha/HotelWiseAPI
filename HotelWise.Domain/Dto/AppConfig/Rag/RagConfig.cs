@@ -5,6 +5,13 @@ using HotelWise.Domain.Interfaces.AppConfig;
 
 namespace HotelWise.Domain.Dto.AppConfig.Rag
 {
+    /// <summary>
+    /// ⚠️ Movido para HotelWise.Core.SDK — cópia Obsolete no host (enums Domain ≠ Core durante migração).
+    /// </summary>
+    [Obsolete(
+        "Movido para HotelWise.Core.SDK. Use HotelWise.Core.SDK.AI.Configuration.RagConfig.",
+        error: false,
+        DiagnosticId = "HW_CORE_SDK_AI")]
     public sealed class RagConfig : IRagConfig
     {
         public const string ConfigSectionName = "ApplicationIAConfig:Rag";

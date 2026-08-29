@@ -2,12 +2,14 @@
 
 namespace HotelWise.Domain.Dto.AppConfig
 {
-    public class TokenConfigurationDto : ITokenConfigurationDto
+    /// <summary>
+    /// ⚠️ Movido para HotelWise.Core.SDK — implementação canônica no pacote Core.
+    /// </summary>
+    [Obsolete(
+        "Movido para HotelWise.Core.SDK. Use HotelWise.Core.SDK.Security.TokenConfigurationDto.",
+        error: false,
+        DiagnosticId = "HW_CORE_SDK_SECURITY")]
+    public class TokenConfigurationDto : HotelWise.Core.SDK.Security.TokenConfigurationDto, ITokenConfigurationDto
     {
-        public string Audience { get; set; } = string.Empty;
-        public string Issuer { get; set; } = string.Empty;
-        public string Secret { get; set; } = string.Empty;
-        public int Minutes { get; set; }
-        public int DaysToExpiry { get; set; }
     }
 }

@@ -1,0 +1,66 @@
+#if NET8_0_OR_GREATER
+using HotelWise.Core.SDK.AI.Abstractions;
+using HotelWise.Core.SDK.AI.DTO;
+using HotelWise.Core.SDK.AI.Enums;
+using Mistral.SDK;
+using Mistral.SDK.DTOs;
+
+namespace HotelWise.Core.SDK.AI.Adapters;
+
+/// <summary>
+/// Adapter de inferência via Mistral API.
+/// </summary>
+public class MistralApiAdapter : IAIInferenceAdapter
+{
+    private readonly MistralClient _client;
+
+    public MistralApiAdapter(IApplicationIAConfig applicationConfig)
+    {
+        _client = new MistralClient(applicationConfig.MistralApiConfig.ApiKey);
+    }
+
+    public async Task<string> GenerateChatCompletionAsync(PromptMessageVO[] messages)
+    {
+        var chatMessages = messages.Select(m => new ChatMessage(
+            GetRole(m),
+            m.Content)).ToList();
+
+        var request = new ChatCompletionRequest(
+            model: ModelDefinitions.MistralMedium,
+            messages: chatMessages,
+            safePrompt: true,
+            temperature: 0,
+            maxTokens: 500,
+            topP: 1,
+            randomSeed: 32
+        );
+
+        var response = await _client.Completions.GetCompletionAsync(request);
+        return response.VarObject.ToString();
+    }
+
+    private static ChatMessage.RoleEnum GetRole(PromptMessageVO pm) =>
+        pm.RoleType switch
+        {
+            RoleAiPromptsType.System or RoleAiPromptsType.Agent => ChatMessage.RoleEnum.System,
+            RoleAiPromptsType.User => ChatMessage.RoleEnum.User,
+            RoleAiPromptsType.Assistant => ChatMessage.RoleEnum.Assistant,
+            _ => ChatMessage.RoleEnum.User
+        };
+
+    public async Task<string> GenerateChatCompletionByAgentAsync(PromptMessageVO[] messages) =>
+        await GenerateChatCompletionAsync(messages);
+
+    public async Task<float[]> GenerateEmbeddingAsync(string text)
+    {
+        var request = new EmbeddingRequest(ModelDefinitions.MistralEmbed, new List<string>() { text }, EmbeddingRequest.EncodingFormatEnum.Float);
+        var response = await _client.Embeddings.GetEmbeddingsAsync(request);
+        var resultEmbedding = new List<float>();
+        response.Data.ForEach(x => resultEmbedding.AddRange(x.Embedding.Select(eb => (float)eb).ToList()));
+        return resultEmbedding.ToArray();
+    }
+
+    public async Task<string> GenerateChatCompletionByAgentSimpleRagAsync(PromptMessageVO[] messages) =>
+        await GenerateChatCompletionAsync(messages);
+}
+#endif

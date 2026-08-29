@@ -1,72 +1,33 @@
-﻿using System.Globalization;
-
-namespace HotelWise.Domain.Helpers
+﻿namespace HotelWise.Domain.Helpers
 {
+    /// <summary>
+    /// ⚠️ Movido para HotelWise.Core.SDK — implementação canônica no pacote Core.
+    /// </summary>
+    [Obsolete(
+        "Movido para HotelWise.Core.SDK. Use HotelWise.Core.SDK.Helpers.DataHelper.",
+        error: false,
+        DiagnosticId = "HW_CORE_SDK_HELPER")]
     public static class DataHelper
     {
-        public static string ConvertSecondsToTimeString(double seconds)
-        {
-            TimeSpan time = TimeSpan.FromSeconds(seconds);
-            return time.ToString(@"hh\:mm\:ss");
-        }
-        private static readonly string dateFormat = "dd/MM/yyyy HH:mm:ss";
+        public static string ConvertSecondsToTimeString(double seconds) =>
+            HotelWise.Core.SDK.Helpers.DataHelper.ConvertSecondsToTimeString(seconds);
 
-        public static string GetDateTimeCustomFormat(DateTime dateInput)
-        {
-            var cultureInfo = System.Globalization.CultureInfo.InvariantCulture;
-            var result = dateInput.ToString(dateFormat, cultureInfo);
-            return result;
-        }
+        public static string GetDateTimeCustomFormat(DateTime dateInput) =>
+            HotelWise.Core.SDK.Helpers.DataHelper.GetDateTimeCustomFormat(dateInput);
 
-        public static void SetCulture()
-        {
-            // Set the culture to Portuguese (Brazil)
-            var cultureInfo = new CultureInfo("pt-BR");
+        public static void SetCulture() => HotelWise.Core.SDK.Helpers.DataHelper.SetCulture();
 
-            // Set the culture of the current thread
-            Thread.CurrentThread.CurrentCulture = cultureInfo;
+        public static DateTime GetDateTimeNowBrazil() => HotelWise.Core.SDK.Helpers.DataHelper.GetDateTimeNowBrazil();
 
-            // Set the UI culture of the current thread
-            Thread.CurrentThread.CurrentUICulture = cultureInfo;
-        }
+        public static DateTime GetDateTimeNowToLog() => HotelWise.Core.SDK.Helpers.DataHelper.GetDateTimeNowToLog();
 
-        public static DateTime GetDateTimeNowBrazil()
-        {
-            DateTime now = DateTime.UtcNow;
-            TimeZoneInfo tzi = TimeZoneInfo.FindSystemTimeZoneById("E. South America Standard Time");
-            DateTime brazilTime = TimeZoneInfo.ConvertTimeFromUtc(now, tzi);
-            return brazilTime;
-        }
+        public static DateTime GetDateTimeNowToProcess() => HotelWise.Core.SDK.Helpers.DataHelper.GetDateTimeNowToProcess();
 
-        public static DateTime GetDateTimeNowToLog()
-        {
-            return GetDateTimeNowBrazil();
-        }
+        public static DateTime GetDateTimeNowToPersistData() => HotelWise.Core.SDK.Helpers.DataHelper.GetDateTimeNowToPersistData();
 
-        public static DateTime GetDateTimeNowToProcess()
-        {
-            return GetDateTimeNowBrazil();
-        }
+        public static DateTime GetDateTimeNow() => HotelWise.Core.SDK.Helpers.DataHelper.GetDateTimeNow();
 
-        public static DateTime GetDateTimeNowToPersistData()
-        {
-            return GetDateTimeNowBrazil();
-        }
-
-        public static DateTime GetDateTimeNow()
-        {
-            return DateTime.UtcNow;
-        }
-
-        public static DateTime ApplyTimeZone(DateTime dateTime, string timeZoneId)
-        {
-            // Obter o fuso horário a partir do ID
-            var timeZone = TimeZoneInfo.FindSystemTimeZoneById(timeZoneId);
-
-            // Converter a data e hora para o fuso horário especificado
-            var dateTimeWithTimeZone = TimeZoneInfo.ConvertTimeFromUtc(dateTime, timeZone);
-
-            return dateTimeWithTimeZone;
-        }
+        public static DateTime ApplyTimeZone(DateTime dateTime, string timeZoneId) =>
+            HotelWise.Core.SDK.Helpers.DataHelper.ApplyTimeZone(dateTime, timeZoneId);
     }
 }

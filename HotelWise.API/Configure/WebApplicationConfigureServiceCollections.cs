@@ -1,5 +1,5 @@
 ﻿using HotelWise.API.Configure;
-using HotelWise.Domain.Helpers;
+using HotelWise.Core.SDK.Logging;
 using HotelWise.Service.Configure;
 using Microsoft.Net.Http.Headers;
 using Microsoft.OpenApi;

@@ -1,14 +1,14 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using HotelWise.Domain.Interfaces.AppConfig;
+
 namespace HotelWise.Domain.Dto.AppConfig.Rag;
 
 /// <summary>
-/// Qdrant service settings.
+/// ⚠️ Movido para HotelWise.Core.SDK — implementação canônica no pacote Core.
 /// </summary>
-public sealed class OllamaConfig : AiInferenceConfigBase
+[Obsolete(
+    "Movido para HotelWise.Core.SDK. Use HotelWise.Core.SDK.AI.Configuration.OllamaConfig.",
+    error: false,
+    DiagnosticId = "HW_CORE_SDK_AI")]
+public class OllamaConfig : HotelWise.Core.SDK.AI.Configuration.OllamaConfig, IAiInferenceConfigBase
 {
-    public new static string ConfigSectionName => "OllamaApi";
-    public int NumPredict { get; set; } = 500;
-    public float Temperature { get; set; } = 0.0f;
-    public float TopP { get; set; } = 1.0f;
-    public int? Seed { get; set; } = 32;
 }

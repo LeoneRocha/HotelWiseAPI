@@ -19,6 +19,14 @@ using OllamaSharp;
 
 namespace HotelWise.Service.Configure
 {
+    /// <summary>
+    /// ⚠️ Movido para HotelWise.Core.SDK — cópia Obsolete (ApplicationIAConfig Domain + HotelVector).
+    /// Core: HotelWise.Core.SDK.AI.Configure.SemanticKernelProviderConfigure.SetupSemanticKernelProvider&lt;TVector&gt;.
+    /// </summary>
+    [Obsolete(
+        "Movido para HotelWise.Core.SDK. Use HotelWise.Core.SDK.AI.Configure.SemanticKernelProviderConfigure.",
+        error: false,
+        DiagnosticId = "HW_CORE_SDK_AI")]
     public static class SemanticKernelProviderConfigure
     {
         public static void SetupSemanticKernelProvider(IServiceCollection services, IConfiguration configuration)

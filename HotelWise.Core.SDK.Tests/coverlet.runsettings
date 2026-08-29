@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RunSettings>
+  <DataCollectionRunSettings>
+    <DataCollectors>
+      <DataCollector friendlyName="XPlat Code Coverage">
+        <Configuration>
+          <Format>cobertura</Format>
+          <Exclude>
+            [HotelWise.Core.SDK]HotelWise.Core.SDK.AI.Adapters.*,
+            [HotelWise.Core.SDK]HotelWise.Core.SDK.AI.Configure.SemanticKernelProviderConfigure*,
+            [HotelWise.Core.SDK]HotelWise.Core.SDK.AI.Configuration.ApplicationIAConfig*
+          </Exclude>
+          <ExcludeByFile>
+            **/AI/Adapters/*.cs,
+            **/AI/Configure/SemanticKernelProviderConfigure.cs,
+            **/AI/Configuration/ApplicationIAConfig.cs
+          </ExcludeByFile>
+        </Configuration>
+      </DataCollector>
+    </DataCollectors>
+  </DataCollectionRunSettings>
+</RunSettings>

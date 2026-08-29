@@ -1,22 +1,19 @@
 ﻿using AutoMapper;
 
 namespace HotelWise.Service.Generic
-{ 
-    public abstract class GenericVectorStoreServiceBase  
+{
+    /// <summary>
+    /// ⚠️ Movido para HotelWise.Core.SDK — implementação canônica no pacote Core.
+    /// </summary>
+    [Obsolete(
+        "Movido para HotelWise.Core.SDK. Use HotelWise.Core.SDK.AI.Services.GenericVectorStoreServiceBase.",
+        error: false,
+        DiagnosticId = "HW_CORE_SDK_AI")]
+    public abstract class GenericVectorStoreServiceBase : HotelWise.Core.SDK.AI.Services.GenericVectorStoreServiceBase
     {
-        protected readonly IMapper _mapper;
-        protected readonly Serilog.ILogger _logger;
-        protected long UserId { get; private set; }
-
         protected GenericVectorStoreServiceBase(IMapper mapper, Serilog.ILogger logger)
+            : base(mapper, logger)
         {
-            _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
-
-        public void SetUserId(long id)
-        {
-            UserId = id;
-        } 
-    } 
+    }
 }

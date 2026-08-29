@@ -1,13 +1,11 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
-
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <NoWarn>CS8604,CS8600,CS8602,CS1998,CS8618,CS8601,CS8629,SKEXP0050,SKEXP0001,SKEXP0010,SKEXP0070,SKEXP0110</NoWarn>
+    <NoWarn>CS8604,CS8600,CS8602,CS1998,CS8618,CS8601,CS8629,CS0618,SKEXP0050,SKEXP0001,SKEXP0010,SKEXP0070,SKEXP0110,HW_CORE_SDK_DOMAIN,HW_CORE_SDK_REPO,HW_CORE_SDK_COMMON,HW_CORE_SDK_SERVICE,HW_CORE_SDK_HELPER,HW_CORE_SDK_SECURITY,HW_CORE_SDK_AI,HW_CORE_SDK_MIDDLEWARE,HW_CORE_SDK_DI,HW_CORE_SDK_LOGGING</NoWarn>
     <UserSecretsId>a630c9f3-448e-4200-b647-8b1eefced4f7</UserSecretsId>
   </PropertyGroup>
-
   <ItemGroup>
     <PackageReference Include="AutoMapper" />
     <PackageReference Include="Azure.ResourceManager.Authorization" />
@@ -29,10 +27,9 @@
     <PackageReference Include="Microsoft.SemanticKernel.Connectors.MistralAI" />
     <PackageReference Include="Microsoft.SemanticKernel.Connectors.Ollama" />
   </ItemGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\HotelWise.Data\HotelWise.Data.csproj" />
     <ProjectReference Include="..\HotelWise.Domain\HotelWise.Domain.csproj" />
+    <ProjectReference Include="..\HotelWise.Core.SDK\HotelWise.Core.SDK.csproj" />
   </ItemGroup>
-
 </Project>

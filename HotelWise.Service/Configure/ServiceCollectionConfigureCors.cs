@@ -2,32 +2,16 @@
 
 namespace HotelWise.Service.Configure
 {
+    /// <summary>
+    /// ⚠️ Movido para HotelWise.Core.SDK — implementação canônica no pacote Core.
+    /// </summary>
+    [Obsolete(
+        "Movido para HotelWise.Core.SDK. Use HotelWise.Core.SDK.Extensions.ServiceCollectionConfigureCors.",
+        error: false,
+        DiagnosticId = "HW_CORE_SDK_DI")]
     public static class ServiceCollectionConfigureCors
     {
-        public static void Configure(IServiceCollection services)
-        {
-            addCors(services);
-        }
-        private static void addCors(IServiceCollection services)
-        {
-#pragma warning disable S5122 // Disabling Sonar warning for CORS 
-            services.AddCors(options => options.AddDefaultPolicy(builder =>
-            {
-                builder.AllowAnyOrigin()
-                .AllowAnyMethod()
-                .AllowAnyHeader()
-                .WithExposedHeaders("Content-Disposition");
-            }));
-
-            services.AddCors(options =>
-            {
-                options.AddPolicy("AllowAnyOrigin",
-                    builder => builder.AllowAnyOrigin()
-                    .AllowAnyMethod()
-                    .AllowAnyHeader());
-            });
-#pragma warning restore S5122 
-
-        }
+        public static void Configure(IServiceCollection services) =>
+            HotelWise.Core.SDK.Extensions.ServiceCollectionConfigureCors.Configure(services);
     }
 }

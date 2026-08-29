@@ -2,9 +2,14 @@
 
 namespace HotelWise.Domain.Dto.Base
 {
-    public abstract class EntityDtoBase : IEntityDto
+    /// <summary>
+    /// ⚠️ Movido para HotelWise.Core.SDK — implementação canônica no pacote Core.
+    /// </summary>
+    [Obsolete(
+        "Movido para HotelWise.Core.SDK. Use HotelWise.Core.SDK.Common.EntityDtoBase.",
+        error: false,
+        DiagnosticId = "HW_CORE_SDK_COMMON")]
+    public abstract class EntityDtoBase : HotelWise.Core.SDK.Common.EntityDtoBase, IEntityDto
     {
-        public long Id { get; set; }
-        public bool Enable { get; set; }
     }
 }

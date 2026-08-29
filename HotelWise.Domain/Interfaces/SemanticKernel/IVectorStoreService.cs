@@ -3,6 +3,13 @@ using HotelWise.Domain.Dto.Enitty;
 
 namespace HotelWise.Domain.Interfaces.SemanticKernel
 {
+    /// <summary>
+    /// ⚠️ Movido para HotelWise.Core.SDK — implementação canônica no pacote Core.
+    /// </summary>
+    [Obsolete(
+        "Movido para HotelWise.Core.SDK. Use HotelWise.Core.SDK.AI.Abstractions.IVectorStoreService<TEntity>.",
+        error: false,
+        DiagnosticId = "HW_CORE_SDK_AI")]
     public interface IVectorStoreService<TEntity>
     {
         Task UpsertDataAsync(TEntity entity);

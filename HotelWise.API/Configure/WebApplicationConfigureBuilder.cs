@@ -1,6 +1,6 @@
 ﻿using HotelWise.Data.Context;
-using HotelWise.Domain.CustomMiddleware;
-using HotelWise.Domain.Helpers;
+using HotelWise.Core.SDK.Infrastructure.Middleware;
+using HotelWise.Core.SDK.Logging;
 using Microsoft.AspNetCore.Rewrite;
 using Microsoft.EntityFrameworkCore;
 using Serilog;

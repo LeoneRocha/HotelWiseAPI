@@ -9,6 +9,13 @@ using System.Linq.Expressions;
 
 namespace HotelWise.Service.Generic
 {
+    /// <summary>
+    /// ⚠️ Movido para HotelWise.Core.SDK — cópia Obsolete no host (ServiceResponse/IGenericService Domain ≠ Core).
+    /// </summary>
+    [Obsolete(
+        "Movido para HotelWise.Core.SDK. Use HotelWise.Core.SDK.Services.GenericEntityServiceBase<T, TDto>.",
+        error: false,
+        DiagnosticId = "HW_CORE_SDK_SERVICE")]
     public abstract class GenericEntityServiceBase<T, TDto> : IGenericService<TDto>
         where T : class, new()
         where TDto : class, new()
@@ -19,7 +26,6 @@ namespace HotelWise.Service.Generic
         protected readonly IValidator<T> _entityValidator;
         protected long UserId { get; private set; }
 
-        // Constantes para mensagens de erro
         private const string ErrorFetchingAllEntities = "Error occurred while fetching all entities.";
         private const string ErrorFetchingEntityById = "Error occurred while fetching entity with ID {Id}.";
         private const string ErrorFindingEntities = "Error occurred while finding entities with specified criteria.";
@@ -30,7 +36,6 @@ namespace HotelWise.Service.Generic
         private const string ErrorDeletingEntity = "Error occurred while deleting entity with ID {Id}.";
         private const string ErrorCountingEntities = "Error occurred while counting entities.";
         private const string ErrorFetchingEntitiesPagination = "Error occurred while fetching entities with offset {Offset} and limit {Limit}.";
-
         private const string GeneralErrorOccurred = "An error occurred while processing the request.";
 
         protected GenericEntityServiceBase(IGenericRepository<T> repository, IMapper mapper, Serilog.ILogger logger, IValidator<T> entityValidator)
@@ -41,10 +46,7 @@ namespace HotelWise.Service.Generic
             _entityValidator = entityValidator;
         }
 
-        public void SetUserId(long id)
-        {
-            UserId = id;
-        }
+        public void SetUserId(long id) => UserId = id;
 
         public virtual async Task<List<TDto>> GetAllAsync()
         {
@@ -95,7 +97,6 @@ namespace HotelWise.Service.Generic
             try
             {
                 var entityAdd = _mapper.Map<T>(entityDto);
-
                 response = await Validate(entityAdd);
                 if (response.Success)
                 {
@@ -129,13 +130,12 @@ namespace HotelWise.Service.Generic
             try
             {
                 var entityAdd = _mapper.Map<T>(entityDto);
-
                 response = await Validate(entityAdd);
                 if (response.Success)
                 {
                     var updatedEntity = await _repository.UpdateAsync(entityAdd);
                     response.Data = _mapper.Map<TDto>(updatedEntity);
-                } 
+                }
             }
             catch (Exception ex)
             {
@@ -201,31 +201,26 @@ namespace HotelWise.Service.Generic
             _logger.Error(ex, message);
             throw new InvalidOperationException(GeneralErrorOccurred, ex);
         }
+
         public virtual async Task<ServiceResponse<TDto>> Validate(T item)
         {
             ServiceResponse<TDto> response = new ServiceResponse<TDto>();
             try
             {
-
                 var validationResult = await _entityValidator.ValidateAsync(item);
-
                 response.Success = validationResult.IsValid;
                 response.Errors = HelperValidation.GetErrorsMap(validationResult).ToList();
-                //Translate Message  
                 if (response.Errors != null && response.Errors.Count > 0)
                 {
                     List<ErrorResponse> errosTranslated = new List<ErrorResponse>();
                     foreach (var errosItem in response.Errors)
                     {
-                        var errosAdd = new ErrorResponse()
+                        errosTranslated.Add(new ErrorResponse
                         {
                             Name = errosItem.Name,
                             Message = errosItem.DefaultMessage,
-
                             ErrorCode = errosItem.ErrorCode,
-                        };
-
-                        errosTranslated.Add(errosAdd);
+                        });
                     }
                     response.Errors = errosTranslated;
                     response.Message = ValidatorConstants.ValidateErroMessage_Message;

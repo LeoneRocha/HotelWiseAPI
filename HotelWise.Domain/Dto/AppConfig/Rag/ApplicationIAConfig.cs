@@ -6,8 +6,12 @@ using System;
 namespace HotelWise.Domain.Dto.AppConfig.Rag
 {
     /// <summary>
-    /// Helper class to load all configuration settings for the VectorStoreRAG project.
+    /// ⚠️ Movido para HotelWise.Core.SDK — cópia Obsolete no host (enums/configs Domain ≠ Core durante migração).
     /// </summary>
+    [Obsolete(
+        "Movido para HotelWise.Core.SDK. Use HotelWise.Core.SDK.AI.Configuration.ApplicationIAConfig.",
+        error: false,
+        DiagnosticId = "HW_CORE_SDK_AI")]
     public sealed class ApplicationIAConfig : IApplicationIAConfig
     {
         public const string ConfigSectionName = "ApplicationIAConfig";

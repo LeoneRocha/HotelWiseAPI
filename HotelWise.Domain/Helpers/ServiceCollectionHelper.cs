@@ -4,59 +4,30 @@ using System.Reflection;
 
 namespace HotelWise.Domain.Helpers
 {
+    /// <summary>
+    /// ⚠️ Movido para HotelWise.Core.SDK — implementação canônica no pacote Core.
+    /// </summary>
+    [Obsolete(
+        "Movido para HotelWise.Core.SDK. Use HotelWise.Core.SDK.Extensions.ServiceCollectionHelper.",
+        error: false,
+        DiagnosticId = "HW_CORE_SDK_HELPER")]
     public static class ServiceCollectionHelper
     {
-        public static T[] FilterItems<T>(T[] items, params T[][] filters)
-        {
-            var filteredItems = items;
-            foreach (var filter in filters)
-            {
-                filteredItems = filteredItems.Where(item => !filter.Contains(item)).ToArray();
-            }
-            return filteredItems;
+        public static T[] FilterItems<T>(T[] items, params T[][] filters) =>
+            HotelWise.Core.SDK.Extensions.ServiceCollectionHelper.FilterItems(items, filters);
 
-        }
+        public static HashSet<Type> GetRegisteredInterfaces(IServiceCollection services) =>
+            HotelWise.Core.SDK.Extensions.ServiceCollectionHelper.GetRegisteredInterfaces(services);
 
-        public static HashSet<Type> GetRegisteredInterfaces(IServiceCollection services)
-        {
-            return services.Where(service => service.Lifetime == ServiceLifetime.Scoped)
-                           .Select(service => service.ServiceType)
-                           .ToHashSet();
-        }
-
-        public static RepositoryInfo[] GetInterfaces(string[] classSuffixes, params Assembly[] assemblies)
-        {
-            var repositories = assemblies.SelectMany(assembly => assembly.GetTypes())
-                             .Where(type => type.IsClass && !type.IsAbstract && classSuffixes.Any(suffix => type.Name.EndsWith(suffix)))
-                             .Select(type => new RepositoryInfo
-                             {
-                                 InterfaceType = type.GetInterfaces().FirstOrDefault(i => i.Name == $"I{type.Name}"),
-                                 ImplementationType = type
-                             })
-                             .Where(repo => repo.InterfaceType != null)
-                             .ToArray();
-
-            return repositories.ToArray();
-        }
-
-        public static void RegisterInterfaces(IServiceCollection services, string[] classSuffixes, List<Type> ignoredInterfaces, Assembly[] assemblies)
-        {
-            var interfaceInfos = GetInterfaces(classSuffixes, assemblies);
-
-            interfaceInfos = interfaceInfos.OrderBy(i => i.InterfaceType!.Name).ToArray();
-
-            var filteredInterfaces = FilterItems(interfaceInfos.Select(info => info.InterfaceType!).ToArray(), ignoredInterfaces.ToArray());
-
-            filteredInterfaces = filteredInterfaces.OrderBy(i => i.Name).ToArray();
-
-            foreach (var interfaceType in filteredInterfaces)
-            {
-                var implementationType = interfaceInfos.First(info => info.InterfaceType == interfaceType).ImplementationType;
-                if (implementationType != null)
+        public static RepositoryInfo[] GetInterfaces(string[] classSuffixes, params Assembly[] assemblies) =>
+            HotelWise.Core.SDK.Extensions.ServiceCollectionHelper.GetInterfaces(classSuffixes, assemblies)
+                .Select(r => new RepositoryInfo
                 {
-                    services.AddScoped(interfaceType, implementationType!);
-                }
-            }
-        }
+                    InterfaceType = r.InterfaceType,
+                    ImplementationType = r.ImplementationType
+                }).ToArray();
+
+        public static void RegisterInterfaces(IServiceCollection services, string[] classSuffixes, List<Type> ignoredInterfaces, Assembly[] assemblies) =>
+            HotelWise.Core.SDK.Extensions.ServiceCollectionHelper.RegisterInterfaces(services, classSuffixes, ignoredInterfaces, assemblies);
     }
 }
