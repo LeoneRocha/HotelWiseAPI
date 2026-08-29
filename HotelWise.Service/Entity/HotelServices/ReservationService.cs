@@ -16,7 +16,7 @@ namespace HotelWise.Service.Entity;
 /// </summary>
 public class ReservationService : GenericEntityServiceBase<Reservation, ReservationDto>, IReservationService
 {
-    private readonly IRoomRepository _roomRepository; 
+    private readonly IRoomRepository _roomRepository;
     private readonly IReservationRepository _reservationRepository;
 
     /// <summary>
@@ -30,12 +30,12 @@ public class ReservationService : GenericEntityServiceBase<Reservation, Reservat
     public ReservationService(
           ILogger logger,
           IReservationRepository repository,
-          IRoomRepository roomRepository, 
+          IRoomRepository roomRepository,
           IMapper mapper,
           IValidator<Reservation> entityValidator
     ) : base(repository, mapper, logger, entityValidator)
     {
-        _roomRepository = roomRepository; 
+        _roomRepository = roomRepository;
         _reservationRepository = repository;
     }
 

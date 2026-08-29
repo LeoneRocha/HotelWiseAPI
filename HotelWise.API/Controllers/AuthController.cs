@@ -22,7 +22,7 @@ public class AuthController : ControllerBase
     public AuthController(IUserService userService)
     {
         _userService = userService;
-    } 
+    }
 
     /// <summary>
     /// Autentica o usuário com credenciais de login e senha, retornando os tokens JWT gerados.
@@ -38,5 +38,5 @@ public class AuthController : ControllerBase
             return Unauthorized(response);
         }
         return Ok(response);
-    } 
+    }
 }

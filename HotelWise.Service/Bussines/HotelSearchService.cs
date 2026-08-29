@@ -24,7 +24,7 @@ namespace HotelWise.Service.Entity;
 /// </summary>
 public class HotelSearchService : GenericEntityServiceBase<Hotel, HotelDto>, IHotelSearchService
 {
-    private readonly IVectorStoreService<HotelVector> _hotelVectorStoreService; 
+    private readonly IVectorStoreService<HotelVector> _hotelVectorStoreService;
     private readonly IHotelRepository _hotelRepository;
     private readonly IAIInferenceService _aIInferenceService;
     private readonly InferenceAiAdapterType _eIAInferenceAdapterType;
@@ -46,9 +46,9 @@ public class HotelSearchService : GenericEntityServiceBase<Hotel, HotelDto>, IHo
         IHotelRepository hotelRepository,
         IVectorStoreService<HotelVector> hotelVectorStoreService,
         IValidator<Hotel> entityValidator,
-        IAIInferenceService aIInferenceService) 
+        IAIInferenceService aIInferenceService)
         : base(hotelRepository, mapper, logger, entityValidator)
-    { 
+    {
         _hotelVectorStoreService = hotelVectorStoreService;
         _hotelRepository = hotelRepository;
         _eIAInferenceAdapterType = applicationConfig.RagConfig.GetAInferenceAdapterType();
@@ -120,10 +120,10 @@ public class HotelSearchService : GenericEntityServiceBase<Hotel, HotelDto>, IHo
 
         // Filtra os hotéis do vetor com base nos IDs
         var hotelsMatch = response.HotelsVectorResult.Where(hotel => interferenceIds.Contains(hotel.HotelId)).ToArray();
-        response.HotelsVectorResult = hotelsMatch;  
+        response.HotelsVectorResult = hotelsMatch;
         return response;
     }
-     
+
     /// <summary>
     /// Busca hotéis do banco de dados de forma paginada e concorrente.
     /// </summary>
@@ -246,15 +246,15 @@ public class HotelSearchService : GenericEntityServiceBase<Hotel, HotelDto>, IHo
 
         PromptMessageVO ragMsg = new PromptMessageVO()
         {
-            RoleType = RoleAiPromptsType.Context, 
+            RoleType = RoleAiPromptsType.Context,
             DataContextRag = convertDataContext(allHotelsFromDb)
-        }; 
+        };
 
         PromptMessageVO userMsg = new PromptMessageVO()
         {
             RoleType = RoleAiPromptsType.User,
-            Content = request.SearchTextCriteria, 
-        };  
+            Content = request.SearchTextCriteria,
+        };
         PromptMessageVO[] messages = [sysMsgHotelAgent, sysMsgHotelSearch, userMsg, ragMsg];
         return messages;
     }

@@ -30,7 +30,7 @@ public static class ServiceCollectionConfigureSecurity
     /// Configura esquemas de autenticação e políticas de autorização Bearer e AzureAd.
     /// </summary>
     private static void addSecurity(IServiceCollection services, TokenConfigurationDto tokenConfigurations, IConfiguration configuration)
-    {    
+    {
         services.AddAuthentication(options =>
         {
             options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;

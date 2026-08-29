@@ -23,7 +23,7 @@ public class RoomAvailabilityController : ControllerBase
     public RoomAvailabilityController(IRoomAvailabilityService roomAvailabilityService)
     {
         _roomAvailabilityService = roomAvailabilityService;
-    } 
+    }
 
     /// <summary>
     /// Obtém uma disponibilidade de quarto pelo seu identificador primário.
@@ -58,10 +58,10 @@ public class RoomAvailabilityController : ControllerBase
         {
             response ??= new ServiceResponse<RoomAvailabilityDto[]>();
             response.Message = "Nenhuma disponibilidade encontrada para o quarto informado.";
-        } 
+        }
         return Ok(response);
     }
-     
+
     /// <summary>
     /// Cria ou atualiza múltiplas disponibilidades de quartos em lote.
     /// </summary>
@@ -70,7 +70,7 @@ public class RoomAvailabilityController : ControllerBase
     [HttpPost("batch")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<IActionResult> CreateBatch([FromBody] RoomAvailabilityDto[] availabilitiesDto)
-    { 
+    {
         if (availabilitiesDto == null || availabilitiesDto.Length == 0)
         {
             var result = new ServiceResponse<string>() { Data = "Nenhuma disponibilidade fornecida.", Message = "Nenhuma disponibilidade fornecida." };

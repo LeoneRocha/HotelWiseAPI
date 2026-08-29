@@ -77,7 +77,7 @@ public class RoomsController : ControllerBase
             return NotFound(new { Message = "Nenhum quarto encontrado para o hotel informado." });
         }
         else if (response.Data == null || response.Data.Length == 0)
-        { 
+        {
             response.Message = "Nenhum quarto encontrado para o hotel informado.";
             return Ok(response);
         }

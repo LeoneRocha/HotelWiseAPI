@@ -22,7 +22,7 @@ public static class ServiceCollectionAddAllDependencies
         services.AddSingleton<Serilog.ILogger>(sp =>
         {
             return _logger;
-        }); 
+        });
         addORM(services, configuration);
 
         ServiceCollectionConfigureServicesDomain.Configure(services, configuration);

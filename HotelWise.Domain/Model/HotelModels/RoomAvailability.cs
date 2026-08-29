@@ -18,7 +18,7 @@ public class RoomAvailability
     /// <summary>
     /// Matriz de preços e quantidades disponíveis categorizadas por dia da semana.
     /// </summary>
-    public RoomPriceAndAvailabilityItem[] AvailabilityWithPrice { get; set; } = [];        
+    public RoomPriceAndAvailabilityItem[] AvailabilityWithPrice { get; set; } = [];
 
     /// <summary>
     /// Referência de navegação ao <see cref="Room"/> vinculado.

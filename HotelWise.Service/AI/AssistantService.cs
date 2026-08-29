@@ -21,7 +21,7 @@ public class AssistantService : IAssistantService
     private readonly IAIInferenceService _aIInferenceService;
     private readonly InferenceAiAdapterType _eIAInferenceAdapterType;
     private readonly IChatSessionHistoryService _chatSessionHistoryService;
-    
+
     /// <summary>
     /// Instância do AutoMapper para projeções entre entidades e DTOs de sessão.
     /// </summary>
@@ -31,7 +31,7 @@ public class AssistantService : IAssistantService
     /// Identificador do usuário autenticado no contexto da conversa.
     /// </summary>
     protected long UserId { get; private set; }
-    
+
     private readonly Serilog.ILogger _logger;
 
     /// <summary>
@@ -121,7 +121,7 @@ public class AssistantService : IAssistantService
 
             await PersistChatAsync(userCurrentPrompt, askAssistantResponses, existingSession, currentToken);
             return askAssistantResponses;
-        } 
+        }
         catch (Exception ex)
         {
             _logger.Error(ex, "AssistantService AskAssistant: {Message} at: {Time}", ex.Message, DataHelper.GetDateTimeNowToLog());

@@ -141,8 +141,8 @@ public class RoomAvailabilityService : GenericEntityServiceBase<RoomAvailability
             if (existingAvailability == null)
             {
                 return ResponseBuilder<string>.BuildError($"Disponibilidade com ID {availabilityDto.Id} não encontrada");
-            } 
-            existingAvailability.AvailabilityWithPrice = availabilityDto.AvailabilityWithPrice; 
+            }
+            existingAvailability.AvailabilityWithPrice = availabilityDto.AvailabilityWithPrice;
             var validationResult = await ValidateAvailabilityAsync(existingAvailability);
             if (!validationResult.IsValid)
             {

@@ -24,13 +24,13 @@ public static class ServiceCollectionConfigureServicesDomain
         // AutoMapper
         ServiceCollectionConfigureAutoMapper.Configure(services);
         AddDependenciesSingleton(services);
-          
+
         ServicesDomainRepository.AddDependenciesManually(services);
 
         ServicesDomainService.AddDependenciesManually(services);
-         
+
         ConfigureServicesAI.ConfigureServices(services);
-         
+
         #region KERNEL  
         SemanticKernelProviderConfigure.SetupSemanticKernelProvider(services, _configuration);
         #endregion KERNEL
@@ -40,7 +40,7 @@ public static class ServiceCollectionConfigureServicesDomain
 
         ServicesDomainRepository.AddDependenciesAuto(services);
         ServicesDomainService.AddDependenciesAuto(services);
-    } 
+    }
 
     /// <summary>
     /// Registra dependências singleton utilitárias como HttpContextAccessor e TokenService.
@@ -49,6 +49,6 @@ public static class ServiceCollectionConfigureServicesDomain
     {
         services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
-        services.AddSingleton<ITokenService, TokenService>(); 
+        services.AddSingleton<ITokenService, TokenService>();
     }
 }

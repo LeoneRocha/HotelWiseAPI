@@ -21,7 +21,7 @@ public static class ServicesDomainRepository
     /// <param name="services">Coleção de serviços.</param>
     public static void AddDependenciesManually(IServiceCollection services)
     {
-        services.AddScoped<IHotelRepository, HotelRepository>(); 
+        services.AddScoped<IHotelRepository, HotelRepository>();
         services.AddScoped<IUserRepository, UserRepository>();
     }
 

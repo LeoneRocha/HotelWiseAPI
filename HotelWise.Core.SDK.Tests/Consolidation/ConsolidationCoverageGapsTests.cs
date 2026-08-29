@@ -204,8 +204,15 @@ public class ConsolidationCoverageGapsTests
         new QdrantConfig { Host = "h", Port = 1, Https = true, ApiKey = "k" }.Host.Should().Be("h");
         new RedisConfig { ConnectionConfiguration = "localhost" }.ConnectionConfiguration.Should().Be("localhost");
         new OllamaConfig { Temperature = 0.5f, TopP = 0.9f, Seed = 1 }.Temperature.Should().Be(0.5f);
-        new AiInferenceConfigBaseProbe { Endpoint = "e", ApiKey = "a", ModelId = "m", OrgId = "o",
-            EndpointEmbeddings = "ee", ModelIdEmbeddings = "me" }.Endpoint.Should().Be("e");
+        new AiInferenceConfigBaseProbe
+        {
+            Endpoint = "e",
+            ApiKey = "a",
+            ModelId = "m",
+            OrgId = "o",
+            EndpointEmbeddings = "ee",
+            ModelIdEmbeddings = "me"
+        }.Endpoint.Should().Be("e");
     }
 
     private sealed class AiInferenceConfigBaseProbe : AiInferenceConfigBase { }
@@ -215,7 +222,11 @@ public class ConsolidationCoverageGapsTests
     {
         new AppInformationVersionProductDto
         {
-            Id = "1", Name = "n", Version = "v", EnvironmentName = "e", Message = "m"
+            Id = "1",
+            Name = "n",
+            Version = "v",
+            EnvironmentName = "e",
+            Message = "m"
         }.Message.Should().Be("m");
 
         new AppWarningException().Should().BeAssignableTo<Exception>();

@@ -8,7 +8,7 @@ namespace HotelWise.Domain.Interfaces.Entity.HotelInterfaces.Service;
 /// Contrato de serviço para gerenciamento e consulta de disponibilidade e precificação de quartos.
 /// </summary>
 public interface IRoomAvailabilityService : IGenericService<RoomAvailabilityDto>
-{ 
+{
     /// <summary>
     /// Recupera todas as disponibilidades cadastradas para um determinado quarto.
     /// </summary>

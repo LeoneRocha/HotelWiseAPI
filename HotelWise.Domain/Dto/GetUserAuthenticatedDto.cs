@@ -29,7 +29,7 @@ public class GetUserAuthenticatedDto : EntityDtoBase
     /// <summary>
     /// Objeto contendo os tokens de acesso e renovação (JWT e refresh token).
     /// </summary>
-    public TokenVO? TokenAuth { get; set; } 
+    public TokenVO? TokenAuth { get; set; }
 
     /// <summary>
     /// Identificador médico/registro associado ao usuário, se aplicável.

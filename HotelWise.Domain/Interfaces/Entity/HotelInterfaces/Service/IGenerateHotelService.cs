@@ -18,5 +18,5 @@ public interface IGenerateHotelService
     /// Gera uma única entidade de hotel sintético com dados plausíveis de acomodação.
     /// </summary>
     /// <returns>Instância de <see cref="Hotel"/> gerada.</returns>
-    Task<Hotel> GetHotelAsync(); 
+    Task<Hotel> GetHotelAsync();
 }

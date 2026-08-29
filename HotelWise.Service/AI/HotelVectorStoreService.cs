@@ -184,5 +184,5 @@ public class HotelVectorStoreService : GenericVectorStoreServiceBase, IVectorSto
     public async Task DeleteAsync(long dataKey)
     {
         await _adapter.DeleteAsync(nameCollection, dataKey);
-    } 
+    }
 }

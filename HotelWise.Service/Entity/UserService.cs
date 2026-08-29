@@ -21,7 +21,7 @@ namespace HotelWise.Service.Entity;
 public class UserService : GenericEntityServiceBase<User, UserLoginDto>, IUserService
 {
     private readonly ITokenService _tokenService;
-    private readonly ITokenConfigurationDto _configurationToken; 
+    private readonly ITokenConfigurationDto _configurationToken;
     private readonly IUserRepository _userRepository;
 
     /// <summary>

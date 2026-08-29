@@ -97,7 +97,7 @@ public class RoomService : GenericEntityServiceBase<Room, RoomDto>, IRoomService
         room.CreatedUserId = base.UserId;
         room.ModifyDate = DataHelper.GetDateTimeNow();
         room.ModifyUserId = base.UserId;
-         
+
         // Valida o quarto antes de atualizar
         var validationResult = await _entityValidator.ValidateAsync(room);
         if (!validationResult.IsValid)

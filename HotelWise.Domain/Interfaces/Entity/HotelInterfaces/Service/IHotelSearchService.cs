@@ -10,7 +10,7 @@ namespace HotelWise.Domain.Interfaces.Entity.HotelInterfaces.Service;
 /// Contrato de serviço especializado em busca semântica e contextual de hotéis utilizando inteligência artificial e RAG.
 /// </summary>
 public interface IHotelSearchService : IGenericService<HotelDto>
-{ 
+{
     /// <summary>
     /// Executa uma busca semântica inteligente sobre a base de hotéis a partir dos critérios fornecidos.
     /// </summary>

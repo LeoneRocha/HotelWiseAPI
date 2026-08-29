@@ -55,7 +55,7 @@ public class HotelWiseDbContextMysql : DbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         //Configure FLUENT API 
-        ConfigurationEntitiesHelper.AddConfigurationEntitiesManually(modelBuilder); 
+        ConfigurationEntitiesHelper.AddConfigurationEntitiesManually(modelBuilder);
         ConfigurationEntitiesHelper.AddConfigurationEntities(modelBuilder);
     }
 }

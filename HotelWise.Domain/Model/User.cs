@@ -11,7 +11,7 @@ public class User : EntityBaseWithNameEmail
     /// Inicializa uma nova instância de <see cref="User"/>.
     /// </summary>
     public User()
-    { 
+    {
     }
 
     #region Columns 

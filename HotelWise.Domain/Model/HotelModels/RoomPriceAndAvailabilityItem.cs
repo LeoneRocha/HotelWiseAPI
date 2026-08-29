@@ -6,7 +6,7 @@ namespace HotelWise.Domain.Model.HotelModels;
 /// Estrutura de valor que define o preço diário, estoque de vagas e status de disponibilidade por dia da semana.
 /// </summary>
 public class RoomPriceAndAvailabilityItem
-{ 
+{
     /// <summary>
     /// Dia da semana correspondente à regra de tarifação (Sunday, Monday, etc.).
     /// </summary>
@@ -31,4 +31,4 @@ public class RoomPriceAndAvailabilityItem
     /// Status operacional de disponibilidade da vaga (Available, Reserved, Blocked).
     /// </summary>
     public RoomAvailabilityStatus Status { get; set; } = RoomAvailabilityStatus.Available;
-} 
+}

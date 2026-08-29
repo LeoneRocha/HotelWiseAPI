@@ -8,7 +8,7 @@ namespace HotelWise.Domain.Interfaces.Entity.HotelInterfaces.Service;
 /// Contrato de serviço para gerenciamento e consultas dos quartos dos estabelecimentos hoteleiros.
 /// </summary>
 public interface IRoomService : IGenericService<RoomDto>
-{ 
+{
     /// <summary>
     /// Recupera todos os quartos pertencentes a um determinado hotel.
     /// </summary>

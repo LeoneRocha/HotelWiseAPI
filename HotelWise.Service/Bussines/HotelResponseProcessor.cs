@@ -30,7 +30,7 @@ public static class HotelResponseProcessor
             .Select(x => new HotelInfo
             {
                 Id = x.HotelId.Value,
-                IdType = "Hotel", 
+                IdType = "Hotel",
             })
             .ToArray();
 

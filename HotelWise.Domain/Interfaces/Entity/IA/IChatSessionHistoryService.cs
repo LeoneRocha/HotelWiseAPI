@@ -7,7 +7,7 @@ namespace HotelWise.Domain.Interfaces.Entity.IA;
 /// Contrato de serviço para manipulação, armazenamento e limpeza do histórico de conversas do assistente virtual.
 /// </summary>
 public interface IChatSessionHistoryService : IGenericService<ChatSessionHistoryDto>
-{ 
+{
     /// <summary>
     /// Recupera o histórico de mensagens de uma sessão pelo token/GUID identificador.
     /// </summary>

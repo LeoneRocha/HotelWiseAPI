@@ -31,7 +31,7 @@ public class ReservationRepository : GenericRepositoryBase<Reservation, HotelWis
             .Where(r => r.RoomId == roomId)
             .ToArrayAsync();
     }
-     
+
     /// <summary>
     /// Recupera todas as reservas associadas a um quarto específico incluindo os detalhes do quarto.
     /// </summary>

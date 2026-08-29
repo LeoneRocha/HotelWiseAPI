@@ -184,7 +184,7 @@ public class ReservationValidator : AbstractValidator<Reservation>
     {
         return availabilities.Any(av => av.StartDate.Date <= targetDate &&
                                         av.EndDate.Date >= targetDate &&
-                                        av.AvailabilityWithPrice.Any(item => 
+                                        av.AvailabilityWithPrice.Any(item =>
                                             item.QuantityAvailable > 0 &&
                                             string.Equals(item.Currency, currency, StringComparison.OrdinalIgnoreCase)));
     }

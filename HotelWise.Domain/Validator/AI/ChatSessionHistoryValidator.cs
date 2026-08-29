@@ -34,7 +34,7 @@ public class ChatSessionHistoryValidator : AbstractValidator<ChatSessionHistory>
 
         RuleFor(ch => ch.CountMessages)
             .GreaterThanOrEqualTo(0).WithMessage("O total de messages deve ser maior ou igual a 0.");
-          
+
         // Validação para CountMessages
         RuleFor(ch => ch.CountMessages)
             .GreaterThan(0).WithMessage("A contagem de mensagens deve ser maior que 0.");

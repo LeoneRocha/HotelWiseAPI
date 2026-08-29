@@ -22,7 +22,7 @@ public static class ServicesDomainService
     /// <param name="services">Coleção de serviços.</param>
     public static void AddDependenciesManually(IServiceCollection services)
     {
-        RegisterManuallyAddedServices(services); 
+        RegisterManuallyAddedServices(services);
     }
 
     /// <summary>

@@ -141,7 +141,7 @@ public class GenerateHotelService : IGenerateHotelService
     /// </summary>
     private async Task<string> GenerateDescriptionAndTags(string prompt)
     {
-        PromptMessageVO[] messages = [new PromptMessageVO() { RoleType = RoleAiPromptsType.User, Content = prompt }]; 
+        PromptMessageVO[] messages = [new PromptMessageVO() { RoleType = RoleAiPromptsType.User, Content = prompt }];
         return await _aIInferenceService.GenerateChatCompletionAsync(messages, _eIAInferenceAdapterType);
     }
 
