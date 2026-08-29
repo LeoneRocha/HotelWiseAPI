@@ -1,8 +1,8 @@
 # Especificação Técnica — HotelWise.Core.SDK (Módulo API)
 
-**Versão:** 1.0.0  
+**Versão:** 2.0.0  
 **Data:** 2026-08-28  
-**Projeto de Origem:** `HotelWise.API` (`HotelWise.API.csproj`)  
+**Projeto de Origem:** `HotelWise.API` (`HotelWise.API.csproj`, TFM `net10.0`, SDK `Microsoft.NET.Sdk.Web`)  
 **Projeto de Destino:** `HotelWise.Core.SDK`  
 **Documento Principal:** [HotelWise.Core.SDK.Levantamento.md](./HotelWise.Core.SDK.Levantamento.md)
 
@@ -10,47 +10,71 @@
 
 ## 1. Papel do Módulo na Arquitetura
 
-O projeto `HotelWise.API` é o aplicativo host ASP.NET Core (`Microsoft.NET.Sdk.Web`) executando no framework `.NET 10`. Ele atua primariamente como a camada de apresentação HTTP, orquestrando a inicialização do servidor web, a configuração do pipeline de middlewares, a documentação Swagger/OpenAPI, a autenticação JWT Bearer e a exposição dos endpoints REST da aplicação.
+O projeto `HotelWise.API` é o host ASP.NET Core — o ponto de entrada da aplicação. Orquestra inicialização do servidor, pipeline de middlewares, Swagger/OpenAPI, autenticação JWT Bearer e exposição dos endpoints REST.
 
-Na migração para o `HotelWise.Core.SDK`, o projeto `HotelWise.API` é **fundamentalmente um consumidor**. Ele não cede controladores de negócio para o Core, mas passa a consumir diretamente os tipos canônicos de DTOs, helpers, segurança, middlewares e contratos agora centralizados no SDK.
+Na migração para o Core.SDK, o `HotelWise.API` é **fundamentalmente um consumidor**. Ele não cede controllers ou classes de configuração para o Core, mas passa a consumir tipos canônicos do SDK (DTOs, helpers, segurança, middlewares).
+
+### Dependências NuGet relevantes do .csproj
+
+| Pacote | Observação |
+| :--- | :--- |
+| `Microsoft.ApplicationInsights.AspNetCore` | Telemetria |
+| `Microsoft.Extensions.AI` | AI extensibility |
+| `Microsoft.Graph` | Integração Microsoft Graph |
+| `Microsoft.SemanticKernel`, `.Connectors.MistralAI`, `.Connectors.Ollama` | SK na camada API |
+| `Serilog.AspNetCore`, `.Enrichers.Environment`, `.Sinks.*` | Logging |
+| `Azure.Identity` | Autenticação Azure |
 
 ---
 
-## 2. Inventário de Componentes de `HotelWise.API`
+## 2. Inventário Completo — Arquivos .cs (excluindo /obj/)
 
-### 2.1 Controladores da API (Todos Permanecem no Host)
+> Total: **12 arquivos** fonte no projeto. **Todos permanecem no host.**
 
-| Controlador | Rota | Responsabilidade | Situação |
+---
+
+### 2.1 Controladores (7 arquivos)
+
+| Arquivo | Tipo | Rota | Situação |
 | :--- | :--- | :--- | :--- |
-| `HotelsController` | `api/hotels/v1` | CRUD de hotéis, indexação vetorial e busca semântica. | **Manter no Host** |
-| `RoomsController` | `api/rooms/v1` | CRUD e consulta de quartos e capacidades. | **Manter no Host** |
-| `ReservationsController` | `api/reservations/v1` | Operações de reserva de hóspedes. | **Manter no Host** |
-| `RoomAvailabilityController` | `api/roomavailability/v1` | Consulta e atualização de disponibilidade e diárias. | **Manter no Host** |
-| `AuthController` | `api/auth/v1` | Login, autenticação e emissão de tokens JWT. | **Manter no Host** |
-| `AssistantController` | `api/assistant/v1` | Interação conversacional com o agente StayMate. | **Manter no Host** |
-| `AppInformationVersionProductController` | `api/appinformationversionproduct/v1` | Exposição de metadados de versão da API. | **Manter no Host** (Ajuste de namespace) |
+| `Controllers/HotelEndpoints/HotelsController.cs` | `HotelsController` | `api/hotels/v1` | **Manter** — atualizar `using`s |
+| `Controllers/HotelEndpoints/RoomsController.cs` | `RoomsController` | `api/rooms/v1` | **Manter** — atualizar `using`s |
+| `Controllers/HotelEndpoints/ReservationsController.cs` | `ReservationsController` | `api/reservations/v1` | **Manter** — atualizar `using`s |
+| `Controllers/HotelEndpoints/RoomAvailabilityController.cs` | `RoomAvailabilityController` | `api/roomavailability/v1` | **Manter** — atualizar `using`s |
+| `Controllers/AuthController.cs` | `AuthController` | `api/auth/v1` | **Manter** — atualizar `using`s |
+| `Controllers/Ai/AssistantController.cs` | `AssistantController` | `api/assistant/v1` | **Manter** — atualizar `using`s |
+| `Controllers/AppInformationVersionProductController.cs` | `AppInformationVersionProductController` | `api/appinformationversionproduct/v1` | **Manter** — **corrigir namespace** ¹ |
 
-> **Ajuste de Namespace Legado:** O arquivo `AppInformationVersionProductController.cs` possuía historicamente o namespace `SmartDigitalPsico.WebAPI.Controllers.v1.SystemDomains`. Ele será corrigido para `HotelWise.API.Controllers`.
+> ¹ **Bug de namespace legado confirmado no código-fonte:**
+> ```csharp
+> namespace SmartDigitalPsico.WebAPI.Controllers.v1.SystemDomains
+> ```
+> Deve ser corrigido para:
+> ```csharp
+> namespace HotelWise.API.Controllers
+> ```
+> Além disso, os `using`s atuais apontam para `HotelWise.Domain.Dto` (→ `HotelWise.Core.SDK.Common`) e `HotelWise.Domain.Helpers` (→ `HotelWise.Core.SDK.Logging`).
+
+### 2.2 Configuração de Inicialização (4 arquivos)
+
+| Arquivo | Tipo | Situação |
+| :--- | :--- | :--- |
+| `Configure/WebApplicationConfigureBuilder.cs` | `WebApplicationConfigureBuilder` | **Manter** — atualizar `using`s para Middlewares do Core |
+| `Configure/WebApplicationConfigureServiceCollections.cs` | `WebApplicationConfigureServiceCollections` | **Manter** — atualizar `using`s |
+| `Configure/ServiceCollectionAddAllDependencies.cs` | `ServiceCollectionAddAllDependencies` | **Manter** — atualizar `using`s |
+| `Configure/ServiceCollectionConfigureSecurity.cs` | `ServiceCollectionConfigureSecurity` | **Manter** — atualizar `using`s (TokenConfigurationDto) |
+
+### 2.3 Entry Point (1 arquivo)
+
+| Arquivo | Tipo | Situação |
+| :--- | :--- | :--- |
+| `Program.cs` | — | **Manter** — sem alteração de `using`s necessária |
 
 ---
 
-### 2.2 Estruturas de Inicialização e Configuração
-
-| Arquivo / Classe | Caminho | Responsabilidade | Situação |
-| :--- | :--- | :--- | :--- |
-| `Program.cs` | `Program.cs` | Entry point da aplicação, inicialização de host e catch de falhas fatais. | **Manter no Host** |
-| `WebApplicationConfigureBuilder` | `Configure/WebApplicationConfigureBuilder.cs` | Construção de pipeline, middlewares e auto-migration EF. | **Manter no Host** |
-| `WebApplicationConfigureServiceCollections` | `Configure/WebApplicationConfigureServiceCollections.cs` | Configuração de CORS, HealthChecks, AppInsights, Swagger e MVC. | **Manter no Host** |
-| `ServiceCollectionAddAllDependencies` | `Configure/ServiceCollectionAddAllDependencies.cs` | Registro de pool de DbContext MySQL e injeções de dependência. | **Manter no Host** |
-| `ServiceCollectionConfigureSecurity` | `Configure/ServiceCollectionConfigureSecurity.cs` | Configuração de autenticação JWT Bearer e Azure AD. | **Manter no Host** |
-
----
-
-## 3. Integração e Consumo do `HotelWise.Core.SDK`
+## 3. Integração e Consumo do Core.SDK
 
 ### 3.1 Atualização de Referência no Projeto
-
-O arquivo `HotelWise.API.csproj` receberá a referência de projeto para o SDK canônico:
 
 ```xml
 <ItemGroup>
@@ -59,14 +83,22 @@ O arquivo `HotelWise.API.csproj` receberá a referência de projeto para o SDK c
 </ItemGroup>
 ```
 
-### 3.2 Atualização de Namespaces e `using`s nos Controladores
+### 3.2 Mapa de `using`s a Atualizar
 
-Os controladores passam a importar os tipos de resposta (`ServiceResponse`), utilitários de segurança (`SecurityHelperApi`) e DTOs base diretamente do `HotelWise.Core.SDK`:
+| `using` antigo | `using` novo (Core.SDK) | Arquivos afetados |
+| :--- | :--- | :--- |
+| `HotelWise.Domain.Dto` | `HotelWise.Core.SDK.Common` | Controllers (ServiceResponse, ErrorResponse, AppInformationVersionProductDto) |
+| `HotelWise.Domain.Helpers` | `HotelWise.Core.SDK.Logging` | `AppInformationVersionProductController` (LogAppHelper) |
+| `HotelWise.Domain.Helpers` | `HotelWise.Core.SDK.Security` | Controllers (SecurityHelperApi) |
+| `HotelWise.Domain.CustomMiddleware` | `HotelWise.Core.SDK.Infrastructure.Middleware` | `WebApplicationConfigureBuilder` |
+| `HotelWise.Domain.Dto.AppConfig` | `HotelWise.Core.SDK.Security` | `ServiceCollectionConfigureSecurity` (TokenConfigurationDto) |
+
+### 3.3 Exemplo: Controller Atualizado
 
 ```csharp
-using HotelWise.Core.SDK.Common;
-using HotelWise.Core.SDK.Security;
-using HotelWise.Domain.Dto.Enitty;
+using HotelWise.Core.SDK.Common;     // ServiceResponse<T>
+using HotelWise.Core.SDK.Security;    // SecurityHelperApi
+using HotelWise.Domain.Dto.Enitty;    // permanece (DTOs de domínio)
 using HotelWise.Domain.Dto.Enitty.HotelDtos;
 using HotelWise.Domain.Interfaces.Entity.HotelInterfaces.Service;
 using Microsoft.AspNetCore.Authorization;
@@ -102,31 +134,15 @@ namespace HotelWise.API.Controllers.HotelEndpoints
             var hotels = await _hotelService.GetAllHotelsAsync();
             return Ok(hotels);
         }
-
-        [HttpPost]
-        [ProducesResponseType(typeof(ServiceResponse<HotelDto>), StatusCodes.Status200OK)]
-        public async Task<IActionResult> Create([FromBody] HotelDto hotel)
-        {
-            SetUserIdCurrent();
-            var response = await _hotelService.AddHotelAsync(hotel);
-            return Ok(response);
-        }
     }
 }
 ```
 
----
-
-### 3.3 Integração de Middlewares Canônicos
-
-O pipeline HTTP configurado em `WebApplicationConfigureBuilder.Configure` consome os middlewares canônicos migrados para o `HotelWise.Core.SDK.Infrastructure.Middleware`:
+### 3.4 Exemplo: Pipeline de Middlewares
 
 ```csharp
 using HotelWise.Core.SDK.Infrastructure.Middleware;
 using HotelWise.Core.SDK.Logging;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
 
 namespace HotelWise.API.Configure
 {
@@ -134,10 +150,8 @@ namespace HotelWise.API.Configure
     {
         public static void Configure(IApplicationBuilder app, IWebHostEnvironment env, IConfiguration configuration)
         {
-            // Middleware canônico de CorrelationId
             app.UseMiddleware<CorrelationIdMiddleware>();
 
-            // Logging estruturado Serilog
             app.UseSerilogRequestLogging(options =>
             {
                 options.EnrichDiagnosticContext = (diagnosticContext, httpContext) =>
@@ -148,46 +162,66 @@ namespace HotelWise.API.Configure
                 };
             });
 
-            // Middlewares canônicos de tratamento de exceções e log de requisição
             app.UseMiddleware<GlobalExceptionMiddleware>();
             app.UseMiddleware<RequestLoggingMiddleware>();
 
-            // Demais etapas de roteamento, autenticação, swagger e endpoints...
+            // ... roteamento, auth, swagger, endpoints
         }
     }
 }
+```
+
+### 3.5 Correção do Namespace Legado
+
+```diff
+- namespace SmartDigitalPsico.WebAPI.Controllers.v1.SystemDomains
++ namespace HotelWise.API.Controllers
+
+- using HotelWise.Domain.Dto;
+- using HotelWise.Domain.Helpers;
++ using HotelWise.Core.SDK.Common;
++ using HotelWise.Core.SDK.Logging;
 ```
 
 ---
 
 ## 4. Plano de Verificação e Smoke Testing
 
-Após a conclusão da migração e compilação do `HotelWiseAPI.sln`, a validação do WebAPI seguirá o roteiro:
+### 4.1 Build da Solução
+```bash
+dotnet build HotelWiseAPI.sln -c Release
+```
 
-1. **Build da Solução:**
-   ```bash
-   dotnet build HotelWiseAPI.sln -c Release
-   ```
-2. **Execução de Testes Unitários e de Integração:**
-   ```bash
-   dotnet test HotelWise.Core.SDK.Tests/HotelWise.Core.SDK.Tests.csproj
-   ```
-3. **Smoke Test de Inicialização:**
-   - Inicializar a API localmente ou em contêiner.
-   - Validar endpoint de Health Check: `GET /health` $\rightarrow$ Status `200 OK`.
-   - Validar endpoint de Versão: `GET /api/appinformationversionproduct/v1/GetAppInformationVersionProduct` $\rightarrow$ Status `200 OK`.
-   - Validar UI do Swagger: `GET /swagger/index.html`.
-4. **Smoke Test de Autenticação e CRUD:**
-   - Efetuar login e obter token JWT: `POST /api/auth/v1/login`.
-   - Listar hotéis autenticado com Bearer Token: `GET /api/hotels/v1`.
+### 4.2 Testes
+```bash
+dotnet test HotelWise.Core.SDK.Tests/HotelWise.Core.SDK.Tests.csproj
+```
+
+### 4.3 Smoke Test de Inicialização
+- **Health Check:** `GET /health` → 200 OK
+- **Versão:** `GET /api/appinformationversionproduct/v1/GetAppInformationVersionProduct` → 200 OK
+- **Swagger:** `GET /swagger/index.html` → carrega sem erros
+
+### 4.4 Smoke Test de Autenticação e CRUD
+- **Login:** `POST /api/auth/v1/login` → JWT token
+- **Hotéis (autenticado):** `GET /api/hotels/v1` → 200 OK com Bearer
+
+### 4.5 Validação de Namespace
+```bash
+# Deve retornar 0 ocorrências em arquivos .cs
+grep -r "SmartDigitalPsico" --include="*.cs" HotelWise.API/
+```
 
 ---
 
 ## 5. Checklist de Implementação
 
-- [ ] Adicionar `ProjectReference` para `HotelWise.Core.SDK` em `HotelWise.API.csproj`.
-- [ ] Atualizar `using`s em todos os controladores em `Controllers/` para os namespaces do Core.SDK.
-- [ ] Atualizar `WebApplicationConfigureBuilder` para consumir middlewares do Core.SDK.
-- [ ] Corrigir namespace do `AppInformationVersionProductController.cs`.
-- [ ] Validar ausência de warnings de obsolescência (`HW_CORE_SDK_*`) nos controladores.
-- [ ] Executar build completo da solução e realizar smoke test dos endpoints principais.
+- [ ] Adicionar `ProjectReference` para `HotelWise.Core.SDK` em `HotelWise.API.csproj`
+- [ ] Atualizar `using`s em 7 controllers (ver mapa §3.2)
+- [ ] Atualizar `using`s em 4 classes de configuração
+- [ ] Corrigir namespace de `AppInformationVersionProductController.cs`:  
+      `SmartDigitalPsico.WebAPI.Controllers.v1.SystemDomains` → `HotelWise.API.Controllers`
+- [ ] Validar ausência de warnings `HW_CORE_SDK_*` nos controllers
+- [ ] Build completo da solução
+- [ ] Smoke test: health, swagger, auth, CRUD
+- [ ] `grep -r "SmartDigitalPsico"` = 0 ocorrências em `.cs`

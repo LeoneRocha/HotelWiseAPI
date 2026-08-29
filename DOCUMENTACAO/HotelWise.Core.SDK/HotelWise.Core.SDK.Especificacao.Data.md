@@ -1,8 +1,8 @@
 # Especificação Técnica — HotelWise.Core.SDK (Módulo Data)
 
-**Versão:** 1.0.0  
+**Versão:** 2.0.0  
 **Data:** 2026-08-28  
-**Projeto de Origem:** `HotelWise.Data` (`HotelWise.Data.csproj`)  
+**Projeto de Origem:** `HotelWise.Data` (`HotelWise.Data.csproj`, TFM `net10.0`)  
 **Projeto de Destino:** `HotelWise.Core.SDK`  
 **Documento Principal:** [HotelWise.Core.SDK.Levantamento.md](./HotelWise.Core.SDK.Levantamento.md)
 
@@ -10,69 +10,95 @@
 
 ## 1. Papel do Módulo na Arquitetura
 
-O projeto `HotelWise.Data` é a camada de persistência e acesso a dados relacionais da solução HotelWiseAPI, utilizando **Entity Framework Core 9** com o provedor **Pomelo.EntityFrameworkCore.MySql**.
+O projeto `HotelWise.Data` é a camada de persistência da solução, utilizando **Entity Framework Core** com o provedor **Pomelo.EntityFrameworkCore.MySql**. Referencia `HotelWise.Domain`.
 
-O papel desta especificação é definir a extração dos padrões genéricos de acesso a dados (`GenericRepositoryBase<T, TContext>`) e utilitários de configuração de modelo EF Core (`ModelBuilderExtensions`, `HelperCharSet`, `ConfigurationEntitiesHelper`) para o núcleo `HotelWise.Core.SDK`, mantendo no projeto host `HotelWise.Data` apenas os elementos estritamente vinculados ao banco de dados concreto da aplicação (DbContext, migrations, mapeamentos fluentes e repositórios de domínio).
+O papel desta especificação é definir a extração dos padrões genéricos de acesso a dados para o `HotelWise.Core.SDK`, mantendo no host apenas o DbContext concreto, migrations, mapeamentos fluentes, mock data e repositórios de domínio.
+
+### Dependências NuGet relevantes do .csproj
+
+| Pacote | Impacto no Core.SDK |
+| :--- | :--- |
+| `Microsoft.EntityFrameworkCore` | Dependência condicional por TFM no Core |
+| `Microsoft.EntityFrameworkCore.Relational` | Idem |
+| `Pomelo.EntityFrameworkCore.MySql` | **Apenas no host** — provedor de banco concreto |
+| `Bogus` | **Apenas no host** — geração de mock data |
+| `Azure.Data.Tables`, `Azure.Identity` | Cloud abstractions |
 
 ---
 
-## 2. Inventário de Tipos de `HotelWise.Data`
+## 2. Inventário Completo — Arquivos .cs (excluindo /obj/ e migrations)
 
-### 2.1 Tipos para Portar + Obsoletar (Canônicos no Core.SDK)
+> Total: **16 arquivos** fonte (excluindo 21 migrations e 3 arquivos obj).
 
-| Tipo Original | Caminho no Host | Caminho no Core.SDK | Namespace Canônico | DiagnosticId |
+---
+
+### 2.1 Portar + Obsoletar → Core.SDK (4 arquivos)
+
+| Arquivo | Tipo | Destino Core.SDK | Namespace Canônico | DiagnosticId |
 | :--- | :--- | :--- | :--- | :--- |
-| `GenericRepositoryBase<T, TContext>` | `Repository/Generic/GenericRepositoryBase.cs` | `Infrastructure/GenericRepositoryBase.cs` | `HotelWise.Core.SDK.Infrastructure` | `HW_CORE_SDK_REPO` |
-| `ModelBuilderExtensions` | `Context/Configure/Helper/ModelBuilderExtensions.cs` | `Extensions/ModelBuilderExtensions.cs` | `HotelWise.Core.SDK.Extensions` | `HW_CORE_SDK_REPO` |
-| `HelperCharSet` | `Context/Configure/Helper/HelperCharSet.cs` | `Infrastructure/HelperCharSet.cs` | `HotelWise.Core.SDK.Infrastructure` | `HW_CORE_SDK_REPO` |
-| `ConfigurationEntitiesHelper` | `Context/Configure/Helper/ConfigurationEntitiesHelper.cs` | `Infrastructure/ConfigurationEntitiesHelper.cs` | `HotelWise.Core.SDK.Infrastructure` | `HW_CORE_SDK_REPO` |
-
-### 2.2 Tipos para Manter no Host (`HotelWise.Data`)
-
-| Tipo / Pasta | Caminho no Host | Motivo da Permanência |
-| :--- | :--- | :--- |
-| `HotelWiseDbContextMysql` | `Context/HotelWiseDbContextMysql.cs` | DbContext concreto de produção com DbSets específicos da aplicação. |
-| Mapeamentos Fluent API (`*Configuration.cs`) | `Context/Configure/Entity/*` | Mapeamento de tabelas específicas (`Hotel`, `Room`, `Reservation`, `User`, etc.). |
-| Mocks de Seed (`HotelsMockData`, etc.) | `Context/Configure/Mock/*` | Dados de seed específicos para ambiente de desenvolvimento/testes do produto. |
-| Migrations MySQL (`Migrations/MySql/*`) | `Migrations/MySql/*` | Histórico e snapshots de schema do banco de dados MySQL de produção. |
-| `HotelRepository` | `Repository/HotelRepositories/HotelRepository.cs` | Regras de persistência de hotéis (herda a base genérica do Core). |
-| `RoomRepository` | `Repository/HotelRepositories/RoomRepository.cs` | Consultas e comandos de quartos. |
-| `ReservationRepository` | `Repository/HotelRepositories/ReservationRepository.cs` | Consultas e comandos de reservas de hotel. |
-| `RoomAvailabilityRepository` | `Repository/HotelRepositories/RoomAvailabilityRepository.cs` | Consultas e comandos de disponibilidade de quartos. |
-| `UserRepository` | `Repository/UserRepository.cs` | Consultas e autenticação de usuários. |
-| `ChatSessionHistoryRepository` | `Repository/ChatSessionHistoryRepository.cs` | Histórico de sessões de chat com IA. |
+| `Repository/Generic/GenericRepositoryBase.cs` | `GenericRepositoryBase<T, TContext>` | `Infrastructure/` | `HotelWise.Core.SDK.Infrastructure` | `HW_CORE_SDK_REPO` |
+| `Context/Configure/Helper/ModelBuilderExtensions.cs` | `ModelBuilderExtensions` | `Extensions/` | `HotelWise.Core.SDK.Extensions` | `HW_CORE_SDK_REPO` |
+| `Context/Configure/Helper/HelperCharSet.cs` | `HelperCharSet` | `Infrastructure/` | `HotelWise.Core.SDK.Infrastructure` | `HW_CORE_SDK_REPO` |
+| `Context/Configure/Helper/ConfigurationEntitiesHelper.cs` | `ConfigurationEntitiesHelper` | `Infrastructure/` | `HotelWise.Core.SDK.Infrastructure` | `HW_CORE_SDK_REPO` |
 
 ---
 
-## 3. Detalhamento Técnico das Extrações
+### 2.2 Manter no Host (12 arquivos)
 
-### 3.1 `GenericRepositoryBase<T, TContext>`
+#### DbContext concreto (1 arquivo)
 
-#### Análise da Implementação Atual
-Atualmente localizado em `HotelWise.Data.Repository.Generic.GenericRepositoryBase<T, TContext>`, o repositório fornece operações assíncronas padrão:
-- `GetAllAsync()` (com `AsNoTracking()`)
-- `GetByIdAsync(long id)`
-- `FindAsync(Expression<Func<T, bool>> predicate)`
-- `AddAsync(T entity)` / `AddRangeAsync(IEnumerable<T> entities)`
-- `UpdateAsync(T entity)` / `UpdateRangeAsync(IEnumerable<T> entities)`
-- `DeleteAsync(long id)`
-- `CountAsync()`
-- `ExistsAsync(Expression<Func<T, bool>> predicate)`
-- `FetchAsync(int offset, int limit)`
+| Arquivo | Tipo | Motivo |
+| :--- | :--- | :--- |
+| `Context/HotelWiseDbContextMysql.cs` | `HotelWiseDbContextMysql` | DbContext concreto de produção com DbSets de `Hotel`, `Room`, `Reservation`, `RoomAvailability`, `User`, `ChatSessionHistory` |
 
-#### Estratégia Canônica no Core.SDK
-No Core.SDK, a classe será migrada com suporte tanto para `DbContext` genérico tipado quanto para o tipo base `Microsoft.EntityFrameworkCore.DbContext`:
+#### Mapeamentos Fluent API (6 arquivos)
+
+| Arquivo | Tipo | Motivo |
+| :--- | :--- | :--- |
+| `Context/Configure/Entity/ChatSessionHistoryConfiguration.cs` | `ChatSessionHistoryConfiguration` | Mapeamento EF de `ChatSessionHistory` |
+| `Context/Configure/Entity/HotelModelConfigurations/HotelConfiguration.cs` | `HotelConfiguration` | Mapeamento EF de `Hotel` |
+| `Context/Configure/Entity/HotelModelConfigurations/ReservationConfiguration.cs` | `ReservationConfiguration` | Mapeamento EF de `Reservation` |
+| `Context/Configure/Entity/HotelModelConfigurations/RoomAvailabilityConfiguration.cs` | `RoomAvailabilityConfiguration` | Mapeamento EF de `RoomAvailability` |
+| `Context/Configure/Entity/HotelModelConfigurations/RoomConfiguration.cs` | `RoomConfiguration` | Mapeamento EF de `Room` |
+| `Context/Configure/Entity/UserConfiguration.cs` | `UserConfiguration` | Mapeamento EF de `User` |
+
+#### Mock Data / Seed (3 arquivos)
+
+| Arquivo | Tipo | Motivo |
+| :--- | :--- | :--- |
+| `Context/Configure/Mock/HotelsMockData.cs` | `HotelsMockData` | Seed de hotéis para desenvolvimento |
+| `Context/Configure/Mock/RoomsMockData.cs` | `RoomsMockData` | Seed de quartos para desenvolvimento |
+| `Context/Configure/Mock/UserMockData.cs` | `UserMockData` | Seed de usuários para desenvolvimento |
+
+#### Repositórios de Domínio (6 arquivos)
+
+| Arquivo | Tipo | Motivo |
+| :--- | :--- | :--- |
+| `Repository/HotelRepositories/HotelRepository.cs` | `HotelRepository` | Persistência de hotéis |
+| `Repository/HotelRepositories/RoomRepository.cs` | `RoomRepository` | Persistência de quartos |
+| `Repository/HotelRepositories/ReservationRepository.cs` | `ReservationRepository` | Persistência de reservas |
+| `Repository/HotelRepositories/RoomAvailabilityRepository.cs` | `RoomAvailabilityRepository` | Persistência de disponibilidade |
+| `Repository/UserRepository.cs` | `UserRepository` | Persistência e autenticação de usuários |
+| `Repository/ChatSessionHistoryRepository.cs` | `ChatSessionHistoryRepository` | Persistência de sessões de chat |
+
+#### Migrations MySQL (armazenadas, não contabilizadas individualmente)
+
+Pasta `Migrations/MySql/` contém **11 migrations** (InitialCreate → SeedRoomPosDotNet10 → FixUserMockSeedPosDotNet10) + `HotelWiseDbContextMysqlModelSnapshot.cs`. Todas permanecem intocadas no host.
+
+---
+
+## 3. Detalhamento Técnico — `GenericRepositoryBase<T, TContext>`
+
+### Implementação Atual
+
+Localizado em `HotelWise.Data.Repository.Generic.GenericRepositoryBase<T, TContext>`:
 
 ```csharp
 namespace HotelWise.Core.SDK.Infrastructure
 {
     using HotelWise.Core.SDK.Abstractions;
     using Microsoft.EntityFrameworkCore;
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
     using System.Linq.Expressions;
-    using System.Threading.Tasks;
 
     public abstract class GenericRepositoryBase<T, TContext> : IGenericRepository<T>
         where T : class
@@ -92,26 +118,18 @@ namespace HotelWise.Core.SDK.Infrastructure
         protected TContext CreateContext()
         {
             if (_options == null)
-            {
                 throw new InvalidOperationException("DbContextOptions was not provided.");
-            }
             return (TContext)Activator.CreateInstance(typeof(TContext), _options)!;
         }
 
         public virtual async Task<List<T>> GetAllAsync()
-        {
-            return await _dataset.AsNoTracking().ToListAsync();
-        }
+            => await _dataset.AsNoTracking().ToListAsync();
 
         public virtual async Task<T?> GetByIdAsync(long id)
-        {
-            return await _dataset.FindAsync(id);
-        }
+            => await _dataset.FindAsync(id);
 
         public virtual async Task<List<T>> FindAsync(Expression<Func<T, bool>> predicate)
-        {
-            return await _dataset.Where(predicate).ToListAsync();
-        }
+            => await _dataset.Where(predicate).ToListAsync();
 
         public virtual async Task<T> AddAsync(T entity)
         {
@@ -150,63 +168,52 @@ namespace HotelWise.Core.SDK.Infrastructure
         }
 
         public virtual async Task<int> CountAsync()
-        {
-            return await _dataset.CountAsync();
-        }
+            => await _dataset.CountAsync();
 
         public virtual async Task<bool> ExistsAsync(Expression<Func<T, bool>> predicate)
-        {
-            return await _dataset.AsNoTracking().AnyAsync(predicate);
-        }
+            => await _dataset.AsNoTracking().AnyAsync(predicate);
 
         public virtual async Task<List<T>> FetchAsync(int offset, int limit)
-        {
-            return await _dataset.AsNoTracking().Skip(offset).Take(limit).ToListAsync();
-        }
+            => await _dataset.AsNoTracking().Skip(offset).Take(limit).ToListAsync();
     }
 
-    // Sobrecarga de conveniência utilizando DbContext base
+    // Sobrecarga de conveniência com DbContext base
     public abstract class GenericRepositoryBase<T> : GenericRepositoryBase<T, DbContext>
         where T : class
     {
         protected GenericRepositoryBase(DbContext context, DbContextOptions<DbContext>? options = null)
-            : base(context, options)
-        {
-        }
+            : base(context, options) { }
     }
 }
 ```
 
-### 3.2 Helpers de Configuração EF Core
+### Helpers EF Core
 
-#### `ModelBuilderExtensions.cs`
-- Centraliza métodos utilitários para aplicar convenções globais de nomenclatura, filtros de soft-delete, conversões de DateTime para UTC e aplicação em massa de configurações fluentes.
-
-#### `HelperCharSet.cs` & `ConfigurationEntitiesHelper.cs`
-- Utilitários para definir CharSet padrão (ex: `utf8mb4`), Collation e convenções de chave primária/estrangeira de forma agnóstica a bancos relacionais.
+- **`ModelBuilderExtensions.cs`**: Convenções globais de nomenclatura, filtros, conversões DateTime → UTC, aplicação em massa de configurações fluentes.
+- **`HelperCharSet.cs`**: CharSet padrão (`utf8mb4`), Collation, constantes de charset agnósticas.
+- **`ConfigurationEntitiesHelper.cs`**: Convenções de chave primária/estrangeira, aplicação padronizada de mapeamentos.
 
 ---
 
-## 4. Padrão de Shim no Host (`HotelWise.Data`)
-
-O arquivo original em `HotelWise.Data/Repository/Generic/GenericRepositoryBase.cs` será mantido com a declaração de obsolescência e herança direta da classe canônica do Core:
+## 4. Padrão de Shim no Host
 
 ```csharp
 namespace HotelWise.Data.Repository.Generic
 {
     using Microsoft.EntityFrameworkCore;
-    using CoreRepo = HotelWise.Core.SDK.Infrastructure;
 
-    // Movido para HotelWise.Core.SDK — implementação canônica no pacote Core.
-    [Obsolete("Movido para HotelWise.Core.SDK. Use HotelWise.Core.SDK.Infrastructure.GenericRepositoryBase<T, TContext>.", error: false, DiagnosticId = "HW_CORE_SDK_REPO")]
-    public abstract class GenericRepositoryBase<T, TContext> : CoreRepo.GenericRepositoryBase<T, TContext>
+    // ⚠️ Movido para HotelWise.Core.SDK — implementação canônica no pacote Core.
+    [Obsolete(
+        "Movido para HotelWise.Core.SDK. Use HotelWise.Core.SDK.Infrastructure.GenericRepositoryBase<T, TContext>.",
+        error: false,
+        DiagnosticId = "HW_CORE_SDK_REPO")]
+    public abstract class GenericRepositoryBase<T, TContext>
+        : HotelWise.Core.SDK.Infrastructure.GenericRepositoryBase<T, TContext>
         where T : class
         where TContext : DbContext
     {
         protected GenericRepositoryBase(TContext context, DbContextOptions<TContext> options)
-            : base(context, options)
-        {
-        }
+            : base(context, options) { }
     }
 }
 ```
@@ -215,10 +222,10 @@ namespace HotelWise.Data.Repository.Generic
 
 ## 5. Adaptação dos Repositórios de Domínio
 
-Os repositórios de domínio concretos (`HotelRepository`, `RoomRepository`, etc.) continuam em `HotelWise.Data`, porém atualizam suas importações para herdar diretamente de `HotelWise.Core.SDK.Infrastructure.GenericRepositoryBase`:
+Os repositórios concretos atualizam herança para usar o Core diretamente:
 
 ```csharp
-using HotelWise.Core.SDK.Infrastructure;
+using HotelWise.Core.SDK.Infrastructure;   // GenericRepositoryBase<T, TContext>
 using HotelWise.Data.Context;
 using HotelWise.Domain.Interfaces.Entity.HotelInterfaces.Repository;
 using HotelWise.Domain.Model.HotelModels;
@@ -226,12 +233,13 @@ using Microsoft.EntityFrameworkCore;
 
 namespace HotelWise.Data.Repository.HotelRepositories
 {
-    public class HotelRepository : GenericRepositoryBase<Hotel, HotelWiseDbContextMysql>, IHotelRepository
+    public class HotelRepository
+        : GenericRepositoryBase<Hotel, HotelWiseDbContextMysql>, IHotelRepository
     {
-        public HotelRepository(HotelWiseDbContextMysql context, DbContextOptions<HotelWiseDbContextMysql> options) 
-            : base(context, options)
-        {
-        }
+        public HotelRepository(
+            HotelWiseDbContextMysql context,
+            DbContextOptions<HotelWiseDbContextMysql> options)
+            : base(context, options) { }
 
         // Métodos específicos de domínio...
     }
@@ -242,24 +250,23 @@ namespace HotelWise.Data.Repository.HotelRepositories
 
 ## 6. Plano de Testes (`HotelWise.Core.SDK.Tests`)
 
-Para garantir cobertura $\ge 90\%$, o projeto de testes do SDK implementará:
-1. **`GenericRepositoryBaseTests.cs`:**
-   - Criação de um `DbContext` em memória (`Microsoft.EntityFrameworkCore.InMemory` ou SQLite in-memory).
-   - Teste de todas as operações CRUD (`AddAsync`, `AddRangeAsync`, `GetByIdAsync`, `GetAllAsync`, `FindAsync`, `UpdateAsync`, `UpdateRangeAsync`, `DeleteAsync`, `CountAsync`, `ExistsAsync`, `FetchAsync`).
-   - Teste de resiliência e tratamento de parâmetros nulos (`ArgumentNullException`).
-2. **`ModelBuilderExtensionsTests.cs`:**
-   - Validação da aplicação de convenções e extensões no `ModelBuilder`.
-3. **`HelperCharSetTests.cs`:**
-   - Validação das strings de formatação de charset/collation.
+| Suite | Foco | Estratégia |
+| :--- | :--- | :--- |
+| `GenericRepositoryBaseTests.cs` | CRUD completo (`Add`, `AddRange`, `GetById`, `GetAll`, `Find`, `Update`, `UpdateRange`, `Delete`, `Count`, `Exists`, `Fetch`) | SQLite in-memory ou `Microsoft.EntityFrameworkCore.InMemory` |
+| `GenericRepositoryBaseTests.cs` | Tratamento de `null` → `ArgumentNullException` | Caso negativo |
+| `GenericRepositoryBaseTests.cs` | `CreateContext` sem options → `InvalidOperationException` | Caso negativo |
+| `ModelBuilderExtensionsTests.cs` | Validação de aplicação de convenções | `ModelBuilder` mockado |
+| `HelperCharSetTests.cs` | Constantes de charset/collation | Comparação de strings |
 
 ---
 
-## 7. Checklist de Implementação e Validação
+## 7. Checklist de Implementação
 
-- [ ] Criar classe canônica `GenericRepositoryBase<T, TContext>` em `HotelWise.Core.SDK/Infrastructure/`.
-- [ ] Criar `ModelBuilderExtensions.cs`, `HelperCharSet.cs` e `ConfigurationEntitiesHelper.cs` em `HotelWise.Core.SDK/`.
-- [ ] Adicionar `[Obsolete]` e shim fino no arquivo `HotelWise.Data/Repository/Generic/GenericRepositoryBase.cs`.
-- [ ] Adicionar `ProjectReference` para `HotelWise.Core.SDK` em `HotelWise.Data.csproj`.
-- [ ] Atualizar `using`s nos repositórios de domínio (`HotelRepository`, `RoomRepository`, etc.).
-- [ ] Implementar suíte de testes de persistência em `HotelWise.Core.SDK.Tests`.
-- [ ] Executar `dotnet build HotelWise.Data/HotelWise.Data.csproj` e verificar ausência de erros.
+- [ ] Criar classe canônica `GenericRepositoryBase<T, TContext>` + `GenericRepositoryBase<T>` em `HotelWise.Core.SDK/Infrastructure/`
+- [ ] Criar `ModelBuilderExtensions.cs` em `HotelWise.Core.SDK/Extensions/`
+- [ ] Criar `HelperCharSet.cs` e `ConfigurationEntitiesHelper.cs` em `HotelWise.Core.SDK/Infrastructure/`
+- [ ] Adicionar `[Obsolete]` e shim fino em 4 arquivos de `HotelWise.Data`
+- [ ] Adicionar `ProjectReference` para `HotelWise.Core.SDK` em `HotelWise.Data.csproj`
+- [ ] Atualizar `using`s nos 6 repositórios de domínio
+- [ ] Implementar suíte de testes de persistência em `HotelWise.Core.SDK.Tests`
+- [ ] `dotnet build HotelWise.Data/HotelWise.Data.csproj` verde

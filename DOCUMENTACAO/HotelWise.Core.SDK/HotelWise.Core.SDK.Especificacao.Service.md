@@ -1,8 +1,8 @@
 # Especificação Técnica — HotelWise.Core.SDK (Módulo Service)
 
-**Versão:** 1.0.0  
+**Versão:** 2.0.0  
 **Data:** 2026-08-28  
-**Projeto de Origem:** `HotelWise.Service` (`HotelWise.Service.csproj`)  
+**Projeto de Origem:** `HotelWise.Service` (`HotelWise.Service.csproj`, TFM `net10.0`)  
 **Projeto de Destino:** `HotelWise.Core.SDK`  
 **Documento Principal:** [HotelWise.Core.SDK.Levantamento.md](./HotelWise.Core.SDK.Levantamento.md)
 
@@ -10,67 +10,125 @@
 
 ## 1. Papel do Módulo na Arquitetura
 
-O projeto `HotelWise.Service` concentra as regras de negócio, a orquestração de CRUD genérico para DTOs, a integração com provedores de Inteligência Artificial e Semantic Kernel, geração de tokens JWT e a configuração central de Injeção de Dependências (DI) da solução.
+O projeto `HotelWise.Service` concentra orquestração de CRUD, integração com provedores de IA, geração de tokens JWT e configuração de DI. Referencia `HotelWise.Data` e `HotelWise.Domain`.
 
-O objetivo desta especificação é definir a extração dos serviços genéricos reutilizáveis (`GenericEntityServiceBase<T, TDto>`, `GenericVectorStoreServiceBase`), o serviço de autenticação JWT (`TokenService`), as fábricas e adaptadores de IA (`AIInferenceAdapterFactory`, `VectorStoreAdapterFactory`, `AIInferenceService`) e extensões de DI para o `HotelWise.Core.SDK`, mantendo no host apenas os serviços que implementam regras exclusivas do domínio hoteleiro e do assistente virtual StayMate.
+O objetivo é extrair os serviços genéricos reutilizáveis, o `TokenService`, as fábricas/adapters de IA e extensões de DI para o Core.SDK, mantendo no host os serviços de domínio hoteleiro.
+
+### Dependências NuGet relevantes do .csproj
+
+| Pacote | Impacto no Core.SDK |
+| :--- | :--- |
+| `AutoMapper` | Mapeamento DTO ↔ Entity em `GenericEntityServiceBase` |
+| `FluentValidation` | Validação em `GenericEntityServiceBase` |
+| `Microsoft.EntityFrameworkCore` | Referência indireta via repositórios |
+| `Microsoft.SemanticKernel.Connectors.MistralAI` | Conector SK específico |
+| `Microsoft.SemanticKernel.Connectors.Ollama` | Conector SK específico |
+| `Azure.Storage.Blobs`, `Azure.Storage.Queues` | Cloud storage |
+| `Azure.ResourceManager.Authorization` | Gestão de autorização Azure |
 
 ---
 
-## 2. Inventário de Tipos de `HotelWise.Service`
+## 2. Inventário Completo — Arquivos .cs (excluindo /obj/)
 
-### 2.1 Tipos para Portar + Obsoletar (Canônicos no Core.SDK)
+> Total: **25 arquivos** fonte no projeto.
 
-| Tipo Original | Caminho no Host | Caminho no Core.SDK | DiagnosticId |
+---
+
+### 2.1 Portar + Obsoletar → Core.SDK (11 arquivos)
+
+#### Serviços Genéricos Base (2 arquivos)
+
+| Arquivo | Tipo | Destino Core.SDK | DiagnosticId |
 | :--- | :--- | :--- | :--- |
-| `GenericEntityServiceBase<T, TDto>` | `Entity/Generic/GenericEntityServiceBase.cs` | `Services/GenericEntityServiceBase.cs` | `HW_CORE_SDK_SERVICE` |
-| `GenericVectorStoreServiceBase` | `Generic/GenericServiceBase.cs` | `AI/Services/GenericVectorStoreServiceBase.cs` | `HW_CORE_SDK_AI` |
-| `AIInferenceAdapterFactory` | `AI/AIInferenceAdapterFactory.cs` | `AI/Services/AIInferenceAdapterFactory.cs` | `HW_CORE_SDK_AI` |
-| `AIInferenceService` | `AI/AIInferenceService.cs` | `AI/Services/AIInferenceService.cs` | `HW_CORE_SDK_AI` |
-| `VectorStoreAdapterFactory` | `AI/VectorStoreAdapterFactory.cs` | `AI/Services/VectorStoreAdapterFactory.cs` | `HW_CORE_SDK_AI` |
-| `TokenService` | `Security/TokenService.cs` | `Security/TokenService.cs` | `HW_CORE_SDK_SECURITY` |
-| `SemanticKernelProviderConfigure` | `Configure/SemanticKernelProviderConfigure.cs` | `AI/Configure/SemanticKernelProviderConfigure.cs` | `HW_CORE_SDK_AI` |
-| `ConfigureServicesAI` | `Configure/ConfigureServicesAI.cs` | `AI/Configure/ConfigureServicesAI.cs` | `HW_CORE_SDK_AI` |
-| `ServiceCollectionConfigureCors` | `Configure/ServiceCollectionConfigureCors.cs` | `Extensions/ServiceCollectionConfigureCors.cs` | `HW_CORE_SDK_DI` |
-| `ServiceCollectionConfigureAppSettings` | `Configure/ServiceCollectionConfigureAppSettings.cs` | `Extensions/ServiceCollectionConfigureAppSettings.cs` | `HW_CORE_SDK_DI` |
-| `ServiceCollectionConfigureAutoMapper` | `Configure/ServiceCollectionConfigureAutoMapper.cs` | `Extensions/ServiceCollectionConfigureAutoMapper.cs` | `HW_CORE_SDK_DI` |
+| `Entity/Generic/GenericEntityServiceBase.cs` | `GenericEntityServiceBase<T, TDto>` | `Services/` | `HW_CORE_SDK_SERVICE` |
+| `Generic/GenericServiceBase.cs` | `GenericVectorStoreServiceBase` | `AI/Services/` | `HW_CORE_SDK_AI` |
+
+#### Segurança JWT (1 arquivo)
+
+| Arquivo | Tipo | Destino Core.SDK | DiagnosticId |
+| :--- | :--- | :--- | :--- |
+| `Security/TokenService.cs` | `TokenService` | `Security/` | `HW_CORE_SDK_SECURITY` |
+
+#### Fábricas e Serviços de IA (3 arquivos)
+
+| Arquivo | Tipo | Destino Core.SDK | DiagnosticId |
+| :--- | :--- | :--- | :--- |
+| `AI/AIInferenceAdapterFactory.cs` | `AIInferenceAdapterFactory` | `AI/Services/` | `HW_CORE_SDK_AI` |
+| `AI/AIInferenceService.cs` | `AIInferenceService` | `AI/Services/` | `HW_CORE_SDK_AI` |
+| `AI/VectorStoreAdapterFactory.cs` | `VectorStoreAdapterFactory` | `AI/Services/` | `HW_CORE_SDK_AI` |
+
+#### Configuração Semantic Kernel (2 arquivos)
+
+| Arquivo | Tipo | Destino Core.SDK | DiagnosticId |
+| :--- | :--- | :--- | :--- |
+| `Configure/SemanticKernelProviderConfigure.cs` | `SemanticKernelProviderConfigure` | `AI/Configure/` | `HW_CORE_SDK_AI` |
+| `Configure/ConfigureServicesAI.cs` | `ConfigureServicesAI` | `AI/Configure/` | `HW_CORE_SDK_AI` |
+
+#### Extensões de DI Genéricas (3 arquivos)
+
+| Arquivo | Tipo | Destino Core.SDK | DiagnosticId |
+| :--- | :--- | :--- | :--- |
+| `Configure/ServiceCollectionConfigureCors.cs` | `ServiceCollectionConfigureCors` | `Extensions/` | `HW_CORE_SDK_DI` |
+| `Configure/ServiceCollectionConfigureAppSettings.cs` | `ServiceCollectionConfigureAppSettings` | `Extensions/` | `HW_CORE_SDK_DI` |
+| `Configure/ServiceCollectionConfigureAutoMapper.cs` | `ServiceCollectionConfigureAutoMapper` | `Extensions/` | `HW_CORE_SDK_DI` |
 
 ---
 
-### 2.2 Tipos para Manter no Host (`HotelWise.Service`)
+### 2.2 Manter no Host (14 arquivos)
 
-| Tipo / Pasta | Caminho no Host | Motivo da Permanência |
+#### Serviços de Domínio Hoteleiro (5 arquivos)
+
+| Arquivo | Tipo | Motivo |
 | :--- | :--- | :--- |
-| `HotelService` | `Entity/HotelServices/HotelService.cs` | Lógica de negócio, catálogo de hotéis e geração de vetores. |
-| `RoomService` | `Entity/HotelServices/RoomService.cs` | Gestão de quartos e comodidades de hotéis. |
-| `ReservationService` | `Entity/HotelServices/ReservationService.cs` | Lógica de reserva, cálculo de datas e status. |
-| `RoomAvailabilityService` | `Entity/HotelServices/RoomAvailabilityService.cs` | Motor de busca de disponibilidade e precificação dinâmica. |
-| `UserService` | `Entity/UserService.cs` | Autenticação de credenciais, validação de usuário e geração de claims. |
-| `ChatSessionHistoryService` | `Entity/IA/ChatSessionHistoryService.cs` | Persistência de sessões de conversação do usuário. |
-| `GenerateHotelService` | `Entity/GenerateHotelService.cs` | Geração sintética de dados hoteleiros via IA. |
-| `HotelSearchService` | `Bussines/HotelSearchService.cs` | Busca semântica e vetorizada de hotéis usando critérios de negócio. |
-| `HotelResponseProcessor` | `Bussines/HotelResponseProcessor.cs` | Processamento de resposta de IA formatada para o assistente de hotel. |
-| `StayMatePromptGenerator` | `Bussines/StayMatePromptGenerator.cs` | Construção de system prompts do agente StayMate. |
-| `AssistantService` | `AI/AssistantService.cs` | Orquestração do agente conversacional de hotelaria. |
-| `HotelVectorStoreService` | `AI/HotelVectorStoreService.cs` | Indexação vetorial específica de hotéis no Qdrant/Memory. |
-| `ServicesDomainRepository` | `Configure/ServicesDomainRepository.cs` | Registro no DI dos repositórios concretos de domínio. |
-| `ServicesDomainService` | `Configure/ServicesDomainService.cs` | Registro no DI dos serviços de domínio hoteleiro. |
-| `ServiceCollectionConfigureServicesDomain` | `Configure/ServiceCollectionConfigureServicesDomain.cs` | Orquestrador de injeção de dependência do host. |
+| `Entity/HotelServices/HotelService.cs` | `HotelService` | Lógica de negócio de hotéis, geração de vetores |
+| `Entity/HotelServices/RoomService.cs` | `RoomService` | Gestão de quartos |
+| `Entity/HotelServices/ReservationService.cs` | `ReservationService` | Lógica de reservas |
+| `Entity/HotelServices/RoomAvailabilityService.cs` | `RoomAvailabilityService` | Disponibilidade e precificação |
+| `Entity/UserService.cs` | `UserService` | Autenticação e gestão de usuários |
+
+#### Serviços de IA de Domínio (3 arquivos)
+
+| Arquivo | Tipo | Motivo |
+| :--- | :--- | :--- |
+| `Entity/IA/ChatSessionHistoryService.cs` | `ChatSessionHistoryService` | Sessões de conversação |
+| `Entity/GenerateHotelService.cs` | `GenerateHotelService` | Geração sintética de hotéis via IA |
+| `AI/AssistantService.cs` | `AssistantService` | Orquestração do agente StayMate |
+
+#### Serviço de Vector Store de Domínio (1 arquivo)
+
+| Arquivo | Tipo | Motivo |
+| :--- | :--- | :--- |
+| `AI/HotelVectorStoreService.cs` | `HotelVectorStoreService` | Indexação vetorial de hotéis no Qdrant/Memory |
+
+#### Lógica de Negócio e Prompts (3 arquivos)
+
+| Arquivo | Tipo | Motivo |
+| :--- | :--- | :--- |
+| `Bussines/HotelSearchService.cs` | `HotelSearchService` | Busca semântica de hotéis |
+| `Bussines/HotelResponseProcessor.cs` | `HotelResponseProcessor` | Formatação de respostas IA |
+| `Bussines/StayMatePromptGenerator.cs` | `StayMatePromptGenerator` | System prompts do agente StayMate |
+
+#### DI Wire-up de Domínio (3 arquivos)
+
+| Arquivo | Tipo | Motivo |
+| :--- | :--- | :--- |
+| `Configure/ServicesDomainRepository.cs` | `ServicesDomainRepository` | Registro de repositórios de domínio |
+| `Configure/ServicesDomainService.cs` | `ServicesDomainService` | Registro de serviços de domínio |
+| `Configure/ServiceCollectionConfigureServicesDomain.cs` | `ServiceCollectionConfigureServicesDomain` | Orquestrador DI do host |
 
 ---
 
-## 3. Detalhamento Técnico das Extrações
+## 3. Detalhamento Técnico — `GenericEntityServiceBase<T, TDto>`
 
-### 3.1 `GenericEntityServiceBase<T, TDto>`
+### Responsabilidades
+- CRUD completo: `GetAllAsync`, `GetByIdAsync`, `FindAsync`, `CreateAsync`, `AddRangeAsync`, `UpdateAsync`, `UpdateRangeAsync`, `DeleteAsync`, `CountAsync`, `FetchAsync`
+- Validação automática via `FluentValidation.IValidator<T>` → `Validate(T item)`
+- Mapeamento entidade ↔ DTO via `AutoMapper.IMapper`
+- Respostas encapsuladas em `ServiceResponse<TDto>`
+- Contexto do chamador via `SetUserId(long id)`
+- Tratamento de exceções com `Serilog.ILogger`
 
-#### Responsabilidades
-- Fornece operações completas de CRUD (`GetAllAsync`, `GetByIdAsync`, `FindAsync`, `CreateAsync`, `AddRangeAsync`, `UpdateAsync`, `UpdateRangeAsync`, `DeleteAsync`, `CountAsync`, `FetchAsync`).
-- Realiza validação assíncrona automática via `FluentValidation.IValidator<T>` através do método `Validate(T item)`.
-- Mapeia entidades para DTOs e vice-versa via `AutoMapper.IMapper`.
-- Retorna respostas encapsuladas e padronizadas no `ServiceResponse<TDto>`.
-- Gerencia contexto do usuário chamador via `SetUserId(long id)`.
-- Trata e registra exceções estruturadas via `Serilog.ILogger`.
-
-#### Estrutura Canônica no Core.SDK
+### Estrutura Canônica no Core.SDK
 ```csharp
 namespace HotelWise.Core.SDK.Services
 {
@@ -78,12 +136,6 @@ namespace HotelWise.Core.SDK.Services
     using FluentValidation;
     using HotelWise.Core.SDK.Abstractions;
     using HotelWise.Core.SDK.Common;
-    using HotelWise.Core.SDK.Validation;
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Linq.Expressions;
-    using System.Threading.Tasks;
 
     public abstract class GenericEntityServiceBase<T, TDto> : IGenericService<TDto>
         where T : class, new()
@@ -96,9 +148,9 @@ namespace HotelWise.Core.SDK.Services
         protected long UserId { get; private set; }
 
         protected GenericEntityServiceBase(
-            IGenericRepository<T> repository, 
-            IMapper mapper, 
-            Serilog.ILogger logger, 
+            IGenericRepository<T> repository,
+            IMapper mapper,
+            Serilog.ILogger logger,
             IValidator<T> entityValidator)
         {
             _repository = repository ?? throw new ArgumentNullException(nameof(repository));
@@ -109,23 +161,21 @@ namespace HotelWise.Core.SDK.Services
 
         public void SetUserId(long id) => UserId = id;
 
-        // Implementações completas dos métodos assíncronos protegidos com try/catch e log...
+        // Implementações dos métodos assíncronos com try/catch, log e validação...
     }
 }
 ```
 
 ---
 
-### 3.2 `TokenService`
+## 4. Detalhamento Técnico — `TokenService`
 
-O serviço `TokenService` implementa `ITokenService` e centraliza a geração de tokens JWT autenticados utilizando a chave de assinatura, issuer e audience configurados via `ITokenConfigurationDto` e `SecurityHelper`:
+Implementa `ITokenService` (definido em `Interfaces/AppConfig/`), centralizando geração de tokens JWT:
 
 ```csharp
 namespace HotelWise.Core.SDK.Security
 {
-    using HotelWise.Core.SDK.Abstractions;
-    using HotelWise.Core.SDK.Common;
-    using System;
+    using System.Security.Claims;
 
     public class TokenService : ITokenService
     {
@@ -133,36 +183,34 @@ namespace HotelWise.Core.SDK.Security
 
         public TokenService(ITokenConfigurationDto tokenConfigurations)
         {
-            _tokenConfigurations = tokenConfigurations ?? throw new ArgumentNullException(nameof(tokenConfigurations));
+            _tokenConfigurations = tokenConfigurations
+                ?? throw new ArgumentNullException(nameof(tokenConfigurations));
         }
 
-        public TokenVO GenerateToken(UserLoginDto userLoginDto)
-        {
-            // Validações e geração de JWT token...
-        }
+        public string GenerateAccessToken(IEnumerable<Claim> claims) { /* ... */ }
+        public string GenerateRefreshToken() { /* ... */ }
+        public ClaimsPrincipal GetPrincipalFromExpiredToken(string token) { /* ... */ }
     }
 }
 ```
 
 ---
 
-### 3.3 Módulo de Inferência de IA e Fábricas de Vetores
+## 5. Detalhamento Técnico — Fábricas de IA
 
-#### `AIInferenceAdapterFactory` & `AIInferenceService`
-Permitem selecionar dinamicamente o provedor de inferência LLM em tempo de execução:
-- `InferenceAiAdapterType.GroqApi` $\rightarrow$ `GroqApiAdapter`
-- `InferenceAiAdapterType.Mistral` $\rightarrow$ `MistralApiAdapter`
-- `InferenceAiAdapterType.Ollama` $\rightarrow$ `OllamaAdapter`
-- `InferenceAiAdapterType.SemanticKernel` $\rightarrow$ `SemanticKernelAdapter`
+### `AIInferenceAdapterFactory` + `AIInferenceService`
+Seleção dinâmica de provedor LLM em runtime:
+- `InferenceAiAdapterType.GroqApi` → `GroqApiAdapter`
+- `InferenceAiAdapterType.Mistral` → `MistralApiAdapter`
+- `InferenceAiAdapterType.Ollama` → `OllamaAdapter`
+- `InferenceAiAdapterType.SemanticKernel` → `SemanticKernelAdapter`
 
-#### `VectorStoreAdapterFactory`
-Instancia adaptadores de `IVectorStoreAdapter<TVector>` baseados na configuração RAG selecionada (`VectorStoreType.Qdrant`, `VectorStoreType.Memory`, etc.).
+### `VectorStoreAdapterFactory`
+Instancia `IVectorStoreAdapter<TVector>` baseado em `VectorStoreType` (`Qdrant`, `Memory`, etc.).
 
 ---
 
-## 4. Padrão de Shim no Host (`HotelWise.Service`)
-
-O arquivo original em `HotelWise.Service/Entity/Generic/GenericEntityServiceBase.cs` será mantido com `[Obsolete]` e herança direta da classe canônica do Core:
+## 6. Padrão de Shim no Host
 
 ```csharp
 namespace HotelWise.Service.Entity.Generic
@@ -193,18 +241,16 @@ namespace HotelWise.Service.Entity.Generic
 }
 ```
 
-> **Nota:** A referência `HotelWise.Domain.Interfaces.Entity.HotelWise.Domain.Interfaces.Entity` (namespace aninhado duplicado) que existia no arquivo original **não** deve ser replicada no shim. O shim usa `HotelWise.Core.SDK.Abstractions.IGenericRepository<T>` diretamente.
+> **Nota:** A referência `HotelWise.Domain.Interfaces.Entity.HotelWise.Domain.Interfaces.Entity` (namespace aninhado duplicado) do arquivo original **não** é replicada no shim. O shim usa `HotelWise.Core.SDK.Abstractions.IGenericRepository<T>` diretamente.
 
 ---
 
-## 5. Serviços de Domínio no Host
-
-Os serviços concretos de negócio (`HotelService`, `RoomService`, `ReservationService`, etc.) continuam em `HotelWise.Service`, herdando a base genérica canônica do SDK:
+## 7. Adaptação dos Serviços de Domínio
 
 ```csharp
 using AutoMapper;
 using FluentValidation;
-using HotelWise.Core.SDK.Services;
+using HotelWise.Core.SDK.Services;    // GenericEntityServiceBase<T, TDto>
 using HotelWise.Domain.Dto.Enitty.HotelDtos;
 using HotelWise.Domain.Interfaces.Entity.HotelInterfaces.Repository;
 using HotelWise.Domain.Interfaces.Entity.HotelInterfaces.Service;
@@ -217,9 +263,9 @@ namespace HotelWise.Service.Entity.HotelServices
         private readonly IHotelRepository _hotelRepository;
 
         public HotelService(
-            IHotelRepository hotelRepository, 
-            IMapper mapper, 
-            Serilog.ILogger logger, 
+            IHotelRepository hotelRepository,
+            IMapper mapper,
+            Serilog.ILogger logger,
             IValidator<Hotel> entityValidator)
             : base(hotelRepository, mapper, logger, entityValidator)
         {
@@ -233,28 +279,29 @@ namespace HotelWise.Service.Entity.HotelServices
 
 ---
 
-## 6. Plano de Testes Canônicos (`HotelWise.Core.SDK.Tests`)
+## 8. Plano de Testes (`HotelWise.Core.SDK.Tests`)
 
-1. **`GenericEntityServiceBaseTests.cs`:**
-   - Teste de fluxo completo com mocks de `IGenericRepository<T>`, `IMapper`, `ILogger` e `IValidator<T>`.
-   - Teste do método `CreateAsync`: caso de validação bem-sucedida vs caso de falha de validação (erros mapeados).
-   - Teste do método `UpdateAsync`, `DeleteAsync`, `GetAllAsync`, `GetByIdAsync`.
-   - Teste de resiliência e tratamento de exceções com `LogAndThrow`.
-2. **`TokenServiceTests.cs`:**
-   - Validação da emissão de tokens JWT com expiração, claims corretas e assinatura válida.
-3. **`AIInferenceAdapterFactoryTests.cs`:**
-   - Verificação da criação de instâncias de adaptadores corretos de acordo com o enum `InferenceAiAdapterType`.
+| Suite | Foco | Estratégia |
+| :--- | :--- | :--- |
+| `GenericEntityServiceBaseTests.cs` | CRUD com mocks de `IGenericRepository<T>`, `IMapper`, `ILogger`, `IValidator<T>` | Moq + FluentAssertions |
+| `GenericEntityServiceBaseTests.cs` | `CreateAsync` com validação OK vs falha | Caso positivo/negativo |
+| `GenericEntityServiceBaseTests.cs` | Tratamento de exceções | Exception flow |
+| `TokenServiceTests.cs` | Emissão JWT, expiração, claims, assinatura válida | Mock de `ITokenConfigurationDto` |
+| `AIInferenceAdapterFactoryTests.cs` | Criação de instâncias corretas por `InferenceAiAdapterType` | Parametrizado por enum |
+| `VectorStoreAdapterFactoryTests.cs` | Instância correta por `VectorStoreType` | Parametrizado por enum |
 
 ---
 
-## 7. Checklist de Implementação
+## 9. Checklist de Implementação
 
-- [ ] Criar classe canônica `GenericEntityServiceBase<T, TDto>` em `HotelWise.Core.SDK/Services/`.
-- [ ] Criar `GenericVectorStoreServiceBase`, `AIInferenceAdapterFactory` e `VectorStoreAdapterFactory` em `HotelWise.Core.SDK/AI/Services/`.
-- [ ] Criar `TokenService` em `HotelWise.Core.SDK/Security/`.
-- [ ] Migrar extensões de configuração de DI genéricas para `HotelWise.Core.SDK/Extensions/`.
-- [ ] Adicionar anotações `[Obsolete]` e shims nos arquivos correspondentes em `HotelWise.Service`.
-- [ ] Adicionar `ProjectReference` para `HotelWise.Core.SDK` em `HotelWise.Service.csproj`.
-- [ ] Atualizar `using`s nos serviços de domínio (`HotelService`, `RoomService`, etc.).
-- [ ] Implementar suíte de testes em `HotelWise.Core.SDK.Tests` com cobertura $\ge 90\%$.
-- [ ] Executar `dotnet build HotelWise.Service/HotelWise.Service.csproj` e verificar compilação sem erros.
+- [ ] Criar `GenericEntityServiceBase<T, TDto>` em `HotelWise.Core.SDK/Services/`
+- [ ] Criar `GenericVectorStoreServiceBase` em `HotelWise.Core.SDK/AI/Services/`
+- [ ] Criar `TokenService` em `HotelWise.Core.SDK/Security/`
+- [ ] Criar `AIInferenceAdapterFactory`, `AIInferenceService`, `VectorStoreAdapterFactory` em `HotelWise.Core.SDK/AI/Services/`
+- [ ] Criar `SemanticKernelProviderConfigure`, `ConfigureServicesAI` em `HotelWise.Core.SDK/AI/Configure/`
+- [ ] Criar extensões DI em `HotelWise.Core.SDK/Extensions/`
+- [ ] Adicionar `[Obsolete]` e shims em **11 arquivos** de `HotelWise.Service`
+- [ ] Adicionar `ProjectReference` para `HotelWise.Core.SDK` em `HotelWise.Service.csproj`
+- [ ] Atualizar `using`s nos 14 serviços de domínio mantidos no host
+- [ ] Implementar suíte de testes com cobertura ≥ 90%
+- [ ] `dotnet build HotelWise.Service/HotelWise.Service.csproj` verde
