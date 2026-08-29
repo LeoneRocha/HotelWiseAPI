@@ -6,10 +6,15 @@ using HotelWise.Core.SDK.AI.DTO;
 namespace HotelWise.Core.SDK.AI.Validation;
 
 /// <summary>
-/// Valida históricos de prompts (arrays).
+/// Valida históricos de prompts (arrays de <see cref="PromptMessageVO"/>).
+/// Garante quantidade mínima/máxima de mensagens, validação individual via
+/// <see cref="PromptMessageValidator"/> e limite total de tokens para chat completion.
 /// </summary>
 public class HistoryPromptsValidator : AbstractValidator<PromptMessageVO[]>
 {
+    /// <summary>
+    /// Inicializa as regras de validação do histórico de prompts.
+    /// </summary>
     public HistoryPromptsValidator()
     {
         RuleFor(x => x.Length)
@@ -24,6 +29,11 @@ public class HistoryPromptsValidator : AbstractValidator<PromptMessageVO[]>
             .WithMessage($"A soma total de tokens no histórico não pode exceder {ChatCompletionValidatorsConstants.MaxTotalTokens}.");
     }
 
+    /// <summary>
+    /// Verifica se a soma de tokens do histórico não excede o limite configurado.
+    /// </summary>
+    /// <param name="prompts">Histórico de prompts.</param>
+    /// <returns><c>true</c> se dentro do limite; caso contrário, <c>false</c>.</returns>
     private static bool NotExceedMaxTokens(PromptMessageVO[] prompts)
     {
         if (prompts == null || prompts.Length == 0) return true;

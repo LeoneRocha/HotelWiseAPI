@@ -11,10 +11,18 @@ using Microsoft.Extensions.Options;
 namespace HotelWise.Core.SDK.Extensions;
 
 /// <summary>
-/// Bind de AppSettings genéricos (Azure AD / Token).
+/// Extensões de <see cref="IServiceCollection"/> para bind de AppSettings
+/// genéricos (Azure AD e Token JWT) a partir de <see cref="IConfiguration"/>,
+/// registrando as instâncias como singletons no DI.
 /// </summary>
 public static class ServiceCollectionConfigureAppSettings
 {
+    /// <summary>
+    /// Faz bind da seção AzureAd, registra <see cref="IAzureAdConfig"/> e devolve a instância.
+    /// </summary>
+    /// <param name="services">Coleção de serviços da aplicação.</param>
+    /// <param name="configuration">Configuração raiz da aplicação.</param>
+    /// <returns>Instância configurada de <see cref="AzureAdConfig"/>.</returns>
     public static AzureAdConfig AddAndReturnAzureAdConfig(IServiceCollection services, IConfiguration configuration)
     {
         var appValue = new AzureAdConfig();
@@ -24,6 +32,12 @@ public static class ServiceCollectionConfigureAppSettings
         return appValue;
     }
 
+    /// <summary>
+    /// Faz bind da seção TokenConfigurations, registra as abstrações de token e devolve a instância.
+    /// </summary>
+    /// <param name="services">Coleção de serviços da aplicação.</param>
+    /// <param name="configuration">Configuração raiz da aplicação.</param>
+    /// <returns>Instância configurada de <see cref="TokenConfigurationDto"/>.</returns>
     public static TokenConfigurationDto AddAndReturnTokenConfiguration(IServiceCollection services, IConfiguration configuration)
     {
         var configValue = ConfigurationAppSettingsHelper.GetTokenConfigurations(configuration);

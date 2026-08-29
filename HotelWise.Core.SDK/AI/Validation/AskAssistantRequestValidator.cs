@@ -6,10 +6,14 @@ using HotelWise.Core.SDK.AI.DTO;
 namespace HotelWise.Core.SDK.AI.Validation;
 
 /// <summary>
-/// Valida solicitações ao assistente conversacional.
+/// Valida solicitações ao assistente conversacional (<see cref="AskAssistantRequest"/>).
+/// Garante mensagem obrigatória e limites de comprimento para mensagem e token de sessão.
 /// </summary>
 public class AskAssistantRequestValidator : AbstractValidator<AskAssistantRequest>
 {
+    /// <summary>
+    /// Inicializa as regras de validação da solicitação ao assistente.
+    /// </summary>
     public AskAssistantRequestValidator()
     {
         RuleFor(x => x.Message)

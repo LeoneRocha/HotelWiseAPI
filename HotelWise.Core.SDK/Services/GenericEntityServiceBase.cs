@@ -11,30 +11,83 @@ using HotelWise.Core.SDK.Validation;
 namespace HotelWise.Core.SDK.Services;
 
 /// <summary>
-/// Serviço genérico de entidade com CRUD, validação e mapeamento.
+/// Serviço genérico de entidade com CRUD assíncrono, validação FluentValidation
+/// e mapeamento AutoMapper entre entidade <typeparamref name="T"/> e DTO
+/// <typeparamref name="TDto"/>. Serve de base para serviços de domínio concretos
+/// do HotelWise, encapsulando logging de erros e respostas <see cref="ServiceResponse{TDto}"/>.
 /// </summary>
+/// <typeparam name="T">Tipo da entidade de domínio.</typeparam>
+/// <typeparam name="TDto">Tipo do DTO exposto pela camada de serviço.</typeparam>
+/// <example>
+/// <code>
+/// public class HotelService : GenericEntityServiceBase&lt;Hotel, HotelDto&gt;
+/// {
+///     public HotelService(IGenericRepository&lt;Hotel&gt; repo, IMapper mapper,
+///         Serilog.ILogger logger, IValidator&lt;Hotel&gt; validator)
+///         : base(repo, mapper, logger, validator) { }
+/// }
+/// </code>
+/// </example>
 public abstract class GenericEntityServiceBase<T, TDto> : IGenericService<TDto>
     where T : class, new()
     where TDto : class, new()
 {
+    /// <summary>
+    /// Repositório genérico da entidade <typeparamref name="T"/>.
+    /// </summary>
     protected readonly IGenericRepository<T> _repository;
+
+    /// <summary>
+    /// Mapper AutoMapper entre entidade e DTO.
+    /// </summary>
     protected readonly IMapper _mapper;
+
+    /// <summary>
+    /// Logger Serilog para erros de operação.
+    /// </summary>
     protected readonly Serilog.ILogger _logger;
+
+    /// <summary>
+    /// Validador FluentValidation da entidade.
+    /// </summary>
     protected readonly IValidator<T> _entityValidator;
+
+    /// <summary>
+    /// Identificador do usuário autenticado associado ao contexto do serviço.
+    /// </summary>
     protected long UserId { get; private set; }
 
+    /// <summary>Mensagem de erro ao buscar todas as entidades.</summary>
     private const string ErrorFetchingAllEntities = "Error occurred while fetching all entities.";
+    /// <summary>Mensagem de erro ao buscar entidade por Id.</summary>
     private const string ErrorFetchingEntityById = "Error occurred while fetching entity with ID {Id}.";
+    /// <summary>Mensagem de erro ao filtrar entidades.</summary>
     private const string ErrorFindingEntities = "Error occurred while finding entities with specified criteria.";
+    /// <summary>Mensagem de erro ao adicionar entidade.</summary>
     private const string ErrorAddingEntity = "Error occurred while adding a new entity.";
+    /// <summary>Mensagem de erro ao adicionar intervalo de entidades.</summary>
     private const string ErrorAddingEntitiesRange = "Error occurred while adding a range of new entities.";
+    /// <summary>Mensagem de erro ao atualizar entidade.</summary>
     private const string ErrorUpdatingEntity = "Error occurred while updating the entity.";
+    /// <summary>Mensagem de erro ao atualizar intervalo de entidades.</summary>
     private const string ErrorUpdatingEntitiesRange = "Error occurred while updating a range of entities.";
+    /// <summary>Mensagem de erro ao excluir entidade.</summary>
     private const string ErrorDeletingEntity = "Error occurred while deleting entity with ID {Id}.";
+    /// <summary>Mensagem de erro ao contar entidades.</summary>
     private const string ErrorCountingEntities = "Error occurred while counting entities.";
+    /// <summary>Mensagem de erro na paginação.</summary>
     private const string ErrorFetchingEntitiesPagination = "Error occurred while fetching entities with offset {Offset} and limit {Limit}.";
+    /// <summary>Mensagem genérica encapsulada na exceção relançada.</summary>
     private const string GeneralErrorOccurred = "An error occurred while processing the request.";
 
+    /// <summary>
+    /// Inicializa o serviço genérico com repositório, mapper, logger e validador.
+    /// </summary>
+    /// <param name="repository">Repositório da entidade.</param>
+    /// <param name="mapper">Instância AutoMapper.</param>
+    /// <param name="logger">Logger Serilog.</param>
+    /// <param name="entityValidator">Validador FluentValidation da entidade.</param>
+    /// <exception cref="ArgumentNullException">Quando repository, mapper ou logger são nulos.</exception>
     protected GenericEntityServiceBase(IGenericRepository<T> repository, IMapper mapper, Serilog.ILogger logger, IValidator<T> entityValidator)
     {
         _repository = repository ?? throw new ArgumentNullException(nameof(repository));
@@ -43,8 +96,16 @@ public abstract class GenericEntityServiceBase<T, TDto> : IGenericService<TDto>
         _entityValidator = entityValidator;
     }
 
+    /// <summary>
+    /// Define o Id do usuário no contexto deste serviço.
+    /// </summary>
+    /// <param name="id">Identificador do usuário autenticado.</param>
     public void SetUserId(long id) => UserId = id;
 
+    /// <summary>
+    /// Obtém todos os registros mapeados para <typeparamref name="TDto"/>.
+    /// </summary>
+    /// <returns>Lista de DTOs.</returns>
     public virtual async Task<List<TDto>> GetAllAsync()
     {
         try
@@ -59,6 +120,11 @@ public abstract class GenericEntityServiceBase<T, TDto> : IGenericService<TDto>
         }
     }
 
+    /// <summary>
+    /// Obtém um registro pelo identificador, mapeado para <typeparamref name="TDto"/>.
+    /// </summary>
+    /// <param name="id">Identificador da entidade.</param>
+    /// <returns>DTO correspondente ou valor padrão em falha tratada.</returns>
     public virtual async Task<TDto?> GetByIdAsync(long id)
     {
         try
@@ -73,6 +139,11 @@ public abstract class GenericEntityServiceBase<T, TDto> : IGenericService<TDto>
         }
     }
 
+    /// <summary>
+    /// Filtra registros com predicado sobre o DTO (mapeado para predicado de entidade).
+    /// </summary>
+    /// <param name="predicate">Expressão de filtro sobre <typeparamref name="TDto"/>.</param>
+    /// <returns>Lista de DTOs que satisfazem o critério.</returns>
     public virtual async Task<List<TDto>> FindAsync(Expression<Func<TDto, bool>> predicate)
     {
         try
@@ -88,6 +159,11 @@ public abstract class GenericEntityServiceBase<T, TDto> : IGenericService<TDto>
         }
     }
 
+    /// <summary>
+    /// Valida e cria uma nova entidade a partir do DTO.
+    /// </summary>
+    /// <param name="entityDto">DTO a persistir.</param>
+    /// <returns><see cref="ServiceResponse{TDto}"/> com dados ou erros de validação.</returns>
     public virtual async Task<ServiceResponse<TDto>> CreateAsync(TDto entityDto)
     {
         ServiceResponse<TDto> response = new ServiceResponse<TDto>();
@@ -108,6 +184,11 @@ public abstract class GenericEntityServiceBase<T, TDto> : IGenericService<TDto>
         return response;
     }
 
+    /// <summary>
+    /// Adiciona um conjunto de entidades a partir de DTOs (sem validação individual).
+    /// </summary>
+    /// <param name="entitiesDto">Coleção de DTOs a inserir.</param>
+    /// <returns>Tarefa que representa a operação assíncrona.</returns>
     public virtual async Task AddRangeAsync(IEnumerable<TDto> entitiesDto)
     {
         try
@@ -121,6 +202,11 @@ public abstract class GenericEntityServiceBase<T, TDto> : IGenericService<TDto>
         }
     }
 
+    /// <summary>
+    /// Valida e atualiza uma entidade a partir do DTO.
+    /// </summary>
+    /// <param name="entityDto">DTO com os novos valores.</param>
+    /// <returns><see cref="ServiceResponse{TDto}"/> com dados ou erros de validação.</returns>
     public virtual async Task<ServiceResponse<TDto>> UpdateAsync(TDto entityDto)
     {
         ServiceResponse<TDto> response = new ServiceResponse<TDto>();
@@ -141,6 +227,11 @@ public abstract class GenericEntityServiceBase<T, TDto> : IGenericService<TDto>
         return response;
     }
 
+    /// <summary>
+    /// Atualiza um conjunto de entidades a partir de DTOs.
+    /// </summary>
+    /// <param name="entitiesDto">Coleção de DTOs a atualizar.</param>
+    /// <returns>Tarefa que representa a operação assíncrona.</returns>
     public virtual async Task UpdateRangeAsync(IEnumerable<TDto> entitiesDto)
     {
         try
@@ -154,6 +245,11 @@ public abstract class GenericEntityServiceBase<T, TDto> : IGenericService<TDto>
         }
     }
 
+    /// <summary>
+    /// Exclui a entidade pelo identificador.
+    /// </summary>
+    /// <param name="id">Identificador da entidade.</param>
+    /// <returns>Tarefa que representa a operação assíncrona.</returns>
     public virtual async Task DeleteAsync(long id)
     {
         try
@@ -166,6 +262,10 @@ public abstract class GenericEntityServiceBase<T, TDto> : IGenericService<TDto>
         }
     }
 
+    /// <summary>
+    /// Conta o total de entidades no repositório.
+    /// </summary>
+    /// <returns>Quantidade de registros.</returns>
     public virtual async Task<int> CountAsync()
     {
         try
@@ -179,6 +279,12 @@ public abstract class GenericEntityServiceBase<T, TDto> : IGenericService<TDto>
         }
     }
 
+    /// <summary>
+    /// Obtém uma página de DTOs (offset/limit).
+    /// </summary>
+    /// <param name="offset">Quantidade de registros a ignorar.</param>
+    /// <param name="limit">Quantidade máxima a retornar.</param>
+    /// <returns>Lista paginada de DTOs.</returns>
     public virtual async Task<List<TDto>> FetchAsync(int offset, int limit)
     {
         try
@@ -193,12 +299,22 @@ public abstract class GenericEntityServiceBase<T, TDto> : IGenericService<TDto>
         }
     }
 
+    /// <summary>
+    /// Registra o erro no logger e relança como <see cref="InvalidOperationException"/>.
+    /// </summary>
+    /// <param name="ex">Exceção original.</param>
+    /// <param name="message">Mensagem de contexto para o log.</param>
     protected void LogAndThrow(Exception ex, string message)
     {
         _logger.Error(ex, message);
         throw new InvalidOperationException(GeneralErrorOccurred, ex);
     }
 
+    /// <summary>
+    /// Executa a validação FluentValidation da entidade e monta <see cref="ServiceResponse{TDto}"/>.
+    /// </summary>
+    /// <param name="item">Entidade a validar.</param>
+    /// <returns>Resposta com Success, Errors e Message padronizados.</returns>
     public virtual async Task<ServiceResponse<TDto>> Validate(T item)
     {
         ServiceResponse<TDto> response = new ServiceResponse<TDto>();

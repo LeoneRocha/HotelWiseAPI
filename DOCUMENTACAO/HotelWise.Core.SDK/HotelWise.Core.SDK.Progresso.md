@@ -13,6 +13,7 @@
 | Categoria | Documento | Status |
 | :--- | :--- | :---: |
 | **Visão Geral** | [HotelWise.Core.SDK.Levantamento.md](./HotelWise.Core.SDK.Levantamento.md) | ✅ Consolidado |
+| **Guia de Referência** | [HotelWise.Core.SDK.Guide.md](./HotelWise.Core.SDK.Guide.md) | ✅ Publicado |
 | **Plano Geral** | [HotelWise.Core.SDK.PlanoImplementacao.md](./HotelWise.Core.SDK.PlanoImplementacao.md) | ✅ Consolidado |
 | **Domain** | [HotelWise.Core.SDK.Especificacao.Domain.md](./HotelWise.Core.SDK.Especificacao.Domain.md) · [PlanoImplementacao.Domain.md](./HotelWise.Core.SDK.PlanoImplementacao.Domain.md) | ✅ Consolidado |
 | **Data** | [HotelWise.Core.SDK.Especificacao.Data.md](./HotelWise.Core.SDK.Especificacao.Data.md) · [PlanoImplementacao.Data.md](./HotelWise.Core.SDK.PlanoImplementacao.Data.md) | ✅ Consolidado |

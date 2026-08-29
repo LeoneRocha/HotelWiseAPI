@@ -20,10 +20,30 @@ using OllamaSharp;
 namespace HotelWise.Core.SDK.AI.Configure;
 
 /// <summary>
-/// Configuração genérica do Semantic Kernel / vector store.
+/// Configuração genérica do Semantic Kernel, serviços de chat/embeddings e vector store Qdrant.
+/// Registra <see cref="IApplicationIAConfig"/>, <see cref="IRagConfig"/>, <see cref="Kernel"/>
+/// e dependências de inferência no container DI da aplicação.
 /// </summary>
+/// <example>
+/// <code>
+/// // Em Program.cs / Startup
+/// SemanticKernelProviderConfigure.SetupSemanticKernelProvider&lt;HotelVector&gt;(
+///     builder.Services, builder.Configuration);
+/// </code>
+/// </example>
 public static class SemanticKernelProviderConfigure
 {
+    /// <summary>
+    /// Configura Semantic Kernel, Qdrant e serviços de IA no <see cref="IServiceCollection"/>.
+    /// </summary>
+    /// <typeparam name="TVector">Tipo do registro vetorial da coleção Qdrant.</typeparam>
+    /// <param name="services">Coleção de serviços DI.</param>
+    /// <param name="configuration">Configuração da aplicação.</param>
+    /// <example>
+    /// <code>
+    /// SemanticKernelProviderConfigure.SetupSemanticKernelProvider&lt;MyVector&gt;(services, configuration);
+    /// </code>
+    /// </example>
     public static void SetupSemanticKernelProvider<TVector>(IServiceCollection services, IConfiguration configuration)
         where TVector : class
     {
@@ -38,6 +58,11 @@ public static class SemanticKernelProviderConfigure
         AddServicesDependencies(services, kernel, appConfig);
     }
 
+    /// <summary>
+    /// Registra <see cref="IRagConfig"/> a partir das settings da aplicação.
+    /// </summary>
+    /// <param name="services">Coleção de serviços DI.</param>
+    /// <param name="configuration">Configuração da aplicação.</param>
     private static void AddRagConfig(IServiceCollection services, IConfiguration configuration)
     {
         var appSettingsValue = new RagConfig();
@@ -46,6 +71,12 @@ public static class SemanticKernelProviderConfigure
         services.AddSingleton<IRagConfig>(appSettingsValue);
     }
 
+    /// <summary>
+    /// Cria e registra <see cref="ApplicationIAConfig"/> como <see cref="IApplicationIAConfig"/>.
+    /// </summary>
+    /// <param name="services">Coleção de serviços DI.</param>
+    /// <param name="configuration">Configuração da aplicação.</param>
+    /// <returns>Instância carregada de <see cref="ApplicationIAConfig"/>.</returns>
     private static ApplicationIAConfig AddApplicationConfig(IServiceCollection services, IConfiguration configuration)
     {
         var appConfig = new ApplicationIAConfig(configuration);
@@ -53,6 +84,11 @@ public static class SemanticKernelProviderConfigure
         return appConfig;
     }
 
+    /// <summary>
+    /// Adiciona serviços de chat/embeddings ao builder do Kernel conforme <see cref="IRagConfig.AIChatServiceApi"/>.
+    /// </summary>
+    /// <param name="appConfig">Configuração agregada de IA.</param>
+    /// <param name="builder">Builder do Semantic Kernel.</param>
     private static void AddAIServices(IApplicationIAConfig appConfig, IKernelBuilder builder)
     {
         var aiServiceType = appConfig?.RagConfig?.AIChatServiceApi ?? AIChatServiceType.MistralApi;
@@ -74,6 +110,11 @@ public static class SemanticKernelProviderConfigure
 #pragma warning restore SKEXP0070
     }
 
+    /// <summary>
+    /// Configura chat e embeddings Mistral no Kernel.
+    /// </summary>
+    /// <param name="appConfig">Configuração agregada de IA.</param>
+    /// <param name="builder">Builder do Semantic Kernel.</param>
     private static void AddMistral(IApplicationIAConfig appConfig, IKernelBuilder builder)
     {
 #pragma warning disable SKEXP0070
@@ -96,6 +137,11 @@ public static class SemanticKernelProviderConfigure
 #pragma warning restore SKEXP0070
     }
 
+    /// <summary>
+    /// Configura chat e embeddings Ollama no Kernel.
+    /// </summary>
+    /// <param name="appConfig">Configuração agregada de IA.</param>
+    /// <param name="builder">Builder do Semantic Kernel.</param>
     private static void AddOllama(IApplicationIAConfig appConfig, IKernelBuilder builder)
     {
         var modelConfig = appConfig.OllamaConfig;
@@ -110,6 +156,12 @@ public static class SemanticKernelProviderConfigure
 #pragma warning restore SKEXP0070
     }
 
+    /// <summary>
+    /// Garante que um valor de configuração obrigatório esteja preenchido.
+    /// </summary>
+    /// <param name="value">Valor lido da configuração.</param>
+    /// <param name="configPath">Caminho no appsettings.</param>
+    /// <param name="envVarHint">Nome sugerido da variável de ambiente.</param>
     private static void EnsureConfigured(string? value, string configPath, string envVarHint)
     {
         if (string.IsNullOrWhiteSpace(value))
@@ -121,6 +173,12 @@ public static class SemanticKernelProviderConfigure
         }
     }
 
+    /// <summary>
+    /// Registra Kernel, vector store, embeddings e chat completion no DI.
+    /// </summary>
+    /// <param name="services">Coleção de serviços DI.</param>
+    /// <param name="kernel">Kernel construído.</param>
+    /// <param name="configuration">Configuração agregada de IA.</param>
     private static void AddServicesDependencies(IServiceCollection services, Kernel kernel, IApplicationIAConfig configuration)
     {
         services.AddKernel();
@@ -130,18 +188,34 @@ public static class SemanticKernelProviderConfigure
         AddChatCompletionService(services, kernel);
     }
 
+    /// <summary>
+    /// Expõe <see cref="IChatCompletionService"/> do Kernel no DI.
+    /// </summary>
+    /// <param name="services">Coleção de serviços DI.</param>
+    /// <param name="kernel">Kernel construído.</param>
     private static void AddChatCompletionService(IServiceCollection services, Kernel kernel)
     {
         IChatCompletionService chatService = kernel.GetRequiredService<IChatCompletionService>();
         services.AddSingleton(chatService);
     }
 
+    /// <summary>
+    /// Expõe <see cref="VectorStore"/> do Kernel no DI.
+    /// </summary>
+    /// <param name="services">Coleção de serviços DI.</param>
+    /// <param name="kernel">Kernel construído.</param>
     private static void AddKernelVectorStoreToServiceCollection(IServiceCollection services, Kernel kernel)
     {
         VectorStore vectorStore = kernel.GetRequiredService<VectorStore>();
         services.AddSingleton(vectorStore);
     }
 
+    /// <summary>
+    /// Registra o gerador de embeddings conforme <see cref="IRagConfig.AIEmbeddingServiceApi"/>.
+    /// </summary>
+    /// <param name="services">Coleção de serviços DI.</param>
+    /// <param name="kernel">Kernel construído.</param>
+    /// <param name="configuration">Configuração agregada de IA.</param>
     private static void AddTextEmbeddingGenerationService(IServiceCollection services, Kernel kernel, IApplicationIAConfig configuration)
     {
         var typeAIEmbeddingService = configuration.RagConfig.AIEmbeddingServiceApi;
@@ -159,6 +233,11 @@ public static class SemanticKernelProviderConfigure
         }
     }
 
+    /// <summary>
+    /// Registra geração de texto via Ollama a partir do adapter de embeddings.
+    /// </summary>
+    /// <param name="services">Coleção de serviços DI.</param>
+    /// <param name="configuration">Configuração agregada de IA.</param>
     private static void AddOllamaTextEmbeddingGenerationService(IServiceCollection services, IApplicationIAConfig configuration)
     {
 #pragma warning disable SKEXP0001
@@ -171,6 +250,11 @@ public static class SemanticKernelProviderConfigure
 #pragma warning restore SKEXP0001
     }
 
+    /// <summary>
+    /// Expõe o <see cref="IEmbeddingGenerator{TInput,TEmbedding}"/> do Kernel no DI.
+    /// </summary>
+    /// <param name="services">Coleção de serviços DI.</param>
+    /// <param name="kernel">Kernel construído.</param>
     private static void AddDefaultTextEmbeddingGenerationService(IServiceCollection services, Kernel kernel)
     {
         IEmbeddingGenerator<string, Embedding<float>> embeddingGenerator =
@@ -178,6 +262,12 @@ public static class SemanticKernelProviderConfigure
         services.AddSingleton(embeddingGenerator);
     }
 
+    /// <summary>
+    /// Adiciona coleção e vector store Qdrant ao builder do Kernel.
+    /// </summary>
+    /// <typeparam name="TVector">Tipo do registro vetorial.</typeparam>
+    /// <param name="appConfig">Configuração agregada de IA.</param>
+    /// <param name="builder">Builder do Semantic Kernel.</param>
     private static void AddQdrantVectorStoreToBuilder<TVector>(IApplicationIAConfig appConfig, IKernelBuilder builder)
         where TVector : class
     {

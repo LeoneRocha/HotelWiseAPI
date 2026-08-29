@@ -8,10 +8,15 @@ using HotelWise.Core.SDK.AI.Helpers;
 namespace HotelWise.Core.SDK.AI.Validation;
 
 /// <summary>
-/// Valida mensagens individuais de prompt.
+/// Valida mensagens individuais de prompt (<see cref="PromptMessageVO"/>).
+/// Aplica regras de papel, conteúdo, comprimento e limites de tokens,
+/// com tratamento especial para mensagens de contexto RAG.
 /// </summary>
 public class PromptMessageValidator : AbstractValidator<PromptMessageVO>
 {
+    /// <summary>
+    /// Inicializa as regras de validação de mensagem de prompt.
+    /// </summary>
     public PromptMessageValidator()
     {
         RuleFor(x => x.RoleType)
@@ -35,9 +40,19 @@ public class PromptMessageValidator : AbstractValidator<PromptMessageVO>
             .When(x => x.RoleType == RoleAiPromptsType.Context);
     }
 
+    /// <summary>
+    /// Verifica se o conteúdo de contexto está dentro do limite de tokens RAG.
+    /// </summary>
+    /// <param name="content">Conteúdo da mensagem.</param>
+    /// <returns><c>true</c> se dentro do limite.</returns>
     private static bool BeWithinTokenLimitContext(string content) =>
         TokenCounterHelper.CountTokens(content) <= ChatCompletionValidatorsConstants.MaxTokensPerMessageContext;
 
+    /// <summary>
+    /// Verifica se o conteúdo comum está dentro do limite de tokens por mensagem.
+    /// </summary>
+    /// <param name="content">Conteúdo da mensagem.</param>
+    /// <returns><c>true</c> se dentro do limite.</returns>
     private static bool BeWithinTokenLimit(string content) =>
         TokenCounterHelper.CountTokens(content) <= ChatCompletionValidatorsConstants.MaxTokensPerMessage;
 }

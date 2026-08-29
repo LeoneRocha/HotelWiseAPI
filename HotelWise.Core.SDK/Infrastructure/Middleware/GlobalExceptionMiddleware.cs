@@ -10,14 +10,39 @@ using Microsoft.Extensions.Hosting;
 namespace HotelWise.Core.SDK.Infrastructure.Middleware;
 
 /// <summary>
-/// Captura exceções não tratadas e devolve JSON padronizado.
+/// Middleware ASP.NET Core que captura exceções não tratadas no pipeline,
+/// registra o erro com correlation id e devolve um payload JSON padronizado
+/// (<see cref="ErrorResponse"/>), diferenciando avisos de aplicação de falhas internas.
 /// </summary>
+/// <remarks>
+/// Registro no pipeline (tipicamente no início):
+/// <code>
+/// app.UseMiddleware&lt;GlobalExceptionMiddleware&gt;();
+/// </code>
+/// </remarks>
 public class GlobalExceptionMiddleware
 {
+    /// <summary>
+    /// Delegate do próximo middleware no pipeline.
+    /// </summary>
     private readonly RequestDelegate _next;
+
+    /// <summary>
+    /// Logger Serilog para gravação de exceções.
+    /// </summary>
     private readonly Serilog.ILogger _logger;
+
+    /// <summary>
+    /// Ambiente de hospedagem (Development/Production) para decidir o detalhe da mensagem.
+    /// </summary>
     private readonly IWebHostEnvironment _environment;
 
+    /// <summary>
+    /// Inicializa o middleware global de tratamento de exceções.
+    /// </summary>
+    /// <param name="next">Próximo middleware do pipeline.</param>
+    /// <param name="logger">Instância Serilog para logging.</param>
+    /// <param name="environment">Ambiente de hospedagem web.</param>
     public GlobalExceptionMiddleware(RequestDelegate next, Serilog.ILogger logger, IWebHostEnvironment environment)
     {
         _next = next;
@@ -25,6 +50,11 @@ public class GlobalExceptionMiddleware
         _environment = environment;
     }
 
+    /// <summary>
+    /// Executa o pipeline e, em caso de exceção, delega ao manipulador padronizado.
+    /// </summary>
+    /// <param name="context">Contexto HTTP da requisição atual.</param>
+    /// <returns>Tarefa que representa a execução assíncrona.</returns>
     public async Task InvokeAsync(HttpContext context)
     {
         try
@@ -37,6 +67,11 @@ public class GlobalExceptionMiddleware
         }
     }
 
+    /// <summary>
+    /// Registra a exceção e escreve a resposta JSON de erro no <see cref="HttpResponse"/>.
+    /// </summary>
+    /// <param name="context">Contexto HTTP.</param>
+    /// <param name="ex">Exceção capturada.</param>
     private async Task HandleExceptionAsync(HttpContext context, Exception ex)
     {
         var correlationId = context.Items[CorrelationIdMiddleware.ItemKey]?.ToString()

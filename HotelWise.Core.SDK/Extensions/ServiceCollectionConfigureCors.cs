@@ -4,15 +4,25 @@ using Microsoft.Extensions.DependencyInjection;
 namespace HotelWise.Core.SDK.Extensions;
 
 /// <summary>
-/// Configuração CORS genérica.
+/// Extensões de <see cref="IServiceCollection"/> para configuração CORS genérica
+/// (política padrão e política nomeada AllowAnyOrigin), adequada a APIs de desenvolvimento
+/// e hosts que expõem Content-Disposition.
 /// </summary>
 public static class ServiceCollectionConfigureCors
 {
+    /// <summary>
+    /// Aplica a configuração CORS padrão do SDK ao container de serviços.
+    /// </summary>
+    /// <param name="services">Coleção de serviços da aplicação.</param>
     public static void Configure(IServiceCollection services)
     {
         AddCors(services);
     }
 
+    /// <summary>
+    /// Registra as políticas CORS (padrão e AllowAnyOrigin).
+    /// </summary>
+    /// <param name="services">Coleção de serviços da aplicação.</param>
     private static void AddCors(IServiceCollection services)
     {
 #pragma warning disable S5122

@@ -9,17 +9,39 @@ using Microsoft.IdentityModel.Tokens;
 namespace HotelWise.Core.SDK.Security;
 
 /// <summary>
-/// Emissão e validação de tokens JWT.
+/// Serviço de emissão e validação de tokens JWT (access e refresh),
+/// baseado em <see cref="ITokenConfigurationDto"/> (issuer, audience, secret e expiração).
+/// Implementa <see cref="ITokenService"/> para uso em fluxos de autenticação da API.
 /// </summary>
+/// <example>
+/// <code>
+/// var access = tokenService.GenerateAccessToken(claims);
+/// var refresh = tokenService.GenerateRefreshToken();
+/// var principal = tokenService.GetPrincipalFromExpiredToken(expiredAccess);
+/// </code>
+/// </example>
 public class TokenService : ITokenService
 {
+    /// <summary>
+    /// Configuração JWT (secret, issuer, audience e minutos de validade).
+    /// </summary>
     private readonly ITokenConfigurationDto _configuration;
 
+    /// <summary>
+    /// Inicializa o serviço com a configuração de token.
+    /// </summary>
+    /// <param name="configuration">Configuração JWT; não pode ser nula.</param>
+    /// <exception cref="ArgumentNullException">Quando <paramref name="configuration"/> é nula.</exception>
     public TokenService(ITokenConfigurationDto configuration)
     {
         _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
     }
 
+    /// <summary>
+    /// Gera um access token JWT assinado (HMAC-SHA512) com as claims informadas.
+    /// </summary>
+    /// <param name="claims">Claims a incluir no token.</param>
+    /// <returns>Token JWT serializado.</returns>
     public string GenerateAccessToken(IEnumerable<Claim> claims)
     {
         string secretKey = _configuration.Secret;
@@ -37,6 +59,10 @@ public class TokenService : ITokenService
         return new JwtSecurityTokenHandler().WriteToken(options);
     }
 
+    /// <summary>
+    /// Gera um refresh token aleatório (32 bytes em Base64).
+    /// </summary>
+    /// <returns>String Base64 do refresh token.</returns>
     public string GenerateRefreshToken()
     {
         var randomNumber = new byte[32];
@@ -45,6 +71,13 @@ public class TokenService : ITokenService
         return Convert.ToBase64String(randomNumber);
     }
 
+    /// <summary>
+    /// Extrai o <see cref="ClaimsPrincipal"/> de um access token expirado,
+    /// validando a assinatura mas ignorando lifetime (para fluxo de refresh).
+    /// </summary>
+    /// <param name="token">Access token JWT (possivelmente expirado).</param>
+    /// <returns>Principal com as claims do token.</returns>
+    /// <exception cref="SecurityTokenException">Quando o algoritmo ou token é inválido.</exception>
     public ClaimsPrincipal GetPrincipalFromExpiredToken(string token)
     {
         var tokenValidationParameters = new TokenValidationParameters

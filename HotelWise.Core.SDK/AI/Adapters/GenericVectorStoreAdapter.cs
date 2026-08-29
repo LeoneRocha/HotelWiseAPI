@@ -13,15 +13,47 @@ using Microsoft.SemanticKernel.PromptTemplates.Handlebars;
 namespace HotelWise.Core.SDK.AI.Adapters;
 
 /// <summary>
-/// Adapter genérico de vector store.
+/// Adapter genérico de vector store baseado em Microsoft.Extensions.VectorData e Semantic Kernel.
+/// Implementa <see cref="IVectorStoreAdapter{TVector}"/> para upsert, leitura, busca semântica
+/// e análise assistida por plugin LLM no pipeline RAG.
 /// </summary>
+/// <typeparam name="TVector">Tipo do registro vetorial, implementando <see cref="IDataVector"/>.</typeparam>
+/// <example>
+/// <code>
+/// var adapter = new GenericVectorStoreAdapter&lt;HotelVector&gt;(logger, appConfig, vectorStore, kernel);
+/// await adapter.UpsertDataAsync("hotels", hotelVector);
+/// var results = await adapter.VectorizedSearchAsync("hotels", embedding, criteria);
+/// </code>
+/// </example>
 public class GenericVectorStoreAdapter<TVector> : IVectorStoreAdapter<TVector> where TVector : class, IDataVector
 {
+    /// <summary>
+    /// Instância do vector store injetada.
+    /// </summary>
     private readonly VectorStore _vectorStore;
+
+    /// <summary>
+    /// Coleção tipada carregada sob demanda.
+    /// </summary>
     private VectorStoreCollection<ulong, TVector>? _collection;
+
+    /// <summary>
+    /// Kernel do Semantic Kernel para plugins e prompts.
+    /// </summary>
     private readonly Kernel _kernel;
+
+    /// <summary>
+    /// Logger estruturado.
+    /// </summary>
     private readonly Serilog.ILogger _logger;
 
+    /// <summary>
+    /// Inicializa o adapter com logger, configuração de IA, vector store e kernel.
+    /// </summary>
+    /// <param name="logger">Logger Serilog.</param>
+    /// <param name="applicationConfig">Configuração agregada de IA (reservada para extensões).</param>
+    /// <param name="vectorStore">Vector store do Semantic Kernel / Extensions.AI.</param>
+    /// <param name="kernel">Kernel do Semantic Kernel.</param>
     public GenericVectorStoreAdapter(
         Serilog.ILogger logger,
         IApplicationIAConfig applicationConfig,
@@ -33,20 +65,46 @@ public class GenericVectorStoreAdapter<TVector> : IVectorStoreAdapter<TVector> w
         _logger = logger;
     }
 
+    /// <summary>
+    /// Carrega (e cria se necessário) a coleção tipada pelo nome.
+    /// </summary>
+    /// <param name="nameCollection">Nome da coleção.</param>
+    /// <returns>Tarefa assíncrona de preparação da coleção.</returns>
     private async Task LoadCollection(string nameCollection)
     {
         _collection = _vectorStore.GetCollection<ulong, TVector>(nameCollection);
         await CreateCollection();
     }
 
+    /// <summary>
+    /// Garante que a coleção atual exista no store.
+    /// </summary>
+    /// <returns>Tarefa assíncrona de criação/verificação.</returns>
     private async Task CreateCollection() => await _collection!.EnsureCollectionExistsAsync();
 
+    /// <summary>
+    /// Insere ou atualiza um único registro vetorial na coleção.
+    /// </summary>
+    /// <param name="nameCollection">Nome da coleção.</param>
+    /// <param name="dataVector">Registro a persistir.</param>
+    /// <returns>Tarefa que conclui quando o upsert for finalizado.</returns>
+    /// <example>
+    /// <code>
+    /// await adapter.UpsertDataAsync("hotels", vector);
+    /// </code>
+    /// </example>
     public async Task UpsertDataAsync(string nameCollection, TVector dataVector)
     {
         await LoadCollection(nameCollection);
         await _collection!.UpsertAsync(dataVector);
     }
 
+    /// <summary>
+    /// Insere ou atualiza múltiplos registros vetoriais na coleção.
+    /// </summary>
+    /// <param name="nameCollection">Nome da coleção.</param>
+    /// <param name="dataVectors">Registros a persistir.</param>
+    /// <returns>Tarefa que conclui quando todos os upserts forem finalizados.</returns>
     public async Task UpsertDatasAsync(string nameCollection, TVector[] dataVectors)
     {
         await LoadCollection(nameCollection);
@@ -56,12 +114,24 @@ public class GenericVectorStoreAdapter<TVector> : IVectorStoreAdapter<TVector> w
         }
     }
 
+    /// <summary>
+    /// Obtém um registro pela chave na coleção.
+    /// </summary>
+    /// <param name="nameCollection">Nome da coleção.</param>
+    /// <param name="dataKey">Chave do registro.</param>
+    /// <returns>Registro encontrado, ou <c>null</c>.</returns>
     public async Task<TVector?> GetByKey(string nameCollection, ulong dataKey)
     {
         await LoadCollection(nameCollection);
         return await _collection!.GetAsync(dataKey);
     }
 
+    /// <summary>
+    /// Verifica se um registro com a chave existe na coleção.
+    /// </summary>
+    /// <param name="nameCollection">Nome da coleção.</param>
+    /// <param name="dataKey">Chave do registro.</param>
+    /// <returns><c>true</c> se existir; caso contrário, <c>false</c>.</returns>
     public async Task<bool> Exists(string nameCollection, ulong dataKey)
     {
         await LoadCollection(nameCollection);
@@ -69,6 +139,18 @@ public class GenericVectorStoreAdapter<TVector> : IVectorStoreAdapter<TVector> w
         return !EqualityComparer<TVector>.Default.Equals(retrieved, default);
     }
 
+    /// <summary>
+    /// Executa busca vetorial por similaridade com embedding e critérios opcionais de tags.
+    /// </summary>
+    /// <param name="nameCollection">Nome da coleção.</param>
+    /// <param name="searchEmbedding">Vetor de embedding da consulta.</param>
+    /// <param name="searchCriteria">Critérios (limite e tags).</param>
+    /// <returns>Registros similares com <see cref="IDataVector.Score"/> preenchido.</returns>
+    /// <example>
+    /// <code>
+    /// var hits = await adapter.VectorizedSearchAsync("hotels", emb, new SearchCriteria { MaxHotelRetrieve = 5 });
+    /// </code>
+    /// </example>
     public async Task<TVector[]> VectorizedSearchAsync(string nameCollection, float[] searchEmbedding, SearchCriteria searchCriteria)
     {
         await LoadCollection(nameCollection);
@@ -86,6 +168,11 @@ public class GenericVectorStoreAdapter<TVector> : IVectorStoreAdapter<TVector> w
         return dataVectors.ToArray();
     }
 
+    /// <summary>
+    /// Monta opções de busca vetorial, incluindo filtro por tags quando informado.
+    /// </summary>
+    /// <param name="searchCriteria">Critérios de busca.</param>
+    /// <returns>Opções de <see cref="VectorSearchOptions{TRecord}"/>.</returns>
     private static VectorSearchOptions<TVector> CreateOptions(SearchCriteria searchCriteria)
     {
         var vectorSearchOptions = new VectorSearchOptions<TVector>()
@@ -105,6 +192,18 @@ public class GenericVectorStoreAdapter<TVector> : IVectorStoreAdapter<TVector> w
         return vectorSearchOptions;
     }
 
+    /// <summary>
+    /// Busca vetorial combinada com análise via plugin Handlebars do Semantic Kernel.
+    /// </summary>
+    /// <param name="nameCollection">Nome da coleção.</param>
+    /// <param name="searchQuery">Consulta textual.</param>
+    /// <param name="searchEmbedding">Embedding da consulta.</param>
+    /// <returns>Registros resultantes (lista populada conforme fluxo do plugin).</returns>
+    /// <example>
+    /// <code>
+    /// var analyzed = await adapter.SearchAndAnalyzePluginAsync("hotels", "praia", emb);
+    /// </code>
+    /// </example>
     public async Task<TVector[]> SearchAndAnalyzePluginAsync(string nameCollection, string searchQuery, float[] searchEmbedding)
     {
         List<TVector> dataVectors = new List<TVector>();
@@ -133,12 +232,24 @@ public class GenericVectorStoreAdapter<TVector> : IVectorStoreAdapter<TVector> w
         return dataVectors.ToArray();
     }
 
+    /// <summary>
+    /// Registra no log o resultado da busca vetorial intermediária.
+    /// </summary>
+    /// <param name="results">Resultados da busca.</param>
     private void InsertLogVectorizedSearchAsync(VectorSearchResult<TVector>[] results) =>
         _logger.Information("VectorizedSearchAsync : {dataSearchResult}", results);
 
+    /// <summary>
+    /// Registra no log o início da busca com plugin.
+    /// </summary>
     private void InsertLogStarterSearchPluginAsync() =>
         _logger.Information("SearchPluginAsync: {time}", DateTime.UtcNow);
 
+    /// <summary>
+    /// Cria o template Handlebars do plugin de busca textual.
+    /// </summary>
+    /// <param name="pluginName">Nome do plugin registrado no kernel.</param>
+    /// <returns>Template Handlebars como string.</returns>
     private static string CreateTemplate(string pluginName)
     {
         string template = """
@@ -160,6 +271,11 @@ public class GenericVectorStoreAdapter<TVector> : IVectorStoreAdapter<TVector> w
     }
 
 #pragma warning disable SKEXP0001
+    /// <summary>
+    /// Cria e registra o plugin de text search no kernel, se ainda não existir.
+    /// </summary>
+    /// <param name="vectorStoreTextSearch">Fonte de busca textual vetorial.</param>
+    /// <returns>Nome do plugin registrado.</returns>
     private string CreatePlugin(VectorStoreTextSearch<TVector> vectorStoreTextSearch)
     {
         string vectorClassName = typeof(TVector).Name;
@@ -173,6 +289,13 @@ public class GenericVectorStoreAdapter<TVector> : IVectorStoreAdapter<TVector> w
     }
 #pragma warning restore SKEXP0001
 
+    /// <summary>
+    /// Invoca o prompt Handlebars (síncrono e streaming) no kernel.
+    /// </summary>
+    /// <param name="template">Template Handlebars.</param>
+    /// <param name="arguments">Argumentos do prompt.</param>
+    /// <param name="promptTemplateFactory">Fábrica de templates Handlebars.</param>
+    /// <returns>Fluxo assíncrono de conteúdo streaming.</returns>
     private async Task<IAsyncEnumerable<StreamingKernelContent>> InvokePrompt(string template, KernelArguments arguments, HandlebarsPromptTemplateFactory promptTemplateFactory)
     {
         var resultKernel = await _kernel.InvokePromptAsync(template, arguments, templateFormat: HandlebarsPromptTemplateFactory.HandlebarsTemplateFormat, promptTemplateFactory: promptTemplateFactory);
@@ -180,6 +303,12 @@ public class GenericVectorStoreAdapter<TVector> : IVectorStoreAdapter<TVector> w
         return _kernel.InvokePromptStreamingAsync(template, arguments, templateFormat: HandlebarsPromptTemplateFactory.HandlebarsTemplateFormat, promptTemplateFactory: promptTemplateFactory);
     }
 
+    /// <summary>
+    /// Monta os argumentos do prompt (query e results).
+    /// </summary>
+    /// <param name="searchQuery">Consulta textual.</param>
+    /// <param name="searchResult">Resultados vetoriais.</param>
+    /// <returns>Argumentos do kernel.</returns>
     private static KernelArguments CreateArguments(string searchQuery, VectorSearchResult<TVector>[] searchResult) =>
         new KernelArguments
         {
@@ -187,6 +316,14 @@ public class GenericVectorStoreAdapter<TVector> : IVectorStoreAdapter<TVector> w
             { "results", searchResult }
         };
 
+    /// <summary>
+    /// Renderiza o prompt Handlebars para diagnóstico/log.
+    /// </summary>
+    /// <param name="searchQuery">Consulta textual.</param>
+    /// <param name="template">Template Handlebars.</param>
+    /// <param name="results">Resultados vetoriais.</param>
+    /// <param name="promptTemplateFactory">Fábrica de templates.</param>
+    /// <returns>Prompt renderizado.</returns>
     private async Task<string> RenderPrompt(string searchQuery, string template, VectorSearchResult<TVector>[] results, HandlebarsPromptTemplateFactory promptTemplateFactory)
     {
         string templateResult = await promptTemplateFactory.Create(new PromptTemplateConfig()
@@ -202,6 +339,11 @@ public class GenericVectorStoreAdapter<TVector> : IVectorStoreAdapter<TVector> w
         return templateResult;
     }
 
+    /// <summary>
+    /// Obtém os top resultados vetoriais a partir do embedding da consulta.
+    /// </summary>
+    /// <param name="searchEmbedding">Embedding da consulta.</param>
+    /// <returns>Array de resultados de busca vetorial.</returns>
     private async Task<VectorSearchResult<TVector>[]> GetVectorsResults(float[] searchEmbedding)
     {
         var searchEmbeddingCriteria = EmbeddingHelper.ConvertToReadOnlyMemory(searchEmbedding);
@@ -217,6 +359,12 @@ public class GenericVectorStoreAdapter<TVector> : IVectorStoreAdapter<TVector> w
         return dataSearchResult.ToArray();
     }
 
+    /// <summary>
+    /// Remove um registro da coleção pela chave.
+    /// </summary>
+    /// <param name="nameCollection">Nome da coleção.</param>
+    /// <param name="dataKey">Chave do registro.</param>
+    /// <returns>Tarefa que conclui quando a exclusão for finalizada.</returns>
     public async Task DeleteAsync(string nameCollection, long dataKey)
     {
         await LoadCollection(nameCollection);

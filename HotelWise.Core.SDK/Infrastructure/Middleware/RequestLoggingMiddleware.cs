@@ -5,19 +5,45 @@ using Microsoft.AspNetCore.Http;
 namespace HotelWise.Core.SDK.Infrastructure.Middleware;
 
 /// <summary>
-/// Log leve de request HTTP com correlation id (sem secrets).
+/// Middleware ASP.NET Core que registra de forma leve cada requisição HTTP
+/// (método, caminho, status e duração), correlacionando o log ao correlation id
+/// sem expor secrets ou payloads sensíveis.
 /// </summary>
+/// <remarks>
+/// Registro no pipeline:
+/// <code>
+/// app.UseMiddleware&lt;CorrelationIdMiddleware&gt;();
+/// app.UseMiddleware&lt;RequestLoggingMiddleware&gt;();
+/// </code>
+/// </remarks>
 public class RequestLoggingMiddleware
 {
+    /// <summary>
+    /// Delegate do próximo middleware no pipeline.
+    /// </summary>
     private readonly RequestDelegate _next;
+
+    /// <summary>
+    /// Logger Serilog usado para emitir o log de request.
+    /// </summary>
     private readonly Serilog.ILogger _logger;
 
+    /// <summary>
+    /// Inicializa o middleware de logging de requisições.
+    /// </summary>
+    /// <param name="next">Próximo middleware do pipeline.</param>
+    /// <param name="logger">Instância Serilog para gravação dos logs.</param>
     public RequestLoggingMiddleware(RequestDelegate next, Serilog.ILogger logger)
     {
         _next = next;
         _logger = logger;
     }
 
+    /// <summary>
+    /// Mede a duração da requisição e registra método, path, status e correlation id.
+    /// </summary>
+    /// <param name="context">Contexto HTTP da requisição atual.</param>
+    /// <returns>Tarefa que representa a execução assíncrona do pipeline.</returns>
     public async Task InvokeAsync(HttpContext context)
     {
         var stopwatch = Stopwatch.StartNew();
