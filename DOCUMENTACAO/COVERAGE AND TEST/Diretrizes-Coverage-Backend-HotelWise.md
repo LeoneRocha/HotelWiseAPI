@@ -1,128 +1,186 @@
-# Diretrizes para Testes Automatizados e Cobertura (Coverage) — Backend (HotelWise)
+# Diretrizes para Testes Automatizados e Cobertura — Backend (HotelWise)
 
-**Documento:** Guia operacional específico da suíte de testes e cobertura backend HotelWise  
-**Solução:** [HotelWiseAPI.sln](file:///c:/git/HotelWise/HotelWiseAPI/HotelWiseAPI.sln)  
-**Target Framework:** `.NET 10` (`net10.0` / Multi-target `net8.0;net10.0;netstandard2.1;netstandard2.0` no `HotelWise.Core.SDK` e `net8.0;net10.0` no `GroqApiLibrary`)  
-**Meta de Cobertura:** **100% em Lógica de Domínio/Serviço Host, ≥ 90% no Escopo Unit-Testável do Core.SDK e >90% Global**  
-**Guia-Base Genérico:** [Diretrizes-Coverage-Backend-Generico.md](file:///c:/git/HotelWise/HotelWiseAPI/DOCUMENTACAO/COVERAGE%20AND%20TEST/Diretrizes-Coverage-Backend-Generico.md)  
-**Diretrizes de Code Smells:** [Diretrizes-CodeSmell-Backend-HotelWise.md](file:///c:/git/HotelWise/HotelWiseAPI/DOCUMENTACAO/COVERAGE%20AND%20TEST/Diretrizes-CodeSmell-Backend-HotelWise.md)  
+**Documento:** Guia operacional da suíte de testes e cobertura do backend HotelWise  
+**Solução:** [`HotelWiseAPI.sln`](../../HotelWiseAPI.sln)  
+**Target:** `.NET 10` nos hosts; Core.SDK multi-TFM `net10.0;net8.0;netstandard2.1;netstandard2.0`  
+**Guia-base:** [Diretrizes-Coverage-Backend-Generico.md](./Diretrizes-Coverage-Backend-Generico.md)  
+**Code Smells:** [Diretrizes-CodeSmell-Backend-HotelWise.md](./Diretrizes-CodeSmell-Backend-HotelWise.md)  
+**Evidências de cobertura Core:** [HotelWise.Core.SDK.Progresso.md](../HotelWise.Core.SDK/HotelWise.Core.SDK.Progresso.md)  
 **Data da Revisão:** 2026-08-29  
 
 ---
 
-## 1. Mapa Arquitetural da Suíte de Testes do HotelWise
+## 1. Estado Atual vs Roadmap
 
-A suíte de testes automatizados do **HotelWise Backend** é desenhada para cobrir as camadas da Clean Architecture e o núcleo canônico reutilizável (`HotelWise.Core.SDK`), com foco especial nas abstrações transversais, regras de hospitalidade, persistência relacional e orquestração de Inteligência Artificial:
+| Situação | Projetos |
+| -------- | -------- |
+| **Existente (obrigatório manter verde)** | `HotelWise.Core.SDK.Tests` (xUnit + Moq + FluentAssertions + Coverlet) |
+| **Planejado (criar sob demanda de Quality Gate)** | `HotelWise.Domain.Tests`, `HotelWise.Service.Tests`, `HotelWise.Data.Tests`, `HotelWise.API.Tests`, `GroqApiLibrary.Tests` |
+
+> Não inventar cobertura “fantasma”: só cite números de cobertura/contagem de testes que estejam atualizados em [Progresso](../HotelWise.Core.SDK/HotelWise.Core.SDK.Progresso.md) ou no último run Coverlet/CI.
 
 ```mermaid
 flowchart TD
-    subgraph TestSuite["Suíte de Testes Automatizados — HotelWiseAPI"]
-        T0["HotelWise.Core.SDK.Tests\n(xUnit / Moq / FluentAssertions / Coverlet)\nEntidades Base, DTOs, Helpers, TokenService, Repos/Services Genéricos & AI Core"]
-        T1["HotelWise.Service.Tests\n(NUnit 4 / Moq / Bogus)\nCasos de Uso, Orquestração IA, Semantic Kernel & Polly"]
-        T2["HotelWise.Domain.Tests\n(NUnit 4 / FluentValidation)\nEntidades, Regras de Negócio, Value Objects & DTOs"]
-        T3["HotelWise.Data.Tests\n(NUnit 4 / Moq.EntityFrameworkCore / Testcontainers)\nRepositórios, EF Core 9, Pomelo MySQL & Mapeamentos"]
-        T4["HotelWise.API.Tests\n(NUnit 4 / WebApplicationFactory)\nControllers REST, Middlewares, Auth JWT & OpenAPI"]
-        T5["GroqApiLibrary.Tests\n(NUnit 4 / WireMock / Moq)\nCliente HTTP Groq, Serialização & Retries"]
-        T6["HotelWise.ConsolePOC.Tests\n(NUnit 4)\nTestes de Integração com Qdrant & Ollama Local"]
+    subgraph Ativo["Ativo hoje"]
+        T0["HotelWise.Core.SDK.Tests\nxUnit · Moq · FluentAssertions · Coverlet"]
     end
+
+    subgraph Roadmap["Roadmap"]
+        T1["Domain.Tests"]
+        T2["Service.Tests"]
+        T3["Data.Tests"]
+        T4["API.Tests"]
+        T5["GroqApiLibrary.Tests"]
+    end
+
+    T0 --> Core["HotelWise.Core.SDK ≥ 90% unit-testável"]
+    T1 --> Domain["Domain → 100% lógica"]
+    T2 --> Service["Service → 100% lógica"]
+    T3 --> Data["Data → >90%"]
+    T4 --> API["API → >85%"]
+    T5 --> Groq["Groq → >95%"]
 ```
 
-### 1.1 Detalhamento dos Projetos de Teste
+---
 
-| Projeto de Teste | Alvo / Escopo | Framework | Foco Principal e Metas de Cobertura |
-| ---------------- | ------------- | --------- | ----------------------------------- |
-| **`HotelWise.Core.SDK.Tests`** | `HotelWise.Core.SDK` | xUnit | Testes canônicos de entidades base, DTOs de resposta (`ServiceResponse`), `TokenService`, `GenericRepositoryBase`, `GenericEntityServiceBase`, helpers, middlewares e factories de IA (**Meta: ≥ 90%** via `coverlet.runsettings`; **79/79 testes aprovados** com 92.62% line coverage). |
-| **`HotelWise.Service.Tests`** | `HotelWise.Service` | NUnit 4 | Casos de uso de reservas, check-in/check-out, orquestração de IA com Semantic Kernel, fluxos RAG, resiliência via Polly e regras hoteleiras (**Meta: 100%**). |
-| **`HotelWise.Domain.Tests`** | `HotelWise.Domain` | NUnit 4 | Validação de entidades (Hóspede, Quarto, Reserva), validadores FluentValidation, Value Objects e contratos de interface (**Meta: 100%**). |
-| **`HotelWise.Data.Tests`** | `HotelWise.Data` | NUnit 4 | Consultas LINQ assíncronas, repositórios de dados, DbContext EF Core 9, Pomelo MySQL, SQL Server e mapeamentos relacionais (**Meta: >90%**). |
-| **`HotelWise.API.Tests`** | `HotelWise.API` | NUnit 4 | Integração de endpoints REST, serialização JSON, filtros de autenticação JWT, tratamento global de exceções e middlewares (**Meta: >85%**). |
-| **`GroqApiLibrary.Tests`** | `GroqApiLibrary` | NUnit 4 | Chamadas de inferência Groq Cloud, autenticação por Bearer Token, serialização de payloads, timeouts e retries (**Meta: >95%**). |
-| **`HotelWise.ConsolePOC.Tests`** | `HotelWise.ConsolePOC` | NUnit 4 | Operações de busca por similaridade vetorial (Qdrant Vector Data), geração de embeddings e conectores Ollama (**Meta: >80%**). |
+## 2. Metas de Cobertura HotelWise
+
+| Alvo | Meta | Escopo |
+| ---- | ---- | ------ |
+| `HotelWise.Core.SDK` | **≥ 90%** line (unit-testável) | Após exclusões do `coverlet.runsettings` |
+| `HotelWise.Domain` / `HotelWise.Service` | **100%** lógica testável | Quando as suítes existirem |
+| `HotelWise.Data` | **> 90%** | InMemory + (opcional) Testcontainers |
+| `HotelWise.API` | **> 85%** | Controllers + middlewares via `WebApplicationFactory` |
+| `GroqApiLibrary` | **> 95%** | Cliente HTTP (WireMock/Moq) |
+| Global Sonar | Quality Gate A | Respeitar `sonar.coverage.exclusions` |
 
 ---
 
-## 2. Governança e Bibliotecas de Teste no HotelWise
+## 3. `HotelWise.Core.SDK.Tests` (suíte canônica)
 
-### 2.1 Stack de Testes Padronizada (.NET 10)
+### 3.1 Stack efetiva do projeto
 
-Todas as dependências de teste são centralizadas no [Directory.Packages.props](file:///c:/git/HotelWise/HotelWiseAPI/Directory.Packages.props), garantindo integridade e conformidade de licenças:
+| Pacote | Uso |
+| ------ | --- |
+| xUnit | Framework de testes |
+| Moq | Mocks |
+| FluentAssertions | Asserções fluentes |
+| Microsoft.EntityFrameworkCore.InMemory | Repositório genérico / DbContext |
+| coverlet.collector + coverlet.msbuild | Cobertura |
 
-- **`NUnit 4.x` / `NUnit3TestAdapter`:** Framework de execução para testes de host (Service, Domain, Data, API).
-- **`xUnit 2.9.x` / `xunit.runner.visualstudio`:** Framework de execução adotado na suíte canônica do `HotelWise.Core.SDK.Tests`.
-- **`AwesomeAssertions 9.6.0` / `FluentAssertions 7.x`:** Bibliotecas de asserções fluentes para validações expressivas e legíveis.
-- **`Moq 4.20.72`:** Criação de mocks, stubs e verificação de chamadas de métodos.
-- **`Moq.EntityFrameworkCore 9.0.0.10`:** Simulação precisa de `DbSet<T>` e queries LINQ assíncronas compatíveis com EF Core 9.
-- **`Bogus 35.6.5`:** Geração dinâmica e determinística de massas de dados de teste (nomes, e-mails, documentos, tarifas).
-- **`coverlet.collector 10.0.1` & `coverlet.msbuild 10.0.1`:** Coleta padronizada de cobertura nos formatos OpenCover e Cobertura.
-- **`Testcontainers 4.x` (opcional para testes de integração):** Instanciação de contêineres Docker efêmeros (MySQL, SQL Server, Qdrant).
+> Novo código de teste no Core deve seguir o guia genérico (AAA, nomenclatura EN, comentários PT). Bogus/AwesomeAssertions podem ser adotados em suítes novas de host; no Core, manter alinhado ao `.csproj` atual salvo decisão explícita de migração.
 
----
+### 3.2 Organização sugerida
 
-## 3. Gestão de Gaps de Cobertura e Exclusões Homologadas
+| Pasta | Conteúdo |
+| ----- | -------- |
+| `Domain/` | Fundamentos, DTOs, constants, helpers, middlewares, abstrações AI |
+| `Infrastructure/` | `GenericRepositoryBase`, ModelBuilder |
+| `Services/` | `GenericEntityServiceBase`, factories de inferência |
+| `Consolidation/` | Gaps e regressão de cobertura pós-extração |
 
-### 3.1 Tratamento de Gaps de Cobertura
-Ao analisar o relatório de cobertura gerado (`coverlet-gap-report.csv` ou OpenCover):
-1. **Identificar métodos não cobertos:** Filtrar classes com `CoveragePct < 100%` (ou `< 90%` no Core.SDK).
-2. **Priorizar Lógica de Negócio e Serviços:** Focar imediatamente em `HotelWise.Domain`, `HotelWise.Service` e componentes canônicos do `HotelWise.Core.SDK`.
-3. **Exclusões Válidas no Sonar:** Confirmar se o arquivo é um DTO puro, VO anêmico, classe de configuração ou migration antes de criar testes redundantes (conforme `sonar.coverage.exclusions`).
+### 3.3 Exclusões Coverlet homologadas
 
-### 3.2 Exclusões Homologadas de Cobertura Sonar
-```properties
-sonar.coverage.exclusions=**/*Tests*/**,**/*ConsolePOC*/**,**/Program.cs,**/*Dto.cs,**/*Vo.cs,**/*Option*.cs,**/Migrations/**
-```
+Arquivo: [`HotelWise.Core.SDK.Tests/coverlet.runsettings`](../../HotelWise.Core.SDK.Tests/coverlet.runsettings)
 
-### 3.3 Configuração de Cobertura do Core.SDK (`coverlet.runsettings`)
-Para o `HotelWise.Core.SDK.Tests`, exclusões pontuais de conectores live de IA/rede são configuradas via arquivo de runsettings dedicado:
-- **Exclusões:** `AI/Adapters/*`, `SemanticKernelProviderConfigure`, `ApplicationIAConfig` (módulos dependentes de serviços em nuvem ou modelos LLM em runtime).
-- **Meta Atingida:** **92.62%** de line coverage no escopo unit-testável.
+| Exclusão | Motivo |
+| -------- | ------ |
+| `AI/Adapters/*` | Requer vector store / LLM live |
+| `SemanticKernelProviderConfigure` | Wiring SK + Qdrant em runtime |
+| `ApplicationIAConfig` | Bootstrap de configs ligadas a serviços externos |
 
----
+**Não** excluir `GenericRepositoryBase`, `GenericEntityServiceBase`, `TokenService`, middlewares HTTP ou helpers.
 
-## 4. Procedimento Operacional de Execução dos Testes
+### 3.4 Comando canônico
 
 ```powershell
 cd c:\git\HotelWise\HotelWiseAPI
 
-# 1. Compilar toda a solução em modo Release
+dotnet test HotelWise.Core.SDK.Tests/HotelWise.Core.SDK.Tests.csproj -c Release `
+  --collect:"XPlat Code Coverage" `
+  --settings HotelWise.Core.SDK.Tests/coverlet.runsettings
+```
+
+CI de referência: `.github/workflows/core-sdk.yml` (restore → build → test Coverlet → pack).
+
+---
+
+## 4. Governança e exclusões Sonar
+
+```properties
+sonar.coverage.exclusions=**/*Tests*/**,**/*ConsolePOC*/**,**/Program.cs,**/*Dto.cs,**/*Vo.cs,**/*Option*.cs,**/Migrations/**
+```
+
+Ao fechar gaps:
+
+1. Priorizar Domain/Service/Core (não DTO anêmico já excluído).
+2. Confirmar se o arquivo está em `sonar.coverage.exclusions` antes de escrever teste cosmética.
+3. Qualquer exclusão **nova** no Coverlet exige justificativa neste documento + revisão.
+
+---
+
+## 5. Roadmap de suítes de host (quando criar)
+
+| Projeto | Framework sugerido | Foco inicial |
+| ------- | ------------------ | ------------ |
+| `HotelWise.Domain.Tests` | NUnit 4 ou xUnit (escolher um por solução; documentar) | FluentValidation, regras de entidade |
+| `HotelWise.Service.Tests` | Idem | Casos de uso, Polly, orquestração IA com mocks |
+| `HotelWise.Data.Tests` | Idem + Moq.EF / Testcontainers | Repositórios, mapeamentos |
+| `HotelWise.API.Tests` | `WebApplicationFactory` | Auth JWT, middlewares, health |
+| `GroqApiLibrary.Tests` | WireMock / HttpMessageHandler fake | Serialização, retries, erros HTTP |
+
+Dependências novas → apenas via [`Directory.Packages.props`](../../Directory.Packages.props).
+
+---
+
+## 6. Procedimento operacional (solução)
+
+```powershell
+cd c:\git\HotelWise\HotelWiseAPI
+
 dotnet build HotelWiseAPI.sln -c Release
 
-# 2. Executar testes canônicos do Core.SDK com relatório Coverlet
-dotnet test HotelWise.Core.SDK.Tests/HotelWise.Core.SDK.Tests.csproj -c Release --collect:"XPlat Code Coverage" --settings HotelWise.Core.SDK.Tests/coverlet.runsettings
+# Suíte existente
+dotnet test HotelWise.Core.SDK.Tests/HotelWise.Core.SDK.Tests.csproj -c Release `
+  --collect:"XPlat Code Coverage" --settings HotelWise.Core.SDK.Tests/coverlet.runsettings
 
-# 3. Executar toda a suíte de testes automatizados da solução
+# Toda a solução (quando houver mais projetos de teste)
 dotnet test HotelWiseAPI.sln -c Release --no-build
 
-# 4. Executar suíte completa com coleta de cobertura via Coverlet OpenCover
-dotnet test HotelWiseAPI.sln -c Release /p:CollectCoverage=true /p:CoverletOutputFormat=opencover
-
-# 5. Executar testes de um projeto de serviço específico isoladamente
-dotnet test HotelWise.Service.Tests/HotelWise.Service.Tests.csproj -c Release /p:CollectCoverage=true /p:CoverletOutputFormat=opencover
-
-# 6. Gerar relatório visual de cobertura HTML com ReportGenerator
-reportgenerator -reports:**/coverage.opencover.xml -targetdir:./CoverageReport -reporttypes:Html
+# Relatório HTML (opcional)
+reportgenerator -reports:**/coverage.cobertura.xml -targetdir:./CoverageReport -reporttypes:Html
 ```
 
 ---
 
-## 5. Checklist de Homologação de Testes
+## 7. Anti-padrões específicos (vistos no Sonar)
 
-- [ ] Todos os testes da solução executando e passando em modo Release com 100% de sucesso (incluindo 79/79 testes do `HotelWise.Core.SDK.Tests`).
-- [ ] Novos testes implementados seguindo a convenção tripartite `Metodo_Cenario_Resultado` em inglês.
-- [ ] Comentários explicativos `// Cenário:` e `// Objetivo:` em português adicionados acima de cada método.
-- [ ] Blocos `// Arrange`, `// Act`, `// Assert` demarcados explicitamente.
-- [ ] Massa de dados dinamicamente instanciada via Bogus.
-- [ ] Dependências mockadas via `Moq` e `Moq.EntityFrameworkCore`.
-- [ ] Asserções com `AwesomeAssertions` / `FluentAssertions` e agrupamentos com `Assert.Multiple`.
-- [ ] Métricas de cobertura dentro das metas estabelecidas (≥ 90% no Core.SDK e 100% em Domain/Service).
+| Evitar no HotelWise | Preferir |
+| ------------------- | -------- |
+| `Thread.Sleep` em teste | Remover delay ou `await Task.Delay` em teste async |
+| `new float[] { … }` / `new[] { … }` repetido | `private static readonly` |
+| Tipar variável de teste só como interface sem ganho | Tipo concreto da implementação sob teste |
+| Teste que sobe Ollama/Qdrant sem container | Exclusão Coverlet **ou** Testcontainers explícito |
 
 ---
 
-## 6. Referências Internas
+## 8. Checklist de Homologação
 
-- [HotelWiseAPI.sln](file:///c:/git/HotelWise/HotelWiseAPI/HotelWiseAPI.sln) — Solução backend HotelWise
-- [HotelWise.Core.SDK.Guide.md](file:///c:/git/HotelWise/HotelWiseAPI/DOCUMENTACAO/HotelWise.Core.SDK/HotelWise.Core.SDK.Guide.md) — Guia de referência técnica do Core.SDK
-- [HotelWise.Core.SDK.Progresso.md](file:///c:/git/HotelWise/HotelWiseAPI/DOCUMENTACAO/HotelWise.Core.SDK/HotelWise.Core.SDK.Progresso.md) — Registro de consolidação e cobertura do Core.SDK
-- [Directory.Packages.props](file:///c:/git/HotelWise/HotelWiseAPI/Directory.Packages.props) — Import centralizado de pacotes NuGet
-- [Diretrizes-Coverage-Backend-Generico.md](file:///c:/git/HotelWise/HotelWiseAPI/DOCUMENTACAO/COVERAGE%20AND%20TEST/Diretrizes-Coverage-Backend-Generico.md) — Guia genérico de cobertura backend
-- [Diretrizes-CodeSmell-Backend-HotelWise.md](file:///c:/git/HotelWise/HotelWiseAPI/DOCUMENTACAO/COVERAGE%20AND%20TEST/Diretrizes-CodeSmell-Backend-HotelWise.md) — Diretrizes de Code Smells backend HotelWise
-- [2026-07-LevantamentoConjuntoHomologado-HotelWiseAPI.md](file:///c:/git/HotelWise/HotelWiseAPI/DOCUMENTACAO/API/2026-07-LevantamentoConjuntoHomologado-HotelWiseAPI.md) — Levantamento técnico da API
+- [ ] `HotelWise.Core.SDK.Tests` 100% verde em Release
+- [ ] Line coverage Core ≥ 90% com o `coverlet.runsettings` atual
+- [ ] Novos testes: nomenclatura EN + comentários PT + AAA
+- [ ] Sem `Thread.Sleep`; arrays estáticos quando CA1861 aplicar
+- [ ] Exclusões Coverlet/Sonar sem expansão arbitrária
+- [ ] Números de evidência atualizados em [Progresso](../HotelWise.Core.SDK/HotelWise.Core.SDK.Progresso.md) quando o lote mudar a cobertura
+- [ ] Pack + CI Core.SDK intactos após mudanças de teste
+
+---
+
+## 9. Referências
+
+- [Diretrizes-Coverage-Backend-Generico.md](./Diretrizes-Coverage-Backend-Generico.md)
+- [Diretrizes-CodeSmell-Backend-HotelWise.md](./Diretrizes-CodeSmell-Backend-HotelWise.md)
+- [HotelWise.Core.SDK.Guide.md](../HotelWise.Core.SDK/HotelWise.Core.SDK.Guide.md)
+- [HotelWise.Core.SDK.Progresso.md](../HotelWise.Core.SDK/HotelWise.Core.SDK.Progresso.md)
+- [Directory.Packages.props](../../Directory.Packages.props)
+- [coverlet.runsettings](../../HotelWise.Core.SDK.Tests/coverlet.runsettings)

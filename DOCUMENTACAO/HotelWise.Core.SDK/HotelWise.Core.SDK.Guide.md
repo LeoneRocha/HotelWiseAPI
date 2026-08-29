@@ -1,334 +1,390 @@
-# Guia de Referência — HotelWise.Core.SDK
+# Guia de Referência Técnica — HotelWise.Core.SDK
 
-**Pacote:** `HotelWise.Core.SDK` `1.0.0`  
-**TFM:** `net10.0;net8.0;netstandard2.1;netstandard2.0`  
-**Host de referência:** HotelWise API (`net10.0`)
+**Versão do Documento:** 2.3.0  
+**Versão do Pacote:** `HotelWise.Core.SDK` `1.0.0` (NuGet Único)  
+**Data da Revisão:** 2026-08-29  
+**Status Arquitetural:** 🟢 Consolidado — hosts consomem Core.SDK diretamente (0 shims `[Obsolete]`)  
+**Target Frameworks (Multi-TFM):** `net10.0; net8.0; netstandard2.1; netstandard2.0`  
+**Host de Referência:** HotelWise API (`net10.0`)  
 
 ---
 
-## 1. Introdução
+## 1. Introdução e Princípios de Design
 
-### Objetivo do SDK
+### 1.1 Objetivo do SDK
 
-O **HotelWise.Core.SDK** é o núcleo reutilizável do ecossistema HotelWise: abstrações, helpers, infraestrutura genérica (EF/repos), segurança JWT, middlewares ASP.NET Core e o núcleo de IA (adapters LLM, RAG, Semantic Kernel).
+O **`HotelWise.Core.SDK`** é o núcleo canônico, desacoplado e reutilizável do ecossistema HotelWise. Ele consolida em um único pacote NuGet todas as abstrações estruturais, DTOs de comunicação, infraestrutura genérica de acesso a dados (Entity Framework Core), pipeline de segurança JWT, middlewares HTTP para ASP.NET Core e a suíte completa de orquestração de Inteligência Artificial (conectores LLM agnósticos, Semantic Kernel e RAG vetorial).
 
-Tipos específicos de hotel permanecem nos projetos host (`HotelWise.Domain`, `HotelWise.Data`, `HotelWise.Service`, `HotelWise.API`). O Core concentra o que é transversal e testável de forma isolada.
+### 1.2 Princípios Não Negociáveis
 
-### Benefícios
-
-| Benefício | Descrição |
+| Princípio | Descrição |
 | :--- | :--- |
-| **Reutilização** | Um único NuGet para Domain/Data/Service/API e futuros hosts. |
-| **Testes** | Suite `HotelWise.Core.SDK.Tests` com Coverlet (≥ 90% no escopo unit-testável). |
-| **Evolução independente** | Versionamento semântico do pacote sem acoplar features de hotel. |
-| **Documentação** | XML docs (`HotelWise.Core.SDK.xml`) + este guia. |
-| **Multi-TFM** | Helpers leves em netstandard; ASP.NET/EF/SK em `net8.0`/`net10.0`. |
+| **Fonte Única da Verdade (SSoT)** | Toda estrutura transversal reside exclusivamente no `HotelWise.Core.SDK`. |
+| **Isolamento Total de Domínio** | Zero entidades, DTOs ou lógicas de hospitalidade no SDK. O Core é 100% agnóstico a regras de produto. |
+| **Consumo Direto pelos Hosts** | Os projetos host (`Domain`, `Data`, `Service`, `API`) consomem diretamente namespaces `HotelWise.Core.SDK.*`. |
+| **Multi-Targeting Inteligente** | Dependências leves compiladas para `netstandard2.0/2.1`; integrações modernas (EF Core, ASP.NET Core, Semantic Kernel) em `net8.0/net10.0`. |
+| **Alta Testabilidade e Qualidade** | Suíte canônica [HotelWise.Core.SDK.Tests](file:///c:/git/HotelWise/HotelWiseAPI/HotelWise.Core.SDK.Tests) com **79 testes unitários aprovados** e **92.62%** de line coverage via Coverlet. |
 
 ---
 
-## 2. Arquitetura
+## 2. Arquitetura e Estrutura de Módulos
 
-### Estrutura de pastas e namespaces
+### 2.1 Visão Geral de Pastas e Namespaces
 
 ```
 HotelWise.Core.SDK/
-├── Abstractions/          HotelWise.Core.SDK.Abstractions
-├── Domain/                HotelWise.Core.SDK.Domain
-├── Common/                HotelWise.Core.SDK.Common (+ Constants, Exceptions)
-├── Infrastructure/        HotelWise.Core.SDK.Infrastructure (+ Middleware)
-├── Services/              HotelWise.Core.SDK.Services
-├── Security/              HotelWise.Core.SDK.Security
-├── Helpers/               HotelWise.Core.SDK.Helpers
-├── Extensions/            HotelWise.Core.SDK.Extensions
-├── Logging/               HotelWise.Core.SDK.Logging
-├── Validation/            HotelWise.Core.SDK.Validation
+├── Abstractions/                  HotelWise.Core.SDK.Abstractions (Contratos base de repositório, serviço e entidades)
+├── Domain/                        HotelWise.Core.SDK.Domain (EntityBase, EntityBaseWithNameEmail)
+├── Common/                        HotelWise.Core.SDK.Common (ServiceResponse<T>, ErrorResponse, DTOs transversais)
+│   ├── Constants/                 HotelWise.Core.SDK.Common.Constants (AppConfigConstants, ValidatorConstants, etc.)
+│   └── Exceptions/                HotelWise.Core.SDK.Common.Exceptions (AppWarningException)
+├── Infrastructure/                HotelWise.Core.SDK.Infrastructure (GenericRepositoryBase, HelperCharSet)
+│   └── Middleware/                HotelWise.Core.SDK.Infrastructure.Middleware (CorrelationId, GlobalException, RequestLogging)
+├── Services/                      HotelWise.Core.SDK.Services (GenericEntityServiceBase com AutoMapper e FluentValidation)
+├── Security/                      HotelWise.Core.SDK.Security (TokenService, TokenVO, TokenConfigurationDto, SecurityHelper)
+├── Helpers/                       HotelWise.Core.SDK.Helpers (DataHelper, MarkdownHelper, HtmlHelper, TimeFormatter)
+├── Extensions/                    HotelWise.Core.SDK.Extensions (ModelBuilderExtensions, DI Extensions, EnumExtensions)
+├── Logging/                       HotelWise.Core.SDK.Logging (LogAppHelper integrado ao Serilog)
+├── Validation/                    HotelWise.Core.SDK.Validation (HelperValidation para mapeamento FluentValidation)
 └── AI/
-    ├── Abstractions/      HotelWise.Core.SDK.AI.Abstractions
-    ├── Adapters/          HotelWise.Core.SDK.AI.Adapters
-    ├── Configuration/     HotelWise.Core.SDK.AI.Configuration
-    ├── Configure/         HotelWise.Core.SDK.AI.Configure
-    ├── Constants/         HotelWise.Core.SDK.AI.Constants
-    ├── DTO/               HotelWise.Core.SDK.AI.DTO
-    ├── Enums/             HotelWise.Core.SDK.AI.Enums
-    ├── Helpers/           HotelWise.Core.SDK.AI.Helpers
-    ├── Services/          HotelWise.Core.SDK.AI.Services
-    └── Validation/        HotelWise.Core.SDK.AI.Validation
+    ├── Abstractions/              HotelWise.Core.SDK.AI.Abstractions (IAIInferenceAdapter, IVectorStoreAdapter, etc.)
+    ├── Adapters/                  HotelWise.Core.SDK.AI.Adapters (GroqApi, MistralApi, Ollama, SemanticKernel, VectorStore)
+    ├── Configuration/             HotelWise.Core.SDK.AI.Configuration (ApplicationIAConfig, RagConfig, SearchSettings)
+    ├── Configure/                 HotelWise.Core.SDK.AI.Configure (SemanticKernelProviderConfigure, ConfigureServicesAI)
+    ├── Constants/                 HotelWise.Core.SDK.AI.Constants (ChatCompletionValidatorsConstants)
+    ├── DTO/                       HotelWise.Core.SDK.AI.DTO (PromptMessageVO, DataVectorBase, AskAssistantRequest/Response)
+    ├── Enums/                     HotelWise.Core.SDK.AI.Enums (AIChatServiceType, AIEmbeddingServiceType, VectorStoreType)
+    ├── Helpers/                   HotelWise.Core.SDK.AI.Helpers (TokenCounterHelper, ChatSessionHelper, EmbeddingHelper)
+    ├── Services/                  HotelWise.Core.SDK.AI.Services (AIInferenceService, AIInferenceAdapterFactory, etc.)
+    └── Validation/                HotelWise.Core.SDK.AI.Validation (AskAssistantRequestValidator, PromptMessageValidator)
 ```
 
-### Relação host × Core.SDK
+### 2.2 Relação de Dependência entre Hosts e SDK
 
 ```mermaid
 flowchart TB
-  subgraph host [Projetos host HotelWise]
-    API[HotelWise.API]
-    Svc[HotelWise.Service]
-    Data[HotelWise.Data]
-    Dom[HotelWise.Domain]
-  end
-  Core[HotelWise.Core.SDK]
-  API --> Core
-  Svc --> Core
-  Data --> Core
-  Dom --> Core
-  API --> Svc
-  Svc --> Data
-  Data --> Dom
+    subgraph HostExecutavel["1. Hosts de Aplicação (.NET 10)"]
+        API["HotelWise.API\n(Controllers REST, Swagger, Auth JWT, Middlewares)"]
+        ConsolePOC["HotelWise.ConsolePOC\n(Console App para Testes Locais e RAG)"]
+    end
+
+    subgraph HostNegocio["2. Camadas de Negócio e Persistência"]
+        Svc["HotelWise.Service\n(Casos de Uso de Reservas, IA Hoteleira, Polly)"]
+        Data["HotelWise.Data\n(DbContext MySQL Pomelo, Migrations, Repositórios)"]
+        Dom["HotelWise.Domain\n(Modelos Hotel/Room/Reservation, DTOs de Negócio)"]
+    end
+
+    subgraph CoreSDK["3. HotelWise.Core.SDK (Pacote NuGet Único)"]
+        direction TB
+        Abstractions["Abstractions & Domain Base"]
+        Common["Common DTOs & ServiceResponse<T>"]
+        Infra["GenericRepositoryBase & Middlewares"]
+        Services["GenericEntityServiceBase & TokenService"]
+        AI["AI Core: LLM Adapters, Factories, SK & RAG"]
+    end
+
+    subgraph ExtLibraries["4. Bibliotecas de Terceiros / Integrações"]
+        GroqLib["GroqApiLibrary\n(SDK HTTP Groq)"]
+        SKLib["Microsoft.SemanticKernel\n(Connectors Ollama & Mistral)"]
+        EFLib["Microsoft.EntityFrameworkCore\n(Relational & Tools)"]
+    end
+
+    API --> Svc
+    API --> CoreSDK
+    Svc --> Dom
+    Svc --> Data
+    Svc --> CoreSDK
+    Data --> Dom
+    Data --> CoreSDK
+    Dom --> CoreSDK
+    ConsolePOC --> Dom
+    ConsolePOC --> CoreSDK
+    CoreSDK --> GroqLib
+    CoreSDK --> SKLib
+    CoreSDK --> EFLib
 ```
 
-- Hosts referenciam o Core via `ProjectReference` (dev) ou pacote NuGet (consumo externo).
-- Tipos migrados são consumidos **diretamente** de `HotelWise.Core.SDK.*` (shims `[Obsolete]` / `HW_CORE_SDK_*` removidos).
-- Cola hotel (EF Hotel/User, Pomelo charset, DI de `HotelVector`/serviços de domínio) permanece no host sem Obsolete.
-- Código novo deve usar namespaces `HotelWise.Core.SDK.*` diretamente.
-
-### Diagrama simplificado de camadas
+### 2.3 Fluxo de Processamento de Requisição
 
 ```mermaid
-flowchart LR
-  Controllers[API Controllers]
-  MW[Middlewares Core]
-  GESB[GenericEntityServiceBase]
-  Token[TokenService]
-  AIFact[AIInferenceAdapterFactory]
-  Repo[GenericRepositoryBase]
-  Controllers --> MW
-  Controllers --> GESB
-  Controllers --> Token
-  Controllers --> AIFact
-  GESB --> Repo
-  AIFact --> Adapters[LLM Adapters]
+sequenceDiagram
+    autonumber
+    actor Client as Cliente / Frontend
+    participant MW as Middlewares Core<br/>(CorrelationId / Exception / Logging)
+    participant Ctrl as API Controller Host
+    participant Svc as GenericEntityServiceBase
+    participant Val as FluentValidation Validator
+    participant Repo as GenericRepositoryBase
+    participant DB as DbContext MySQL
+    participant AI as AIInferenceAdapterFactory
+
+    Client->>MW: Requisição HTTP (com X-Correlation-ID opcional)
+    MW->>MW: Injeta/Propaga CorrelationId no LogContext
+    MW->>Ctrl: Encaminha requisição autenticada
+    Ctrl->>Svc: Invoca caso de uso (ex: CreateAsync / GetByIdAsync)
+    Svc->>Val: Valida entidade de domínio
+    alt Validação com Falha
+        Val-->>Svc: Retorna ValidationErrors
+        Svc-->>Ctrl: Retorna ServiceResponse<TDto> (Success=false)
+        Ctrl-->>Client: HTTP 400 Bad Request
+    else Validação com Sucesso
+        Svc->>Repo: Executa operação de persistência
+        Repo->>DB: Salva alterações (SaveChangesAsync)
+        DB-->>Repo: Confirmação
+        opt Requer IA / Embeddings
+            Svc->>AI: Solicita inferência LLM ou busca vetorial
+            AI-->>Svc: Retorna resultado gerado
+        end
+        Repo-->>Svc: Retorna entidade persistida
+        Svc-->>Ctrl: Retorna ServiceResponse<TDto> com DTO mapeado
+        Ctrl-->>Client: HTTP 200 / 201 com Payload + CorrelationId
+    end
 ```
 
 ---
 
-## 3. Principais componentes
+## 3. Catálogo Detalhado dos Componentes Canônicos
 
-### Domain / Common
+### 3.1 Domain & Common
 
-| Tipo | Responsabilidade |
-| :--- | :--- |
-| `EntityBase` / `EntityBaseWithNameEmail` | Bases de entidade com Id e auditoria. |
-| `ServiceResponse<T>` / `ErrorResponse` | Envelope de resultado e erros de API/serviço. |
-| `EntityDtoBase`, `SecurityDto`, DTOs de cultura/fuso | Contratos transversais. |
-| Constantes (`AppConfigConstants`, `ValidatorConstants`, …) | Mensagens e chaves compartilhadas. |
-| `AppWarningException` | Exceção de aviso (mapeada para HTTP 400 no middleware). |
+| Tipo | Namespace | Descrição e Papel Arquitetural |
+| :--- | :--- | :--- |
+| `EntityBase` | `HotelWise.Core.SDK.Domain` | Classe abstrata base com `Id` (`long`) e métodos de auditoria/igualdade. |
+| `EntityBaseWithNameEmail` | `HotelWise.Core.SDK.Domain` | Especialização com propriedades `Name` e `Email` para entidades cadastrais. |
+| `ServiceResponse<T>` | `HotelWise.Core.SDK.Common` | Envelope padronizado contendo `Data`, flag `Success`, `Message` e coleção de `ErrorResponse`. |
+| `ErrorResponse` | `HotelWise.Core.SDK.Common` | Modelo estruturado de erro com `ErrorCode`, `ErrorMessage` e campo afetado. |
+| `EntityDtoBase` | `HotelWise.Core.SDK.Common` | DTO base com propriedade `Id` para mapeamentos via AutoMapper. |
+| `AppInformationVersionProductDto` | `HotelWise.Core.SDK.Common` | DTO com metadados de versão da aplicação, assembly e ambiente. |
+| `AppWarningException` | `HotelWise.Core.SDK.Common.Exceptions` | Exceção de negócio tratada automaticamente pelo middleware para HTTP 400. |
 
-### Data (infraestrutura EF)
+### 3.2 Infraestrutura e Persistência (EF Core)
 
-| Tipo | Responsabilidade |
-| :--- | :--- |
-| `GenericRepositoryBase<T, TContext>` | CRUD genérico EF Core (`IGenericRepository<T>`). |
-| `ModelBuilderExtensions` | Extensões de modelagem EF. |
-| `HelperCharSet` | Charset padrão (`latin1`) para configuração de entidades. |
+| Tipo | Namespace | Descrição e Papel Arquitetural |
+| :--- | :--- | :--- |
+| `GenericRepositoryBase<T, TContext>` | `HotelWise.Core.SDK.Infrastructure` | Implementação canônica de `IGenericRepository<T>` com CRUD assíncrono completo (`AddAsync`, `GetByIdAsync`, `GetAllAsync`, `FindAsync`, `UpdateAsync`, `DeleteAsync`, `CountAsync`, `ExistsAsync`, `FetchAsync`). |
+| `GenericRepositoryBase<T>` | `HotelWise.Core.SDK.Infrastructure` | Sobrecarga de conveniência utilizando `DbContext` base. |
+| `ModelBuilderExtensions` | `HotelWise.Core.SDK.Extensions` | Extensões para conversão em massa DateTime → UTC, filtros globais e convenções EF. |
+| `HelperCharSet` | `HotelWise.Core.SDK.Infrastructure` | Constantes de charset e collation agnósticas (`latin1`, `utf8mb4`). |
 
-> Helpers de charset específicos do Pomelo/hotel permanecem no host (`ConfigurationEntitiesHelper`).
+### 3.3 Camada de Serviço e Orquestração
 
-### Service
+| Tipo | Namespace | Descrição e Papel Arquitetural |
+| :--- | :--- | :--- |
+| `GenericEntityServiceBase<T, TDto>` | `HotelWise.Core.SDK.Services` | Orquestrador de CRUD genérico integrando `IGenericRepository<T>`, `IMapper`, `IValidator<T>` e `Serilog.ILogger`. Fornece auditoria por usuário via `SetUserId(long id)`. |
+| `TokenService` | `HotelWise.Core.SDK.Security` | Emissão de tokens de acesso JWT assinados com HMAC-SHA512, refresh tokens e extração de claims de tokens expirados. |
+| `SecurityHelperApi` | `HotelWise.Core.SDK.Security` | Utilitário para extração segura de `UserId` a partir do `ClaimsPrincipal` do ASP.NET Core. |
 
-| Tipo | Responsabilidade |
-| :--- | :--- |
-| `GenericEntityServiceBase<T, TDto>` | CRUD + FluentValidation + AutoMapper + logging. |
-| `TokenService` | Access JWT (HMAC-SHA512) e refresh token. |
-| `AIInferenceService` / `AIInferenceAdapterFactory` | Orquestração e seleção de adapter LLM. |
-| `GenericVectorStoreServiceBase` / `VectorStoreAdapterFactory` | Serviços e fábrica de vector store. |
+### 3.4 Middlewares ASP.NET Core
 
-### API (middlewares e integração)
+| Middleware | Namespace | Papel no Pipeline HTTP |
+| :--- | :--- | :--- |
+| `CorrelationIdMiddleware` | `HotelWise.Core.SDK.Infrastructure.Middleware` | Lê ou gera o header `X-Correlation-ID`, propaga no `HttpContext` e enriquece o `LogContext` do Serilog. |
+| `GlobalExceptionMiddleware` | `HotelWise.Core.SDK.Infrastructure.Middleware` | Captura exceções não tratadas e `AppWarningException`, serializando respostas JSON no padrão `ServiceResponse<object>`. |
+| `RequestLoggingMiddleware` | `HotelWise.Core.SDK.Infrastructure.Middleware` | Registra métricas de tempo de resposta e status HTTP de cada requisição. |
 
-| Tipo | Responsabilidade |
-| :--- | :--- |
-| `CorrelationIdMiddleware` | Propaga/gera `X-Correlation-ID` e enriquece LogContext. |
-| `GlobalExceptionMiddleware` | JSON padronizado 400/500. |
-| `RequestLoggingMiddleware` | Log de request/response. |
-| `SecurityHelperApi` | Extrai user id do `ClaimsPrincipal`. |
-| `ServiceCollectionConfigureCors` / `AppSettings` / `AutoMapper` | Helpers de DI. |
-| `ConfigureServicesAI` / `SemanticKernelProviderConfigure` | Registro de IA e Kernel. |
+### 3.5 Núcleo de Inteligência Artificial, RAG e Semantic Kernel
+
+| Componente | Namespace | Função no SDK |
+| :--- | :--- | :--- |
+| `AIInferenceAdapterFactory` | `HotelWise.Core.SDK.AI.Services` | Fábrica de adaptadores LLM com seleção dinâmica em runtime (`GroqApi`, `Mistral`, `Ollama`, `SemanticKernel`). |
+| `AIInferenceService` | `HotelWise.Core.SDK.AI.Services` | Serviço de alto nível para orquestração de inferência com fallback e retry. |
+| `VectorStoreAdapterFactory` | `HotelWise.Core.SDK.AI.Services` | Fábrica de adaptadores de vector store (`Qdrant`, `InMemory`). |
+| `GenericVectorStoreAdapter<T>` | `HotelWise.Core.SDK.AI.Adapters` | Adaptador genérico para upsert, busca por similaridade e indexação vetorial. |
+| `ApplicationIAConfig` / `RagConfig` | `HotelWise.Core.SDK.AI.Configuration` | Modelos fortemente tipados para configuração de provedores de IA, dimensões de embedding e endpoints. |
+| `TokenCounterHelper` | `HotelWise.Core.SDK.AI.Helpers` | Estimativa de tokens e cálculo de janelas de contexto. |
+| `ChatSessionHelper` | `HotelWise.Core.SDK.AI.Helpers` | Montagem e serialização de histórico conversacional a partir de `PromptMessageVO[]`. |
 
 ---
 
-## 4. Exemplos de uso
+## 4. Exemplos Práticos de Implementação
 
-### CRUD genérico com `GenericEntityServiceBase`
+### 4.1 Implementando um Repositório de Domínio no Host
 
 ```csharp
-public class HotelService : GenericEntityServiceBase<Hotel, HotelDto>
+using HotelWise.Core.SDK.Infrastructure;
+using HotelWise.Data.Context;
+using HotelWise.Domain.Interfaces.Entity.HotelInterfaces.Repository;
+using HotelWise.Domain.Model.HotelModels;
+using Microsoft.EntityFrameworkCore;
+
+namespace HotelWise.Data.Repository.HotelRepositories
 {
-    public HotelService(
-        IGenericRepository<Hotel> repository,
-        IMapper mapper,
-        Serilog.ILogger logger,
-        IValidator<Hotel> validator)
-        : base(repository, mapper, logger, validator) { }
+    public class HotelRepository 
+        : GenericRepositoryBase<Hotel, HotelWiseDbContextMysql>, IHotelRepository
+    {
+        public HotelRepository(
+            HotelWiseDbContextMysql context,
+            DbContextOptions<HotelWiseDbContextMysql> options)
+            : base(context, options)
+        {
+        }
+
+        public async Task<List<Hotel>> GetHotelsByCityAsync(string city, CancellationToken ct = default)
+        {
+            return await _dataset
+                .AsNoTracking()
+                .Where(h => h.City == city && h.Active)
+                .ToListAsync(ct);
+        }
+    }
 }
-
-// Em um controller / handler:
-service.SetUserId(userId);
-var all = await service.GetAllAsync();
-var one = await service.GetByIdAsync(id);
-var created = await service.AddAsync(dto);
 ```
 
-### Emissão de JWT com `TokenService`
+### 4.2 Implementando um Serviço de Domínio com Validação e AutoMapper
 
 ```csharp
-services.AddSingleton<ITokenConfigurationDto>(sp => /* bind TokenConfigurations */);
-services.AddScoped<ITokenService, TokenService>();
+using AutoMapper;
+using FluentValidation;
+using HotelWise.Core.SDK.Common;
+using HotelWise.Core.SDK.Services;
+using HotelWise.Domain.Dto.Enitty.HotelDtos;
+using HotelWise.Domain.Interfaces.Entity.HotelInterfaces.Repository;
+using HotelWise.Domain.Interfaces.Entity.HotelInterfaces.Service;
+using HotelWise.Domain.Model.HotelModels;
 
-var claims = new[]
+namespace HotelWise.Service.Entity.HotelServices
 {
-    new Claim(ClaimTypes.NameIdentifier, userId.ToString()),
-    new Claim(ClaimTypes.Name, userName),
-    new Claim(ClaimTypes.Role, role)
-};
-var access = tokenService.GenerateAccessToken(claims);
-var refresh = tokenService.GenerateRefreshToken();
-var principal = tokenService.GetPrincipalFromExpiredToken(expiredAccess);
+    public class HotelService 
+        : GenericEntityServiceBase<Hotel, HotelDto>, IHotelService
+    {
+        private readonly IHotelRepository _hotelRepository;
+
+        public HotelService(
+            IHotelRepository hotelRepository,
+            IMapper mapper,
+            Serilog.ILogger logger,
+            IValidator<Hotel> validator)
+            : base(hotelRepository, mapper, logger, validator)
+        {
+            _hotelRepository = hotelRepository;
+        }
+
+        // Operações especializadas complementares...
+    }
+}
 ```
 
-### Seleção dinâmica de LLM com `AIInferenceAdapterFactory`
+### 4.3 Invocando Inferência de IA Agnóstica a Provedor
 
 ```csharp
-ConfigureServicesAI.RegisterGenericAiServices(services);
-// + registro de IApplicationIAConfig e Kernel no host
+using HotelWise.Core.SDK.AI.Abstractions;
+using HotelWise.Core.SDK.AI.DTO;
+using HotelWise.Core.SDK.AI.Enums;
 
-var adapter = factory.CreateAdapter(InferenceAiAdapterType.GroqApi);
-var reply = await adapter.GenerateChatCompletionAsync(messages);
+public class GuestAiAssistant
+{
+    private readonly IAIInferenceAdapterFactory _aiFactory;
 
-// Ou via serviço:
-var text = await aiInferenceService.GenerateChatCompletionAsync(
-    messages, InferenceAiAdapterType.Ollama);
+    public GuestAiAssistant(IAIInferenceAdapterFactory aiFactory)
+    {
+        _aiFactory = aiFactory;
+    }
+
+    public async Task<string> AskQuestionAsync(string question, InferenceAiAdapterType provider)
+    {
+        IAIInferenceAdapter adapter = _aiFactory.CreateAdapter(provider);
+
+        var messages = new List<PromptMessageVO>
+        {
+            new() { Role = RoleAiPromptsType.System, Message = "Você é o assistente virtual StayMate do HotelWise." },
+            new() { Role = RoleAiPromptsType.User, Message = question }
+        };
+
+        return await adapter.GenerateChatCompletionAsync(messages);
+    }
+}
 ```
 
-### Configuração de DI com `ServiceCollectionConfigure*`
+### 4.4 Configurando Injeção de Dependência e Pipeline na API (`Program.cs`)
 
 ```csharp
-ServiceCollectionConfigureCors.Configure(services);
-ServiceCollectionConfigureAppSettings.AddAndReturnTokenConfiguration(services, configuration);
-ServiceCollectionConfigureAutoMapper.AddProfile<HotelProfile>(services);
-ConfigureServicesAI.RegisterGenericAiServices(services);
-```
+using HotelWise.Core.SDK.Extensions;
+using HotelWise.Core.SDK.Infrastructure.Middleware;
+using HotelWise.Core.SDK.Security;
 
-Pipeline de middlewares (Program/Startup):
+var builder = WebApplication.CreateBuilder(args);
 
-```csharp
+// 1. Configuração de CORS e AppSettings do Core
+ServiceCollectionConfigureCors.Configure(builder.Services);
+var tokenConfig = ServiceCollectionConfigureAppSettings.AddAndReturnTokenConfiguration(
+    builder.Services, builder.Configuration);
+
+// 2. Registro do TokenService
+builder.Services.AddSingleton(tokenConfig);
+builder.Services.AddScoped<ITokenService, TokenService>();
+
+// 3. Registro de IA Genérica
+ConfigureServicesAI.RegisterGenericAiServices(builder.Services);
+
+var app = builder.Build();
+
+// 4. Pipeline de Middlewares Canônicos
 app.UseMiddleware<CorrelationIdMiddleware>();
 app.UseMiddleware<GlobalExceptionMiddleware>();
 app.UseMiddleware<RequestLoggingMiddleware>();
+
+app.UseAuthentication();
+app.UseAuthorization();
+app.MapControllers();
+
+app.Run();
 ```
 
 ---
 
-## 5. Contexto de IA
+## 5. Matriz de Compatibilidade Multi-TFM
 
-### Adapters
-
-| Adapter | Uso |
-| :--- | :--- |
-| `GroqApiAdapter` | Inferência via Groq API. |
-| `MistralApiAdapter` | Inferência via Mistral. |
-| `OllamaAdapter` | Modelos locais/remotos Ollama. |
-| `SemanticKernelAdapter` | Chat/agent/RAG via Semantic Kernel + DI. |
-| `GenericVectorStoreAdapter<TVector>` | Upsert/search em coleções vetoriais. |
-
-A fábrica `AIInferenceAdapterFactory.CreateAdapter(InferenceAiAdapterType)` escolhe a implementação; tipos desconhecidos fazem fallback para Groq.
-
-### Configs e DTOs RAG
-
-| Tipo | Papel |
-| :--- | :--- |
-| `ApplicationIAConfig` / `IApplicationIAConfig` | Agrega configs de chat, embeddings e stores. |
-| `RagConfig` | Adapter de chat/embedding, dimensões, batch, `VectorStoreType`. |
-| `QdrantConfig`, `RedisConfig`, `AzureOpenAIConfig`, `OllamaConfig`, … | Seções tipadas de `appsettings`. |
-| `PromptMessageVO`, `DataVectorVO`, `AskAssistantRequest/Response` | Mensagens e contexto RAG. |
-| `DataVectorBase` / `IDataVector` | Registro vetorial com key, embedding e tags. |
-
-`RagConfig.GetAInferenceAdapterType()` mapeia `AIChatServiceType` → `InferenceAiAdapterType`.
-
-### Helpers
-
-- `TokenCounterHelper` — estimativa de tokens (`length/4`) e tamanho de contexto vetorial.
-- `ChatSessionHelper` — monta histórico textual a partir de `PromptMessageVO[]`.
-- `EmbeddingHelper` — utilitários de embedding.
-
-### Semantic Kernel
-
-`SemanticKernelProviderConfigure.SetupSemanticKernelProvider<TVector>(…)` configura Kernel, connectors e vector store (InMemory/Qdrant etc.) conforme `ApplicationIAConfig`. Depende de rede/serviços externos em cenários reais; testes unitários priorizam factories/helpers com mocks.
+| Módulo / Funcionalidade | `net10.0` | `net8.0` | `netstandard2.1` | `netstandard2.0` |
+| :--- | :---: | :---: | :---: | :---: |
+| Entidades Base e Contratos (`EntityBase`, `IEntityBase`) | ✅ | ✅ | ✅ | ✅ |
+| Response Pattern (`ServiceResponse<T>`, `ErrorResponse`) | ✅ | ✅ | ✅ | ✅ |
+| Helpers de Data, Hora, Formatação e Logging | ✅ | ✅ | ✅ | ✅ |
+| DTOs de Configuração RAG e Enums de IA | ✅ | ✅ | ✅ | ✅ |
+| `GenericRepositoryBase<T, TContext>` (EF Core) | ✅ | ✅ | ❌ | ❌ |
+| `GenericEntityServiceBase<T, TDto>` (AutoMapper/FV) | ✅ | ✅ | ❌ | ❌ |
+| `TokenService` (JWT Bearer) | ✅ | ✅ | ❌ | ❌ |
+| Adaptadores de IA & Semantic Kernel | ✅ | ✅ | ❌ | ❌ |
+| Middlewares HTTP ASP.NET Core | ✅ | ✅ | ❌ | ❌ |
 
 ---
 
-## 6. Guia para desenvolvedores
+## 6. Procedimento de Testes e Empacotamento
 
-### Como adicionar ProjectReference
+### 6.1 Execução da Suíte de Testes Canônica
 
-No `.csproj` do host:
-
-```xml
-<ItemGroup>
-  <ProjectReference Include="..\HotelWise.Core.SDK\HotelWise.Core.SDK.csproj" />
-</ItemGroup>
-```
-
-Ou via NuGet (após pack):
-
-```xml
-<PackageReference Include="HotelWise.Core.SDK" Version="1.0.0" />
-```
-
-### Como consumir serviços genéricos
-
-1. Implementar entidade (`EntityBase` ou equivalente) e DTO.
-2. Criar repositório herdando `GenericRepositoryBase<T, TContext>` (ou shim host).
-3. Criar serviço herdando `GenericEntityServiceBase<T, TDto>` com `IValidator<T>` e profiles AutoMapper.
-4. Registrar no DI e chamar `SetUserId` quando houver auditoria por usuário.
-
-### Como estender DTOs e helpers
-
-- Preferir **composição** no host (DTOs de hotel) em vez de alterar o Core.
-- Novos helpers genéricos: adicionar em `HotelWise.Core.SDK/Helpers` + testes em `HotelWise.Core.SDK.Tests`.
-- Novos adapters LLM: implementar `IAIInferenceAdapter` e registrar no `AIInferenceAdapterFactory`.
-
-### Como rodar testes e validar cobertura
-
-```bash
+```powershell
+# Execução completa dos 79 testes unitários
 dotnet test HotelWise.Core.SDK.Tests/HotelWise.Core.SDK.Tests.csproj -c Release
 
-dotnet test HotelWise.Core.SDK.Tests/HotelWise.Core.SDK.Tests.csproj -c Release \
-  --collect:"XPlat Code Coverage" \
-  --settings HotelWise.Core.SDK.Tests/coverlet.runsettings
+# Execução com coleta de cobertura via Coverlet (alvo ≥ 90%)
+dotnet test HotelWise.Core.SDK.Tests/HotelWise.Core.SDK.Tests.csproj -c Release `
+    --collect:"XPlat Code Coverage" `
+    --settings HotelWise.Core.SDK.Tests/coverlet.runsettings
 ```
 
-Exclusões Coverlet (rede/SK live): `AI/Adapters/*`, `SemanticKernelProviderConfigure`, `ApplicationIAConfig`. Meta: **≥ 90%** line coverage no escopo incluído.
+### 6.2 Empacotamento NuGet
 
-Pack:
-
-```bash
-dotnet pack HotelWise.Core.SDK/HotelWise.Core.SDK.csproj -c Release -o artifacts
+```powershell
+# Geração do pacote .nupkg + .snupkg + documentação XML
+dotnet pack HotelWise.Core.SDK/HotelWise.Core.SDK.csproj -c Release -o artifacts/core-sdk
 ```
 
 ---
 
-## 7. Checklist de consumo
+## 7. Checklist de Qualidade e Governança
 
-- [ ] `dotnet build` da solução Release — 0 erros
-- [ ] Hosts consomem `HotelWise.Core.SDK.*` (sem shims `HW_CORE_SDK_*`)
-- [ ] Cola hotel (EF/DI) sem atributo Obsolete
-- [ ] `dotnet test HotelWise.Core.SDK.Tests` — 100% passando
-- [ ] Coverlet ≥ 90% no escopo unit-testável (runsettings)
-- [ ] Pack gera `.nupkg` + `.snupkg` + XML docs
-- [ ] Smoke da API (ambiente com MySQL): health, swagger, version, login, hotéis, correlation id
-
-### Smoke HTTP (roteiro)
-
-1. `GET /health` → 200  
-2. `GET /swagger/index.html` → 200  
-3. `GET /api/appinformationversionproduct/v1/GetAppInformationVersionProduct` → 200  
-4. `POST /api/auth/v1/login` → token  
-5. `GET /api/hotels/v1` (Bearer) → 200  
-6. Header `X-Correlation-ID` ecoado na resposta  
+- [ ] **Zero Regressão de Build**: `dotnet build HotelWiseAPI.sln -c Release` conclui com 0 erros.
+- [ ] **100% de Testes Verdes**: 79/79 testes em `HotelWise.Core.SDK.Tests` aprovados.
+- [ ] **Cobertura Validada**: Cobertura de linhas ≥ 90% (resultado homologado: **92.62%**).
+- [ ] **Saneamento de Shims**: Zero ocorrências de `HW_CORE_SDK_*` nos hosts.
+- [ ] **Saneamento de Namespaces**: Zero ocorrências de namespaces legados (`SmartDigitalPsico`).
+- [ ] **Documentação XML**: Arquivo `HotelWise.Core.SDK.xml` gerado e empacotado.
 
 ---
 
-## Referências
+## 8. Documentos de Referência
 
-- [HotelWise.Core.SDK.Levantamento.md](./HotelWise.Core.SDK.Levantamento.md)
-- [HotelWise.Core.SDK.PlanoImplementacao.md](./HotelWise.Core.SDK.PlanoImplementacao.md)
-- [HotelWise.Core.SDK.Progresso.md](./HotelWise.Core.SDK.Progresso.md)
-- Documentação XML do assembly: `HotelWise.Core.SDK.xml` (gerada no build)
+- [HotelWise.Core.SDK.Progresso.md](file:///c:/git/HotelWise/HotelWiseAPI/DOCUMENTACAO/HotelWise.Core.SDK/HotelWise.Core.SDK.Progresso.md) — Histórico de consolidação e evidências de validação.
+- [HotelWise.Core.SDK.Levantamento.md](file:///c:/git/HotelWise/HotelWiseAPI/DOCUMENTACAO/HotelWise.Core.SDK/HotelWise.Core.SDK.Levantamento.md) — Inventário completo de migração de 107 tipos.
+- [HotelWise.Core.SDK.PlanoImplementacao.md](file:///c:/git/HotelWise/HotelWiseAPI/DOCUMENTACAO/HotelWise.Core.SDK/HotelWise.Core.SDK.PlanoImplementacao.md) — Plano de execução das 4 ondas.
+- [HotelWise.Core.SDK/README.md](file:///c:/git/HotelWise/HotelWiseAPI/HotelWise.Core.SDK/README.md) — Documentação introdutória e quickstart do pacote.

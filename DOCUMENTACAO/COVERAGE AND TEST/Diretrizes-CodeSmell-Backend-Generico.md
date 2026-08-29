@@ -1,148 +1,196 @@
 # Diretrizes para Ajuste de Issues e Code Smells — Backend (Genérico C# / .NET)
 
-**Documento:** Guia operacional padronizado e reutilizável para qualidade estática e governança de código backend  
+**Documento:** Guia operacional reutilizável para qualidade estática e governança de código backend  
 **Arquivo:** `Diretrizes-CodeSmell-Backend-Generico.md`  
-**Escopo:** Soluções C# / .NET (APIs, bibliotecas de domínio, serviços de negócio, persistência, workers, SDKs, suítes de teste)  
-**Ferramental de Referência:** SonarQube, SonarCloud, Roslyn Analyzers, .NET CLI, dotnet-format  
-**Target Platform:** .NET 10 / C# 13+ (com suporte a multi-targeting `net8.0;net10.0` e `netstandard2.0/2.1` para SDKs reutilizáveis)  
+**Escopo:** Soluções C# / .NET (APIs, domínio, serviços, persistência, workers, SDKs, testes)  
+**Ferramental:** SonarQube / SonarCloud, Roslyn Analyzers, .NET CLI, `dotnet format`  
+**Target:** .NET 10 / C# 13+ (multi-targeting `net8.0;net10.0` e `netstandard2.0/2.1` quando aplicável)  
+**Companheiro:** [Diretrizes-Coverage-Backend-Generico.md](./Diretrizes-Coverage-Backend-Generico.md)  
 **Data da Revisão:** 2026-08-29  
 
 ---
 
 ## 1. Objetivo
 
-Padronizar e orientar o processo de identificação, diagnóstico e remediação de **Code Smells**, **Bugs**, **Vulnerabilidades** e **Security Hotspots** apontados por analisadores estáticos de código (SonarQube, SonarCloud, Roslyn Analyzers, dotnet format) em soluções C# / .NET, garantindo:
+Padronizar identificação, diagnóstico e remediação de **Code Smells**, **Bugs**, **Vulnerabilidades** e **Security Hotspots**, garantindo:
 
-1. **Zero Regressão de Negócio:** Nenhuma refatoração para eliminação de Code Smell pode alterar o comportamento observável, regras de negócio ou contratos públicos de APIs (REST, gRPC, SignalR, MCP).
-2. **Manutenibilidade e Legibilidade:** Elevação contínua do índice de manutenibilidade (*Maintainability Rating A*), eliminando duplicações, complexidade ciclomática excessiva e acoplamentos espúrios.
-3. **Segurança e Confiabilidade:** Eliminação de brechas de segurança (injeções, manipulação insegura de recursos, vazamento de memória/conexões) e bugs latentes (null dereferences, chamadas incorretas de async/await, deadlocks, loops infinitos).
-4. **Governança Ética de Warnings:** Vedação da supressão indiscriminada de regras via `#pragma warning disable` ou `[SuppressMessage]` sem justificativa arquitetural formal documentada.
+1. **Zero regressão de negócio** — refatoração não altera comportamento observável, regras nem contratos públicos (REST, gRPC, SignalR, MCP, pacotes NuGet).
+2. **Manutenibilidade** — Rating A de Maintainability; menos duplicação, complexidade e acoplamento espúrio.
+3. **Confiabilidade e segurança** — eliminar null-derefs, async incorreto, vazamento de recursos, injeções e credenciais hardcoded.
+4. **Governança de warnings** — `#pragma warning disable` / `[SuppressMessage]` só com justificativa arquitetural documentada no PR.
 
 ---
 
-## 2. Taxonomia de Issues do Sonar em .NET
+## 2. Triagem e Priorização
 
 ```mermaid
 flowchart TD
-    Issue[Issue SonarQube / SonarCloud] --> CS[Code Smell\n(Manutenibilidade / Débito Técnico)]
-    Issue --> Bug[Bug\n(Confiabilidade / Erro Latente)]
-    Issue --> Vuln[Vulnerabilidade\n(Segurança / Brecha Imediata)]
-    Issue --> Hotspot[Security Hotspot\n(Revisão de Segurança Necessária)]
+    Issue[Issue Sonar / Roslyn] --> Prio{Severidade}
+    Prio -->|Blocker / Critical| Vuln[Vulnerabilidade / Hotspot]
+    Prio -->|High / Bug| Bug[Confiabilidade]
+    Prio -->|Medium / Low| Smell[Code Smell]
 
-    CS --> S1[Complexidade Ciclomática / Tamanho de Método]
-    CS --> S2[Parâmetros Excessivos / DI Explosion]
-    CS --> S3[Nomenclatura e Código Morto / Redundâncias]
-
-    Bug --> B1[Null Pointer / Nullable Flow Analysis]
-    Bug --> B2[Uso Incorreto de IDisposable / Async State Machine]
-    Bug --> B3[Condições Booleanas Invariantes]
-
-    Vuln --> V1[Injeção de SQL / Comandos]
-    Vuln --> V2[Exposição de Informações Sensíveis / Credenciais]
-    Vuln --> V3[Configurações Criptográficas / CORS Inseguros]
+    Vuln --> Fix1[Corrigir imediatamente]
+    Bug --> Fix2[Corrigir no mesmo lote]
+    Smell --> Fix3[Corrigir por impacto e localidade]
 ```
 
----
+| Prioridade | Tipo | Ação |
+| ---------- | ---- | ---- |
+| P0 | Vulnerabilidade / Security Hotspot confirmado | Corrigir antes de merge |
+| P1 | Bug (Reliability) | Corrigir no mesmo PR / lote |
+| P2 | Code Smell High/Medium em caminho quente | Corrigir no lote de qualidade |
+| P3 | Code Smell Low / estilo Roslyn | Agrupar; não bloquear feature se Quality Gate ok |
 
-## 3. Catálogo das Regras Sonar C# Mais Comuns e Padrões de Correção
-
-### 3.1 Manutenibilidade e Code Smells
-
-| Regra Sonar | Descrição | Causa Típica | Solução Recomendada (.NET 10 / C# 13+) |
-| ----------- | --------- | ------------ | -------------------------------------- |
-| **`csharpsquid:S107`** | *Methods should not have too many parameters* | Construtores ou métodos com > 7 parâmetros (*DI Explosion*) | Agrupar dependências em objetos agregadores (*Parameter Object Pattern*, *Context Configurations* ou *Factories*). |
-| **`csharpsquid:S112`** | *General exceptions should never be thrown* | Lançar `throw new Exception()` ou `throw new SystemException()` | Substituir por exceções especializadas de domínio (`ArgumentNullException`, `InvalidOperationException`, `BusinessException`, `NotFoundException`). |
-| **`csharpsquid:S1135`** | *Track uses of "TODO" tags* | Comentários com `// TODO` esquecidos no código | Tratar o ponto pendente ou convertê-lo em issue no backlog do projeto, removendo o comentário solto. |
-| **`csharpsquid:S1144`** / **`S1172`** | *Unused private types/methods/parameters* | Parâmetros ou métodos declarados que nunca são lidos/invocados | Remover membros privados não utilizados. Em interfaces/assinaturas públicas, avaliar se o parâmetro é parte do contrato obrigatório. |
-| **`csharpsquid:S3236`** | *Caller information attributes should be used* | Passar nome de método ou arquivo manualmente em loggers | Usar atributos `[CallerMemberName]`, `[CallerFilePath]`, `[CallerLineNumber]`. |
-| **`csharpsquid:S3928`** | *Parameter names should be passed correctly in ArgumentException* | `new ArgumentNullException("mensagem")` em vez do nome do parâmetro | Usar `ArgumentNullException.ThrowIfNull(param)` (.NET 8+) ou `nameof(parametro)` como identificador. |
-| **`csharpsquid:S125`** | *Sections of code should not be commented out* | Blocos de código antigo comentados no arquivo | Remover código comentado (o histórico está preservado no controle de versão Git). |
-| **`csharpsquid:S3260`** | *Non-public types without subclasses should be sealed* | Classes internas/privadas abertas sem necessidade | Adicionar o modificador `sealed` para permitir otimizações de desvirtualização no compilador e JIT. |
-| **`csharpsquid:S6562`** | *Always use "DateTime.UtcNow" or "TimeProvider" instead of "DateTime.Now"* | Uso de `DateTime.Now` acoplado ao fuso local da máquina | Utilizar `TimeProvider` injetável ou `DateTime.UtcNow` para garantir determinismo e testabilidade. |
+**Regra de lote:** preferir um domínio/arquivo por vez; não misturar refactor amplo com mudança de contrato.
 
 ---
 
-### 3.2 Confiabilidade e Bugs
+## 3. Taxonomia Rápida
 
-| Regra Sonar | Descrição | Causa Típica | Solução Recomendada |
-| ----------- | --------- | ------------ | ------------------- |
-| **`csharpsquid:S2259`** | *Null pointers should not be dereferenced* | Acessar membros de um objeto que pode ser nulo sem checagem prévia | Utilizar pattern matching (`if (obj is not null)`), guard clauses (`ArgumentNullException.ThrowIfNull`) ou operador de navegação segura (`obj?.Property`). |
-| **`csharpsquid:S2583`** | *Conditionally executed code should be reachable* | Condições booleanas redundantes que sempre avaliam para `true` ou `false` | Simplificar a expressão lógica eliminando checagens duplicadas ou variáveis de estado invariantes. |
-| **`csharpsquid:S2953`** / **`S3881`** | *Methods named "Dispose" should implement IDisposable* | Classes com método `Dispose` sem implementar formalmente o padrão IDisposable | Implementar a interface `IDisposable` (e opcionalmente `IAsyncDisposable`), implementando o padrão `Dispose(bool disposing)`. |
-| **`csharpsquid:S4457`** | *Parameter validation in async/iterator methods* | Validar argumentos dentro do state machine assíncrono | Dividir o método: método público síncrono para validação de argumentos + método privado local `async` para execução. |
-| **`csharpsquid:S2933`** | *Fields that are only assigned in the constructor should be "readonly"* | Campos atribuídos apenas no construtor sem modificador `readonly` | Adicionar o modificador `readonly` ao campo privado. |
-| **`csharpsquid:S3168`** | *"async void" methods should not be used* | Métodos assíncronos com retorno `void` (exceto event handlers de UI) | Alterar o retorno para `Task` ou `ValueTask` para permitir tratamento correto de exceções e await. |
+| Categoria | Exemplos | Foco da correção |
+| --------- | -------- | ---------------- |
+| Code Smell | S107, S1172, ternários aninhados, `!` redundante | Legibilidade sem mudar comportamento |
+| Bug | S2259, S3168, cancelamento async, exception engolida | Comportamento correto sob falha/cancelamento |
+| Vulnerabilidade | S2077, S6437, SSRF | Entrada não confiável / segredos |
+| Hotspot | CSRF, cookies, crypto | Revisão consciente + evidência |
 
 ---
 
-### 3.3 Segurança e Vulnerabilidades
+## 4. Catálogo de Regras e Padrões de Correção
 
-| Regra Sonar | Descrição | Causa Típica | Solução Recomendada |
-| ----------- | --------- | ------------ | ------------------- |
-| **`csharpsquid:S2077`** | *Formatting SQL queries is security-sensitive* | Concatenação direta de strings em comandos SQL (`$"SELECT * FROM ... WHERE Id = {id}"`) | Utilizar consultas parametrizadas com EF Core (`FromSqlInterpolated`), Dapper (`new { Id = id }`) ou `DbParameter`. |
-| **`csharpsquid:S5144`** | *Server-Side Request Forgery (SSRF)* | Construir URLs HTTP para `HttpClient` a partir de inputs de usuário não validados | Validar e sanitizar URLs contra uma lista de permissões (*allowlist*) de hosts/domínios aceitos. |
-| **`csharpsquid:S4502`** | *CSRF protection should not be disabled* | Desabilitar `[ValidateAntiForgeryToken]` ou `[IgnoreAntiforgeryToken]` em endpoints state-changing | Manter proteção CSRF ativa ou usar autenticação baseada em Bearer Tokens não associada a cookies em APIs REST stateless. |
-| **`csharpsquid:S3330`** | *HttpOnly flag should be set for sensitive cookies* | Cookies de autenticação/sessão gerados sem `HttpOnly = true` | Configurar explicitamente `CookieOptions.HttpOnly = true` e `Secure = true`. |
-| **`csharpsquid:S6437`** | *Hard-coded credentials should not be used* | Chaves de API, senhas ou connection strings em código-fonte | Utilizar `IConfiguration`, Azure Key Vault, User Secrets ou variáveis de ambiente. |
+### 4.1 Manutenibilidade
+
+| Regra | Sintoma | Correção canônica |
+| ----- | ------- | ----------------- |
+| **S107** | Construtor/método com muitos parâmetros | Parameter Object / Context / Factory — **nunca** `#pragma` |
+| **S112** | `throw new Exception()` | Exceção específica (`ArgumentNullException`, `InvalidOperationException`, domínio) |
+| **S1172** / **S1144** | Parâmetro/membro não usado | Remover; se for contrato FluentValidation/override, discard `_` ou propagar o token |
+| **S125** | Código comentado | Remover (histórico no Git) |
+| **S3260** | Tipo interno não `sealed` | Adicionar `sealed` quando não há herança |
+| **S6562** | `DateTime.Now` | `DateTime.UtcNow` ou `TimeProvider` |
+| **Roslyn CA1861** | Array literal repetido em chamada | `private static readonly T[]` |
+| **Roslyn CA1847** | `StartsWith("x")` | `StartsWith('x')` |
+| **Logging placeholders** | `{time}`, `{message}` | PascalCase: `{Time}`, `{Message}` |
+| **Nested ternary** | `a ? b : c ? d : e` | `if` / early return em statement independente |
+| **JsonSerializerOptions** | `new JsonSerializerOptions` a cada serialize | Campo `static readonly` reutilizável |
+| **Null-forgiving `!`** | `obj!` onde o fluxo já prova non-null | Remover `!`; preferir variável local tipada |
+
+### 4.2 Confiabilidade
+
+| Regra | Sintoma | Correção canônica |
+| ----- | ------- | ----------------- |
+| **S2259** | Null dereference | Guard, pattern matching, `?.` |
+| **S1166** | `catch` sem log nem contexto | Logar **e** relançar com wrap (`throw new InvalidOperationException("…", ex)`) **ou** tratar de fato |
+| **Cancelamento / async I/O** | I/O async sem token | Passar `CancellationToken` (ex.: `context.RequestAborted`) ou `CancellationToken.None` **explicitamente** |
+| **S3168** | `async void` | `Task` / `ValueTask` |
+| **S4457** | Validação dentro do async state machine | Validar no método sync público; executar em método `async` privado |
+| **S2933** | Campo só atribuído no ctor | `readonly` |
+
+### 4.3 Segurança
+
+| Regra | Sintoma | Correção canônica |
+| ----- | ------- | ----------------- |
+| **S2077** | SQL concatenado | Parametrizado / EF / Dapper |
+| **S6437** | Credencial no código | `IConfiguration`, Key Vault, User Secrets, env |
+| **S5144** | URL de usuário em `HttpClient` | Allowlist de hosts |
+| **S3330** | Cookie sensível sem HttpOnly | `HttpOnly = true`, `Secure = true` |
+
+### 4.4 SDKs multi-target
+
+| Aspecto | Risco | Correção |
+| ------- | ----- | -------- |
+| API só em TFM novo | Quebra `netstandard` / `net8` | `#if NET8_0_OR_GREATER` ou PackageReference condicional |
+| Tipos públicos sem XML | `CS1591` / DX ruim | `GenerateDocumentationFile` + docs nos membros públicos |
+| Domínio de produto no Core | Acoplamento | Core = contratos, generics, helpers, adapters — sem entidades de negócio |
+| Remoção abrupta | Quebra consumidores | `[Obsolete(..., DiagnosticId = "...")]` na transição; remover após migração |
+| Debug de pacote | Sem símbolos | `IncludeSymbols` + `snupkg` |
 
 ---
 
-### 3.4 Governança em SDKs e Núcleos Reutilizáveis (Multi-Targeting)
+## 5. Playbook de Correção (anti-padrões frequentes)
 
-| Regra / Aspecto | Descrição | Risco / Causa Típica | Solução Recomendada |
-| --------------- | --------- | -------------------- | ------------------- |
-| **Multi-TFM Compatibility** | Quebra de compilação em `netstandard2.0` / `net8.0` | Uso incondicional de APIs exclusivas do .NET 10 (ex: novos métodos de coleção ou BCL) | Utilizar compilação condicional `#if NET8_0_OR_GREATER` ou isolar dependências pesadas por TFM no `.csproj`. |
-| **XML Documentation** | `CS1591` (*Missing XML comment for publicly visible type*) | Tipos públicos exportados por NuGet sem documentação | Ativar `<GenerateDocumentationFile>true</GenerateDocumentationFile>` e documentar membros públicos canônicos. |
-| **Isolamento de Domínio Host** | Acoplamento de regras de produto em biblioteca Core | Inclusão indevida de entidades de negócio concretas em SDKs transversais | Manter no Core apenas contratos, abstrações, helpers, infraestrutura genérica e adapters. |
-| **Transição e Depreciação** | Ruptura de consumidores legados durante extração de Core | Remoção abrupta de tipos sem aviso ou shims | Utilizar `[Obsolete("...", DiagnosticId = "...")]` durante fases de transição e remover apenas após migração total dos hosts. |
-| **Symbol Packages** | Falta de rastreabilidade para debugging de consumidores | Pacotes NuGet sem símbolos associados | Configurar `<IncludeSymbols>true</IncludeSymbols>` e `<SymbolPackageFormat>snupkg</SymbolPackageFormat>`. |
+### 5.1 Exception handling (`S1166`)
+
+```csharp
+// Ruim: engole ou relança sem contexto
+catch (Exception ex) { throw; }
+
+// Bom: log + wrap com contexto
+catch (Exception ex)
+{
+    logger.Error(ex, "Falha em {Operation} at {Time}", nameof(Start), DateTime.UtcNow);
+    throw new InvalidOperationException("Startup failed. See inner exception.", ex);
+}
+```
+
+### 5.2 Cancelamento em I/O HTTP
+
+```csharp
+// Ruim
+await context.Response.WriteAsync(json);
+
+// Bom
+await context.Response.WriteAsync(json, context.RequestAborted);
+```
+
+### 5.3 Null-forgiving em campos mutáveis
+
+```csharp
+// Ruim: campo nullable + ! após LoadAsync
+await LoadAsync();
+await _collection!.UpsertAsync(item);
+
+// Bom: retornar a instância non-null
+var collection = await LoadAsync();
+await collection.UpsertAsync(item);
+```
+
+### 5.4 Testes
+
+| Evitar | Preferir |
+| ------ | -------- |
+| `Thread.Sleep` | Remover delay desnecessário ou `await Task.Delay` em teste async |
+| `new[] { 1, 2 }` repetido em asserts | `private static readonly int[]` |
+| Variável tipada só como interface sem necessidade | Tipo concreto quando o teste instancia a implementação |
 
 ---
 
-## 4. Fluxo Operacional de Saneamento Passo a Passo
+## 6. Fluxo Operacional
 
 ```mermaid
 flowchart TD
-    P1[1. Extração de Relatório Sonar / Roslyn] --> P2[2. Triagem e Priorização\n(Vulnerabilidades > Bugs > Code Smells)]
-    P2 --> P3[3. Diagnóstico e Causa Raiz]
-    P3 --> P4[4. Aplicação da Refatoração Limpa]
-    P4 --> P5[5. Validação Local de Build e Testes]
-    P5 --> P6{Passou com 0 erros e 100% testes?}
-    P6 -- Não --> P3
-    P6 -- Sim --> P7[6. Reanálise Sonar e Emissão de Evidências]
+    A[1. Relatório Sonar / Roslyn] --> B[2. Triagem P0→P3]
+    B --> C[3. Causa raiz]
+    C --> D[4. Refatoração limpa]
+    D --> E[5. Build + testes]
+    E --> F{OK?}
+    F -->|Não| C
+    F -->|Sim| G[6. Evidências + Quality Gate]
 ```
 
-### 4.1 Comandos de Diagnóstico e Validação (.NET CLI)
+### 6.1 Comandos
 
 ```powershell
-# 1. Compilação Release determinística com análise de código ativa
 dotnet build <Solucao>.sln -c Release /p:TreatWarningsAsErrors=false
-
-# 2. Execução de formatador automático de código .NET
 dotnet format <Solucao>.sln --verify-no-changes --verbosity diagnostic
-
-# 3. Execução de toda a suíte de testes automatizados
 dotnet test <Solucao>.sln -c Release --no-build
-
-# 4. Execução de testes com cobertura para validação de não-regressão
 dotnet test <Solucao>.sln -c Release /p:CollectCoverage=true /p:CoverletOutputFormat=opencover
 ```
 
 ---
 
-## 5. Checklist de Qualidade Obrigatório
+## 7. Checklist obrigatório
 
-- [ ] **Compilação Limpa**: `dotnet build -c Release` conclui com 0 erros e 0 warnings novos.
-- [ ] **100% de Testes Verdes**: Todos os projetos de teste da solução passam sem quebras (`dotnet test`).
-- [ ] **Preservação de Assinaturas Públicas**: Nenhuma alteração em interfaces públicas, DTOs de API ou contratos de integração.
-- [ ] **Zero Supressões Não Justificadas**: Nenhum `#pragma warning disable` adicionado sem comentário explicativo e aprovação técnica.
-- [ ] **Registro de Evidências**: Relação de arquivos alterados, regras Sonar resolvidas e status do Quality Gate.
+- [ ] Build Release: 0 erros; 0 warnings **novos** introduzidos pelo lote
+- [ ] Testes: 100% verdes no escopo afetado (idealmente solução inteira)
+- [ ] Contratos públicos preservados (ou versionados / Obsolete documentado)
+- [ ] Sem `#pragma` / `SuppressMessage` sem justificativa no PR
+- [ ] Evidências: arquivos, regras Sonar, resultado do Quality Gate
 
 ---
 
-## 6. Template de Registro de Evidências
-
-Ao finalizar o lote de correções, documentar no relatório de entrega:
+## 8. Template de evidências
 
 ```text
 ================================================================================
@@ -150,21 +198,19 @@ RELATÓRIO DE SANEAMENTO DE CODE SMELLS (BACKEND)
 ================================================================================
 Data: AAAA-MM-DD
 Solução: <NomeSolucao>.sln
+Lote: <escopo breve>
 
-1. Sumário de Issues Resolvidas:
-   - Vulnerabilidades / Segurança: 0 pendentes
-   - Bugs Latentes: 0 pendentes
-   - Code Smells de Manutenibilidade: N corrigidos
+1. Issues
+   - Vulnerabilidades / Hotspots: N
+   - Bugs: N
+   - Code Smells: N
 
-2. Principais Regras Saneadas:
-   - S107 (Parameter count): Refatorado via Parameter Object / Context Configs em X classes
-   - S112 (Generic exceptions): Substituído por exceções de domínio especializadas
-   - S2259 (Null dereference): Adicionadas guard clauses e pattern matching
-   - S3260 (Private sealed): Seladas N classes internas
-   - S6562 (DateTime): Migrado para TimeProvider / UtcNow
+2. Regras principais
+   - S1166 / cancelamento / CA18xx / ... : <ação resumida>
 
-3. Validação:
-   - Build Release: 0 erros / 0 warnings
-   - Testes Automatizados: N / N aprovados (100%)
+3. Validação
+   - Build Release: OK
+   - Testes: N/N OK
+   - Pack multi-TFM (se SDK): OK
 ================================================================================
 ```

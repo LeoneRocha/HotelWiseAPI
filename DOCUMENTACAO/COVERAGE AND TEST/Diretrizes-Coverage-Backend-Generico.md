@@ -1,139 +1,117 @@
-# Diretrizes para Testes Automatizados e Cobertura (Coverage) — Backend (Genérico C# / .NET)
+# Diretrizes para Testes Automatizados e Cobertura — Backend (Genérico C# / .NET)
 
-**Documento:** Guia operacional padronizado e reutilizável para engenharia de testes e metas de cobertura backend  
+**Documento:** Guia operacional reutilizável para engenharia de testes e metas de cobertura  
 **Arquivo:** `Diretrizes-Coverage-Backend-Generico.md`  
-**Escopo:** Soluções C# / .NET (APIs, Domain, Services, Repositories, SDKs)  
-**Ferramental de Referência:** NUnit, xUnit, Moq, Moq.EntityFrameworkCore, Bogus, AwesomeAssertions, Coverlet, Testcontainers  
-**Target Platform:** .NET 10 / C# 13+ (com suporte a bibliotecas multi-target `net8.0;net10.0;netstandard2.0/2.1`)  
+**Escopo:** APIs, Domain, Services, Repositories, SDKs  
+**Ferramental:** xUnit / NUnit, Moq, Moq.EntityFrameworkCore, Bogus, AwesomeAssertions (ou FluentAssertions), Coverlet, ReportGenerator, Testcontainers  
+**Target:** .NET 10 / C# 13+ (SDKs multi-target quando aplicável)  
+**Companheiro:** [Diretrizes-CodeSmell-Backend-Generico.md](./Diretrizes-CodeSmell-Backend-Generico.md)  
 **Data da Revisão:** 2026-08-29  
 
 ---
 
 ## 1. Objetivo
 
-Padronizar a criação, refatoração e manutenção de testes automatizados (unitários e de integração) em soluções C# / .NET, assegurando:
-
-1. **Meta de Cobertura Total (100% de Linhas e Ramos em Lógica de Negócio):** Garantir que toda a lógica de negócio, ramificações condicionais (`if`, `switch`, *pattern matching*, ternários), manipulação de exceções e fluxos de dados estejam cobertos por testes determinísticos.
-2. **Independência e Reprodutibilidade:** Cada teste deve ser autocontido, isolado, idempotente e sem efeitos colaterais em execuções paralelas.
-3. **Clareza e Legibilidade:** Estrutura declarativa e autoexplicativa baseada no padrão **Arrange / Act / Assert (AAA)**.
-4. **Massa de Dados Realista e Dinâmica:** Utilização do **Bogus** para geração de dados sintéticos ricos e testes de valores limite (*boundary testing*).
-5. **Simulação Precisa de Dependências:** Utilização de **Moq** e **Moq.EntityFrameworkCore** para controle total de contratos, retornos assíncronos, simulação de falhas e verificação de interações (`Verify`).
-6. **Asserções Fluentes e Seguras:** Adoção do **AwesomeAssertions** (licença permissiva Apache 2.0) e `Assert.Multiple` para asserções robustas e legíveis.
-7. **Isolamento de SDKs e Núcleos Reutilizáveis:** Cobertura canônica ≥ 90% no escopo unit-testável com exclusão via `.runsettings` apenas de conectores que exigem infraestrutura externa ou hardware especializado.
+1. **Cobertura de lógica de negócio** — linhas e ramos (`if` / `switch` / pattern matching / catch) cobertos por testes determinísticos.
+2. **Independência** — testes autocontidos, idempotentes, seguros em paralelo.
+3. **Legibilidade** — Arrange / Act / Assert (AAA) explícito.
+4. **Dados realistas** — Bogus + boundary testing (evitar literais mágicos desnecessários).
+5. **Dependências controladas** — Moq / Moq.EF Core com `ReturnsAsync` / `ThrowsAsync` / `Verify`.
+6. **Asserções fluentes** — AwesomeAssertions (Apache-2.0) preferencial; `Assert.Multiple` / asserções agrupadas.
+7. **SDKs** — meta canônica **≥ 90%** no escopo unit-testável; exclusões só para código que exige infra externa (documentadas em `.runsettings`).
 
 ---
 
-## 2. Padrões Obrigatórios de Escrita de Testes
+## 2. Metas por tipo de projeto
 
-### 2.1 Padrão de Nomenclatura dos Métodos (Inglês)
-Todos os métodos de teste devem ser nomeados em inglês seguindo a convenção tripartite:
+| Tipo de projeto | Meta de linha/ramo | Observação |
+| --------------- | ------------------ | ---------- |
+| Domain / Service (regras de negócio) | **100%** do código testável | Excluir DTOs anêmicos se a política Sonar já os excluir |
+| SDK / Core packable | **≥ 90%** unit-testável | Adapters live de rede/LLM via `.runsettings` |
+| Data / Repositórios | **> 90%** | Preferir InMemory + Testcontainers para integração |
+| API / Controllers | **> 85%** | `WebApplicationFactory` para smoke de pipeline |
+| Console POC / scripts | **> 80%** ou exclusão Sonar | Não diluir Quality Gate do produto |
+
+---
+
+## 3. Padrões de Escrita
+
+### 3.1 Nomenclatura (inglês)
+
 ```text
-NomeDoMetodo_CenarioSobTeste_ResultadoEsperado
+MethodUnderTest_Scenario_ExpectedResult
 ```
 
-**Exemplos Homologados:**
+Exemplos:
+
 - `GetByIdAsync_WhenEntityExists_ReturnsMappedDto`
 - `CreateAsync_WhenPayloadIsInvalid_ThrowsValidationException`
-- `DeleteAsync_WhenEntityNotFound_ReturnsFalse`
-- `ProcessReservationAsync_WithAvailableRoom_ConfirmsBookingAndDispatchesNotification`
-- `ExecutePromptAsync_WhenLlmFails_AppliesPollyRetryAndThrowsServiceException`
+- `GenerateEmbeddingAsync_WhenAdapterFails_PropagatesException`
 
----
-
-### 2.2 Comentários de Contexto (Português)
-Acima de cada método de teste, adicionar obrigatoriamente um bloco de comentário em português explicando o cenário e o objetivo do teste:
+### 3.2 Comentário de contexto (português)
 
 ```csharp
-// Cenário: Tentativa de recuperação de recurso inexistente na persistência.
-// Objetivo: Garantir que o serviço lance NotFoundException e não execute o mapeamento.
-[Test] // ou [Fact] em xUnit
+// Cenário: Recuperação de recurso inexistente.
+// Objetivo: Garantir NotFoundException e que o mapper não seja chamado.
+[Fact] // ou [Test] em NUnit
 public async Task GetByIdAsync_WhenEntityDoesNotExist_ThrowsNotFoundException()
 {
-    // ...
+    // Arrange
+    // Act
+    // Assert
 }
 ```
 
----
-
-### 2.3 Estrutura Arrange / Act / Assert (AAA)
-O corpo de todo teste unitário deve ser explicitamente delimitado pelos marcadores:
+### 3.3 AAA
 
 ```csharp
-// Cenário: Criação de hóspede com e-mail já existente na base de dados.
-// Objetivo: Validar que uma exceção de conflito de negócio seja lançada e o repositório não persista novos registros.
-[Test]
+// Cenário: Criação com e-mail já existente.
+// Objetivo: Conflito de negócio; repositório não persiste.
+[Fact]
 public async Task CreateGuestAsync_WhenEmailAlreadyExists_ThrowsBusinessConflictException()
 {
     // Arrange
     var guestDto = new Faker<GuestCreateDto>()
-        .RuleFor(g => g.FullName, f => f.Person.FullName)
         .RuleFor(g => g.Email, f => f.Internet.Email())
-        .RuleFor(g => g.Document, f => f.Random.Replace("###.###.###-##"))
         .Generate();
 
-    _guestRepositoryMock
-        .Setup(r => r.ExistsByEmailAsync(guestDto.Email, It.IsAny<CancellationToken>()))
-        .ReturnsAsync(true);
+    _repo.Setup(r => r.ExistsByEmailAsync(guestDto.Email, It.IsAny<CancellationToken>()))
+         .ReturnsAsync(true);
 
     // Act
-    Func<Task> act = async () => await _guestService.CreateGuestAsync(guestDto, CancellationToken.None);
+    var act = async () => await _sut.CreateGuestAsync(guestDto, CancellationToken.None);
 
     // Assert
-    await act.Should().ThrowAsync<BusinessConflictException>()
-        .WithMessage("*já cadastrado*");
-
-    _guestRepositoryMock.Verify(r => r.InsertAsync(It.IsAny<GuestEntity>(), It.IsAny<CancellationToken>()), Times.Never);
+    await act.Should().ThrowAsync<BusinessConflictException>();
+    _repo.Verify(r => r.InsertAsync(It.IsAny<Guest>(), It.IsAny<CancellationToken>()), Times.Never);
 }
 ```
 
 ---
 
-## 3. Guia de Ferramental e Boas Práticas
+## 4. Ferramental
 
-### 3.1 Geração de Dados com Bogus
-- Evitar valores fixos arbitrários (*hardcoded* como `"teste"`, `"12345"`).
-- Utilizar `Faker<T>` para criar entidades válidas, dados aleatórios consistentes e variações de limites (strings nulas, vazias, limites máximos de caracteres, datas passadas/futuras):
+### 4.1 Bogus
 
-```csharp
-private readonly Faker<RoomEntity> _roomFaker = new Faker<RoomEntity>()
-    .RuleFor(r => r.Id, f => f.Random.Long(1, 10000))
-    .RuleFor(r => r.RoomNumber, f => f.Random.Number(101, 999).ToString())
-    .RuleFor(r => r.DailyRate, f => f.Finance.Amount(100, 2000))
-    .RuleFor(r => r.IsAvailable, f => f.Random.Bool());
-```
+- Preferir `Faker<T>` a strings fixas (`"teste"`, `"123"`) quando o valor não for parte da asserção.
+- Cobrir limites: null, empty, max length, datas limítrofes.
 
----
+### 4.2 Moq
 
-### 3.2 Simulação de Dependências com Moq
-- Configurar retornos assíncronos explícitos: `.ReturnsAsync(...)`, `.ThrowsAsync(...)`.
-- Usar `It.IsAny<CancellationToken>()` para permitir cancelamentos sem acoplamento.
-- Usar `.Verify(..., Times.Once)` ou `.Verify(..., Times.Never)` para assegurar que apenas os métodos esperados foram invocados.
-- Em múltiplas asserções sobre propriedades de um objeto retornado, agrupar com `Assert.Multiple`:
+- `ReturnsAsync` / `ThrowsAsync`
+- `It.IsAny<CancellationToken>()`
+- `Verify(..., Times.Once|Never)`
+
+### 4.3 Moq.EntityFrameworkCore
 
 ```csharp
-// Assert
-Assert.Multiple(() =>
-{
-    result.Should().NotBeNull();
-    result.Id.Should().Be(expectedId);
-    result.Status.Should().Be(ReservationStatus.Confirmed);
-});
+_dbContextMock.Setup(db => db.Rooms).ReturnsDbSet(_roomFaker.Generate(5));
 ```
 
----
+### 4.4 SDKs e `.runsettings`
 
-### 3.3 Mocks de EF Core com `Moq.EntityFrameworkCore`
-Ao simular `DbSet<T>` e consultas LINQ assíncronas do EF Core:
-```csharp
-var rooms = _roomFaker.Generate(5);
-_dbContextMock.Setup(db => db.Rooms).ReturnsDbSet(rooms);
-```
+Excluir apenas conectores que **exigem** serviço externo em runtime:
 
----
-
-### 3.4 Testes em SDKs e Núcleos Reutilizáveis (Multi-TFM)
-- **Desacoplamento de Host:** Assegurar que os testes do SDK dependam apenas de contratos e abstrações do próprio SDK, sem referenciar projetos de aplicação host.
-- **Filtros e Configuração `coverlet.runsettings`:** Para suítes de SDK que contêm adaptadores dinâmicos de IA/rede, utilizar arquivo de configuração para isolar código que necessita de serviços externos em execução:
 ```xml
 <?xml version="1.0" encoding="utf-8" ?>
 <RunSettings>
@@ -149,57 +127,66 @@ _dbContextMock.Setup(db => db.Rooms).ReturnsDbSet(rooms);
   </DataCollectionRunSettings>
 </RunSettings>
 ```
-- **Meta Canônica:** Atingir **≥ 90%** de cobertura no escopo unit-testável (entidades base, DTOs, helpers, segurança, repositórios genéricos, orquestração de serviços genéricos e validadores).
+
+Documentar cada exclusão (motivo + data) no README do projeto de teste ou no guia do produto.
 
 ---
 
-## 4. Matriz de Cenários para Cobertura Total (100%)
-
-Para cada método ou caso de uso, cobrir obrigatoriamente os 4 quadrantes:
+## 5. Matriz de Cenários (4 quadrantes)
 
 ```mermaid
 quadrantChart
-    title Quadrantes de Cobertura de Testes
-    x-axis Casos de Sucesso --> Casos de Exceção
-    y-axis Dados Típicos --> Dados Extremos / Limites
-    Fluxo Principal (Happy Path): [0.25, 0.75]
-    Fluxos Alternativos: [0.25, 0.25]
-    Validação de Limites (Boundary): [0.75, 0.75]
-    Tratamento de Erros e Exceções: [0.75, 0.25]
+    title Quadrantes de Cobertura
+    x-axis Sucesso --> Exceção
+    y-axis Dados típicos --> Limites
+    Happy Path: [0.25, 0.75]
+    Alternativos: [0.25, 0.25]
+    Boundary: [0.75, 0.75]
+    Erros: [0.75, 0.25]
 ```
 
-1. **Fluxo Principal (*Happy Path*):** Entrada válida, estado esperado, retorno com sucesso e mapeamento correto.
-2. **Fluxos Alternativos:** Filtros opcionais, paginação, buscas vazias, cenários condicionais secundários.
-3. **Casos Limite (*Boundary Testing*):** Arrays vazios, valores nulos, strings com tamanho máximo permitido, números negativos, datas limítrofes.
-4. **Erros e Exceções:** Falhas de validação (FluentValidation), recursos não encontrados (404), indisponibilidade de serviços de IA externos, timeouts e cancelamentos via `CancellationToken`.
+1. **Happy path** — entrada válida, retorno esperado  
+2. **Alternativos** — filtros, paginação, coleções vazias  
+3. **Boundary** — null, empty, max, negativos, datas limite  
+4. **Erros** — validação, not found, timeout, cancelamento, falha de LLM  
 
 ---
 
-## 5. Roteiro Operacional de Execução e Coleta de Cobertura
+## 6. Anti-padrões em testes (também Code Smell)
+
+| Evitar | Motivo | Preferir |
+| ------ | ------ | -------- |
+| `Thread.Sleep` | Flaky / smell Sonar | Sem sleep; ou `await Task.Delay` só se o SUT exigir tempo |
+| Array literal repetido | CA1861 | `private static readonly T[]` |
+| Ordem dependente entre testes | Não determinístico | Isolamento total |
+| Mock “over-verify” | Fragilidade | Verificar efeitos observáveis |
+| Cobrir só getters de DTO | Ruído | Excluir DTO/VO na política Sonar |
+
+---
+
+## 7. Roteiro de execução
 
 ```powershell
-# 1. Compilar toda a solução em modo Release
 dotnet build <Solucao>.sln -c Release
 
-# 2. Executar toda a suíte de testes com coleta de cobertura via Coverlet
-dotnet test <Solucao>.sln -c Release --no-build /p:CollectCoverage=true /p:CoverletOutputFormat=opencover /p:Threshold=90
+dotnet test <Solucao>.sln -c Release --no-build `
+  /p:CollectCoverage=true /p:CoverletOutputFormat=opencover /p:Threshold=90
 
-# 3. Executar testes de um SDK ou projeto específico com arquivo .runsettings
-dotnet test <ProjetoTeste>.csproj -c Release --collect:"XPlat Code Coverage" --settings coverlet.runsettings
+dotnet test <ProjetoTeste>.csproj -c Release `
+  --collect:"XPlat Code Coverage" --settings coverlet.runsettings
 
-# 4. Gerar relatório HTML de cobertura com ReportGenerator
 reportgenerator -reports:**/coverage.opencover.xml -targetdir:./CoverageReport -reporttypes:Html
 ```
 
 ---
 
-## 6. Checklist de Qualidade para Novos Testes
+## 8. Checklist de novo teste
 
-- [ ] Nome do método em inglês no padrão `Metodo_Cenario_Resultado`.
-- [ ] Comentários em português `// Cenário:` e `// Objetivo:` presentes acima do método.
-- [ ] Seções `// Arrange`, `// Act`, `// Assert` demarcadas no corpo do método.
-- [ ] Dados dinâmicos gerados via Bogus (sem strings arbitrárias fixas).
-- [ ] Mocks configurados com comportamentos assíncronos e verificações (`Verify`).
-- [ ] Asserções fluentes (`AwesomeAssertions`) e `Assert.Multiple` quando houver mais de uma validação.
-- [ ] Cobertura de linhas e ramos verificada sem regressões (≥ 90% em SDKs e 100% em Domain/Service).
-- [ ] Execução rápida e determinística (sem dependência de ordem de execução ou estado compartilhado).
+- [ ] Nome `Metodo_Cenario_Resultado` (EN)
+- [ ] Comentários `// Cenário:` e `// Objetivo:` (PT)
+- [ ] Marcadores `// Arrange` / `// Act` / `// Assert`
+- [ ] Dados via Bogus quando fizer sentido
+- [ ] Mocks async + `Verify` quando a interação importa
+- [ ] Asserções fluentes; múltiplas asserções agrupadas
+- [ ] Sem `Thread.Sleep`; sem estado compartilhado mutável
+- [ ] Meta de cobertura do tipo de projeto respeitada (sem exclusão arbitrária)
