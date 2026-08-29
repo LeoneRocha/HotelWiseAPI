@@ -42,7 +42,7 @@ namespace HotelWise.Service.Entity.HotelServices
             }
             catch (Exception ex)
             {
-                _logger.Error(ex, "GetAllHotelsAsync: {Message} at: {time}", ex.Message, DataHelper.GetDateTimeNowToLog());
+                _logger.Error(ex, "GetAllHotelsAsync: {Message} at: {Time}", ex.Message, DataHelper.GetDateTimeNowToLog());
                 response.Errors.Add(new ErrorResponse() { Message = ex.Message });
             }
             return response;
@@ -62,7 +62,7 @@ namespace HotelWise.Service.Entity.HotelServices
             }
             catch (Exception ex)
             {
-                _logger.Error(ex, "InsertHotelInVectorStore: {Message} at: {time}", ex.Message, DataHelper.GetDateTimeNowToLog());
+                _logger.Error(ex, "InsertHotelInVectorStore: {Message} at: {Time}", ex.Message, DataHelper.GetDateTimeNowToLog());
                 response.Errors.Add(new ErrorResponse() { Message = ex.Message });
             }
             return response;
@@ -87,7 +87,7 @@ namespace HotelWise.Service.Entity.HotelServices
             }
             catch (Exception ex)
             {
-                _logger.Error(ex, "GetHotelByIdAsync: {Message} at: {time}", ex.Message, DataHelper.GetDateTimeNowToLog());
+                _logger.Error(ex, "GetHotelByIdAsync: {Message} at: {Time}", ex.Message, DataHelper.GetDateTimeNowToLog());
                 response.Errors.Add(new ErrorResponse() { Message = ex.Message });
             }
             return response;
@@ -106,7 +106,7 @@ namespace HotelWise.Service.Entity.HotelServices
             }
             catch (Exception ex)
             {
-                _logger.Error(ex, "GenerateHotelByIA: {Message} at: {time}", ex.Message, DataHelper.GetDateTimeNowToLog());
+                _logger.Error(ex, "GenerateHotelByIA: {Message} at: {Time}", ex.Message, DataHelper.GetDateTimeNowToLog());
                 response.Errors.Add(new ErrorResponse() { Message = ex.Message });
             }
             return response;
@@ -138,7 +138,7 @@ namespace HotelWise.Service.Entity.HotelServices
             }
             catch (Exception ex)
             {
-                _logger.Error(ex, "AddHotelAsync: {Message} at: {time}", ex.Message, DataHelper.GetDateTimeNowToLog());
+                _logger.Error(ex, "AddHotelAsync: {Message} at: {Time}", ex.Message, DataHelper.GetDateTimeNowToLog());
                 response.Errors.Add(new ErrorResponse() { Message = ex.Message });
             }
             return response;
@@ -167,7 +167,7 @@ namespace HotelWise.Service.Entity.HotelServices
             }
             catch (Exception ex)
             {
-                _logger.Error(ex, "UpdateHotelAsync: {Message} at: {time}", ex.Message, DataHelper.GetDateTimeNowToLog());
+                _logger.Error(ex, "UpdateHotelAsync: {Message} at: {Time}", ex.Message, DataHelper.GetDateTimeNowToLog());
                 response.Errors.Add(new ErrorResponse() { Message = ex.Message });
             }
             return response;
@@ -203,7 +203,7 @@ namespace HotelWise.Service.Entity.HotelServices
             }
             catch (Exception ex)
             {
-                _logger.Error(ex, "FetchHotelsAsync: {Message} at: {time}", ex.Message, DataHelper.GetDateTimeNowToLog());
+                _logger.Error(ex, "FetchHotelsAsync: {Message} at: {Time}", ex.Message, DataHelper.GetDateTimeNowToLog());
             }
             return tagsResult.ToArray();
         }
@@ -221,7 +221,7 @@ namespace HotelWise.Service.Entity.HotelServices
             }
             catch (Exception ex)
             {
-                _logger.Error(ex, "DeleteHotelAsync: {Message} at: {time}", ex.Message, DataHelper.GetDateTimeNowToLog());
+                _logger.Error(ex, "DeleteHotelAsync: {Message} at: {Time}", ex.Message, DataHelper.GetDateTimeNowToLog());
                 response.Errors.Add(new ErrorResponse() { Message = ex.Message });
             }
             return response;
@@ -241,7 +241,7 @@ namespace HotelWise.Service.Entity.HotelServices
                 }
                 catch (Exception ex)
                 {
-                    _logger.Error(ex, "addOrUpdateDataVector: {Message} at: {time}", ex.Message, DataHelper.GetDateTimeNowToLog());
+                    _logger.Error(ex, "addOrUpdateDataVector: {Message} at: {Time}", ex.Message, DataHelper.GetDateTimeNowToLog());
                 }
             }
         }

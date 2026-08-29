@@ -134,6 +134,7 @@ flowchart TD
 | Log + rethrow com contexto | `WebApplicationConfigureBuilder` | `Log.Error` + `throw new InvalidOperationException("…", ex)` |
 | Ternário aninhado | `UseSerilogRequestLogging.GetLevel` | `if` / early return |
 | Placeholders Serilog | Service / SDK / API | `{Message}`, `{Time}` (PascalCase) |
+| PowerShell `!` | `IA_Local/*.ps1` | Preferir `-not` em vez de `!` |
 | `!` redundante | `GenericVectorStoreAdapter`, searches | Retornar coleção local; remover `!` |
 | `Thread.Sleep` em teste | `*.Tests` | Remover ou `Task.Delay` async |
 | Array literal CA1861 | Testes | `static readonly` fields |

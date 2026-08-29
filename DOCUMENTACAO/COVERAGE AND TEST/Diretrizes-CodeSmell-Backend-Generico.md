@@ -72,6 +72,7 @@ flowchart TD
 | **Roslyn CA1861** | Array literal repetido em chamada | `private static readonly T[]` |
 | **Roslyn CA1847** | `StartsWith("x")` | `StartsWith('x')` |
 | **Logging placeholders** | `{time}`, `{message}` | PascalCase: `{Time}`, `{Message}` |
+| **PowerShell negation** | `if (!(Test-Path …))` | `if (-not (Test-Path …))` |
 | **Nested ternary** | `a ? b : c ? d : e` | `if` / early return em statement independente |
 | **JsonSerializerOptions** | `new JsonSerializerOptions` a cada serialize | Campo `static readonly` reutilizável |
 | **Null-forgiving `!`** | `obj!` onde o fluxo já prova non-null | Remover `!`; preferir variável local tipada |

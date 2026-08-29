@@ -115,7 +115,7 @@ public static class SemanticKernelProviderConfigure
     /// </summary>
     /// <param name="appConfig">Configuração agregada de IA.</param>
     /// <param name="builder">Builder do Semantic Kernel.</param>
-    private static void AddMistral(IApplicationIAConfig appConfig, IKernelBuilder builder)
+    private static void AddMistral(ApplicationIAConfig appConfig, IKernelBuilder builder)
     {
 #pragma warning disable SKEXP0070
         var mistral = appConfig.MistralApiConfig;
@@ -142,7 +142,7 @@ public static class SemanticKernelProviderConfigure
     /// </summary>
     /// <param name="appConfig">Configuração agregada de IA.</param>
     /// <param name="builder">Builder do Semantic Kernel.</param>
-    private static void AddOllama(IApplicationIAConfig appConfig, IKernelBuilder builder)
+    private static void AddOllama(ApplicationIAConfig appConfig, IKernelBuilder builder)
     {
         var modelConfig = appConfig.OllamaConfig;
         EnsureConfigured(
@@ -179,7 +179,7 @@ public static class SemanticKernelProviderConfigure
     /// <param name="services">Coleção de serviços DI.</param>
     /// <param name="kernel">Kernel construído.</param>
     /// <param name="configuration">Configuração agregada de IA.</param>
-    private static void AddServicesDependencies(IServiceCollection services, Kernel kernel, IApplicationIAConfig configuration)
+    private static void AddServicesDependencies(IServiceCollection services, Kernel kernel, ApplicationIAConfig configuration)
     {
         services.AddKernel();
         services.AddSingleton(kernel);
@@ -216,7 +216,7 @@ public static class SemanticKernelProviderConfigure
     /// <param name="services">Coleção de serviços DI.</param>
     /// <param name="kernel">Kernel construído.</param>
     /// <param name="configuration">Configuração agregada de IA.</param>
-    private static void AddTextEmbeddingGenerationService(IServiceCollection services, Kernel kernel, IApplicationIAConfig configuration)
+    private static void AddTextEmbeddingGenerationService(IServiceCollection services, Kernel kernel, ApplicationIAConfig configuration)
     {
         var typeAIEmbeddingService = configuration.RagConfig.AIEmbeddingServiceApi;
         switch (typeAIEmbeddingService)
@@ -238,7 +238,7 @@ public static class SemanticKernelProviderConfigure
     /// </summary>
     /// <param name="services">Coleção de serviços DI.</param>
     /// <param name="configuration">Configuração agregada de IA.</param>
-    private static void AddOllamaTextEmbeddingGenerationService(IServiceCollection services, IApplicationIAConfig configuration)
+    private static void AddOllamaTextEmbeddingGenerationService(IServiceCollection services, ApplicationIAConfig configuration)
     {
 #pragma warning disable SKEXP0001
         var ollamaAdapter = new OllamaAdapter(configuration);

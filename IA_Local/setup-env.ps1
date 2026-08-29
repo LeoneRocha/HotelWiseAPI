@@ -2,7 +2,7 @@
 $env:STORAGE_LOCATION="$HOME\Documents\anythingllm"
 
 # Criar o diretório de armazenamento, caso não exista
-if (!(Test-Path $env:STORAGE_LOCATION)) {
+if (-not (Test-Path $env:STORAGE_LOCATION)) {
     New-Item $env:STORAGE_LOCATION -ItemType Directory
 }
 
@@ -10,7 +10,7 @@ if (!(Test-Path $env:STORAGE_LOCATION)) {
 $envFile = "$env:STORAGE_LOCATION\.env"
 
 # Criar ou editar o arquivo .env
-if (!(Test-Path $envFile)) {
+if (-not (Test-Path $envFile)) {
     New-Item $envFile -ItemType File
 }
 
