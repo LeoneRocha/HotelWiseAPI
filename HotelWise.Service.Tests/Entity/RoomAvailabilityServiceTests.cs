@@ -56,6 +56,117 @@ public class RoomAvailabilityServiceTests
     }
 
     [Fact]
+    public async Task CreateAsync_WhenValidationFails_ShouldReturnError()
+    {
+        var dto = new RoomAvailabilityDto { RoomId = 1 };
+        var entity = new RoomAvailability { RoomId = 1 };
+
+        _mapper.Setup(m => m.Map<RoomAvailability>(dto)).Returns(entity);
+        _validator.Setup(v => v.ValidateAsync(entity, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new ValidationResult([new ValidationFailure("StartDate", "Data inicial inválida")]));
+
+        var response = await CreateSut().CreateAsync(dto);
+
+        response.Success.Should().BeFalse();
+        response.Message.Should().Contain("Data inicial inválida");
+    }
+
+    [Fact]
+    public async Task CreateBatchAsync_WithEmptyItems_ShouldReturnError()
+    {
+        var response = await CreateSut().CreateBatchAsync([]);
+
+        response.Success.Should().BeFalse();
+        response.Message.Should().Contain("Nenhum item");
+    }
+
+    [Fact]
+    public async Task CreateBatchAsync_WithInvalidCreationItem_ShouldReturnError()
+    {
+        var items = new[] { new RoomAvailabilityDto { Id = 0, RoomId = 1 } };
+        var entities = new[] { new RoomAvailability { Id = 0, RoomId = 1 } };
+
+        _mapper.Setup(m => m.Map<RoomAvailability[]>(items)).Returns(entities);
+        _validator.Setup(v => v.ValidateAsync(entities[0], It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new ValidationResult([new ValidationFailure("Currency", "Moeda obrigatória")]));
+
+        var response = await CreateSut().CreateBatchAsync(items);
+
+        response.Success.Should().BeFalse();
+        response.Message.Should().Contain("Erro ao criar item");
+    }
+
+    [Fact]
+    public async Task CreateBatchAsync_WithNonExistentUpdateItem_ShouldReturnError()
+    {
+        var items = new[] { new RoomAvailabilityDto { Id = 999, RoomId = 1 } };
+
+        _availabilityRepository.Setup(r => r.GetByIdAsync(999)).ReturnsAsync((RoomAvailability?)null);
+
+        var response = await CreateSut().CreateBatchAsync(items);
+
+        response.Success.Should().BeFalse();
+        response.Message.Should().Contain("não encontrada");
+    }
+
+    [Fact]
+    public async Task CreateBatchAsync_WithInvalidUpdateItem_ShouldReturnError()
+    {
+        var items = new[] { new RoomAvailabilityDto { Id = 10, RoomId = 1 } };
+        var existing = new RoomAvailability { Id = 10, RoomId = 1 };
+
+        _availabilityRepository.Setup(r => r.GetByIdAsync(10)).ReturnsAsync(existing);
+        _validator.Setup(v => v.ValidateAsync(existing, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new ValidationResult([new ValidationFailure("EndDate", "Data final inválida")]));
+
+        var response = await CreateSut().CreateBatchAsync(items);
+
+        response.Success.Should().BeFalse();
+        response.Message.Should().Contain("Erro ao atualizar item 10");
+    }
+
+    [Fact]
+    public async Task UpdateAsync_WhenNotFound_ShouldReturnError()
+    {
+        var dto = new RoomAvailabilityDto { Id = 999 };
+        _availabilityRepository.Setup(r => r.GetByIdAsync(999)).ReturnsAsync((RoomAvailability?)null);
+
+        var response = await CreateSut().UpdateAsync(dto);
+
+        response.Success.Should().BeFalse();
+        response.Message.Should().Contain("não encontrada");
+    }
+
+    [Fact]
+    public async Task UpdateAsync_WhenValidationFails_ShouldReturnError()
+    {
+        var dto = new RoomAvailabilityDto { Id = 5 };
+        var existing = new RoomAvailability { Id = 5 };
+        var mapped = new RoomAvailability { Id = 5 };
+
+        _availabilityRepository.Setup(r => r.GetByIdAsync(5)).ReturnsAsync(existing);
+        _mapper.Setup(m => m.Map<RoomAvailability>(dto)).Returns(mapped);
+        _validator.Setup(v => v.ValidateAsync(mapped, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new ValidationResult([new ValidationFailure("Currency", "Moeda inválida")]));
+
+        var response = await CreateSut().UpdateAsync(dto);
+
+        response.Success.Should().BeFalse();
+        response.Message.Should().Contain("Moeda inválida");
+    }
+
+    [Fact]
+    public async Task DeleteAsync_WhenNotFound_ShouldReturnError()
+    {
+        _availabilityRepository.Setup(r => r.GetByIdAsync(999)).ReturnsAsync((RoomAvailability?)null);
+
+        var response = await CreateSut().DeleteAsync(999);
+
+        response.Success.Should().BeFalse();
+        response.Message.Should().Contain("não encontrada");
+    }
+
+    [Fact]
     public async Task GetAvailabilitiesByRoomIdAsync_Should_Return_Mapped_Items()
     {
         RoomAvailability[] items =
@@ -88,5 +199,28 @@ public class RoomAvailabilityServiceTests
 
         response.Success.Should().BeFalse();
         response.Message.Should().Contain("não existe");
+    }
+
+    [Fact]
+    public async Task GetAvailabilitiesBySearchCriteriaAsync_ShouldReturnMappedResults()
+    {
+        var searchDto = new RoomAvailabilitySearchDto
+        {
+            HotelId = 1,
+            StartDate = DateTime.UtcNow.Date,
+            EndDate = DateTime.UtcNow.Date.AddDays(3),
+            Currency = "BRL"
+        };
+        var items = new[] { new RoomAvailability { Id = 10, RoomId = 1 } };
+        var dtos = new[] { new RoomAvailabilityDto { Id = 10, RoomId = 1 } };
+
+        _availabilityRepository.Setup(r => r.GetAvailabilitiesByHotelAndPeriodAsync(It.IsAny<HotelAvailabilityRequestDto>()))
+            .ReturnsAsync(items);
+        _mapper.Setup(m => m.Map<RoomAvailabilityDto[]>(items)).Returns(dtos);
+
+        var response = await CreateSut().GetAvailabilitiesBySearchCriteriaAsync(searchDto);
+
+        response.Success.Should().BeTrue();
+        response.Data.Should().ContainSingle();
     }
 }

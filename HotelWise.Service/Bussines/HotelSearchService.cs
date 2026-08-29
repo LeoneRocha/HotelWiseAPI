@@ -70,6 +70,7 @@ namespace HotelWise.Service.Entity
             catch (Exception ex)
             {
                 _logger.Error(ex, "SemanticSearch: {Message} at: {Time}", ex.Message, DataHelper.GetDateTimeNowToLog());
+                response.Success = false;
                 response.Errors.Add(new ErrorResponse() { Message = ex.Message });
                 response.Data.HotelsVectorResult = [];
                 response.Data.HotelsIAResult = [];

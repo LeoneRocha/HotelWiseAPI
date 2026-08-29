@@ -73,6 +73,41 @@ public class DiConfigurationAndBridgesTests
         services.Should().NotBeEmpty();
     }
 
+    // Cenário: Binds de configurações em ServiceCollectionConfigureAppSettings.
+    // Objetivo: Cobrir AddAndReturnAzureAdConfig e AddAndReturnTokenConfiguration.
+    [Fact]
+    public void ServiceCollectionConfigureAppSettings_ShouldBindConfigurationsCorrectly()
+    {
+        // Arrange
+        var services = new ServiceCollection();
+        var inMemorySettings = new Dictionary<string, string?>
+        {
+            { "TokenConfigurations:Audience", "hotelwise-client" },
+            { "TokenConfigurations:Issuer", "hotelwise-auth" },
+            { "TokenConfigurations:Seconds", "3600" },
+            { "TokenConfigurations:Secret", "SuperSecretKeyForHotelWiseTests1234567890!" },
+            { "AzureAd:Instance", "https://login.microsoftonline.com/" },
+            { "AzureAd:Domain", "hotelwise.com" },
+            { "AzureAd:TenantId", "tenant-id" },
+            { "AzureAd:ClientId", "client-id" }
+        };
+
+        IConfiguration configuration = new ConfigurationBuilder()
+            .AddInMemoryCollection(inMemorySettings)
+            .Build();
+
+        // Act
+        var azureConfig = HotelWise.Service.Configure.ServiceCollectionConfigureAppSettings.AddAndReturnAzureAdConfig(services, configuration);
+        var tokenConfig = HotelWise.Service.Configure.ServiceCollectionConfigureAppSettings.AddAndReturnTokenConfiguration(services, configuration);
+
+        // Assert
+        Assert.Multiple(() =>
+        {
+            azureConfig.Domain.Should().Be("hotelwise.com");
+            tokenConfig.Audience.Should().Be("hotelwise-client");
+        });
+    }
+
     // Cenário: Configuração completa via ServiceCollectionConfigureServicesDomain.
     // Objetivo: Cobrir ServiceCollectionConfigureServicesDomain.Configure.
     [Fact]

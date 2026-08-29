@@ -46,6 +46,42 @@ public class GenerateHotelServiceTests
     }
 
     [Fact]
+    public async Task GetHotelAsync_WithCommaSeparatedTags_ShouldParseCorrectly()
+    {
+        const string aiText =
+            "Pousada Sol|Pousada aconchegante|Florianopolis|SC|88000-000|praia, piscina, cafe";
+
+        _inference.Setup(i => i.GenerateChatCompletionAsync(
+                It.IsAny<PromptMessageVO[]>(),
+                InferenceAiAdapterType.SemanticKernel))
+            .ReturnsAsync(aiText);
+
+        var hotel = await CreateSut().GetHotelAsync();
+
+        hotel.Should().NotBeNull();
+        hotel.HotelName.Should().Be("Pousada Sol");
+        hotel.Tags.Should().Contain("praia");
+    }
+
+    [Fact]
+    public async Task GetHotelsAsync_Should_Generate_Multiple_Hotels()
+    {
+        const string aiText =
+            "Grand Hotel|Descricao completa do hotel|Sao Paulo|SP|01000-000|centro|executivo";
+
+        _inference.Setup(i => i.GenerateChatCompletionAsync(
+                It.IsAny<PromptMessageVO[]>(),
+                InferenceAiAdapterType.SemanticKernel))
+            .ReturnsAsync(aiText);
+
+        var hotels = await CreateSut().GetHotelsAsync(2);
+
+        hotels.Should().NotBeNull();
+        hotels.Should().HaveCount(2);
+        hotels[0].HotelName.Should().Be("Grand Hotel");
+    }
+
+    [Fact]
     public async Task GetHotelAsync_Should_Return_Empty_Hotel_When_Format_Invalid()
     {
         _inference.Setup(i => i.GenerateChatCompletionAsync(

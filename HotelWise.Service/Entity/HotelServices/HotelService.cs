@@ -43,6 +43,7 @@ namespace HotelWise.Service.Entity.HotelServices
             catch (Exception ex)
             {
                 _logger.Error(ex, "GetAllHotelsAsync: {Message} at: {Time}", ex.Message, DataHelper.GetDateTimeNowToLog());
+                response.Success = false;
                 response.Errors.Add(new ErrorResponse() { Message = ex.Message });
             }
             return response;
@@ -63,6 +64,7 @@ namespace HotelWise.Service.Entity.HotelServices
             catch (Exception ex)
             {
                 _logger.Error(ex, "InsertHotelInVectorStore: {Message} at: {Time}", ex.Message, DataHelper.GetDateTimeNowToLog());
+                response.Success = false;
                 response.Errors.Add(new ErrorResponse() { Message = ex.Message });
             }
             return response;
@@ -88,6 +90,7 @@ namespace HotelWise.Service.Entity.HotelServices
             catch (Exception ex)
             {
                 _logger.Error(ex, "GetHotelByIdAsync: {Message} at: {Time}", ex.Message, DataHelper.GetDateTimeNowToLog());
+                response.Success = false;
                 response.Errors.Add(new ErrorResponse() { Message = ex.Message });
             }
             return response;
@@ -107,6 +110,7 @@ namespace HotelWise.Service.Entity.HotelServices
             catch (Exception ex)
             {
                 _logger.Error(ex, "GenerateHotelByIA: {Message} at: {Time}", ex.Message, DataHelper.GetDateTimeNowToLog());
+                response.Success = false;
                 response.Errors.Add(new ErrorResponse() { Message = ex.Message });
             }
             return response;
@@ -139,6 +143,7 @@ namespace HotelWise.Service.Entity.HotelServices
             catch (Exception ex)
             {
                 _logger.Error(ex, "AddHotelAsync: {Message} at: {Time}", ex.Message, DataHelper.GetDateTimeNowToLog());
+                response.Success = false;
                 response.Errors.Add(new ErrorResponse() { Message = ex.Message });
             }
             return response;
@@ -168,6 +173,7 @@ namespace HotelWise.Service.Entity.HotelServices
             catch (Exception ex)
             {
                 _logger.Error(ex, "UpdateHotelAsync: {Message} at: {Time}", ex.Message, DataHelper.GetDateTimeNowToLog());
+                response.Success = false;
                 response.Errors.Add(new ErrorResponse() { Message = ex.Message });
             }
             return response;
@@ -222,6 +228,7 @@ namespace HotelWise.Service.Entity.HotelServices
             catch (Exception ex)
             {
                 _logger.Error(ex, "DeleteHotelAsync: {Message} at: {Time}", ex.Message, DataHelper.GetDateTimeNowToLog());
+                response.Success = false;
                 response.Errors.Add(new ErrorResponse() { Message = ex.Message });
             }
             return response;

@@ -20,29 +20,65 @@ public class ServiceEdgeCasesAndBranchesTests
 
     #region ReservationService Tests
 
-    // Cenário: Tentativa de atualizar ou excluir reserva (métodos não suportados).
-    // Objetivo: Garantir que UpdateAsync e DeleteAsync lancem NotImplementedException em ReservationService.
     [Fact]
     public async Task ReservationService_UpdateAndDelete_ShouldThrowNotImplementedException()
     {
-        // Arrange
         var resRepoMock = new Mock<IReservationRepository>();
         var roomRepoMock = new Mock<IRoomRepository>();
         var validatorMock = new Mock<IValidator<Reservation>>();
 
         var service = new ReservationService(_loggerMock.Object, resRepoMock.Object, roomRepoMock.Object, _mapperMock.Object, validatorMock.Object);
 
-        // Act & Assert
         await Assert.ThrowsAsync<NotImplementedException>(() => service.UpdateAsync(new ReservationDto()));
         await Assert.ThrowsAsync<NotImplementedException>(() => service.DeleteAsync(1));
     }
 
-    // Cenário: Cancelamento de reserva inexistente.
-    // Objetivo: Garantir que CancelReservationAsync retorne Success=false quando a reserva não existir.
+    [Fact]
+    public async Task ReservationService_CreateAsync_WhenValidationFails_ShouldReturnError()
+    {
+        var resRepoMock = new Mock<IReservationRepository>();
+        var roomRepoMock = new Mock<IRoomRepository>();
+        var validatorMock = new Mock<IValidator<Reservation>>();
+
+        var dto = new ReservationDto { RoomId = 1 };
+        var entity = new Reservation { RoomId = 1 };
+
+        _mapperMock.Setup(m => m.Map<Reservation>(dto)).Returns(entity);
+        validatorMock.Setup(v => v.ValidateAsync(entity, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new ValidationResult([new ValidationFailure("CheckInDate", "Data de entrada inválida")]));
+
+        var service = new ReservationService(_loggerMock.Object, resRepoMock.Object, roomRepoMock.Object, _mapperMock.Object, validatorMock.Object);
+
+        var response = await service.CreateAsync(dto);
+
+        response.Success.Should().BeFalse();
+        response.Message.Should().Contain("Data de entrada inválida");
+    }
+
+    [Fact]
+    public async Task ReservationService_CancelReservationAsync_WhenValidationFails_ShouldReturnError()
+    {
+        var resRepoMock = new Mock<IReservationRepository>();
+        var roomRepoMock = new Mock<IRoomRepository>();
+        var validatorMock = new Mock<IValidator<Reservation>>();
+
+        var existing = new Reservation { Id = 5, Status = ReservationStatus.Confirmed };
+        resRepoMock.Setup(r => r.GetByIdAsync(5)).ReturnsAsync(existing);
+
+        validatorMock.Setup(v => v.ValidateAsync(existing, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new ValidationResult([new ValidationFailure("Status", "Antecedência mínima não atendida")]));
+
+        var service = new ReservationService(_loggerMock.Object, resRepoMock.Object, roomRepoMock.Object, _mapperMock.Object, validatorMock.Object);
+
+        var response = await service.CancelReservationAsync(5);
+
+        response.Success.Should().BeFalse();
+        response.Message.Should().Contain("Antecedência mínima não atendida");
+    }
+
     [Fact]
     public async Task ReservationService_CancelReservationAsync_WhenNotFound_ShouldReturnError()
     {
-        // Arrange
         var resRepoMock = new Mock<IReservationRepository>();
         var roomRepoMock = new Mock<IRoomRepository>();
         var validatorMock = new Mock<IValidator<Reservation>>();
@@ -51,23 +87,15 @@ public class ServiceEdgeCasesAndBranchesTests
 
         var service = new ReservationService(_loggerMock.Object, resRepoMock.Object, roomRepoMock.Object, _mapperMock.Object, validatorMock.Object);
 
-        // Act
         var response = await service.CancelReservationAsync(999);
 
-        // Assert
-        Assert.Multiple(() =>
-        {
-            response.Success.Should().BeFalse();
-            response.Message.Should().Contain("não encontrada");
-        });
+        response.Success.Should().BeFalse();
+        response.Message.Should().Contain("não encontrada");
     }
 
-    // Cenário: Cancelamento com sucesso de reserva existente.
-    // Objetivo: Garantir que CancelReservationAsync altere o status para Cancelled e persista.
     [Fact]
     public async Task ReservationService_CancelReservationAsync_WhenFound_ShouldCancelSuccessfully()
     {
-        // Arrange
         var resRepoMock = new Mock<IReservationRepository>();
         var roomRepoMock = new Mock<IRoomRepository>();
         var validatorMock = new Mock<IValidator<Reservation>>();
@@ -92,25 +120,17 @@ public class ServiceEdgeCasesAndBranchesTests
 
         var service = new ReservationService(_loggerMock.Object, resRepoMock.Object, roomRepoMock.Object, _mapperMock.Object, validatorMock.Object);
 
-        // Act
         var response = await service.CancelReservationAsync(5);
 
-        // Assert
-        Assert.Multiple(() =>
-        {
-            response.Success.Should().BeTrue();
-            response.Message.Should().Contain("cancelada com sucesso");
-            existing.Status.Should().Be(ReservationStatus.Cancelled);
-        });
+        response.Success.Should().BeTrue();
+        response.Message.Should().Contain("cancelada com sucesso");
+        existing.Status.Should().Be(ReservationStatus.Cancelled);
         resRepoMock.Verify(r => r.UpdateAsync(It.Is<Reservation>(res => res.Status == ReservationStatus.Cancelled)), Times.Once);
     }
 
-    // Cenário: Consulta de reservas por quarto inexistente.
-    // Objetivo: Garantir que GetReservationsByRoomIdAsync retorne erro quando o quarto não existir.
     [Fact]
     public async Task ReservationService_GetReservationsByRoomIdAsync_WhenRoomNotFound_ShouldReturnError()
     {
-        // Arrange
         var resRepoMock = new Mock<IReservationRepository>();
         var roomRepoMock = new Mock<IRoomRepository>();
         var validatorMock = new Mock<IValidator<Reservation>>();
@@ -119,23 +139,15 @@ public class ServiceEdgeCasesAndBranchesTests
 
         var service = new ReservationService(_loggerMock.Object, resRepoMock.Object, roomRepoMock.Object, _mapperMock.Object, validatorMock.Object);
 
-        // Act
         var response = await service.GetReservationsByRoomIdAsync(999);
 
-        // Assert
-        Assert.Multiple(() =>
-        {
-            response.Success.Should().BeFalse();
-            response.Message.Should().Contain("não existe");
-        });
+        response.Success.Should().BeFalse();
+        response.Message.Should().Contain("não existe");
     }
 
-    // Cenário: Consulta de reserva por Id.
-    // Objetivo: Cobrir GetReservationByIdAsync para caso existente e inexistente.
     [Fact]
     public async Task ReservationService_GetReservationByIdAsync_ShouldReturnExpectedResult()
     {
-        // Arrange
         var resRepoMock = new Mock<IReservationRepository>();
         var roomRepoMock = new Mock<IRoomRepository>();
         var validatorMock = new Mock<IValidator<Reservation>>();
@@ -169,171 +181,21 @@ public class ServiceEdgeCasesAndBranchesTests
 
         var service = new ReservationService(_loggerMock.Object, resRepoMock.Object, roomRepoMock.Object, _mapperMock.Object, validatorMock.Object);
 
-        // Act
         var found = await service.GetReservationByIdAsync(1);
         var notFound = await service.GetReservationByIdAsync(2);
 
-        // Assert
-        Assert.Multiple(() =>
-        {
-            found.Success.Should().BeTrue();
-            found.Data.Should().NotBeNull();
-            notFound.Success.Should().BeFalse();
-        });
-    }
-
-    #endregion
-
-    #region RoomAvailabilityService Tests
-
-    // Cenário: Operação em lote de criação e atualização de disponibilidades.
-    // Objetivo: Cobrir CreateBatchAsync, UpdateAsync, DeleteAsync, GetAvailabilitiesByRoomIdAsync e GetAvailabilitiesBySearchCriteriaAsync.
-    [Fact]
-    public async Task RoomAvailabilityService_CreateBatchAndCrud_ShouldWorkProperly()
-    {
-        // Arrange
-        var availRepoMock = new Mock<IRoomAvailabilityRepository>();
-        var roomRepoMock = new Mock<IRoomRepository>();
-        var validatorMock = new Mock<IValidator<RoomAvailability>>();
-
-        validatorMock.Setup(v => v.ValidateAsync(It.IsAny<RoomAvailability>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new ValidationResult());
-
-        var service = new RoomAvailabilityService(_loggerMock.Object, availRepoMock.Object, roomRepoMock.Object, _mapperMock.Object, validatorMock.Object);
-
-        var batchItems = new[]
-        {
-            new RoomAvailabilityDto
-            {
-                Id = 0,
-                RoomId = 1,
-                StartDate = DateTime.UtcNow.Date.AddDays(1),
-                EndDate = DateTime.UtcNow.Date.AddDays(5),
-                Currency = "BRL",
-                AvailabilityWithPrice = [new RoomPriceAndAvailabilityItem { DayOfWeek = DayOfWeek.Monday, Price = 150m, Currency = "BRL" }]
-            },
-            new RoomAvailabilityDto
-            {
-                Id = 10,
-                RoomId = 1,
-                StartDate = DateTime.UtcNow.Date.AddDays(6),
-                EndDate = DateTime.UtcNow.Date.AddDays(10),
-                Currency = "BRL",
-                AvailabilityWithPrice = [new RoomPriceAndAvailabilityItem { DayOfWeek = DayOfWeek.Friday, Price = 200m, Currency = "BRL" }]
-            }
-        };
-
-        var createdEntities = new[]
-        {
-            new RoomAvailability
-            {
-                Id = 0,
-                RoomId = 1,
-                StartDate = DateTime.UtcNow.Date.AddDays(1),
-                EndDate = DateTime.UtcNow.Date.AddDays(5),
-                Currency = "BRL"
-            }
-        };
-
-        var existingItem = new RoomAvailability
-        {
-            Id = 10,
-            RoomId = 1,
-            StartDate = DateTime.UtcNow.Date.AddDays(6),
-            EndDate = DateTime.UtcNow.Date.AddDays(10),
-            Currency = "BRL"
-        };
-
-        _mapperMock.Setup(m => m.Map<RoomAvailability[]>(It.IsAny<RoomAvailabilityDto[]>())).Returns(createdEntities);
-        availRepoMock.Setup(r => r.GetByIdAsync(10)).ReturnsAsync(existingItem);
-        availRepoMock.Setup(r => r.AddRangeAsync(It.IsAny<IEnumerable<RoomAvailability>>())).Returns(Task.CompletedTask);
-        availRepoMock.Setup(r => r.UpdateRangeAsync(It.IsAny<IEnumerable<RoomAvailability>>())).Returns(Task.CompletedTask);
-
-        // Act
-        var batchResult = await service.CreateBatchAsync(batchItems);
-        var emptyBatchResult = await service.CreateBatchAsync([]);
-
-        // Assert
-        Assert.Multiple(() =>
-        {
-            batchResult.Success.Should().BeTrue();
-            emptyBatchResult.Success.Should().BeFalse();
-        });
-    }
-
-    // Cenário: Exclusão e busca de disponibilidade por critérios de busca.
-    // Objetivo: Cobrir DeleteAsync, GetAvailabilitiesByRoomIdAsync e GetAvailabilitiesBySearchCriteriaAsync.
-    [Fact]
-    public async Task RoomAvailabilityService_DeleteAndSearchCriteria_ShouldBehaveCorrectly()
-    {
-        // Arrange
-        var availRepoMock = new Mock<IRoomAvailabilityRepository>();
-        var roomRepoMock = new Mock<IRoomRepository>();
-        var validatorMock = new Mock<IValidator<RoomAvailability>>();
-
-        var existing = new RoomAvailability
-        {
-            Id = 7,
-            RoomId = 1,
-            StartDate = DateTime.UtcNow.Date.AddDays(1),
-            EndDate = DateTime.UtcNow.Date.AddDays(2),
-            Currency = "BRL"
-        };
-
-        var dto = new RoomAvailabilityDto
-        {
-            Id = 7,
-            RoomId = 1,
-            StartDate = existing.StartDate,
-            EndDate = existing.EndDate,
-            Currency = "BRL"
-        };
-
-        availRepoMock.Setup(r => r.GetByIdAsync(7)).ReturnsAsync(existing);
-        availRepoMock.Setup(r => r.GetByIdAsync(999)).ReturnsAsync((RoomAvailability?)null);
-        availRepoMock.Setup(r => r.DeleteAsync(7)).Returns(Task.CompletedTask);
-
-        roomRepoMock.Setup(r => r.ExistsAsync(It.IsAny<System.Linq.Expressions.Expression<Func<Room, bool>>>())).ReturnsAsync(true);
-        availRepoMock.Setup(r => r.GetAvailabilityByRoomId(1)).ReturnsAsync([existing]);
-        availRepoMock.Setup(r => r.GetAvailabilitiesByHotelAndPeriodAsync(It.IsAny<HotelAvailabilityRequestDto>())).ReturnsAsync([existing]);
-        _mapperMock.Setup(m => m.Map<RoomAvailabilityDto[]>(It.IsAny<RoomAvailability[]>())).Returns([dto]);
-
-        var service = new RoomAvailabilityService(_loggerMock.Object, availRepoMock.Object, roomRepoMock.Object, _mapperMock.Object, validatorMock.Object);
-
-        // Act
-        var deleteSuccess = await service.DeleteAsync(7);
-        var deleteNotFound = await service.DeleteAsync(999);
-        var byRoom = await service.GetAvailabilitiesByRoomIdAsync(1);
-        var bySearch = await service.GetAvailabilitiesBySearchCriteriaAsync(new RoomAvailabilitySearchDto
-        {
-            HotelId = 1,
-            StartDate = DateTime.UtcNow.Date,
-            EndDate = DateTime.UtcNow.Date.AddDays(5),
-            Currency = "BRL"
-        });
-
-        // Assert
-        Assert.Multiple(() =>
-        {
-            deleteSuccess.Success.Should().BeTrue();
-            deleteNotFound.Success.Should().BeFalse();
-            byRoom.Success.Should().BeTrue();
-            byRoom.Data.Should().HaveCount(1);
-            bySearch.Success.Should().BeTrue();
-            bySearch.Data.Should().HaveCount(1);
-        });
+        found.Success.Should().BeTrue();
+        found.Data.Should().NotBeNull();
+        notFound.Success.Should().BeFalse();
     }
 
     #endregion
 
     #region RoomService Tests
 
-    // Cenário: Criação, atualização, deleção e listagem de quartos por hotel.
-    // Objetivo: Cobrir métodos de RoomService.
     [Fact]
     public async Task RoomService_CrudOperationsAndByHotel_ShouldBehaveCorrectly()
     {
-        // Arrange
         var roomRepoMock = new Mock<IRoomRepository>();
         var validatorMock = new Mock<IValidator<Room>>();
 
@@ -379,7 +241,6 @@ public class ServiceEdgeCasesAndBranchesTests
 
         var service = new RoomService(_loggerMock.Object, roomRepoMock.Object, _mapperMock.Object, validatorMock.Object);
 
-        // Act
         var created = await service.CreateAsync(roomDto);
         var updated = await service.UpdateAsync(roomDto);
         var deleted = await service.DeleteAsync(3);
@@ -387,29 +248,49 @@ public class ServiceEdgeCasesAndBranchesTests
         var roomsFound = await service.GetRoomsByHotelIdAsync(1);
         var roomsNotFound = await service.GetRoomsByHotelIdAsync(2);
 
-        // Assert
-        Assert.Multiple(() =>
-        {
-            created.Success.Should().BeTrue();
-            updated.Success.Should().BeTrue();
-            deleted.Success.Should().BeTrue();
-            deleteNotFound.Success.Should().BeFalse();
-            roomsFound.Success.Should().BeTrue();
-            roomsFound.Data.Should().HaveCount(1);
-            roomsNotFound.Success.Should().BeFalse();
-        });
+        created.Success.Should().BeTrue();
+        updated.Success.Should().BeTrue();
+        deleted.Success.Should().BeTrue();
+        deleteNotFound.Success.Should().BeFalse();
+        roomsFound.Success.Should().BeTrue();
+        roomsFound.Data.Should().HaveCount(1);
+        roomsNotFound.Success.Should().BeFalse();
+    }
+
+    [Fact]
+    public async Task RoomService_WhenValidationFails_ShouldReturnError()
+    {
+        var roomRepoMock = new Mock<IRoomRepository>();
+        var validatorMock = new Mock<IValidator<Room>>();
+
+        var dto = new RoomDto { Id = 5, HotelId = 1, Name = "" };
+        var entity = new Room { Id = 5, HotelId = 1, Name = "" };
+
+        _mapperMock.Setup(m => m.Map<Room>(dto)).Returns(entity);
+        validatorMock.Setup(v => v.ValidateAsync(entity, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new ValidationResult([new ValidationFailure("Name", "Nome do quarto obrigatório")]));
+
+        roomRepoMock.Setup(r => r.GetByIdAsync(5)).ReturnsAsync(entity);
+        roomRepoMock.Setup(r => r.GetByIdAsync(999)).ReturnsAsync((Room?)null);
+
+        var service = new RoomService(_loggerMock.Object, roomRepoMock.Object, _mapperMock.Object, validatorMock.Object);
+
+        var createFailed = await service.CreateAsync(dto);
+        var updateFailed = await service.UpdateAsync(dto);
+        var updateNotFound = await service.UpdateAsync(new RoomDto { Id = 999 });
+
+        createFailed.Success.Should().BeFalse();
+        updateFailed.Success.Should().BeFalse();
+        updateNotFound.Success.Should().BeFalse();
     }
 
     #endregion
 
     #region HotelService Tests
 
-    // Cenário: Operações especializadas de HotelService (tags, vector store, geração IA, GetAll).
-    // Objetivo: Cobrir GetAllHotelsAsync, InsertHotelInVectorStore, GetHotelByIdAsync, GenerateHotelByIA, AddHotelAsync, UpdateHotelAsync, GetAllTags e DeleteHotelAsync.
     [Fact]
     public async Task HotelService_AdvancedOperations_ShouldExecuteSuccessfully()
     {
-        // Arrange
         var hotelRepoMock = new Mock<IHotelRepository>();
         var generateMock = new Mock<IGenerateHotelService>();
         var vectorStoreMock = new Mock<IVectorStoreService<HotelVector>>();
@@ -446,6 +327,7 @@ public class ServiceEdgeCasesAndBranchesTests
 
         hotelRepoMock.Setup(r => r.GetAllAsync()).ReturnsAsync([hotel]);
         hotelRepoMock.Setup(r => r.GetByIdAsync(1)).ReturnsAsync(hotel);
+        hotelRepoMock.Setup(r => r.GetByIdAsync(999)).ThrowsAsync(new Exception("Hotel not found"));
         hotelRepoMock.Setup(r => r.GetTotalHotelsCountAsync()).ReturnsAsync(1);
         hotelRepoMock.Setup(r => r.GetAllTagsAsync(0, 10)).ReturnsAsync([["luxo", "centro"]]);
         hotelRepoMock.Setup(r => r.AddAsync(It.IsAny<Hotel>())).ReturnsAsync(hotel);
@@ -466,9 +348,10 @@ public class ServiceEdgeCasesAndBranchesTests
             vectorStoreMock.Object,
             validatorMock.Object);
 
-        // Act
+        service.SetUserId(10);
         var all = await service.GetAllHotelsAsync();
         var byId = await service.GetHotelByIdAsync(1);
+        var byIdNotFound = await service.GetHotelByIdAsync(999);
         var insertVec = await service.InsertHotelInVectorStore(1);
         var genIA = await service.GenerateHotelByIA();
         var added = await service.AddHotelAsync(hotelDto);
@@ -476,18 +359,63 @@ public class ServiceEdgeCasesAndBranchesTests
         var tags = await service.GetAllTags();
         var deleted = await service.DeleteHotelAsync(1);
 
-        // Assert
         Assert.Multiple(() =>
         {
             all.Success.Should().BeTrue();
             byId.Success.Should().BeTrue();
             byId.Data!.IsHotelInVectorStore.Should().BeTrue();
+            byIdNotFound.Success.Should().BeFalse();
             insertVec.Success.Should().BeTrue();
             genIA.Success.Should().BeTrue();
             added.Success.Should().BeTrue();
             updated.Success.Should().BeTrue();
             tags.Should().Contain("luxo");
             deleted.Success.Should().BeTrue();
+        });
+    }
+
+    [Fact]
+    public async Task HotelService_WhenExceptionOccurs_ShouldReturnError()
+    {
+        var hotelRepoMock = new Mock<IHotelRepository>();
+        var generateMock = new Mock<IGenerateHotelService>();
+        var vectorStoreMock = new Mock<IVectorStoreService<HotelVector>>();
+        var configMock = new Mock<IApplicationIAConfig>();
+        var validatorMock = new Mock<IValidator<Hotel>>();
+
+        var dto = new HotelDto { HotelId = 1, HotelName = "Error Hotel" };
+        var entity = new Hotel { HotelId = 1, HotelName = "Error Hotel" };
+
+        _mapperMock.Setup(m => m.Map<Hotel>(dto)).Returns(entity);
+
+        hotelRepoMock.Setup(r => r.AddAsync(It.IsAny<Hotel>())).ThrowsAsync(new Exception("DB Insert Error"));
+        hotelRepoMock.Setup(r => r.UpdateAsync(It.IsAny<Hotel>())).ThrowsAsync(new Exception("DB Update Error"));
+        hotelRepoMock.Setup(r => r.DeleteAsync(It.IsAny<long>())).ThrowsAsync(new Exception("DB Delete Error"));
+        hotelRepoMock.Setup(r => r.GetAllAsync()).ThrowsAsync(new Exception("DB Select Error"));
+        generateMock.Setup(g => g.GetHotelAsync()).ThrowsAsync(new Exception("AI Error"));
+
+        var service = new HotelService(
+            _loggerMock.Object,
+            _mapperMock.Object,
+            configMock.Object,
+            hotelRepoMock.Object,
+            generateMock.Object,
+            vectorStoreMock.Object,
+            validatorMock.Object);
+
+        var addResult = await service.AddHotelAsync(dto);
+        var updateResult = await service.UpdateHotelAsync(dto);
+        var deleteResult = await service.DeleteHotelAsync(1);
+        var getAllResult = await service.GetAllHotelsAsync();
+        var genResult = await service.GenerateHotelByIA();
+
+        Assert.Multiple(() =>
+        {
+            addResult.Success.Should().BeFalse();
+            updateResult.Success.Should().BeFalse();
+            deleteResult.Success.Should().BeFalse();
+            getAllResult.Success.Should().BeFalse();
+            genResult.Success.Should().BeFalse();
         });
     }
 
