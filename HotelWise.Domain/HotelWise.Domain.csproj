@@ -58,7 +58,4 @@
     <ProjectReference Include="..\GroqApiLibrary\GroqApiLibrary.csproj" />
     <ProjectReference Include="..\HotelWise.Core.SDK\HotelWise.Core.SDK.csproj" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="AI\Models\" />
-  </ItemGroup>
 </Project>
