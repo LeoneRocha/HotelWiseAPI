@@ -18,21 +18,13 @@ namespace HotelWise.Service.Configure
     }
 
     /// <summary>
-    /// Registra AutoMapper com todos os profiles por categoria do Domain.
+    /// Registra AutoMapper escaneando o assembly Domain (profiles em Mapper/).
     /// </summary>
     public static class ServiceCollectionConfigureAutoMapper
     {
         public static void Configure(IServiceCollection services)
         {
-            services.AddAutoMapper(cfg =>
-            {
-                cfg.AddProfile<UserMappingProfile>();
-                cfg.AddProfile<HotelMappingProfile>();
-                cfg.AddProfile<ChatSessionHistoryMappingProfile>();
-                cfg.AddProfile<ReservationMappingProfile>();
-                cfg.AddProfile<RoomMappingProfile>();
-                cfg.AddProfile<RoomAvailabilityMappingProfile>();
-            });
+            services.AddAutoMapper(_ => { }, typeof(DomainMappingProfile));
         }
     }
 
