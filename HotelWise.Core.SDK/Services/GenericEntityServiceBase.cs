@@ -347,7 +347,7 @@ public abstract class GenericEntityServiceBase<T, TDto> : IGenericService<TDto>
         {
             response.Success = false;
             response.Message = ValidatorConstants.Generic_Erro_Message;
-            _logger.Error(ex, "Validate: {Message} at: {time}", ex.Message, DataHelper.GetDateTimeNowToLog());
+            _logger.Error(ex, "Validate: {Message} at: {Time}", ex.Message, DataHelper.GetDateTimeNowToLog());
         }
         return response;
     }

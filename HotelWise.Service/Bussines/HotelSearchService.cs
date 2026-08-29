@@ -57,10 +57,10 @@ namespace HotelWise.Service.Entity
                 await searchByInterference(searchCriteria, response);
 
                 // Processa a resposta da IA para obter os IDs dos hotéis inferidos
-                var hotelsResultInterference = HotelResponseProcessor.ProcessResponse(response.Data!.PromptResultContent);
+                var hotelsResultInterference = HotelResponseProcessor.ProcessResponse(response.Data.PromptResultContent);
 
                 // Filtra os resultados de HotelsVectorResult com base nos IDs retornados pela inferência
-                response.Data = FilterHotelsByIAResult(response.Data!, hotelsResultInterference);
+                response.Data = FilterHotelsByIAResult(response.Data, hotelsResultInterference);
 
                 if (response.Errors.Count == 0)
                 {
@@ -69,7 +69,7 @@ namespace HotelWise.Service.Entity
             }
             catch (Exception ex)
             {
-                _logger.Error(ex, "SemanticSearch: {Message} at: {time}", ex.Message, DataHelper.GetDateTimeNowToLog());
+                _logger.Error(ex, "SemanticSearch: {Message} at: {Time}", ex.Message, DataHelper.GetDateTimeNowToLog());
                 response.Errors.Add(new ErrorResponse() { Message = ex.Message });
                 response.Data.HotelsVectorResult = [];
                 response.Data.HotelsIAResult = [];
@@ -121,7 +121,7 @@ namespace HotelWise.Service.Entity
             }
             catch (Exception ex)
             {
-                _logger.Error(ex, "FetchHotelsAsync: {Message} at: {time}", ex.Message, DataHelper.GetDateTimeNowToLog());
+                _logger.Error(ex, "FetchHotelsAsync: {Message} at: {Time}", ex.Message, DataHelper.GetDateTimeNowToLog());
                 response.Errors.Add(new ErrorResponse() { Message = ex.Message });
             }
             return response;
@@ -132,14 +132,14 @@ namespace HotelWise.Service.Entity
             var responseVector = await _hotelVectorStoreService.VectorizedSearchAsync(searchCriteria);
             var hotelsVector = responseVector.Data;
             HotelDto[] listHotelsVector = changeHotelsVectorToHotelDtos(allHotelsFromDb, hotelsVector);
-            response.Data!.HotelsVectorResult = listHotelsVector;
+            response.Data.HotelsVectorResult = listHotelsVector;
             response.Errors.AddRange(responseVector.Errors);
             response.Message = responseVector.Message;
         }
 
         private async Task searchByInterference(SearchCriteria searchCriteria, ServiceResponse<HotelSemanticResult> response)
         {
-            PromptMessageVO[] historyPrompts = createPrompts(searchCriteria, response.Data!.HotelsVectorResult);
+            PromptMessageVO[] historyPrompts = createPrompts(searchCriteria, response.Data.HotelsVectorResult);
 
             // valida prompts  
             var promptsValidator = new HistoryPromptsValidator();
@@ -151,10 +151,10 @@ namespace HotelWise.Service.Entity
 
             var result = await _aIInferenceService.GenerateChatCompletionByAgentSimpleRagAsync(historyPrompts, _eIAInferenceAdapterType);
 
-            response.Data!.PromptResultContent = result;
+            response.Data.PromptResultContent = result;
 
-            HotelDto[] listHotelsIAInterference = changeHotelsVectorToHotelDtos(response.Data!.HotelsVectorResult, []);
-            response.Data!.HotelsIAResult = listHotelsIAInterference;
+            HotelDto[] listHotelsIAInterference = changeHotelsVectorToHotelDtos(response.Data.HotelsVectorResult, []);
+            response.Data.HotelsIAResult = listHotelsIAInterference;
 
         }
         private static HotelDto[] changeHotelsVectorToHotelDtos(HotelDto[]? allHotelsFromDb, HotelVector[]? hotelsVector)
@@ -168,7 +168,7 @@ namespace HotelWise.Service.Entity
                 {
                     var hotelId = (long)hotelVector.DataKey;
 
-                    var hotelEntity = allHotelsFromDb!.FirstOrDefault(x => x.HotelId == hotelId);
+                    var hotelEntity = allHotelsFromDb.FirstOrDefault(x => x.HotelId == hotelId);
                     if (hotelEntity != null)
                     {
                         var hotelResponse = new HotelDto()

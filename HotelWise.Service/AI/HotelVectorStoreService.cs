@@ -44,7 +44,7 @@ namespace HotelWise.Service.AI
             }
             catch (Exception ex)
             {
-                _logger.Error(ex, "HotelVectorStoreService GetById: {Message} at: {time}", ex.Message, DataHelper.GetDateTimeNowToLog());
+                _logger.Error(ex, "HotelVectorStoreService GetById: {Message} at: {Time}", ex.Message, DataHelper.GetDateTimeNowToLog());
             }
             return null;
         }
@@ -93,7 +93,7 @@ namespace HotelWise.Service.AI
             }
             catch (Exception ex)
             {
-                _logger.Error(ex, "An error occurred in VectorizedSearchAsync at: {Message} at: {time}", ex.Message, DateTime.UtcNow);
+                _logger.Error(ex, "An error occurred in VectorizedSearchAsync at: {Message} at: {Time}", ex.Message, DateTime.UtcNow);
 
 #pragma warning disable S6776
                 response.Success = false;
@@ -120,7 +120,7 @@ namespace HotelWise.Service.AI
             }
             catch (Exception ex)
             {
-                _logger.Error(ex, "An error occurred in SearchAndAnalyzePluginAsync at: {Message} at: {time}", ex.Message, DateTime.UtcNow);
+                _logger.Error(ex, "An error occurred in SearchAndAnalyzePluginAsync at: {Message} at: {Time}", ex.Message, DateTime.UtcNow);
 
                 response.Success = false;
                 response.Message = ex.Message;

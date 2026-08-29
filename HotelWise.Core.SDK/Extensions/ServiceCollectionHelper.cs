@@ -82,7 +82,7 @@ public static class ServiceCollectionHelper
             var implementationType = interfaceInfos.First(info => info.InterfaceType == interfaceType).ImplementationType;
             if (implementationType != null)
             {
-                services.AddScoped(interfaceType, implementationType!);
+                services.AddScoped(interfaceType, implementationType);
             }
         }
     }

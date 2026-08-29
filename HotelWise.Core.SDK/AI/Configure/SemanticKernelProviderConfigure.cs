@@ -89,20 +89,20 @@ public static class SemanticKernelProviderConfigure
     /// </summary>
     /// <param name="appConfig">Configuração agregada de IA.</param>
     /// <param name="builder">Builder do Semantic Kernel.</param>
-    private static void AddAIServices(IApplicationIAConfig appConfig, IKernelBuilder builder)
+    private static void AddAIServices(ApplicationIAConfig appConfig, IKernelBuilder builder)
     {
-        var aiServiceType = appConfig?.RagConfig?.AIChatServiceApi ?? AIChatServiceType.MistralApi;
+        var aiServiceType = appConfig.RagConfig?.AIChatServiceApi ?? AIChatServiceType.MistralApi;
 
 #pragma warning disable SKEXP0070
         switch (aiServiceType)
         {
             case AIChatServiceType.Default:
             case AIChatServiceType.MistralApi:
-                AddMistral(appConfig!, builder);
+                AddMistral(appConfig, builder);
                 break;
             case AIChatServiceType.Ollama:
             case AIChatServiceType.OllamaAdapter:
-                AddOllama(appConfig!, builder);
+                AddOllama(appConfig, builder);
                 break;
             default:
                 break;
@@ -268,7 +268,7 @@ public static class SemanticKernelProviderConfigure
     /// <typeparam name="TVector">Tipo do registro vetorial.</typeparam>
     /// <param name="appConfig">Configuração agregada de IA.</param>
     /// <param name="builder">Builder do Semantic Kernel.</param>
-    private static void AddQdrantVectorStoreToBuilder<TVector>(IApplicationIAConfig appConfig, IKernelBuilder builder)
+    private static void AddQdrantVectorStoreToBuilder<TVector>(ApplicationIAConfig appConfig, IKernelBuilder builder)
         where TVector : class
     {
 #pragma warning disable SKEXP0020

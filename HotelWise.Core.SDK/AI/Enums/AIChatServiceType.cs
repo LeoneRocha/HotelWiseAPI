@@ -5,7 +5,7 @@ namespace HotelWise.Core.SDK.AI.Enums;
 /// <summary>
 /// Tipos de serviço de chat/completion suportados no pipeline de IA.
 /// Usado em <see cref="Abstractions.IRagConfig"/> e na resolução de configuração
-/// via <see cref="Abstractions.IApplicationIAConfig.GetChatServiceConfig"/>.
+/// via <see cref="Abstractions.IApplicationIAConfig.GetChatServiceConfig(AIChatServiceType)"/>.
 /// </summary>
 [JsonConverter(typeof(JsonStringEnumConverter))]
 public enum AIChatServiceType

@@ -53,12 +53,9 @@ public static class ChatSessionHelper
     {
         var contextBuilder = new StringBuilder();
 
-        foreach (var message in history)
+        foreach (var message in history.Where(m => !string.IsNullOrEmpty(m.Content)))
         {
-            if (!string.IsNullOrEmpty(message.Content))
-            {
-                contextBuilder.AppendLine($"{message.RoleType}: {message.Content}");
-            }
+            contextBuilder.AppendLine($"{message.RoleType}: {message.Content}");
         }
 
         return contextBuilder.ToString().Trim();

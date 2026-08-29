@@ -79,7 +79,7 @@ namespace HotelWise.Domain.Validator.HotelValidators
                 .WithMessage("Já existe um item cadastrado com a mesma data e moeda para este quarto.");
 
             RuleFor(ra => ra)
-              .MustAsync((ra, cancellationToken) => PeriodCannotBeModifiedAsync(ra, cancellationToken))
+              .MustAsync((ra, _) => PeriodCannotBeModifiedAsync(ra))
               .When(ra => ra.Id > 0) // Aplicado apenas em casos de edição
               .WithMessage("O período não pode ser alterado ao editar uma disponibilidade existente.");
         }
@@ -88,7 +88,7 @@ namespace HotelWise.Domain.Validator.HotelValidators
         /// <summary>
         /// Verifica se o período não foi modificado em uma edição.
         /// </summary>
-        private async Task<bool> PeriodCannotBeModifiedAsync(RoomAvailability availability, CancellationToken cancellationToken)
+        private async Task<bool> PeriodCannotBeModifiedAsync(RoomAvailability availability)
         {
             var existingAvailability = await _roomAvailabilityRepository.GetByIdAsync(availability.Id);
 

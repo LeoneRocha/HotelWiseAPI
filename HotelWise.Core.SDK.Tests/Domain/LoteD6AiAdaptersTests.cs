@@ -7,10 +7,12 @@ namespace HotelWise.Core.SDK.Tests.Domain;
 
 public class LoteD6AiAdaptersTests
 {
+    private static readonly float[] SampleEmbedding = [1f, 2f, 3f];
+
     [Fact]
     public void EmbeddingHelper_Should_Convert_Float_Array()
     {
-        var memory = EmbeddingHelper.ConvertToReadOnlyMemory(new[] { 1f, 2f, 3f });
+        var memory = EmbeddingHelper.ConvertToReadOnlyMemory(SampleEmbedding);
         memory.Length.Should().Be(3);
         memory.Span[0].Should().Be(1f);
     }

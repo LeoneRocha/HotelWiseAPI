@@ -82,7 +82,7 @@ namespace HotelWise.Service.Entity
             } 
             catch (Exception ex)
             {
-                _logger.Error(ex, "AssistantService AskAssistant: {Message} at: {time}", ex.Message, DataHelper.GetDateTimeNowToLog());
+                _logger.Error(ex, "AssistantService AskAssistant: {Message} at: {Time}", ex.Message, DataHelper.GetDateTimeNowToLog());
             }
             return null;
         }
@@ -105,7 +105,7 @@ namespace HotelWise.Service.Entity
             }
             catch (Exception ex)
             {
-                _logger.Error(ex, "PersistChatAsync - Erro ao persistir o chat: {Message} at {time}", ex.Message, DataHelper.GetDateTimeNowToLog());
+                _logger.Error(ex, "PersistChatAsync - Erro ao persistir o chat: {Message} at {Time}", ex.Message, DataHelper.GetDateTimeNowToLog());
             }
         }
         private async Task UpdateExistingSession(ChatSessionHistory existingSession, PromptMessageVO promptMessageUser, AskAssistantResponse[] askAssistantResponses)

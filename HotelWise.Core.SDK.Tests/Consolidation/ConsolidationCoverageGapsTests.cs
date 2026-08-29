@@ -29,11 +29,12 @@ namespace HotelWise.Core.SDK.Tests.Consolidation;
 
 public class ConsolidationCoverageGapsTests
 {
+    private static readonly float[] SingleFloatEmbedding = [1f];
+
     [Fact]
     public void LogAppHelper_Should_Cover_Logging_And_Version_Paths()
     {
         var sw = Stopwatch.StartNew();
-        Thread.Sleep(5);
         sw.Stop();
         LogAppHelper.GetDurationStopwatch(sw).Should().MatchRegex(@"\d{2}:\d{2}:\d{2}");
 
@@ -222,7 +223,7 @@ public class ConsolidationCoverageGapsTests
         new AppWarningException("m", new Exception("i")).InnerException!.Message.Should().Be("i");
 
         var vec = new GapDataVector { DataKey = 1, Score = 0.5, Tags = ["t"] };
-        vec.Embedding = new ReadOnlyMemory<float>(new float[] { 1f });
+        vec.Embedding = new ReadOnlyMemory<float>(SingleFloatEmbedding);
         vec.Tags.Should().Contain("t");
 
         MarkdownHelper.HasMarkdown("").Should().BeFalse();

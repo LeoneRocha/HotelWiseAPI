@@ -133,7 +133,7 @@ public static class LogAppHelper
         var assemblyApp = GetInformationVersionProduct();
         if (assemblyApp != null)
         {
-            logger.Information("Name: {Name} | Version: {Version} | Environment: {envName}", assemblyApp.Name, assemblyApp.Version, assemblyApp.EnvironmentName);
+            logger.Information("Name: {Name} | Version: {Version} | Environment: {EnvName}", assemblyApp.Name, assemblyApp.Version, assemblyApp.EnvironmentName);
         }
         else
         {

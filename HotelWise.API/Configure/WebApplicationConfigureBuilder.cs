@@ -44,15 +44,16 @@ namespace HotelWise.API.Configure
 
                 LogAppHelper.PrintLogInformationVersionProduct(_logger);
 
-                _logger.Information("Web API Loading at: {time}", DateTime.UtcNow);
+                _logger.Information("Web API Loading at: {Time}", DateTime.UtcNow);
 
                 app.Run();
             }
             catch (Exception ex)
             {
-                _logger.Error(ex, "Web API Error Loading at: {Message} at: {time}", ex.Message, DateTime.UtcNow);
+                _logger.Error(ex, "Web API Error Loading at: {Message} at: {Time}", ex.Message, DateTime.UtcNow);
                 Console.Error.WriteLine($"FATAL STARTUP: {ex}");
-                throw;
+                throw new InvalidOperationException(
+                    "Web API failed during startup (BuildAndRunAPP). See inner exception for details.", ex);
             }
         }
 
@@ -69,11 +70,19 @@ namespace HotelWise.API.Configure
                     diagnosticContext.Set("CorrelationId", correlationId);
                 };
                 options.GetLevel = (httpContext, elapsed, ex) =>
-                    ex != null || httpContext.Response.StatusCode >= 500
-                        ? Serilog.Events.LogEventLevel.Error
-                        : httpContext.Response.StatusCode >= 400
-                            ? Serilog.Events.LogEventLevel.Warning
-                            : Serilog.Events.LogEventLevel.Information;
+                {
+                    if (ex != null || httpContext.Response.StatusCode >= 500)
+                    {
+                        return Serilog.Events.LogEventLevel.Error;
+                    }
+
+                    if (httpContext.Response.StatusCode >= 400)
+                    {
+                        return Serilog.Events.LogEventLevel.Warning;
+                    }
+
+                    return Serilog.Events.LogEventLevel.Information;
+                };
             });
 
             app.UseMiddleware<GlobalExceptionMiddleware>();
@@ -128,7 +137,8 @@ namespace HotelWise.API.Configure
             catch (Exception ex)
             {
                 Log.Error(ex, "Falha ao aplicar migrations no startup. Verifique ConnectionStrings:DBConnectionMySQL e acesso ao MySQL.");
-                throw;
+                throw new InvalidOperationException(
+                    "Database migration failed during application startup. See inner exception for details.", ex);
             }
         }
     }

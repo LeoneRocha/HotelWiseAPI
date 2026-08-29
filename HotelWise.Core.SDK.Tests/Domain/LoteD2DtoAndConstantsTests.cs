@@ -35,7 +35,7 @@ public class LoteD2DtoAndConstantsTests
     [Fact]
     public void TokenConfigurationDto_Should_Implement_ITokenConfigurationDto()
     {
-        ITokenConfigurationDto cfg = new TokenConfigurationDto
+        TokenConfigurationDto cfg = new TokenConfigurationDto
         {
             Audience = "aud",
             Issuer = "iss",
@@ -44,6 +44,7 @@ public class LoteD2DtoAndConstantsTests
             DaysToExpiry = 7
         };
 
+        cfg.Should().BeAssignableTo<ITokenConfigurationDto>();
         cfg.Audience.Should().Be("aud");
         cfg.Minutes.Should().Be(30);
     }

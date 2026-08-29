@@ -28,6 +28,10 @@ namespace HotelWise.Core.SDK.Tests.Consolidation;
 
 public class ConsolidationCoverageTests
 {
+    private static readonly int[] FilterItemsSource = [1, 2, 3, 4];
+    private static readonly int[] FilterItemsExclude = [2, 4];
+    private static readonly float[] EmbeddingSample = [1f];
+
     [Fact]
     public void ConfigurationAppSettingsHelper_Should_Read_Sections()
     {
@@ -81,8 +85,8 @@ public class ConsolidationCoverageTests
     [Fact]
     public void ServiceCollectionHelper_And_Di_Extensions_Should_Work()
     {
-        var items = new[] { 1, 2, 3, 4 };
-        ServiceCollectionHelper.FilterItems(items, new[] { 2, 4 }).Should().Equal(1, 3);
+        var items = FilterItemsSource;
+        ServiceCollectionHelper.FilterItems(items, FilterItemsExclude).Should().Equal(1, 3);
 
         var services = new ServiceCollection();
         services.AddScoped<object>();
@@ -153,7 +157,7 @@ public class ConsolidationCoverageTests
         adapter.Setup(a => a.GenerateChatCompletionAsync(It.IsAny<PromptMessageVO[]>())).ReturnsAsync("ok");
         adapter.Setup(a => a.GenerateChatCompletionByAgentAsync(It.IsAny<PromptMessageVO[]>())).ReturnsAsync("agent");
         adapter.Setup(a => a.GenerateChatCompletionByAgentSimpleRagAsync(It.IsAny<PromptMessageVO[]>())).ReturnsAsync("rag");
-        adapter.Setup(a => a.GenerateEmbeddingAsync("t")).ReturnsAsync(new float[] { 1f });
+        adapter.Setup(a => a.GenerateEmbeddingAsync("t")).ReturnsAsync(EmbeddingSample);
 
         var factory = new Mock<IAIInferenceAdapterFactory>();
         factory.Setup(f => f.CreateAdapter(InferenceAiAdapterType.GroqApi)).Returns(adapter.Object);

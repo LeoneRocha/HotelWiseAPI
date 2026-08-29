@@ -90,7 +90,7 @@ public class GenericRepositoryBaseTests
         });
 
         (await repo.GetAllAsync()).Should().HaveCount(3);
-        (await repo.FindAsync(e => e.Name.StartsWith("x"))).Should().HaveCount(2);
+        (await repo.FindAsync(e => e.Name.StartsWith('x'))).Should().HaveCount(2);
         (await repo.ExistsAsync(e => e.Name == "y")).Should().BeTrue();
         (await repo.CountAsync()).Should().Be(3);
         (await repo.FetchAsync(0, 2)).Should().HaveCount(2);

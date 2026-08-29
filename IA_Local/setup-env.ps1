@@ -2,7 +2,7 @@
 $env:STORAGE_LOCATION="$HOME\Documents\anythingllm"
 
 # Criar o diretório de armazenamento, caso não exista
-If (!(Test-Path $env:STORAGE_LOCATION)) {
+if (!(Test-Path $env:STORAGE_LOCATION)) {
     New-Item $env:STORAGE_LOCATION -ItemType Directory
 }
 
@@ -10,7 +10,7 @@ If (!(Test-Path $env:STORAGE_LOCATION)) {
 $envFile = "$env:STORAGE_LOCATION\.env"
 
 # Criar ou editar o arquivo .env
-If (!(Test-Path $envFile)) {
+if (!(Test-Path $envFile)) {
     New-Item $envFile -ItemType File
 }
 
@@ -33,9 +33,9 @@ Start-Sleep -Seconds 5 # Ajuste o tempo de espera se necessário
 
 # Verificar se o Ollama está em execução
 $ollamaRunning = docker ps | Select-String "ollama"
-If ($ollamaRunning) {
+if ($ollamaRunning) {
     Write-Host "Ollama está rodando. Configuração completa!"
-} Else {
+} else {
     Write-Host "Ollama não foi encontrado. Verifique o `docker-compose`."
 }
 

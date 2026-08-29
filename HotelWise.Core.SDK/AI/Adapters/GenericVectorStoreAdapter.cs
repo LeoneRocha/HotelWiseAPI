@@ -33,11 +33,6 @@ public class GenericVectorStoreAdapter<TVector> : IVectorStoreAdapter<TVector> w
     private readonly VectorStore _vectorStore;
 
     /// <summary>
-    /// Coleção tipada carregada sob demanda.
-    /// </summary>
-    private VectorStoreCollection<ulong, TVector>? _collection;
-
-    /// <summary>
     /// Kernel do Semantic Kernel para plugins e prompts.
     /// </summary>
     private readonly Kernel _kernel;
@@ -69,18 +64,13 @@ public class GenericVectorStoreAdapter<TVector> : IVectorStoreAdapter<TVector> w
     /// Carrega (e cria se necessário) a coleção tipada pelo nome.
     /// </summary>
     /// <param name="nameCollection">Nome da coleção.</param>
-    /// <returns>Tarefa assíncrona de preparação da coleção.</returns>
-    private async Task LoadCollection(string nameCollection)
+    /// <returns>Coleção tipada pronta para uso.</returns>
+    private async Task<VectorStoreCollection<ulong, TVector>> LoadCollection(string nameCollection)
     {
-        _collection = _vectorStore.GetCollection<ulong, TVector>(nameCollection);
-        await CreateCollection();
+        var collection = _vectorStore.GetCollection<ulong, TVector>(nameCollection);
+        await collection.EnsureCollectionExistsAsync();
+        return collection;
     }
-
-    /// <summary>
-    /// Garante que a coleção atual exista no store.
-    /// </summary>
-    /// <returns>Tarefa assíncrona de criação/verificação.</returns>
-    private async Task CreateCollection() => await _collection!.EnsureCollectionExistsAsync();
 
     /// <summary>
     /// Insere ou atualiza um único registro vetorial na coleção.
@@ -95,8 +85,8 @@ public class GenericVectorStoreAdapter<TVector> : IVectorStoreAdapter<TVector> w
     /// </example>
     public async Task UpsertDataAsync(string nameCollection, TVector dataVector)
     {
-        await LoadCollection(nameCollection);
-        await _collection!.UpsertAsync(dataVector);
+        var collection = await LoadCollection(nameCollection);
+        await collection.UpsertAsync(dataVector);
     }
 
     /// <summary>
@@ -107,10 +97,10 @@ public class GenericVectorStoreAdapter<TVector> : IVectorStoreAdapter<TVector> w
     /// <returns>Tarefa que conclui quando todos os upserts forem finalizados.</returns>
     public async Task UpsertDatasAsync(string nameCollection, TVector[] dataVectors)
     {
-        await LoadCollection(nameCollection);
+        var collection = await LoadCollection(nameCollection);
         foreach (TVector dataVector in dataVectors)
         {
-            await _collection!.UpsertAsync(dataVector);
+            await collection.UpsertAsync(dataVector);
         }
     }
 
@@ -122,8 +112,8 @@ public class GenericVectorStoreAdapter<TVector> : IVectorStoreAdapter<TVector> w
     /// <returns>Registro encontrado, ou <c>null</c>.</returns>
     public async Task<TVector?> GetByKey(string nameCollection, ulong dataKey)
     {
-        await LoadCollection(nameCollection);
-        return await _collection!.GetAsync(dataKey);
+        var collection = await LoadCollection(nameCollection);
+        return await collection.GetAsync(dataKey);
     }
 
     /// <summary>
@@ -134,8 +124,8 @@ public class GenericVectorStoreAdapter<TVector> : IVectorStoreAdapter<TVector> w
     /// <returns><c>true</c> se existir; caso contrário, <c>false</c>.</returns>
     public async Task<bool> Exists(string nameCollection, ulong dataKey)
     {
-        await LoadCollection(nameCollection);
-        TVector? retrieved = await _collection!.GetAsync(dataKey);
+        var collection = await LoadCollection(nameCollection);
+        TVector? retrieved = await collection.GetAsync(dataKey);
         return !EqualityComparer<TVector>.Default.Equals(retrieved, default);
     }
 
@@ -153,10 +143,10 @@ public class GenericVectorStoreAdapter<TVector> : IVectorStoreAdapter<TVector> w
     /// </example>
     public async Task<TVector[]> VectorizedSearchAsync(string nameCollection, float[] searchEmbedding, SearchCriteria searchCriteria)
     {
-        await LoadCollection(nameCollection);
+        var collection = await LoadCollection(nameCollection);
         var searchEmbeddingCriteria = EmbeddingHelper.ConvertToReadOnlyMemory(searchEmbedding);
         VectorSearchOptions<TVector> vectorSearchOptions = CreateOptions(searchCriteria);
-        var searchResult = _collection!.SearchAsync(searchEmbeddingCriteria, searchCriteria.MaxHotelRetrieve, vectorSearchOptions);
+        var searchResult = collection.SearchAsync(searchEmbeddingCriteria, searchCriteria.MaxHotelRetrieve, vectorSearchOptions);
 
         List<TVector> dataVectors = new List<TVector>();
         await foreach (var item in searchResult)
@@ -209,26 +199,26 @@ public class GenericVectorStoreAdapter<TVector> : IVectorStoreAdapter<TVector> w
         List<TVector> dataVectors = new List<TVector>();
         var stopwatch = Stopwatch.StartNew();
         InsertLogStarterSearchPluginAsync();
-        await LoadCollection(nameCollection);
+        var collection = await LoadCollection(nameCollection);
 
         IEmbeddingGenerator<string, Embedding<float>> embeddingGenerator =
             _kernel.GetRequiredService<IEmbeddingGenerator<string, Embedding<float>>>();
-        var vectorStoreTextSearch = new VectorStoreTextSearch<TVector>(_collection!, embeddingGenerator);
+        var vectorStoreTextSearch = new VectorStoreTextSearch<TVector>(collection, embeddingGenerator);
         string pluginName = CreatePlugin(vectorStoreTextSearch);
         string template = CreateTemplate(pluginName);
-        var results = await GetVectorsResults(searchEmbedding);
+        var results = await GetVectorsResults(collection, searchEmbedding);
         InsertLogVectorizedSearchAsync(results);
         KernelArguments arguments = CreateArguments(searchQuery, results);
         HandlebarsPromptTemplateFactory promptTemplateFactory = new();
         string templateResult = await RenderPrompt(searchQuery, template, results, promptTemplateFactory);
-        _logger.Information("SearchAndAnalyzePluginAsync - Rendered Prompt: {templateResult}", templateResult);
+        _logger.Information("SearchAndAnalyzePluginAsync - Rendered Prompt: {TemplateResult}", templateResult);
         IAsyncEnumerable<StreamingKernelContent> result2 = await InvokePrompt(template, arguments, promptTemplateFactory);
         await foreach (var message in result2)
         {
-            _logger.Information("Result IA : {message}", message);
+            _logger.Information("Result IA : {Message}", message);
         }
         stopwatch.Stop();
-        _logger.Information("SearchPluginAsync completed in: {elapsed} (hh:mm:ss)", TimeFormatter.FormatElapsedTime(stopwatch.Elapsed));
+        _logger.Information("SearchPluginAsync completed in: {Elapsed} (hh:mm:ss)", TimeFormatter.FormatElapsedTime(stopwatch.Elapsed));
         return dataVectors.ToArray();
     }
 
@@ -237,13 +227,13 @@ public class GenericVectorStoreAdapter<TVector> : IVectorStoreAdapter<TVector> w
     /// </summary>
     /// <param name="results">Resultados da busca.</param>
     private void InsertLogVectorizedSearchAsync(VectorSearchResult<TVector>[] results) =>
-        _logger.Information("VectorizedSearchAsync : {dataSearchResult}", results);
+        _logger.Information("VectorizedSearchAsync : {DataSearchResult}", results);
 
     /// <summary>
     /// Registra no log o início da busca com plugin.
     /// </summary>
     private void InsertLogStarterSearchPluginAsync() =>
-        _logger.Information("SearchPluginAsync: {time}", DateTime.UtcNow);
+        _logger.Information("SearchPluginAsync: {Time}", DateTime.UtcNow);
 
     /// <summary>
     /// Cria o template Handlebars do plugin de busca textual.
@@ -299,7 +289,7 @@ public class GenericVectorStoreAdapter<TVector> : IVectorStoreAdapter<TVector> w
     private async Task<IAsyncEnumerable<StreamingKernelContent>> InvokePrompt(string template, KernelArguments arguments, HandlebarsPromptTemplateFactory promptTemplateFactory)
     {
         var resultKernel = await _kernel.InvokePromptAsync(template, arguments, templateFormat: HandlebarsPromptTemplateFactory.HandlebarsTemplateFormat, promptTemplateFactory: promptTemplateFactory);
-        _logger.Information("InvokePrompt  - InvokePromptAsync: {templateResult}", resultKernel);
+        _logger.Information("InvokePrompt  - InvokePromptAsync: {TemplateResult}", resultKernel);
         return _kernel.InvokePromptStreamingAsync(template, arguments, templateFormat: HandlebarsPromptTemplateFactory.HandlebarsTemplateFormat, promptTemplateFactory: promptTemplateFactory);
     }
 
@@ -335,19 +325,22 @@ public class GenericVectorStoreAdapter<TVector> : IVectorStoreAdapter<TVector> w
                 new InputVariable() { Name = "results", Default = results }
             }
         }).RenderAsync(_kernel);
-        _logger.Information("Rendered Prompt: {templateResult}", templateResult);
+        _logger.Information("Rendered Prompt: {TemplateResult}", templateResult);
         return templateResult;
     }
 
     /// <summary>
     /// Obtém os top resultados vetoriais a partir do embedding da consulta.
     /// </summary>
+    /// <param name="collection">Coleção tipada já carregada.</param>
     /// <param name="searchEmbedding">Embedding da consulta.</param>
     /// <returns>Array de resultados de busca vetorial.</returns>
-    private async Task<VectorSearchResult<TVector>[]> GetVectorsResults(float[] searchEmbedding)
+    private static async Task<VectorSearchResult<TVector>[]> GetVectorsResults(
+        VectorStoreCollection<ulong, TVector> collection,
+        float[] searchEmbedding)
     {
         var searchEmbeddingCriteria = EmbeddingHelper.ConvertToReadOnlyMemory(searchEmbedding);
-        var searchResult = _collection!.SearchAsync(searchEmbeddingCriteria, top: 2, new VectorSearchOptions<TVector>
+        var searchResult = collection.SearchAsync(searchEmbeddingCriteria, top: 2, new VectorSearchOptions<TVector>
         {
             VectorProperty = r => r.Embedding
         });
@@ -367,8 +360,8 @@ public class GenericVectorStoreAdapter<TVector> : IVectorStoreAdapter<TVector> w
     /// <returns>Tarefa que conclui quando a exclusão for finalizada.</returns>
     public async Task DeleteAsync(string nameCollection, long dataKey)
     {
-        await LoadCollection(nameCollection);
-        await _collection!.DeleteAsync((ulong)dataKey);
+        var collection = await LoadCollection(nameCollection);
+        await collection.DeleteAsync((ulong)dataKey);
     }
 }
 #endif
