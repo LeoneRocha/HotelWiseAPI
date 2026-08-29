@@ -1,5 +1,4 @@
-﻿using HotelWise.Domain.Enuns.Hotel;
-using HotelWise.Domain.Interfaces.Base;
+using HotelWise.Domain.Enuns.Hotel;
 
 namespace HotelWise.Domain.Model.HotelModels
 {

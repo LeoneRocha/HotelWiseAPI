@@ -1,9 +1,9 @@
-﻿using AutoMapper;
+using HotelWise.Domain.Dto.IA.SemanticKernel;
+using AutoMapper;
 using HotelWise.Domain.Dto;
+using HotelWise.Domain.Dto.IA;
 using HotelWise.Domain.Dto.Enitty.HotelDtos;
 using HotelWise.Domain.Dto.Enitty;
-using HotelWise.Domain.Dto.IA.SemanticKernel;
-using HotelWise.Domain.Dto.IA;
 using HotelWise.Domain.Model.AI;
 using HotelWise.Domain.Model;
 using HotelWise.Domain.Model.HotelModels;

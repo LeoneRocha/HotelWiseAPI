@@ -1,9 +1,5 @@
-﻿using Bogus;
-using HotelWise.Domain.Dto.IA.SemanticKernel;
-using HotelWise.Domain.Enuns.IA;
-using HotelWise.Domain.Interfaces.AppConfig;
+using Bogus;
 using HotelWise.Domain.Interfaces.Entity.HotelInterfaces.Service;
-using HotelWise.Domain.Interfaces.IA;
 using HotelWise.Domain.Model.HotelModels;
 using System.Text.RegularExpressions;
 

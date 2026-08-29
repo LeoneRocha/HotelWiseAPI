@@ -1,0 +1,12 @@
+global using HotelWise.Core.SDK.Abstractions;
+global using HotelWise.Core.SDK.Common;
+global using HotelWise.Core.SDK.Common.Constants;
+global using HotelWise.Core.SDK.Common.Exceptions;
+global using HotelWise.Core.SDK.Helpers;
+global using HotelWise.Core.SDK.Logging;
+global using HotelWise.Core.SDK.Security;
+global using HotelWise.Core.SDK.Infrastructure.Middleware;
+global using HotelWise.Core.SDK.AI.DTO;
+global using HotelWise.Core.SDK.AI.Enums;
+global using HotelWise.Core.SDK.AI.Abstractions;
+global using HotelWise.Core.SDK.AI.Configuration;

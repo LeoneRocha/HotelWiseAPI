@@ -1,13 +1,11 @@
-﻿using AutoMapper;
+using AutoMapper;
 using FluentValidation;
 using HotelWise.Domain.Dto;
 using HotelWise.Domain.Dto.Enitty.HotelDtos;
-using HotelWise.Service.Generic;
 using HotelWise.Domain.Model.HotelModels;
 using Serilog;
 using HotelWise.Domain.Interfaces.Entity.HotelInterfaces.Repository;
 using HotelWise.Domain.Interfaces.Entity.HotelInterfaces.Service;
-using HotelWise.Domain.Helpers;
 
 namespace HotelWise.Service.Entity.HotelServices
 {

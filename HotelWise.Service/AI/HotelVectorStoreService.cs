@@ -1,13 +1,7 @@
-﻿using AutoMapper;
+using HotelWise.Domain.Dto.IA.SemanticKernel;
+using AutoMapper;
 using HotelWise.Domain.Dto;
 using HotelWise.Domain.Dto.Enitty;
-using HotelWise.Domain.Dto.IA.SemanticKernel;
-using HotelWise.Domain.Enuns.IA;
-using HotelWise.Domain.Helpers;
-using HotelWise.Domain.Interfaces.AppConfig;
-using HotelWise.Domain.Interfaces.IA;
-using HotelWise.Domain.Interfaces.SemanticKernel;
-using HotelWise.Service.Generic;
 
 namespace HotelWise.Service.AI
 {

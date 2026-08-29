@@ -76,8 +76,7 @@ flowchart TB
 ```
 
 - Hosts referenciam o Core via `ProjectReference` (dev) ou pacote NuGet (consumo externo).
-- Tipos migrados são consumidos **diretamente** de `HotelWise.Core.SDK.*` (shims `[Obsolete]` / `HW_CORE_SDK_*` removidos).
-- Cola hotel (EF Hotel/User, Pomelo charset, DI de `HotelVector`/serviços de domínio) permanece no host sem Obsolete.
+- Tipos migrados no host ficam como shims `[Obsolete(..., DiagnosticId = "HW_CORE_SDK_*")]` que herdam ou encapsulam o tipo Core.
 - Código novo deve usar namespaces `HotelWise.Core.SDK.*` diretamente.
 
 ### Diagrama simplificado de camadas
@@ -308,8 +307,8 @@ dotnet pack HotelWise.Core.SDK/HotelWise.Core.SDK.csproj -c Release -o artifacts
 ## 7. Checklist de consumo
 
 - [ ] `dotnet build` da solução Release — 0 erros
-- [ ] Hosts consomem `HotelWise.Core.SDK.*` (sem shims `HW_CORE_SDK_*`)
-- [ ] Cola hotel (EF/DI) sem atributo Obsolete
+- [ ] Shims `[Obsolete(..., DiagnosticId = "HW_CORE_SDK_*")]` presentes no host onde tipos foram migrados
+- [ ] Usings da API apontam para `HotelWise.Core.SDK.*` (sem namespaces legados)
 - [ ] `dotnet test HotelWise.Core.SDK.Tests` — 100% passando
 - [ ] Coverlet ≥ 90% no escopo unit-testável (runsettings)
 - [ ] Pack gera `.nupkg` + `.snupkg` + XML docs

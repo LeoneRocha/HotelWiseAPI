@@ -1,6 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
-using HotelWise.Domain.Dto.IA.SemanticKernel;
 
 namespace HotelWise.Domain.Model.AI
 {

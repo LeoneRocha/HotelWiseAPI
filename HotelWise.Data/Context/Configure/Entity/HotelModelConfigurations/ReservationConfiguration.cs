@@ -1,4 +1,4 @@
-﻿using HotelWise.Data.Context.Configure.Helper;
+using HotelWise.Data.Context.Configure.Helper;
 using HotelWise.Domain.Model.HotelModels;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -10,7 +10,7 @@ namespace HotelWise.Data.Context.Configure.Entity.HotelModelConfigurations
         public void Configure(EntityTypeBuilder<Reservation> builder)
         {
             builder.ToTable("Reservation");
-            HelperCharSet.AddCharSet(builder);
+            PomeloCharSetHelper.AddCharSet(builder);
 
             #region KEY
             // Definição de chave primária 

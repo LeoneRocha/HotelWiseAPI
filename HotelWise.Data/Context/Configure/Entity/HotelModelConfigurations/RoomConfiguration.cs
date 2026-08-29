@@ -1,4 +1,4 @@
-﻿using HotelWise.Data.Context.Configure.Helper;
+using HotelWise.Data.Context.Configure.Helper;
 using HotelWise.Data.Context.Configure.Mock;
 using HotelWise.Domain.Model.HotelModels;
 using Microsoft.EntityFrameworkCore;
@@ -11,7 +11,7 @@ namespace HotelWise.Data.Context.Configure.Entity.HotelModelConfigurations
         public void Configure(EntityTypeBuilder<Room> builder)
         {
             builder.ToTable("Room");
-            HelperCharSet.AddCharSet(builder);
+            PomeloCharSetHelper.AddCharSet(builder);
 
             #region KEY
             // Definição de chave primária

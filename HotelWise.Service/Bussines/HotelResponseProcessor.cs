@@ -1,5 +1,5 @@
-﻿using HotelWise.Domain.Dto.IA.SemanticKernel;
 using System.Text.RegularExpressions;
+using HotelWise.Domain.Dto.IA.SemanticKernel;
 
 namespace HotelWise.Service.Bussines
 {

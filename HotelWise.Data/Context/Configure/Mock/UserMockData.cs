@@ -1,4 +1,3 @@
-﻿using HotelWise.Domain.Helpers;
 using HotelWise.Domain.Model;
 
 namespace HotelWise.Data.Context.Configure.Mock

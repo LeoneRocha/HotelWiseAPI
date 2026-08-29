@@ -1,14 +1,9 @@
-﻿using AutoMapper;
+using AutoMapper;
 using FluentValidation;
-using HotelWise.Domain.Constants;
 using HotelWise.Domain.Dto;
-using HotelWise.Domain.Dto.AppConfig;
 using HotelWise.Domain.Dto.Enitty;
-using HotelWise.Domain.Helpers;
-using HotelWise.Domain.Interfaces.AppConfig;
 using HotelWise.Domain.Interfaces.Entity;
 using HotelWise.Domain.Model;
-using HotelWise.Service.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 

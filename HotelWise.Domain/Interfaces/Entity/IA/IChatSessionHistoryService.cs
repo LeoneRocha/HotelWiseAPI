@@ -1,5 +1,4 @@
-﻿using HotelWise.Domain.Dto.IA;
-using HotelWise.Domain.Interfaces.Base;
+using HotelWise.Domain.Dto.IA;
 
 namespace HotelWise.Domain.Interfaces.Entity.IA
 {

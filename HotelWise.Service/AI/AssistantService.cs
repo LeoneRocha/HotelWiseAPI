@@ -1,15 +1,8 @@
-﻿using AutoMapper;
+using AutoMapper;
 using FluentValidation;
 using HotelWise.Domain.Dto.IA;
-using HotelWise.Domain.Dto.IA.SemanticKernel;
-using HotelWise.Domain.Enuns.IA;
-using HotelWise.Domain.Helpers;
-using HotelWise.Domain.Helpers.AI;
-using HotelWise.Domain.Interfaces.AppConfig;
 using HotelWise.Domain.Interfaces.Entity.IA;
-using HotelWise.Domain.Interfaces.IA;
 using HotelWise.Domain.Model.AI;
-using HotelWise.Domain.Validator.AI;
 using System.Text;
 
 namespace HotelWise.Service.Entity
@@ -241,7 +234,7 @@ namespace HotelWise.Service.Entity
 
             if (existingSession != null)
             {
-                string context = ChatSessionHelper.GetHistoryContext(existingSession);
+                string context = ChatSessionHelper.GetHistoryContext(existingSession.PromptMessageHistory);
 
                 PromptMessageVO histories = new PromptMessageVO()
                 {

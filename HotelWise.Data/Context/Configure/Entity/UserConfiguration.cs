@@ -1,6 +1,5 @@
-﻿using HotelWise.Data.Context.Configure.Helper;
+using HotelWise.Data.Context.Configure.Helper;
 using HotelWise.Data.Context.Configure.Mock;
-using HotelWise.Domain.Constants;
 using HotelWise.Domain.Model;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -12,7 +11,7 @@ namespace HotelWise.Data.Context.Configure.Entity
         public void Configure(EntityTypeBuilder<User> builder)
         {
             builder.ToTable("User");
-            HelperCharSet.AddCharSet(builder);
+            PomeloCharSetHelper.AddCharSet(builder);
             builder.HasKey(e => e.Id);
 
             builder.Property(e => e.Id).ValueGeneratedOnAdd();

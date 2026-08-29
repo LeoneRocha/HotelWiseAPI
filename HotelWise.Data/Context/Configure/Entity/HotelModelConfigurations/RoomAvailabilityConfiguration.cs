@@ -1,6 +1,4 @@
-﻿using HotelWise.Data.Context.Configure.Helper;
-using HotelWise.Domain.Constants;
-using HotelWise.Domain.Enuns;
+using HotelWise.Data.Context.Configure.Helper;
 using HotelWise.Domain.Model.HotelModels;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -14,7 +12,7 @@ namespace HotelWise.Data.Context.Configure.Entity.HotelModelConfigurations
         {
 
             builder.ToTable("RoomAvailability");
-            HelperCharSet.AddCharSet(builder);
+            PomeloCharSetHelper.AddCharSet(builder);
 
             #region KEY
             // Definição de chave primária 

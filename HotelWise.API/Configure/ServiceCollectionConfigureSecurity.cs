@@ -1,6 +1,4 @@
-﻿using HotelWise.Domain.Constants;
 using HotelWise.Core.SDK.Security;
-using HotelWise.Domain.Dto.AppConfig.Rag;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Identity.Web;
 using Microsoft.IdentityModel.Tokens;

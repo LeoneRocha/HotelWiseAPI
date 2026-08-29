@@ -1,15 +1,11 @@
-﻿using AutoMapper;
+using HotelWise.Domain.Dto.IA.SemanticKernel;
+using AutoMapper;
 using FluentValidation;
 using HotelWise.Domain.Dto;
 using HotelWise.Domain.Dto.Enitty.HotelDtos;
-using HotelWise.Domain.Dto.IA.SemanticKernel;
-using HotelWise.Domain.Helpers;
-using HotelWise.Domain.Interfaces.AppConfig;
 using HotelWise.Domain.Interfaces.Entity.HotelInterfaces.Repository;
 using HotelWise.Domain.Interfaces.Entity.HotelInterfaces.Service;
-using HotelWise.Domain.Interfaces.SemanticKernel;
 using HotelWise.Domain.Model.HotelModels;
-using HotelWise.Service.Generic;
 using System.Collections.Concurrent;
 
 namespace HotelWise.Service.Entity.HotelServices

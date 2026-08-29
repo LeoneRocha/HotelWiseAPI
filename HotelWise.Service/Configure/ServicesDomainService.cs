@@ -1,5 +1,3 @@
-﻿using HotelWise.Domain.Helpers;
-using HotelWise.Domain.Interfaces.AppConfig;
 using HotelWise.Domain.Interfaces.Entity;
 using HotelWise.Domain.Interfaces.Entity.HotelInterfaces.Service;
 using HotelWise.Service.Entity;

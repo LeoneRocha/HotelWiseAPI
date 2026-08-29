@@ -1,5 +1,4 @@
-﻿using HotelWise.Data.Context;
-using HotelWise.Data.Repository.Generic;
+using HotelWise.Data.Context;
 using HotelWise.Domain.Interfaces.Entity.IA;
 using HotelWise.Domain.Model.AI;
 using Microsoft.EntityFrameworkCore;

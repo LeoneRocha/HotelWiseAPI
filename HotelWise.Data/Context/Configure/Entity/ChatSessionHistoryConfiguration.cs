@@ -1,7 +1,4 @@
-﻿using HotelWise.Data.Context.Configure.Helper;
-using HotelWise.Domain.Constants;
-using HotelWise.Domain.Dto.IA.SemanticKernel;
-using HotelWise.Domain.Enuns;
+using HotelWise.Data.Context.Configure.Helper;
 using HotelWise.Domain.Model.AI;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -14,7 +11,7 @@ namespace HotelWise.Data.Context.Configure.Entity
         public void Configure(EntityTypeBuilder<ChatSessionHistory> builder)
         {
             builder.ToTable("ChatSessionHistory");
-            HelperCharSet.AddCharSet(builder);
+            PomeloCharSetHelper.AddCharSet(builder);
 
             // Definição de chave primária 
             builder.HasKey(e => e.Id);

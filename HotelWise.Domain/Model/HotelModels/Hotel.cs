@@ -1,4 +1,3 @@
-﻿using HotelWise.Domain.Interfaces.Base;
 
 namespace HotelWise.Domain.Model.HotelModels
 {

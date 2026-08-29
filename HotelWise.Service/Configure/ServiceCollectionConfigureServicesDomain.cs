@@ -1,7 +1,5 @@
-﻿using FluentValidation;
-using HotelWise.Domain.Interfaces.AppConfig;
+using FluentValidation;
 using HotelWise.Domain.Validator.HotelValidators;
-using HotelWise.Service.Security;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;

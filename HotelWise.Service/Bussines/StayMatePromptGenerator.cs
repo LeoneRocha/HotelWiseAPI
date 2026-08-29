@@ -1,5 +1,3 @@
-﻿using HotelWise.Domain.Dto.IA.SemanticKernel;
-using HotelWise.Domain.Enuns.IA;
 using System.Text;
 
 namespace HotelWise.Service.Prompts

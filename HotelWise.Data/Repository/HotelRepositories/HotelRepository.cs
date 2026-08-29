@@ -1,5 +1,4 @@
-﻿using HotelWise.Data.Context;
-using HotelWise.Data.Repository.Generic;
+using HotelWise.Data.Context;
 using HotelWise.Domain.Interfaces.Entity.HotelInterfaces.Repository;
 using HotelWise.Domain.Model.HotelModels;
 using Microsoft.EntityFrameworkCore;

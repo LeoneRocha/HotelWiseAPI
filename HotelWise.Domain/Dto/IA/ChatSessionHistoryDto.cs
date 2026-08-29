@@ -1,4 +1,3 @@
-﻿using HotelWise.Domain.Helpers;
 using HotelWise.Domain.Model.AI;
 
 namespace HotelWise.Domain.Dto.IA

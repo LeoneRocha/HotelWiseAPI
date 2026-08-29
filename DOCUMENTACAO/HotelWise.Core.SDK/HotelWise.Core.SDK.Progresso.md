@@ -1,8 +1,8 @@
 # Progresso da Implementação — HotelWise.Core.SDK
 
-**Versão:** 2.2.0  
+**Versão:** 2.3.0  
 **Data:** 2026-08-29  
-**Status Geral:** 🟢 Consolidação concluída — migração completa  
+**Status Geral:** 🟢 Shims Obsolete removidos — hosts consomem Core.SDK exclusivo  
 **Pacote Alvo:** `HotelWise.Core.SDK` (NuGet Único)  
 **TFM:** `net10.0` (host) · `net10.0;net8.0;netstandard2.1;netstandard2.0` (Core.SDK)
 
@@ -32,12 +32,34 @@
 | **Onda 3 (S1–S2)** | `HotelWise.Service` | 11 tipos | **11** | ✅ Concluído | 100% |
 | **Onda 4 (W1–W2)** | `HotelWise.API` | usings + smoke | **12** | ✅ Concluído | 100% |
 | **Consolidação** | Solução Completa | cobertura ≥ 90%, pack, CI | — | ✅ Concluído | 100% |
+| **Remoção shims** | Domain/Data/Service | `HW_CORE_SDK_*` → 0 | **108→0** | ✅ Concluído | 100% |
 
 **Progresso Global Estimado:** **100%**
 
 ---
 
-## 3. Detalhamento — Consolidação
+## 3. Detalhamento — Remoção de shims Obsolete
+
+### Escopo
+- Inventário pré: **108** arquivos com `DiagnosticId = HW_CORE_SDK_*` (Domain ~93, Data 4, Service 11).
+- Inventário pós: **0** ocorrências `HW_CORE_SDK_` em Domain/Data/Service.
+- Consumidores migrados para `HotelWise.Core.SDK.*` via `GlobalUsings.Core.cs` + usings diretos.
+
+### Cola hotel mantida (sem Obsolete)
+- `ConfigurationEntitiesHelper` (EF Hotel/User)
+- `PomeloCharSetHelper` (HasCharSet Pomelo)
+- `ConfigureServicesAI` / `SemanticKernelProviderConfigure` / DI bridges em `HostConfigureBridge.cs` (chamam Core + regs hotel)
+
+### Evidências
+- [x] `dotnet build HotelWiseAPI.sln -c Release` — **0 erros**
+- [x] `dotnet test HotelWise.Core.SDK.Tests` — **79/79**
+- [x] Coverlet line coverage **92.62%** (740/799; runsettings)
+- [x] `HW_CORE_SDK_` = **0**
+- [x] Smoke API: checklist manual (pendente de ambiente MySQL; não bloqueante)
+
+---
+
+## 4. Detalhamento — Consolidação (histórico)
 
 ### Auditoria final
 - [x] `dotnet build HotelWiseAPI.sln -c Release` — 0 erros
@@ -65,7 +87,7 @@
 
 ---
 
-## 4. Evidências de Validação
+## 5. Evidências de Validação
 
 | Fase | Build | Testes | Observações |
 | :---: | :---: | :---: | :--- |
