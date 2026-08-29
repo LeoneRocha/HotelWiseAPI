@@ -4,8 +4,8 @@
 **Arquivo:** `Diretrizes-CodeSmell-Backend-Generico.md`  
 **Escopo:** Soluções C# / .NET (APIs, bibliotecas de domínio, serviços de negócio, persistência, workers, SDKs, suítes de teste)  
 **Ferramental de Referência:** SonarQube, SonarCloud, Roslyn Analyzers, .NET CLI, dotnet-format  
-**Target Platform:** .NET 10 / C# 13+ (com suporte a multi-targeting `net8.0;net10.0`)  
-**Data da Revisão:** 2026-08-28  
+**Target Platform:** .NET 10 / C# 13+ (com suporte a multi-targeting `net8.0;net10.0` e `netstandard2.0/2.1` para SDKs reutilizáveis)  
+**Data da Revisão:** 2026-08-29  
 
 ---
 
@@ -84,6 +84,18 @@ flowchart TD
 | **`csharpsquid:S4502`** | *CSRF protection should not be disabled* | Desabilitar `[ValidateAntiForgeryToken]` ou `[IgnoreAntiforgeryToken]` em endpoints state-changing | Manter proteção CSRF ativa ou usar autenticação baseada em Bearer Tokens não associada a cookies em APIs REST stateless. |
 | **`csharpsquid:S3330`** | *HttpOnly flag should be set for sensitive cookies* | Cookies de autenticação/sessão gerados sem `HttpOnly = true` | Configurar explicitamente `CookieOptions.HttpOnly = true` e `Secure = true`. |
 | **`csharpsquid:S6437`** | *Hard-coded credentials should not be used* | Chaves de API, senhas ou connection strings em código-fonte | Utilizar `IConfiguration`, Azure Key Vault, User Secrets ou variáveis de ambiente. |
+
+---
+
+### 3.4 Governança em SDKs e Núcleos Reutilizáveis (Multi-Targeting)
+
+| Regra / Aspecto | Descrição | Risco / Causa Típica | Solução Recomendada |
+| --------------- | --------- | -------------------- | ------------------- |
+| **Multi-TFM Compatibility** | Quebra de compilação em `netstandard2.0` / `net8.0` | Uso incondicional de APIs exclusivas do .NET 10 (ex: novos métodos de coleção ou BCL) | Utilizar compilação condicional `#if NET8_0_OR_GREATER` ou isolar dependências pesadas por TFM no `.csproj`. |
+| **XML Documentation** | `CS1591` (*Missing XML comment for publicly visible type*) | Tipos públicos exportados por NuGet sem documentação | Ativar `<GenerateDocumentationFile>true</GenerateDocumentationFile>` e documentar membros públicos canônicos. |
+| **Isolamento de Domínio Host** | Acoplamento de regras de produto em biblioteca Core | Inclusão indevida de entidades de negócio concretas em SDKs transversais | Manter no Core apenas contratos, abstrações, helpers, infraestrutura genérica e adapters. |
+| **Transição e Depreciação** | Ruptura de consumidores legados durante extração de Core | Remoção abrupta de tipos sem aviso ou shims | Utilizar `[Obsolete("...", DiagnosticId = "...")]` durante fases de transição e remover apenas após migração total dos hosts. |
+| **Symbol Packages** | Falta de rastreabilidade para debugging de consumidores | Pacotes NuGet sem símbolos associados | Configurar `<IncludeSymbols>true</IncludeSymbols>` e `<SymbolPackageFormat>snupkg</SymbolPackageFormat>`. |
 
 ---
 

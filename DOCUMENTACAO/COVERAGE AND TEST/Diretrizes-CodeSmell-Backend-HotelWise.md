@@ -2,16 +2,16 @@
 
 **Documento:** Guia operacional específico da solução backend HotelWise  
 **Solução:** [HotelWiseAPI.sln](file:///c:/git/HotelWise/HotelWiseAPI/HotelWiseAPI.sln)  
-**Target Framework:** `.NET 10` (`net10.0` / Multi-target `net8.0;net10.0` no `GroqApiLibrary`)  
+**Target Framework:** `.NET 10` (`net10.0` / Multi-target `net8.0;net10.0;netstandard2.1;netstandard2.0` no `HotelWise.Core.SDK` e `net8.0;net10.0` no `GroqApiLibrary`)  
 **Guia-Base Genérico:** [Diretrizes-CodeSmell-Backend-Generico.md](file:///c:/git/HotelWise/HotelWiseAPI/DOCUMENTACAO/COVERAGE%20AND%20TEST/Diretrizes-CodeSmell-Backend-Generico.md)  
 **Diretrizes de Cobertura:** [Diretrizes-Coverage-Backend-HotelWise.md](file:///c:/git/HotelWise/HotelWiseAPI/DOCUMENTACAO/COVERAGE%20AND%20TEST/Diretrizes-Coverage-Backend-HotelWise.md)  
-**Data da Revisão:** 2026-08-28  
+**Data da Revisão:** 2026-08-29  
 
 ---
 
 ## 1. Contexto Arquitetural e Governança no HotelWise
 
-A solução **HotelWise Backend** (`HotelWiseAPI.sln`) é estruturada segundo os princípios de Clean Architecture, integrando serviços de hospitalidade, orquestração de Inteligência Artificial generativa (LLMs/SLMs), recuperação aumentada por geração (RAG vetorial) e persistência relacional:
+A solução **HotelWise Backend** (`HotelWiseAPI.sln`) é estruturada segundo os princípios de Clean Architecture e Modularidade Canônica, integrando serviços de hospitalidade, um núcleo transversal desacoplado (`HotelWise.Core.SDK`), orquestração de Inteligência Artificial generativa (LLMs/SLMs), recuperação aumentada por geração (RAG vetorial) e persistência relacional:
 
 ```mermaid
 flowchart TD
@@ -25,40 +25,52 @@ flowchart TD
     end
 
     subgraph CamadaDominio["3. Camada de Domínio & Contratos"]
-        Domain["HotelWise.Domain\n(Entidades, Interfaces de Repositório, DTOs, FluentValidation, Abstrações IA)"]
+        Domain["HotelWise.Domain\n(Entidades Hoteleiras, Interfaces de Repositório Hotel, DTOs de Negócio)"]
     end
 
     subgraph CamadaDados["4. Persistência & Infraestrutura"]
-        Data["HotelWise.Data\n(EF Core 9, Pomelo MySQL, SQL Server, Migrations, Repositórios)"]
+        Data["HotelWise.Data\n(EF Core 9, Pomelo MySQL, SQL Server, Migrations, Repositórios Concretos)"]
         QdrantStore["Qdrant Vector Database\n(Armazenamento de Embeddings & RAG)"]
     end
 
-    subgraph SDKsIntegracoes["5. SDKs & Bibliotecas de Integração"]
+    subgraph CoreTransversal["5. Núcleo Canônico Reutilizável (Multi-TFM)"]
+        CoreSDK["HotelWise.Core.SDK\n(Abstrações Base, Generic Repos/Services, JWT, DTOs, Helpers, AI Adapters/Configs)\n[net10.0;net8.0;netstandard2.1;netstandard2.0]"]
+    end
+
+    subgraph SDKsIntegracoes["6. SDKs & Bibliotecas de Integração"]
         GroqLib["GroqApiLibrary\n(SDK Packable Multi-Target net8.0;net10.0)"]
         OllamaConn["OllamaSharp / Mistral SDK\n(Conectores de Modelos de Linguagem)"]
     end
 
     API --> Service
+    API --> CoreSDK
     ConsolePOC --> Domain
+    ConsolePOC --> CoreSDK
     ConsolePOC --> GroqLib
     Service --> Domain
     Service --> Data
+    Service --> CoreSDK
     Service --> GroqLib
     Service --> OllamaConn
     Data --> Domain
+    Data --> CoreSDK
     Data --> QdrantStore
+    Domain --> CoreSDK
+    CoreSDK --> GroqLib
 ```
 
 ### 1.1 Inventário de Projetos da Solução
 
 | Projeto | Caminho | Tipo | TFM | Responsabilidade Principal |
 | ------- | ------- | ---- | --- | -------------------------- |
+| **HotelWise.Core.SDK** | `HotelWise.Core.SDK/` | Class Library (Packable) | `net10.0;net8.0;netstandard2.1;netstandard2.0` | **Núcleo canônico transversal reutilizável:** entidades base (`EntityBase`), DTOs de resposta (`ServiceResponse<T>`), interfaces, helpers, segurança JWT (`TokenService`), persistência genérica (`GenericRepositoryBase`), CRUD genérico (`GenericEntityServiceBase`), middlewares e adapters de IA/RAG. |
 | **HotelWise.API** | `HotelWise.API/` | Web API | `net10.0` | Controllers REST, autenticação JWT, documentação Swagger/Scalar, injeção de dependência e health checks. |
 | **HotelWise.Service** | `HotelWise.Service/` | Class Library | `net10.0` | Regras de negócio de reservas/hóspedes, orquestração de IA com Semantic Kernel, fluxos de RAG e resiliência via Polly. |
-| **HotelWise.Domain** | `HotelWise.Domain/` | Class Library | `net10.0` | Entidades centrais do domínio, Value Objects, contratos de interfaces, validações FluentValidation e DTOs. |
+| **HotelWise.Domain** | `HotelWise.Domain/` | Class Library | `net10.0` | Entidades centrais de produto (Hotel, Room, Reservation), Value Objects, contratos de interfaces e validadores FluentValidation. |
 | **HotelWise.Data** | `HotelWise.Data/` | Class Library | `net10.0` | Mapeamento relacional EF Core 9, Pomelo MySQL, SQL Server, repositórios concretos e migrações. |
 | **GroqApiLibrary** | `GroqApiLibrary/` | Class Library (Packable) | `net8.0;net10.0` | SDK cliente para comunicação de alta performance com a API de inferência Groq Cloud. |
 | **HotelWise.ConsolePOC** | `HotelWise.ConsolePOC/` | Console App | `net10.0` | Ambiente de experimentação e validação de embeddings, vetores Qdrant e inferência local via Ollama. |
+| **HotelWise.Core.SDK.Tests** | `HotelWise.Core.SDK.Tests/` | Test Project (xUnit) | `net10.0` | Suíte de testes canônicos automatizados do Core.SDK com cobertura ≥ 90% via Coverlet. |
 
 ---
 
@@ -116,6 +128,16 @@ flowchart TD
 
 ---
 
+### 2.6 Governança Canônica e Qualidade no `HotelWise.Core.SDK`
+- **Problema:** Mistura de contratos de domínio hoteleiro no SDK transversal, quebra de compilação multi-TFM (`net10.0;net8.0;netstandard2.1;netstandard2.0`) ou permanência de shims `[Obsolete]` depreciados nos hosts.
+- **Solução Arquitetural Homologada:**
+  - **Isolamento Total de Domínio:** O Core.SDK contém apenas tipos genéricos (`EntityBase`, `ServiceResponse<T>`, `GenericRepositoryBase<T, TContext>`, `GenericEntityServiceBase<T, TDto>`, `TokenService`, adaptadores e fábricas de IA). Zero entidades ou DTOs de negócio de Hotel/Quarto/Reserva no SDK.
+  - **Consumo Direto pelos Hosts:** Os projetos host (`Domain`, `Data`, `Service`, `API`) consomem diretamente `HotelWise.Core.SDK.*` (warnings e shims `HW_CORE_SDK_*` eliminados).
+  - **Multi-TFM e Dependências Condicionais:** Dependências leves (JSON, Serilog) disponíveis em todos os TFMs; dependências modernas (EF Core, Semantic Kernel, ASP.NET Core) condicionadas a `net10.0` e `net8.0`.
+  - **Documentação e Símbolos:** Geração de documentação XML (`GenerateDocumentationFile`) e pacote de símbolos (`.snupkg`) para distribuição NuGet profissional.
+
+---
+
 ## 3. Configuração do Sonar e Exclusões Homologadas
 
 Recomenda-se a seguinte configuração de exclusões no analisador estático para o HotelWise:
@@ -128,7 +150,7 @@ sonar.exclusions=**/Migrations/**,**/obj/**,**/bin/**,**/*.designer.cs,**/*.g.cs
 sonar.coverage.exclusions=**/*Tests*/**,**/*ConsolePOC*/**,**/Program.cs,**/*Dto.cs,**/*Vo.cs,**/*Option*.cs,**/Migrations/**
 ```
 
-> **Atenção:** Nunca adicionar exclusões arbitrárias para classes com regras de negócio (`HotelWise.Service` ou `HotelWise.Domain`) com o objetivo de burlar métricas.
+> **Atenção:** Nunca adicionar exclusões arbitrárias para classes com regras de negócio (`HotelWise.Service`, `HotelWise.Domain` ou `HotelWise.Core.SDK`) com o objetivo de burlar métricas.
 
 ---
 
@@ -150,7 +172,7 @@ dotnet format HotelWiseAPI.sln --verify-no-changes --verbosity diagnostic
 
 ### Passo 2: Aplicação das Correções
 
-Aplicar refatorações limpas nos projetos afetados (`HotelWise.Domain`, `HotelWise.Data`, `HotelWise.Service`, `HotelWise.API`, `GroqApiLibrary`), respeitando:
+Aplicar refatorações limpas nos projetos afetados (`HotelWise.Core.SDK`, `HotelWise.Domain`, `HotelWise.Data`, `HotelWise.Service`, `HotelWise.API`, `GroqApiLibrary`), respeitando:
 1. Padrões estabelecidos em [Diretrizes-CodeSmell-Backend-Generico.md](file:///c:/git/HotelWise/HotelWiseAPI/DOCUMENTACAO/COVERAGE%20AND%20TEST/Diretrizes-CodeSmell-Backend-Generico.md).
 2. Não alteração de contratos públicos REST ou schemas de banco de dados sem alinhamento prévio.
 
@@ -162,16 +184,22 @@ Aplicar refatorações limpas nos projetos afetados (`HotelWise.Domain`, `HotelW
 # 1. Executar todos os testes automatizados da solução
 dotnet test HotelWiseAPI.sln -c Release --no-build
 
-# 2. Executar análise com coleta de cobertura via Coverlet OpenCover
+# 2. Executar testes do Core.SDK com coleta de cobertura via Coverlet
+dotnet test HotelWise.Core.SDK.Tests/HotelWise.Core.SDK.Tests.csproj -c Release /p:CollectCoverage=true /p:CoverletOutputFormat=opencover
+
+# 3. Executar análise com coleta de cobertura global via Coverlet OpenCover
 dotnet test HotelWiseAPI.sln -c Release /p:CollectCoverage=true /p:CoverletOutputFormat=opencover
 ```
 
 ---
 
-### Passo 4: Validação de Empacotamento do GroqApiLibrary
+### Passo 4: Validação de Empacotamento de SDKs Multi-Target
 
 ```powershell
-# Validar empacotamento multi-target (net8.0 + net10.0)
+# 1. Validar empacotamento do HotelWise.Core.SDK (net10.0 + net8.0 + netstandard2.1 + netstandard2.0)
+dotnet pack HotelWise.Core.SDK/HotelWise.Core.SDK.csproj -c Release
+
+# 2. Validar empacotamento multi-target do GroqApiLibrary (net8.0 + net10.0)
 dotnet pack GroqApiLibrary/GroqApiLibrary.csproj -c Release
 ```
 
@@ -180,9 +208,10 @@ dotnet pack GroqApiLibrary/GroqApiLibrary.csproj -c Release
 ## 5. Checklist de Homologação
 
 - [ ] `dotnet build HotelWiseAPI.sln -c Release` conclui com 0 erros e 0 warnings novos.
-- [ ] Todos os testes automatizados da solução aprovados com 100% de sucesso.
+- [ ] Todos os testes automatizados da solução aprovados com 100% de sucesso (incluindo 79+ testes do `HotelWise.Core.SDK.Tests`).
 - [ ] Central Package Management (`Directory.Packages.props`) íntegro sem versões inline nos `.csproj`.
-- [ ] Multi-targeting do `GroqApiLibrary` (`net8.0;net10.0`) empacotando com sucesso (`dotnet pack`).
+- [ ] Multi-targeting do `HotelWise.Core.SDK` e `GroqApiLibrary` empacotando com sucesso (`dotnet pack`).
+- [ ] Ausência de resíduos de shims `HW_CORE_SDK_*` e namespace legado `SmartDigitalPsico`.
 - [ ] Métodos assíncronos do EF Core utilizando `CancellationToken`.
 - [ ] Sem credenciais ou chaves de API hardcoded no código-fonte.
 - [ ] Quality Gate do SonarQube/SonarCloud em conformidade (Rating A em Maintainability, Reliability e Security).
@@ -192,6 +221,8 @@ dotnet pack GroqApiLibrary/GroqApiLibrary.csproj -c Release
 ## 6. Referências Internas
 
 - [HotelWiseAPI.sln](file:///c:/git/HotelWise/HotelWiseAPI/HotelWiseAPI.sln) — Solução principal backend
+- [HotelWise.Core.SDK.Guide.md](file:///c:/git/HotelWise/HotelWiseAPI/DOCUMENTACAO/HotelWise.Core.SDK/HotelWise.Core.SDK.Guide.md) — Guia de referência técnica do Core.SDK
+- [HotelWise.Core.SDK.Progresso.md](file:///c:/git/HotelWise/HotelWiseAPI/DOCUMENTACAO/HotelWise.Core.SDK/HotelWise.Core.SDK.Progresso.md) — Registro de progresso e consolidação do Core.SDK
 - [Directory.Packages.props](file:///c:/git/HotelWise/HotelWiseAPI/Directory.Packages.props) — Gestão centralizada de pacotes NuGet
 - [Diretrizes-CodeSmell-Backend-Generico.md](file:///c:/git/HotelWise/HotelWiseAPI/DOCUMENTACAO/COVERAGE%20AND%20TEST/Diretrizes-CodeSmell-Backend-Generico.md) — Guia genérico de Code Smells C#
 - [Diretrizes-Coverage-Backend-HotelWise.md](file:///c:/git/HotelWise/HotelWiseAPI/DOCUMENTACAO/COVERAGE%20AND%20TEST/Diretrizes-Coverage-Backend-HotelWise.md) — Diretrizes de cobertura e testes backend HotelWise

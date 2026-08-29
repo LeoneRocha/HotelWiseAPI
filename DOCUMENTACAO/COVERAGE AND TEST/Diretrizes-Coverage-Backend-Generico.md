@@ -4,8 +4,8 @@
 **Arquivo:** `Diretrizes-Coverage-Backend-Generico.md`  
 **Escopo:** Soluções C# / .NET (APIs, Domain, Services, Repositories, SDKs)  
 **Ferramental de Referência:** NUnit, xUnit, Moq, Moq.EntityFrameworkCore, Bogus, AwesomeAssertions, Coverlet, Testcontainers  
-**Target Platform:** .NET 10 / C# 13+  
-**Data da Revisão:** 2026-08-28  
+**Target Platform:** .NET 10 / C# 13+ (com suporte a bibliotecas multi-target `net8.0;net10.0;netstandard2.0/2.1`)  
+**Data da Revisão:** 2026-08-29  
 
 ---
 
@@ -19,6 +19,7 @@ Padronizar a criação, refatoração e manutenção de testes automatizados (un
 4. **Massa de Dados Realista e Dinâmica:** Utilização do **Bogus** para geração de dados sintéticos ricos e testes de valores limite (*boundary testing*).
 5. **Simulação Precisa de Dependências:** Utilização de **Moq** e **Moq.EntityFrameworkCore** para controle total de contratos, retornos assíncronos, simulação de falhas e verificação de interações (`Verify`).
 6. **Asserções Fluentes e Seguras:** Adoção do **AwesomeAssertions** (licença permissiva Apache 2.0) e `Assert.Multiple` para asserções robustas e legíveis.
+7. **Isolamento de SDKs e Núcleos Reutilizáveis:** Cobertura canônica ≥ 90% no escopo unit-testável com exclusão via `.runsettings` apenas de conectores que exigem infraestrutura externa ou hardware especializado.
 
 ---
 
@@ -45,7 +46,7 @@ Acima de cada método de teste, adicionar obrigatoriamente um bloco de comentár
 ```csharp
 // Cenário: Tentativa de recuperação de recurso inexistente na persistência.
 // Objetivo: Garantir que o serviço lance NotFoundException e não execute o mapeamento.
-[Test]
+[Test] // ou [Fact] em xUnit
 public async Task GetByIdAsync_WhenEntityDoesNotExist_ThrowsNotFoundException()
 {
     // ...
@@ -130,6 +131,28 @@ _dbContextMock.Setup(db => db.Rooms).ReturnsDbSet(rooms);
 
 ---
 
+### 3.4 Testes em SDKs e Núcleos Reutilizáveis (Multi-TFM)
+- **Desacoplamento de Host:** Assegurar que os testes do SDK dependam apenas de contratos e abstrações do próprio SDK, sem referenciar projetos de aplicação host.
+- **Filtros e Configuração `coverlet.runsettings`:** Para suítes de SDK que contêm adaptadores dinâmicos de IA/rede, utilizar arquivo de configuração para isolar código que necessita de serviços externos em execução:
+```xml
+<?xml version="1.0" encoding="utf-8" ?>
+<RunSettings>
+  <DataCollectionRunSettings>
+    <DataCollectors>
+      <DataCollector friendlyName="XPlat Code Coverage">
+        <Configuration>
+          <Format>opencover,cobertura</Format>
+          <Exclude>[*]*.Adapters.*,[*]*.SemanticKernelProviderConfigure*</Exclude>
+        </Configuration>
+      </DataCollector>
+    </DataCollectors>
+  </DataCollectionRunSettings>
+</RunSettings>
+```
+- **Meta Canônica:** Atingir **≥ 90%** de cobertura no escopo unit-testável (entidades base, DTOs, helpers, segurança, repositórios genéricos, orquestração de serviços genéricos e validadores).
+
+---
+
 ## 4. Matriz de Cenários para Cobertura Total (100%)
 
 Para cada método ou caso de uso, cobrir obrigatoriamente os 4 quadrantes:
@@ -161,8 +184,8 @@ dotnet build <Solucao>.sln -c Release
 # 2. Executar toda a suíte de testes com coleta de cobertura via Coverlet
 dotnet test <Solucao>.sln -c Release --no-build /p:CollectCoverage=true /p:CoverletOutputFormat=opencover /p:Threshold=90
 
-# 3. Executar projeto de teste específico isoladamente
-dotnet test <CaminhoProjetoTeste>.csproj -c Release /p:CollectCoverage=true /p:CoverletOutputFormat=opencover
+# 3. Executar testes de um SDK ou projeto específico com arquivo .runsettings
+dotnet test <ProjetoTeste>.csproj -c Release --collect:"XPlat Code Coverage" --settings coverlet.runsettings
 
 # 4. Gerar relatório HTML de cobertura com ReportGenerator
 reportgenerator -reports:**/coverage.opencover.xml -targetdir:./CoverageReport -reporttypes:Html
@@ -178,5 +201,5 @@ reportgenerator -reports:**/coverage.opencover.xml -targetdir:./CoverageReport -
 - [ ] Dados dinâmicos gerados via Bogus (sem strings arbitrárias fixas).
 - [ ] Mocks configurados com comportamentos assíncronos e verificações (`Verify`).
 - [ ] Asserções fluentes (`AwesomeAssertions`) e `Assert.Multiple` quando houver mais de uma validação.
-- [ ] Cobertura de linhas e ramos verificada sem regressões.
+- [ ] Cobertura de linhas e ramos verificada sem regressões (≥ 90% em SDKs e 100% em Domain/Service).
 - [ ] Execução rápida e determinística (sem dependência de ordem de execução ou estado compartilhado).
