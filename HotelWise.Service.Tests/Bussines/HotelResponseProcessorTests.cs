@@ -41,4 +41,15 @@ public class HotelResponseProcessorTests
         result.Should().ContainSingle()
             .Which.Id.Should().Be(99);
     }
+
+    [Fact]
+    public void ProcessResponse_WithOverflowId_ShouldHandleGracefully()
+    {
+        // Número que casa com \d+ mas excede long.MaxValue (falha no TryParse)
+        const string markdown = "<!-- ID-Hotel: 9999999999999999999999999999999999999999 -->";
+
+        HotelInfo[] result = HotelResponseProcessor.ProcessResponse(markdown);
+
+        result.Should().BeEmpty();
+    }
 }

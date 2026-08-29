@@ -126,6 +126,40 @@ public class RoomAvailabilityServiceTests
     }
 
     [Fact]
+    public async Task CreateBatchAsync_WhenExceptionOccurs_ShouldReturnError()
+    {
+        var items = new[] { new RoomAvailabilityDto { Id = 0, RoomId = 1 } };
+        var entities = new[] { new RoomAvailability { Id = 0, RoomId = 1 } };
+
+        _mapper.Setup(m => m.Map<RoomAvailability[]>(items)).Returns(entities);
+        _availabilityRepository.Setup(r => r.AddRangeAsync(It.IsAny<IEnumerable<RoomAvailability>>()))
+            .ThrowsAsync(new Exception("Database connection failed"));
+
+        var response = await CreateSut().CreateBatchAsync(items);
+
+        response.Success.Should().BeFalse();
+        response.Message.Should().Contain("Database connection failed");
+    }
+
+    [Fact]
+    public async Task UpdateAsync_Should_Succeed_When_Valid()
+    {
+        var dto = new RoomAvailabilityDto { Id = 5, RoomId = 1, Currency = "BRL" };
+        var existing = new RoomAvailability { Id = 5, RoomId = 1, Currency = "BRL" };
+        var mapped = new RoomAvailability { Id = 5, RoomId = 1, Currency = "BRL" };
+
+        _availabilityRepository.Setup(r => r.GetByIdAsync(5)).ReturnsAsync(existing);
+        _mapper.Setup(m => m.Map<RoomAvailability>(dto)).Returns(mapped);
+        _availabilityRepository.Setup(r => r.UpdateAsync(mapped)).ReturnsAsync(mapped);
+        _mapper.Setup(m => m.Map<RoomAvailabilityDto>(mapped)).Returns(dto);
+
+        var response = await CreateSut().UpdateAsync(dto);
+
+        response.Success.Should().BeTrue();
+        response.Message.Should().Contain("atualizada com sucesso");
+    }
+
+    [Fact]
     public async Task UpdateAsync_WhenNotFound_ShouldReturnError()
     {
         var dto = new RoomAvailabilityDto { Id = 999 };
@@ -153,6 +187,19 @@ public class RoomAvailabilityServiceTests
 
         response.Success.Should().BeFalse();
         response.Message.Should().Contain("Moeda inválida");
+    }
+
+    [Fact]
+    public async Task DeleteAsync_Should_Succeed_When_Found()
+    {
+        var existing = new RoomAvailability { Id = 5 };
+        _availabilityRepository.Setup(r => r.GetByIdAsync(5)).ReturnsAsync(existing);
+        _availabilityRepository.Setup(r => r.DeleteAsync(5)).Returns(Task.CompletedTask);
+
+        var response = await CreateSut().DeleteAsync(5);
+
+        response.Success.Should().BeTrue();
+        response.Message.Should().Contain("excluída com sucesso");
     }
 
     [Fact]
