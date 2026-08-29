@@ -10,6 +10,8 @@ namespace HotelWise.API.Tests.Controllers;
 
 public class HotelsControllerTests
 {
+    private static readonly string[] ExpectedTags = ["spa", "pool"];
+
     private readonly Mock<IHotelService> _hotelService = new();
     private readonly Mock<IHotelSearchService> _hotelSearchService = new();
     private readonly HotelsController _controller;
@@ -69,14 +71,14 @@ public class HotelsControllerTests
     public async Task GetAllTags_Should_Return_Ok()
     {
         // Arrange
-        _hotelService.Setup(s => s.GetAllTags()).ReturnsAsync(["spa", "pool"]);
+        _hotelService.Setup(s => s.GetAllTags()).ReturnsAsync(ExpectedTags);
 
         // Act
         var result = await _controller.GetAllTags();
 
         // Assert
         result.Should().BeOfType<OkObjectResult>();
-        ((OkObjectResult)result).Value.Should().BeEquivalentTo(new[] { "spa", "pool" });
+        ((OkObjectResult)result).Value.Should().BeEquivalentTo(ExpectedTags);
         _hotelService.Verify(s => s.GetAllTags(), Times.Once);
     }
 
