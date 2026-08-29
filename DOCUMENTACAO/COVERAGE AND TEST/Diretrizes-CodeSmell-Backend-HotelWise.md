@@ -70,9 +70,13 @@ flowchart TD
 | **HotelWise.Data** | Library | `net10.0` | EF Core, Pomelo MySQL, SQL Server, migrations, repositórios |
 | **GroqApiLibrary** | Library packable | `net8.0;net10.0` | Cliente HTTP Groq |
 | **HotelWise.ConsolePOC** | Console | `net10.0` | Experimentos Ollama / Qdrant |
-| **HotelWise.Core.SDK.Tests** | xUnit | `net10.0` | Única suíte de testes automatizados **existente** na solução (meta ≥ 90% no escopo unit-testável) |
+| **HotelWise.Core.SDK.Tests** | xUnit | `net10.0` | Suíte Core.SDK (≥ 90% unit-testável) |
+| **HotelWise.Domain.Tests** | xUnit | `net10.0` | Validators, mappers, models |
+| **HotelWise.Data.Tests** | xUnit | `net10.0` | Repositórios + EF InMemory |
+| **HotelWise.Service.Tests** | xUnit | `net10.0` | Serviços com Moq |
+| **HotelWise.API.Tests** | xUnit | `net10.0` | Controllers com serviços mockados |
 
-> Status detalhado do Core.SDK: [HotelWise.Core.SDK.Progresso.md](../HotelWise.Core.SDK/HotelWise.Core.SDK.Progresso.md).
+> Status detalhado do Core.SDK: [HotelWise.Core.SDK.Progresso.md](../HotelWise.Core.SDK/HotelWise.Core.SDK.Progresso.md). Cobertura host: [Diretrizes-Coverage-Backend-HotelWise.md](./Diretrizes-Coverage-Backend-HotelWise.md).
 
 ---
 
@@ -180,7 +184,7 @@ Ordem de correção sugerida: **Core.SDK → Domain → Data → Service → API
 ## 5. Checklist de Homologação
 
 - [ ] `dotnet build HotelWiseAPI.sln -c Release` — 0 erros / 0 warnings novos
-- [ ] Testes verdes (`HotelWise.Core.SDK.Tests` e demais suítes quando existirem)
+- [ ] Testes verdes (`Domain`, `Data`, `Service`, `API`, `Core.SDK`)
 - [ ] CPM íntegro (`Directory.Packages.props`)
 - [ ] `dotnet pack` OK para Core.SDK e GroqApiLibrary
 - [ ] Zero resíduos `HW_CORE_SDK_*` / namespace legado

@@ -8,7 +8,8 @@ public class ChatSessionHistoryMappingProfile : Profile
 {
     public ChatSessionHistoryMappingProfile()
     {
-        CreateMap<ChatSessionHistory, ChatSessionHistoryDto>();
+        CreateMap<ChatSessionHistory, ChatSessionHistoryDto>()
+            .ForMember(d => d.UpdateDate, opt => opt.Ignore());
         CreateMap<ChatSessionHistoryDto, ChatSessionHistory>();
     }
 }

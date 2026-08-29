@@ -10,6 +10,6 @@ public class ReservationMappingProfile : Profile
     {
         CreateMap<Reservation, ReservationDto>()
             .ForMember(dest => dest.RoomDetails, opt => opt.MapFrom(src => src.Room));
-        CreateMap<ReservationDto, Reservation>();
+        CreateMap<ReservationDto, Reservation>(MemberList.None);
     }
 }

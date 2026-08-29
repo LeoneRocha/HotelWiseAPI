@@ -10,6 +10,6 @@ public class RoomMappingProfile : Profile
     {
         CreateMap<Room, RoomDto>()
             .ForMember(dest => dest.Availabilities, opt => opt.MapFrom(src => src.RoomAvailabilities));
-        CreateMap<RoomDto, Room>();
+        CreateMap<RoomDto, Room>(MemberList.None);
     }
 }
