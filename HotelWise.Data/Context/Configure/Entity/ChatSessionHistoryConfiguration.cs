@@ -1,5 +1,3 @@
-using HotelWise.Core.SDK.Common;
-using HotelWise.Core.SDK.Common.Constants;
 using HotelWise.Data.Context.Configure.Helper;
 using HotelWise.Domain.Model.AI;
 using Microsoft.EntityFrameworkCore;

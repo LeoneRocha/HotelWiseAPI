@@ -1,7 +1,5 @@
 using AutoMapper;
 using FluentValidation;
-using HotelWise.Core.SDK.Common;
-using HotelWise.Core.SDK.Services;
 using HotelWise.Domain.Dto.Enitty.HotelDtos;
 using HotelWise.Domain.Enuns.Hotel;
 using HotelWise.Domain.Interfaces.Entity.HotelInterfaces.Repository;
@@ -175,3 +173,4 @@ public class ReservationService : GenericEntityServiceBase<Reservation, Reservat
         return response;
     }
 }
+

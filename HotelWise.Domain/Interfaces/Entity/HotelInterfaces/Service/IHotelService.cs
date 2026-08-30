@@ -1,5 +1,3 @@
-using HotelWise.Core.SDK.Abstractions;
-using HotelWise.Core.SDK.Common;
 using HotelWise.Domain.Dto.Enitty.HotelDtos;
 
 namespace HotelWise.Domain.Interfaces.Entity.HotelInterfaces.Service;

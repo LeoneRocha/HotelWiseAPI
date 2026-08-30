@@ -1,6 +1,4 @@
 using System.Text;
-using HotelWise.Core.SDK.AI.DTO;
-using HotelWise.Core.SDK.AI.Enums;
 
 namespace HotelWise.Service.Prompts;
 
@@ -95,3 +93,4 @@ _Estou aqui para ajudar no que precisar. Aproveite sua escolha!_
         };
     }
 }
+

@@ -1,5 +1,3 @@
-using HotelWise.Core.SDK.AI.DTO;
-using HotelWise.Core.SDK.Security;
 using HotelWise.Domain.Interfaces.Entity.IA;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

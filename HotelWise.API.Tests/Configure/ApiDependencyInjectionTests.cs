@@ -1,5 +1,4 @@
 using HotelWise.API.Configure;
-using HotelWise.Core.SDK.Security;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
@@ -72,3 +71,4 @@ public class ApiDependencyInjectionTests
             .WithMessage("*Connection string MySQL ausente*");
     }
 }
+

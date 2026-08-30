@@ -1,4 +1,3 @@
-using HotelWise.Core.SDK.Abstractions;
 using HotelWise.Domain.Enuns.Hotel;
 
 namespace HotelWise.Domain.Model.HotelModels;

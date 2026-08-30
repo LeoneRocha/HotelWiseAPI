@@ -1,4 +1,3 @@
-using HotelWise.Core.SDK.Abstractions;
 using HotelWise.Domain.Model.AI;
 
 namespace HotelWise.Domain.Interfaces.Entity.IA;
@@ -22,3 +21,4 @@ public interface IChatSessionHistoryRepository : IGenericRepository<ChatSessionH
     /// <returns>Registro de histórico da sessão ou <c>null</c> se não encontrado.</returns>
     Task<ChatSessionHistory?> GetByIdTokenAsync(string token);
 }
+

@@ -1,5 +1,3 @@
-using HotelWise.Core.SDK.Infrastructure.Middleware;
-using HotelWise.Core.SDK.Logging;
 using HotelWise.Data.Context;
 using Microsoft.AspNetCore.Rewrite;
 using Microsoft.EntityFrameworkCore;
@@ -163,3 +161,4 @@ public static class WebApplicationConfigureBuilder
         }
     }
 }
+

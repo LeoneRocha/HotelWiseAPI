@@ -1,5 +1,4 @@
 using System.Reflection;
-using HotelWise.Core.SDK.Extensions;
 using HotelWise.Data.Repository;
 using HotelWise.Data.Repository.HotelRepositories;
 using HotelWise.Domain.Interfaces.Entity;
@@ -47,3 +46,4 @@ public static class ServicesDomainRepository
         ServiceCollectionHelper.RegisterInterfaces(services, [RepositorySuffix], ignoredInterfaces, assemblies);
     }
 }
+

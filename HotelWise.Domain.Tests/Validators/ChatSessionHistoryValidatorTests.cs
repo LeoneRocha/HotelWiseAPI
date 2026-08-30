@@ -1,6 +1,4 @@
 using FluentValidation;
-using HotelWise.Core.SDK.AI.DTO;
-using HotelWise.Core.SDK.AI.Enums;
 using HotelWise.Domain.Model.AI;
 using HotelWise.Domain.Validator.AI;
 
@@ -73,3 +71,4 @@ public class ChatSessionHistoryValidatorTests
         result.Errors.Should().Contain(e => e.PropertyName == nameof(ChatSessionHistory.IdToken));
     }
 }
+

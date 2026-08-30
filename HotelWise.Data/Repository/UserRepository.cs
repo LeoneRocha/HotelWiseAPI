@@ -1,4 +1,3 @@
-using HotelWise.Core.SDK.Infrastructure;
 using HotelWise.Data.Context;
 using HotelWise.Domain.Interfaces.Entity;
 using HotelWise.Domain.Model;
@@ -72,3 +71,4 @@ public class UserRepository : GenericRepositoryBase<User, HotelWiseDbContextMysq
         return new User();
     }
 }
+

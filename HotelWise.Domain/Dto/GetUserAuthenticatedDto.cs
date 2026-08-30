@@ -1,5 +1,3 @@
-using HotelWise.Core.SDK.Common;
-using HotelWise.Core.SDK.Security;
 
 namespace HotelWise.Domain.Dto;
 
@@ -36,3 +34,4 @@ public class GetUserAuthenticatedDto : EntityDtoBase
     /// </summary>
     public long? MedicalId { get; set; }
 }
+

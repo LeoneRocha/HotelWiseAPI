@@ -1,9 +1,4 @@
 using AutoMapper;
-using HotelWise.Core.SDK.AI.Abstractions;
-using HotelWise.Core.SDK.AI.Configuration;
-using HotelWise.Core.SDK.AI.DTO;
-using HotelWise.Core.SDK.AI.Enums;
-using HotelWise.Core.SDK.Common;
 using HotelWise.Domain.Dto.IA;
 using HotelWise.Domain.Interfaces.Entity.IA;
 using HotelWise.Domain.Model.AI;
@@ -133,3 +128,4 @@ public class AssistantServiceTests
         result.Should().HaveCount(3);
     }
 }
+

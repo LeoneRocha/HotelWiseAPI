@@ -1,4 +1,3 @@
-using HotelWise.Core.SDK.AI.Enums;
 using HotelWise.Service.Prompts;
 
 namespace HotelWise.Service.Tests.Bussines;
@@ -27,3 +26,4 @@ public class StayMatePromptGeneratorTests
         prompt.Content.Should().Contain("StayMate");
     }
 }
+

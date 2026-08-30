@@ -1,8 +1,5 @@
 using System.Text.RegularExpressions;
 using Bogus;
-using HotelWise.Core.SDK.AI.Abstractions;
-using HotelWise.Core.SDK.AI.DTO;
-using HotelWise.Core.SDK.AI.Enums;
 using HotelWise.Domain.Interfaces.Entity.HotelInterfaces.Service;
 using HotelWise.Domain.Model.HotelModels;
 

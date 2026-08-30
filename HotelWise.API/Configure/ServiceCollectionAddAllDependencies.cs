@@ -1,4 +1,3 @@
-using HotelWise.Core.SDK.Helpers;
 using HotelWise.Data.Context;
 using HotelWise.Service.Configure;
 using Microsoft.EntityFrameworkCore;
@@ -58,3 +57,4 @@ public static class ServiceCollectionAddAllDependencies
         }, ServiceLifetime.Transient, ServiceLifetime.Transient);
     }
 }
+

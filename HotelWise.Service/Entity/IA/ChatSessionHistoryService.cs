@@ -1,8 +1,5 @@
 using AutoMapper;
 using FluentValidation;
-using HotelWise.Core.SDK.AI.Abstractions;
-using HotelWise.Core.SDK.AI.Services;
-using HotelWise.Core.SDK.Services;
 using HotelWise.Domain.Dto.IA;
 using HotelWise.Domain.Dto.IA.SemanticKernel;
 using HotelWise.Domain.Interfaces.Entity.HotelInterfaces.Service;

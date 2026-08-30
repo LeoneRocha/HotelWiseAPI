@@ -1,4 +1,3 @@
-using HotelWise.Core.SDK.Common;
 using HotelWise.Domain.Dto;
 
 namespace HotelWise.Domain.Interfaces.Entity;
@@ -16,3 +15,4 @@ public interface IUserService
     /// <returns>Resposta com o DTO do usuário autenticado e suas credenciais de token, ou mensagem de falha.</returns>
     Task<ServiceResponse<GetUserAuthenticatedDto>> Login(string login, string password);
 }
+

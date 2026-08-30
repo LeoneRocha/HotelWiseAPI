@@ -1,4 +1,3 @@
-using HotelWise.Core.SDK.Common;
 using HotelWise.Domain.Dto;
 using HotelWise.Domain.Dto.Enitty;
 using HotelWise.Domain.Interfaces.Entity;
@@ -40,3 +39,4 @@ public class AuthController : ControllerBase
         return Ok(response);
     }
 }
+

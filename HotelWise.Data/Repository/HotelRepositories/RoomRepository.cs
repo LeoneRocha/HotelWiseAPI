@@ -1,4 +1,3 @@
-using HotelWise.Core.SDK.Infrastructure;
 using HotelWise.Data.Context;
 using HotelWise.Domain.Interfaces.Entity.HotelInterfaces.Repository;
 using HotelWise.Domain.Model.HotelModels;
@@ -58,3 +57,4 @@ public class RoomRepository : GenericRepositoryBase<Room, HotelWiseDbContextMysq
             .ToArrayAsync();
     }
 }
+

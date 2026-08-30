@@ -1,5 +1,4 @@
 using HotelWise.API.Controllers.ReservationEndpoints;
-using HotelWise.Core.SDK.Common;
 using HotelWise.Domain.Dto.Enitty.HotelDtos;
 using HotelWise.Domain.Interfaces.Entity.HotelInterfaces.Service;
 using Microsoft.AspNetCore.Mvc;
@@ -123,3 +122,4 @@ public class ReservationsControllerTests
         result.Should().BeOfType<NotFoundObjectResult>();
     }
 }
+

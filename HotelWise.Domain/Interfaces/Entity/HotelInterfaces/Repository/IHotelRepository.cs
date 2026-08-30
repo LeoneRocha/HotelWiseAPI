@@ -1,4 +1,3 @@
-using HotelWise.Core.SDK.Abstractions;
 using HotelWise.Domain.Model.HotelModels;
 
 namespace HotelWise.Domain.Interfaces.Entity.HotelInterfaces.Repository;
@@ -30,3 +29,4 @@ public interface IHotelRepository : IGenericRepository<Hotel>
     /// <returns>Matriz contendo as coleções de tags por hotel.</returns>
     Task<string[][]> GetAllTagsAsync(int offset, int limit);
 }
+

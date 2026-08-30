@@ -1,5 +1,3 @@
-using HotelWise.Core.SDK.Common;
-using HotelWise.Core.SDK.Common.Constants;
 using HotelWise.Data.Context.Configure.Helper;
 using HotelWise.Domain.Model.HotelModels;
 using Microsoft.EntityFrameworkCore;
@@ -60,3 +58,4 @@ public class RoomAvailabilityConfiguration : IEntityTypeConfiguration<RoomAvaila
         builder.HasIndex(ra => new { ra.RoomId, ra.StartDate, ra.EndDate, ra.Currency }).HasDatabaseName("IX_RoomAvailability_RoomId_StartDate_EndDate_Currency");
     }
 }
+

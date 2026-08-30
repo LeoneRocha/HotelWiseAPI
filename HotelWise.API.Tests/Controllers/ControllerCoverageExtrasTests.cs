@@ -1,5 +1,4 @@
 using HotelWise.API.Controllers.RoomEndpoints;
-using HotelWise.Core.SDK.Common;
 using HotelWise.Domain.Dto.Enitty.HotelDtos;
 using HotelWise.Domain.Interfaces.Entity.HotelInterfaces.Service;
 using Microsoft.AspNetCore.Mvc;
@@ -31,3 +30,4 @@ public class ControllerCoverageExtrasTests
         roomService.Verify(s => s.GetRoomsByHotelIdAsync(12), Times.Once);
     }
 }
+

@@ -1,5 +1,3 @@
-using HotelWise.Core.SDK.AI.DTO;
-using HotelWise.Core.SDK.Security;
 using HotelWise.Domain.Dto.Enitty.HotelDtos;
 using HotelWise.Domain.Interfaces.Entity.HotelInterfaces.Service;
 using Microsoft.AspNetCore.Authorization;
@@ -184,3 +182,4 @@ public class HotelsController : ControllerBase
         return Ok(response);
     }
 }
+

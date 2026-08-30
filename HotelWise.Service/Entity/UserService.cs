@@ -2,12 +2,6 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using AutoMapper;
 using FluentValidation;
-using HotelWise.Core.SDK.Abstractions;
-using HotelWise.Core.SDK.Common;
-using HotelWise.Core.SDK.Common.Constants;
-using HotelWise.Core.SDK.Helpers;
-using HotelWise.Core.SDK.Security;
-using HotelWise.Core.SDK.Services;
 using HotelWise.Domain.Dto;
 using HotelWise.Domain.Dto.Enitty;
 using HotelWise.Domain.Interfaces.Entity;
@@ -128,3 +122,4 @@ public class UserService : GenericEntityServiceBase<User, UserLoginDto>, IUserSe
         );
     }
 }
+

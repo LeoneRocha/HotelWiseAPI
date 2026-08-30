@@ -1,6 +1,4 @@
 using HotelWise.API.Controllers.HotelEndpoints;
-using HotelWise.Core.SDK.AI.DTO;
-using HotelWise.Core.SDK.Common;
 using HotelWise.Domain.Dto.Enitty.HotelDtos;
 using HotelWise.Domain.Dto.IA.SemanticKernel;
 using HotelWise.Domain.Interfaces.Entity.HotelInterfaces.Service;
@@ -193,3 +191,4 @@ public class HotelsControllerTests
         _hotelService.Verify(s => s.DeleteHotelAsync(3), Times.Once);
     }
 }
+

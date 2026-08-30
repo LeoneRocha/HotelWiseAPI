@@ -1,5 +1,4 @@
 using HotelWise.API.Configure;
-using HotelWise.Core.SDK.Logging;
 using HotelWise.Service.Configure;
 using Microsoft.Net.Http.Headers;
 using Microsoft.OpenApi;
@@ -80,3 +79,4 @@ public static class WebApplicationConfigureServiceCollections
         ServiceCollectionConfigureSecurity.Configure(services, tokenConfigurations, configuration, azureConfig);
     }
 }
+

@@ -1,6 +1,4 @@
 using System.Text;
-using HotelWise.Core.SDK.AI.Configuration;
-using HotelWise.Core.SDK.Security;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Identity.Web;
 using Microsoft.IdentityModel.Tokens;
@@ -106,3 +104,4 @@ public static class ServiceCollectionConfigureSecurity
         });
     }
 }
+

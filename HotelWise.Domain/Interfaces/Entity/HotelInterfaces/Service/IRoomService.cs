@@ -1,5 +1,3 @@
-using HotelWise.Core.SDK.Abstractions;
-using HotelWise.Core.SDK.Common;
 using HotelWise.Domain.Dto.Enitty.HotelDtos;
 
 namespace HotelWise.Domain.Interfaces.Entity.HotelInterfaces.Service;
@@ -16,3 +14,4 @@ public interface IRoomService : IGenericService<RoomDto>
     /// <returns>Resposta contendo o array de quartos do hotel.</returns>
     Task<ServiceResponse<RoomDto[]>> GetRoomsByHotelIdAsync(long hotelId);
 }
+

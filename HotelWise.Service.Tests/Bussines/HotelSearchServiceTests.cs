@@ -1,10 +1,6 @@
 using AutoMapper;
 using FluentValidation;
 using FluentValidation.Results;
-using HotelWise.Core.SDK.AI.Abstractions;
-using HotelWise.Core.SDK.AI.Configuration;
-using HotelWise.Core.SDK.AI.DTO;
-using HotelWise.Core.SDK.AI.Enums;
 using HotelWise.Domain.Dto;
 using HotelWise.Domain.Dto.Enitty.HotelDtos;
 using HotelWise.Domain.Dto.IA.SemanticKernel;
@@ -173,3 +169,4 @@ public class HotelSearchServiceTests
             .WithMessage("*não podem ser nulos*");
     }
 }
+

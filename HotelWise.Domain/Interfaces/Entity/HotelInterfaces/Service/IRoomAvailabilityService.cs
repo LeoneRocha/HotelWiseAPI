@@ -1,5 +1,3 @@
-using HotelWise.Core.SDK.Abstractions;
-using HotelWise.Core.SDK.Common;
 using HotelWise.Domain.Dto.Enitty.HotelDtos;
 
 namespace HotelWise.Domain.Interfaces.Entity.HotelInterfaces.Service;
@@ -30,3 +28,4 @@ public interface IRoomAvailabilityService : IGenericService<RoomAvailabilityDto>
     /// <returns>Resposta contendo o array de disponibilidades correspondentes.</returns>
     Task<ServiceResponse<RoomAvailabilityDto[]>> GetAvailabilitiesBySearchCriteriaAsync(RoomAvailabilitySearchDto searchDto);
 }
+

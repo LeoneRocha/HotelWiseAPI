@@ -1,4 +1,3 @@
-using HotelWise.Core.SDK.Domain;
 
 namespace HotelWise.Domain.Model;
 
@@ -63,3 +62,4 @@ public class User : EntityBaseWithNameEmail
 
     #endregion Columns 
 }
+

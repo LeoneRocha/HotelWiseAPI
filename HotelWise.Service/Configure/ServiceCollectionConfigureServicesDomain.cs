@@ -1,6 +1,4 @@
 using FluentValidation;
-using HotelWise.Core.SDK.Abstractions;
-using HotelWise.Core.SDK.Security;
 using HotelWise.Domain.Validator.HotelValidators;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
@@ -52,3 +50,4 @@ public static class ServiceCollectionConfigureServicesDomain
         services.AddSingleton<ITokenService, TokenService>();
     }
 }
+

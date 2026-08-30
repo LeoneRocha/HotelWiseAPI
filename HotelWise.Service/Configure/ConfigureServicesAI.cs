@@ -1,5 +1,3 @@
-using HotelWise.Core.SDK.AI.Abstractions;
-using HotelWise.Core.SDK.AI.Services;
 using HotelWise.Domain.Dto.IA.SemanticKernel;
 using HotelWise.Domain.Interfaces.Entity.HotelInterfaces.Service;
 using HotelWise.Service.AI;
@@ -26,3 +24,4 @@ public static class ConfigureServicesAI
         services.AddScoped<IAssistantService, AssistantService>();
     }
 }
+

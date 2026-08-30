@@ -1,4 +1,3 @@
-using HotelWise.Core.SDK.Common.Constants;
 using HotelWise.Data.Context.Configure.Helper;
 using HotelWise.Data.Context.Configure.Mock;
 using HotelWise.Domain.Model;
@@ -40,3 +39,4 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
         builder.HasData(UserMockData.GetMock());
     }
 }
+

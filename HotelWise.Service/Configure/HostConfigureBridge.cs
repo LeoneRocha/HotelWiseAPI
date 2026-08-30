@@ -1,5 +1,3 @@
-using HotelWise.Core.SDK.AI.Configuration;
-using HotelWise.Core.SDK.Security;
 using HotelWise.Domain.Dto.IA.SemanticKernel;
 using HotelWise.Domain.Mapper;
 using Microsoft.Extensions.Configuration;
@@ -75,3 +73,4 @@ public static class ServiceCollectionConfigureCors
     public static void Configure(IServiceCollection services) =>
         HotelWise.Core.SDK.Extensions.ServiceCollectionConfigureCors.Configure(services);
 }
+

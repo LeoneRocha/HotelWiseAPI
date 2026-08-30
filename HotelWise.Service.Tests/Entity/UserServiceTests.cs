@@ -1,8 +1,6 @@
 using AutoMapper;
 using FluentValidation;
 using FluentValidation.Results;
-using HotelWise.Core.SDK.Abstractions;
-using HotelWise.Core.SDK.Security;
 using HotelWise.Domain.Dto;
 using HotelWise.Domain.Interfaces.Entity;
 using HotelWise.Domain.Model;
@@ -97,3 +95,4 @@ public class UserServiceTests
         response.Message.Should().Be("Wrong password.");
     }
 }
+

@@ -1,4 +1,3 @@
-using HotelWise.Core.SDK.Security;
 using HotelWise.Domain.Dto.Enitty.HotelDtos;
 using HotelWise.Domain.Interfaces.Entity.HotelInterfaces.Service;
 using Microsoft.AspNetCore.Authorization;
@@ -107,3 +106,4 @@ public class ReservationsController : ControllerBase
         return Ok(reservations);
     }
 }
+

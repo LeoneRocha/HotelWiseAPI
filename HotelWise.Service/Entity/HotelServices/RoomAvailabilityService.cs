@@ -1,7 +1,5 @@
 using AutoMapper;
 using FluentValidation;
-using HotelWise.Core.SDK.Common;
-using HotelWise.Core.SDK.Services;
 using HotelWise.Domain.Dto.Enitty.HotelDtos;
 using HotelWise.Domain.Interfaces.Entity.HotelInterfaces.Repository;
 using HotelWise.Domain.Interfaces.Entity.HotelInterfaces.Service;
@@ -313,3 +311,4 @@ public class RoomAvailabilityService : GenericEntityServiceBase<RoomAvailability
         return response;
     }
 }
+

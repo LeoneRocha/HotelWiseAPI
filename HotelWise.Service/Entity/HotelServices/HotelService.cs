@@ -1,11 +1,6 @@
 using System.Collections.Concurrent;
 using AutoMapper;
 using FluentValidation;
-using HotelWise.Core.SDK.AI.Abstractions;
-using HotelWise.Core.SDK.AI.Services;
-using HotelWise.Core.SDK.Common;
-using HotelWise.Core.SDK.Helpers;
-using HotelWise.Core.SDK.Services;
 using HotelWise.Domain.Dto.Enitty.HotelDtos;
 using HotelWise.Domain.Dto.IA.SemanticKernel;
 using HotelWise.Domain.Interfaces.Entity.HotelInterfaces.Repository;

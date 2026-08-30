@@ -1,5 +1,4 @@
 using HotelWise.API.Controllers.RoomAvailabilityEndpoints;
-using HotelWise.Core.SDK.Common;
 using HotelWise.Domain.Dto.Enitty.HotelDtos;
 using HotelWise.Domain.Interfaces.Entity.HotelInterfaces.Service;
 using Microsoft.AspNetCore.Mvc;
@@ -168,3 +167,4 @@ public class RoomAvailabilityControllerTests
         _availabilityService.Verify(s => s.DeleteAsync(4), Times.Once);
     }
 }
+

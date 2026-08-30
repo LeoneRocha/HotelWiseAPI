@@ -1,4 +1,3 @@
-using HotelWise.Core.SDK.Abstractions;
 using HotelWise.Domain.Model.HotelModels;
 
 namespace HotelWise.Domain.Interfaces.Entity.HotelInterfaces.Repository;
@@ -30,3 +29,4 @@ public interface IReservationRepository : IGenericRepository<Reservation>
     /// <returns>Array de reservas ativas no período.</returns>
     Task<Reservation[]> GetReservationsWithinDateRange(DateTime startDate, DateTime endDate);
 }
+

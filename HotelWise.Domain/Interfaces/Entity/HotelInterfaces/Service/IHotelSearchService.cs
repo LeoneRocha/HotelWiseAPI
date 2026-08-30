@@ -1,6 +1,3 @@
-using HotelWise.Core.SDK.Abstractions;
-using HotelWise.Core.SDK.AI.DTO;
-using HotelWise.Core.SDK.Common;
 using HotelWise.Domain.Dto.Enitty.HotelDtos;
 using HotelWise.Domain.Dto.IA.SemanticKernel;
 
@@ -18,3 +15,4 @@ public interface IHotelSearchService : IGenericService<HotelDto>
     /// <returns>Resposta contendo o resultado semântico com análise de IA e hotéis encontrados.</returns>
     Task<ServiceResponse<HotelSemanticResult>> SemanticSearch(SearchCriteria searchCriteria);
 }
+

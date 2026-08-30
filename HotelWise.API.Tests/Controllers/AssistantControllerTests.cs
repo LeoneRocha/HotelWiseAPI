@@ -1,6 +1,4 @@
 using HotelWise.API.Controllers.Ai;
-using HotelWise.Core.SDK.AI.Abstractions;
-using HotelWise.Core.SDK.AI.DTO;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HotelWise.API.Tests.Controllers;
@@ -67,3 +65,4 @@ public class AssistantControllerTests
         _assistantService.Verify(s => s.AskAssistant(request), Times.Once);
     }
 }
+

@@ -1,5 +1,3 @@
-using HotelWise.Core.SDK.Helpers;
-using HotelWise.Core.SDK.Security;
 using HotelWise.Domain.Model;
 
 namespace HotelWise.Data.Context.Configure.Mock;
@@ -43,3 +41,4 @@ public static class UserMockData
         ];
     }
 }
+

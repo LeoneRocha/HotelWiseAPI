@@ -1,6 +1,5 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using HotelWise.Core.SDK.AI.DTO;
 
 namespace HotelWise.Domain.Model.AI;
 
@@ -52,3 +51,4 @@ public class ChatSessionHistory
     /// </summary>
     public long? IdUser { get; set; }
 }
+

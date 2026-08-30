@@ -1,4 +1,3 @@
-using HotelWise.Core.SDK.Abstractions;
 using HotelWise.Domain.Model;
 
 namespace HotelWise.Domain.Interfaces.Entity;
@@ -36,3 +35,4 @@ public interface IUserRepository : IGenericRepository<User>
     /// <returns>Usuário atualizado.</returns>
     Task<User> RefreshUserInfo(User user);
 }
+

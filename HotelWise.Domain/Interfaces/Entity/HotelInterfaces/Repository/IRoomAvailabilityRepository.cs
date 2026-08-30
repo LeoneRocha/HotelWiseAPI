@@ -1,4 +1,3 @@
-using HotelWise.Core.SDK.Abstractions;
 using HotelWise.Domain.Dto.Enitty.HotelDtos;
 using HotelWise.Domain.Model.HotelModels;
 
@@ -32,3 +31,4 @@ public interface IRoomAvailabilityRepository : IGenericRepository<RoomAvailabili
     /// <returns>Array de disponibilidades dos quartos do hotel no período.</returns>
     Task<RoomAvailability[]> GetAvailabilitiesByHotelAndPeriodAsync(HotelAvailabilityRequestDto request);
 }
+

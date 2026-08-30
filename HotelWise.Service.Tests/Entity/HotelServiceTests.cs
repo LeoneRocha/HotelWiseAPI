@@ -1,8 +1,6 @@
 using AutoMapper;
 using FluentValidation;
 using FluentValidation.Results;
-using HotelWise.Core.SDK.AI.Abstractions;
-using HotelWise.Core.SDK.AI.Configuration;
 using HotelWise.Domain.Dto.Enitty.HotelDtos;
 using HotelWise.Domain.Dto.IA.SemanticKernel;
 using HotelWise.Domain.Interfaces.Entity.HotelInterfaces.Repository;
@@ -76,3 +74,4 @@ public class HotelServiceTests
         response.Data.Should().BeNull();
     }
 }
+

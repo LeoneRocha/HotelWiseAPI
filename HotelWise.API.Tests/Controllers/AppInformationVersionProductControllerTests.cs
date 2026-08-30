@@ -1,5 +1,4 @@
 using HotelWise.API.Controllers;
-using HotelWise.Core.SDK.Common;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HotelWise.API.Tests.Controllers;
@@ -33,3 +32,4 @@ public class AppInformationVersionProductControllerTests
         list.Should().HaveCount(1);
     }
 }
+

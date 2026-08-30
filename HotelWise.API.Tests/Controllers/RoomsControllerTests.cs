@@ -1,5 +1,4 @@
 using HotelWise.API.Controllers.RoomEndpoints;
-using HotelWise.Core.SDK.Common;
 using HotelWise.Domain.Dto.Enitty.HotelDtos;
 using HotelWise.Domain.Interfaces.Entity.HotelInterfaces.Service;
 using Microsoft.AspNetCore.Mvc;
@@ -153,3 +152,4 @@ public class RoomsControllerTests
         _roomService.Verify(s => s.DeleteAsync(8), Times.Once);
     }
 }
+

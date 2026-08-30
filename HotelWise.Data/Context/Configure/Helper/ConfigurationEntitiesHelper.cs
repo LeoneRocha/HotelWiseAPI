@@ -1,5 +1,4 @@
 using System.Reflection;
-using HotelWise.Core.SDK.Extensions;
 using HotelWise.Data.Context.Configure.Entity;
 using HotelWise.Data.Context.Configure.Entity.HotelModelConfigurations;
 using Microsoft.EntityFrameworkCore;
@@ -35,3 +34,4 @@ public static class ConfigurationEntitiesHelper
         modelBuilder.AddConfigurationEntities(Assembly.GetExecutingAssembly(), manuallyConfiguredTypes);
     }
 }
+

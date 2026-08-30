@@ -1,11 +1,4 @@
 using AutoMapper;
-using HotelWise.Core.SDK.AI.Abstractions;
-using HotelWise.Core.SDK.AI.DTO;
-using HotelWise.Core.SDK.AI.Enums;
-using HotelWise.Core.SDK.AI.Helpers;
-using HotelWise.Core.SDK.AI.Services;
-using HotelWise.Core.SDK.Common;
-using HotelWise.Core.SDK.Helpers;
 using HotelWise.Domain.Dto.IA.SemanticKernel;
 
 namespace HotelWise.Service.AI;

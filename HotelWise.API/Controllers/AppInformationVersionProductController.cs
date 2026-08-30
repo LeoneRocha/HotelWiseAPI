@@ -1,5 +1,3 @@
-using HotelWise.Core.SDK.Common;
-using HotelWise.Core.SDK.Logging;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HotelWise.API.Controllers;
@@ -46,3 +44,4 @@ public class AppInformationVersionProductController : ControllerBase
         return NotFound(responseVO);
     }
 }
+

@@ -1,8 +1,4 @@
 using AutoMapper;
-using HotelWise.Core.SDK.AI.Abstractions;
-using HotelWise.Core.SDK.AI.Configuration;
-using HotelWise.Core.SDK.AI.DTO;
-using HotelWise.Core.SDK.AI.Enums;
 using HotelWise.Domain.Dto.IA.SemanticKernel;
 using HotelWise.Service.AI;
 
@@ -186,3 +182,4 @@ public class HotelVectorStoreServiceTests
         _adapter.Verify(a => a.DeleteAsync("test_skhotels", 50L), Times.Once);
     }
 }
+

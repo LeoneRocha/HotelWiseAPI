@@ -1,4 +1,3 @@
-using HotelWise.Core.SDK.Abstractions;
 using HotelWise.Domain.Model.HotelModels;
 
 namespace HotelWise.Domain.Interfaces.Entity.HotelInterfaces.Repository;
@@ -29,3 +28,4 @@ public interface IRoomRepository : IGenericRepository<Room>
     /// <returns>Array de quartos do hotel.</returns>
     Task<Room[]> GetRoomsByHotelIdAsync(long hotelId);
 }
+

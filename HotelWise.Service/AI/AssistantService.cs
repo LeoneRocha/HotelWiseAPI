@@ -1,12 +1,6 @@
 using System.Text;
 using AutoMapper;
 using FluentValidation;
-using HotelWise.Core.SDK.AI.Abstractions;
-using HotelWise.Core.SDK.AI.DTO;
-using HotelWise.Core.SDK.AI.Enums;
-using HotelWise.Core.SDK.AI.Helpers;
-using HotelWise.Core.SDK.AI.Validation;
-using HotelWise.Core.SDK.Helpers;
 using HotelWise.Domain.Dto.IA;
 using HotelWise.Domain.Interfaces.Entity.IA;
 using HotelWise.Domain.Model.AI;

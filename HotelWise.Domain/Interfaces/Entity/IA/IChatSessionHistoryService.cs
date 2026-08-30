@@ -1,4 +1,3 @@
-using HotelWise.Core.SDK.Abstractions;
 using HotelWise.Domain.Dto.IA;
 
 namespace HotelWise.Domain.Interfaces.Entity.IA;
@@ -22,3 +21,4 @@ public interface IChatSessionHistoryService : IGenericService<ChatSessionHistory
     /// <returns>Tarefa representando a operação assíncrona.</returns>
     Task DeleteByIdTokenAsync(string token);
 }
+
