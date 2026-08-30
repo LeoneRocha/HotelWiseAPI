@@ -156,9 +156,11 @@ public class HotelSearchServiceTests
         var result = await sut.SemanticSearch(criteria);
 
         // Assert
+        result.Should().NotBeNull();
         result.Success.Should().BeFalse();
         result.Errors.Should().NotBeEmpty();
-        result.Data.HotelsVectorResult.Should().BeEmpty();
+        result.Data.Should().NotBeNull();
+        result.Data!.HotelsVectorResult.Should().BeEmpty();
         result.Data.HotelsIAResult.Should().BeEmpty();
     }
 
