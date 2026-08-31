@@ -10,6 +10,7 @@ namespace HotelWise.Core.SDK.Domain;
 /// Implementa <see cref="IEntityBase"/> e <see cref="IEntityBaseLog"/> e serve como
 /// raiz comum para entidades de domínio persistidas via EF Core no SDK.
 /// </summary>
+[Obsolete("Depreciado. Migrado para SmartCoreHub.Core.SDK na camada Domain. Use o pacote NuGet SmartCoreHub.Core.SDK — tipo SmartCoreHub.Core.SDK.Domain.Entities.Common.Ported.EntityBase. Após publicar o NuGet, HotelWise.Core.SDK será só casca (PackageReference + wrappers) e delegará a SmartCoreHub.Core.SDK.")]
 public abstract class EntityBase : IEntityBase, IEntityBaseLog
 {
     /// <summary>

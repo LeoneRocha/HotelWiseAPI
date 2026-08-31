@@ -20,6 +20,7 @@ namespace HotelWise.Core.SDK.Security;
 /// string jwt = SecurityHelper.CreateToken(securityDto);
 /// </code>
 /// </example>
+[Obsolete("Depreciado. Migrado para SmartCoreHub.Core.SDK na camada Service. Use o pacote NuGet SmartCoreHub.Core.SDK — tipo SmartCoreHub.Core.SDK.Service.Security.Ported.SecurityHelper. Após publicar o NuGet, HotelWise.Core.SDK será só casca (PackageReference + wrappers) e delegará a SmartCoreHub.Core.SDK.")]
 public static class SecurityHelper
 {
     /// <summary>

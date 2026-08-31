@@ -11,6 +11,7 @@ namespace HotelWise.Core.SDK.Security;
 /// long userId = SecurityHelperApi.GetUserIdApi(HttpContext.User);
 /// </code>
 /// </example>
+[Obsolete("Depreciado. Migrado para SmartCoreHub.Core.SDK na camada Service. Use o pacote NuGet SmartCoreHub.Core.SDK — tipo SmartCoreHub.Core.SDK.Service.Security.Ported.SecurityHelperApi. Após publicar o NuGet, HotelWise.Core.SDK será só casca (PackageReference + wrappers) e delegará a SmartCoreHub.Core.SDK.")]
 public static class SecurityHelperApi
 {
     /// <summary>
