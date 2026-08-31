@@ -1,6 +1,6 @@
 # HotelWise.Core.SDK → casca sobre SmartCoreHub.Core.SDK
 
-**Status:** ✅ casca **ativada** (Etapa 3 — AI cluster convertido; retenções de contrato/DI documentadas)  
+**Status:** ✅ casca **concluída** + hosts migrados para FQNs SCH  
 **Atualizado:** 2026-08-31
 
 Os tipos migrados neste pacote estão marcados com `[Obsolete]`:
@@ -23,36 +23,44 @@ Os tipos migrados neste pacote estão marcados com `[Obsolete]`:
 
 1. [x] Publicar `SmartCoreHub.Core.SDK` no feed (`20260831.2105.0`).
 2. [x] `PackageReference` + CPM `PackageVersion` no HotelWiseAPI.
-3. [x] Thin wrappers (herança / delegação estática / enum espelho) nos tipos migráveis.
+3. [x] Thin wrappers (herança / delegação estática / enum espelho) nos tipos migráveis (~92/110).
 4. [x] Alias `SearchCriteria.MaxHotelRetrieve` ↔ SCH `MaxRetrieve`.
 5. [x] Destinos **Ported** usados onde o `[Obsolete]` indica Ported.
 6. [x] Removido `ProjectReference` → `GroqApiLibrary` (Groq embutido no SCH; evita CS0433).
 7. [x] Cluster AI: configs (herança + sealed composition), DTOs, helpers, validation, adapters.
-8. [x] `HotelWise.Core.SDK.Tests` **79/79** + `HotelWiseAPI.sln` Release.
-9. [ ] Hosts migrados para FQNs SCH (CS0618 esperado até lá).
+8. [x] Runtime AI: `SemanticKernelProviderConfigure` delega SCH + overlay DI HW; factories delegam SCH.
+9. [x] `CoreSdkInfo` delega metadados ao SCH; `IServiceResponse<T>` herda SCH.
+10. [x] `HotelWise.Core.SDK.Tests` **79/79** + `HotelWiseAPI.sln` Release.
+11. [x] Hosts migrados para FQNs SCH (`Domain`, `Data`, `Service`, `API`, `*.Tests`); `PackageReference` SCH; testes **264/264**.
 
-## O que já está feito
+## Convertido nesta passagem (2026-08-31)
 
-- Port aditivo no `SmartCoreHub.Core.SDK` (Etapa 1) — **110/110**.
-- `[Obsolete]` nos **110** tipos, com NuGet + FQN.
-- **Casca ativada:** `SmartCoreHub.Core.SDK` **20260831.2105.0** via CPM.
-- Wrappers thin para Abstractions (maioria), Common, Helpers, Extensions, Logging, Security, Domain EntityBase*, Infra, Services genéricos, **cluster AI**.
-- Enums: **espelho** (não `TypeForwardedTo`).
-- `ApplicationIAConfig` / `RagConfig` (sealed no SCH): **composição** + `Inner` / bridge para adapters SCH.
-- Adapters: composição sobre SCH + `ApplicationIAConfigSchBridge`.
+| Tipo | Estratégia |
+| :--- | :--- |
+| `CoreSdkInfo` | `const` delegados ao SCH |
+| `IServiceResponse<T>` | Herança vazia `: SCH.IServiceResponse<T>` |
+| `SemanticKernelProviderConfigure` | Delega 100% ao SCH |
+| `VectorStoreAdapterFactory` | Herda SCH; retorna adapters SCH |
+| `AIInferenceAdapterFactory` | Herda SCH factory |
+| `GenericVectorStoreAdapter` | Casca HW sobre adapter SCH; assinaturas SCH (`SearchCriteria`, etc.) |
+| `AzureADEntraIDConstants`, `AppConfigConstants`, `ValidatorConstants`, `EntityTypeConfigurationConstants` | Forward `const` ao SCH (§4.6 implementacao) |
+| `ConfigureServicesAI`, `ServiceCollectionConfigureAppSettings`, `AIInferenceService` | Delegação/herança SCH |
+| `IGenericService`, `ServiceResponse`, interfaces AI/Vector | Herança vazia `: SCH.*` |
+| `PromptMessageVO`, `DataVectorVO` | Herança vazia `: SCH.*` |
+| Hosts | `GlobalUsings.Core.cs` → namespaces SCH; DI bridges → `Service.AI.Configure` / `Service.DependenciesCollection.Extensions` |
 
-## Retenções locais (intencionais)
+## Retenções locais (mínimas — casca HW)
 
 | Retenção | Motivo |
 | :--- | :--- |
-| `AI/Enums/*` | Espelho (regra de casca; não herda) |
-| `AI/Abstractions` de runtime (`IAIInference*`, `IApplicationIAConfig`, `IRagConfig`, `IVectorStore*`, `IAssistantService`) | Assinaturas com DTOs/enums HW; herdar SCH quebraria hosts |
-| `AI/Configure/SemanticKernelProviderConfigure` + `ConfigureServicesAI` | DI shim: registra tipos **HW** (`IApplicationIAConfig` / factories HW) |
-| `AI/Services` factories (`AIInferenceAdapterFactory`, `VectorStoreAdapterFactory`, `AIInferenceService`) | Orquestração thin com tipos HW (não SCH factory) |
-| `IGenericService` / `ServiceResponse` / `IServiceResponse` | Compat hosts (`ServiceResponse` HW); `ErrorResponse` / `GenericEntityServiceBase` já wrapped |
-| `ServiceCollectionConfigureAppSettings` | DI shim HW (`AzureAdConfig` / token HW) |
+| `AI/Enums/*` (6) | Espelho `(int)Sch.*` — namespace HW para `[Obsolete]` |
+| `ApplicationIAConfig`, `RagConfig` (sealed SCH) | Referência direta via `global using` → SCH; sem composição `Inner` |
+| `SearchSettings` | Herança SCH (não sealed) |
+| Adapters HW (`GroqApiAdapter`, etc.) | Casca fina; `IApplicationIAConfig` pass-through SCH |
 
-Follow-up opcional: unseal SCH `ApplicationIAConfig`/`RagConfig` ou migrar hosts para FQNs SCH e apagar casca.
+**Nota:** interfaces (`IAIInference*`, `IVectorStore*`, `IGenericService`, `IServiceResponse`) herdam SCH; implementações SCH satisfazem o contrato SCH. Tipos HW explícitos na casca existem só onde sealed/composição/`new` enum impedem herança pura.
+
+Follow-up opcional: deprecar pacote `HotelWise.Core.SDK` quando não houver consumidores externos.
 
 ## Layout SCH (camadas)
 

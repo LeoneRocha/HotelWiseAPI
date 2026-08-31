@@ -30,9 +30,9 @@ public class LoteD6AiAdaptersTests
     {
         var rag = new RagConfig
         {
-            AIChatServiceAdapter = HotelWise.Core.SDK.AI.Enums.AIChatServiceType.GroqApi
+            AIChatServiceAdapter = AIChatServiceType.GroqApi
         };
-        rag.GetAInferenceAdapterType().Should().Be(HotelWise.Core.SDK.AI.Enums.InferenceAiAdapterType.GroqApi);
+        rag.GetAInferenceAdapterType().Should().Be(InferenceAiAdapterType.GroqApi);
     }
 
     [Fact]

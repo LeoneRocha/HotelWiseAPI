@@ -1,5 +1,4 @@
 using HotelWise.Core.SDK.AI.Abstractions;
-using HotelWise.Core.SDK.AI.Enums;
 using HotelWise.Core.SDK.AI.Services;
 using HotelWise.Core.SDK.Extensions;
 using Microsoft.Extensions.DependencyInjection;
@@ -9,10 +8,10 @@ namespace HotelWise.Core.SDK.Tests.Services;
 public class AIInferenceAdapterFactoryTests
 {
     [Theory]
-    [InlineData(InferenceAiAdapterType.GroqApi, typeof(HotelWise.Core.SDK.AI.Adapters.GroqApiAdapter))]
-    [InlineData(InferenceAiAdapterType.Mistral, typeof(HotelWise.Core.SDK.AI.Adapters.MistralApiAdapter))]
-    [InlineData(InferenceAiAdapterType.Ollama, typeof(HotelWise.Core.SDK.AI.Adapters.OllamaAdapter))]
-    public void CreateAdapter_Should_Return_Expected_Type(InferenceAiAdapterType type, Type expected)
+    [InlineData(InferenceAiAdapterType.GroqApi, "GroqApiAdapter")]
+    [InlineData(InferenceAiAdapterType.Mistral, "MistralApiAdapter")]
+    [InlineData(InferenceAiAdapterType.Ollama, "OllamaAdapter")]
+    public void CreateAdapter_Should_Return_Sch_Adapter(InferenceAiAdapterType type, string expectedTypeName)
     {
         var config = new Mock<IApplicationIAConfig>();
         config.SetupGet(c => c.GroqApiConfig).Returns(new HotelWise.Core.SDK.AI.Configuration.GroqApiConfig
@@ -34,7 +33,8 @@ public class AIInferenceAdapterFactoryTests
 
         var factory = new AIInferenceAdapterFactory(config.Object, Mock.Of<IServiceProvider>());
         var adapter = factory.CreateAdapter(type);
-        adapter.Should().BeOfType(expected);
+        adapter.Should().BeAssignableTo<SmartCoreHub.Core.SDK.Domain.AI.Abstractions.IAIInferenceAdapter>();
+        adapter.GetType().Name.Should().Be(expectedTypeName);
     }
 }
 

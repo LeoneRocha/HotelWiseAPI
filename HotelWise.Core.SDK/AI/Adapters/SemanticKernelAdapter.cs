@@ -1,7 +1,7 @@
 #if NET8_0_OR_GREATER
 using HotelWise.Core.SDK.AI.Abstractions;
-using HotelWise.Core.SDK.AI.DTO;
 using SchAdapters = SmartCoreHub.Core.SDK.Infrastructure.AI.Adapters;
+using SchDto = SmartCoreHub.Core.SDK.Domain.AI.DTO;
 
 namespace HotelWise.Core.SDK.AI.Adapters;
 
@@ -20,15 +20,15 @@ public class SemanticKernelAdapter : IAIInferenceAdapter
     /// <param name="serviceProvider">Provedor de serviços para injeção de dependência.</param>
     public SemanticKernelAdapter(IApplicationIAConfig applicationConfig, IServiceProvider serviceProvider)
     {
-        _inner = new SchAdapters.SemanticKernelAdapter(ApplicationIAConfigSchBridge.ToSch(applicationConfig), serviceProvider);
+        _inner = new SchAdapters.SemanticKernelAdapter(applicationConfig, serviceProvider);
     }
 
     /// <inheritdoc />
-    public Task<string> GenerateChatCompletionAsync(PromptMessageVO[] messages) =>
+    public Task<string> GenerateChatCompletionAsync(SchDto.PromptMessageVO[] messages) =>
         _inner.GenerateChatCompletionAsync(messages);
 
     /// <inheritdoc />
-    public Task<string> GenerateChatCompletionByAgentAsync(PromptMessageVO[] messages) =>
+    public Task<string> GenerateChatCompletionByAgentAsync(SchDto.PromptMessageVO[] messages) =>
         _inner.GenerateChatCompletionByAgentAsync(messages);
 
     /// <inheritdoc />
@@ -36,7 +36,7 @@ public class SemanticKernelAdapter : IAIInferenceAdapter
         _inner.GenerateEmbeddingAsync(text);
 
     /// <inheritdoc />
-    public Task<string> GenerateChatCompletionByAgentSimpleRagAsync(PromptMessageVO[] messages) =>
+    public Task<string> GenerateChatCompletionByAgentSimpleRagAsync(SchDto.PromptMessageVO[] messages) =>
         _inner.GenerateChatCompletionByAgentSimpleRagAsync(messages);
 }
 #endif

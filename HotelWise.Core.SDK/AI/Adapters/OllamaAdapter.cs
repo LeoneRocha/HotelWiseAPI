@@ -1,7 +1,7 @@
 #if NET8_0_OR_GREATER
 using HotelWise.Core.SDK.AI.Abstractions;
-using HotelWise.Core.SDK.AI.DTO;
 using SchAdapters = SmartCoreHub.Core.SDK.Infrastructure.AI.Adapters;
+using SchDto = SmartCoreHub.Core.SDK.Domain.AI.DTO;
 
 namespace HotelWise.Core.SDK.AI.Adapters;
 
@@ -19,7 +19,7 @@ public class OllamaAdapter : IAIInferenceAdapter
     /// <param name="applicationConfig">Configuração da aplicação IA.</param>
     public OllamaAdapter(IApplicationIAConfig applicationConfig)
     {
-        _inner = new SchAdapters.OllamaAdapter(ApplicationIAConfigSchBridge.ToSch(applicationConfig));
+        _inner = new SchAdapters.OllamaAdapter(applicationConfig);
     }
 
     /// <summary>
@@ -35,11 +35,11 @@ public class OllamaAdapter : IAIInferenceAdapter
     public OllamaSharp.OllamaApiClient GetClientEmbedding() => _inner.GetClientEmbedding();
 
     /// <inheritdoc />
-    public Task<string> GenerateChatCompletionAsync(PromptMessageVO[] messages) =>
+    public Task<string> GenerateChatCompletionAsync(SchDto.PromptMessageVO[] messages) =>
         _inner.GenerateChatCompletionAsync(messages);
 
     /// <inheritdoc />
-    public Task<string> GenerateChatCompletionByAgentAsync(PromptMessageVO[] messages) =>
+    public Task<string> GenerateChatCompletionByAgentAsync(SchDto.PromptMessageVO[] messages) =>
         _inner.GenerateChatCompletionByAgentAsync(messages);
 
     /// <inheritdoc />
@@ -47,7 +47,7 @@ public class OllamaAdapter : IAIInferenceAdapter
         _inner.GenerateEmbeddingAsync(text);
 
     /// <inheritdoc />
-    public Task<string> GenerateChatCompletionByAgentSimpleRagAsync(PromptMessageVO[] messages) =>
+    public Task<string> GenerateChatCompletionByAgentSimpleRagAsync(SchDto.PromptMessageVO[] messages) =>
         _inner.GenerateChatCompletionByAgentSimpleRagAsync(messages);
 }
 #endif

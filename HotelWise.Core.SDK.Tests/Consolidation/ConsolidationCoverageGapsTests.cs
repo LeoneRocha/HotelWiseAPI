@@ -3,7 +3,6 @@ using FluentValidation.Results;
 using HotelWise.Core.SDK.AI.Abstractions;
 using HotelWise.Core.SDK.AI.Configuration;
 using HotelWise.Core.SDK.AI.DTO;
-using HotelWise.Core.SDK.AI.Enums;
 using HotelWise.Core.SDK.AI.Helpers;
 using HotelWise.Core.SDK.AI.Services;
 using HotelWise.Core.SDK.Common;

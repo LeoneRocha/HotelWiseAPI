@@ -1,7 +1,6 @@
 using FluentValidation;
 using HotelWise.Core.SDK.AI.Constants;
 using HotelWise.Core.SDK.AI.DTO;
-using HotelWise.Core.SDK.AI.Enums;
 using HotelWise.Core.SDK.AI.Helpers;
 using HotelWise.Core.SDK.AI.Validation;
 

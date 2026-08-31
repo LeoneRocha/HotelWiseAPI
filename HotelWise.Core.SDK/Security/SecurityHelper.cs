@@ -1,10 +1,10 @@
 #if NET8_0_OR_GREATER
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
 using HotelWise.Core.SDK.Common;
 using HotelWise.Core.SDK.Helpers;
 using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
 
 namespace HotelWise.Core.SDK.Security;
 

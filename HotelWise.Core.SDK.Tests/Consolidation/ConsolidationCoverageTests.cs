@@ -6,7 +6,6 @@ using FluentValidation.Results;
 using HotelWise.Core.SDK.AI.Abstractions;
 using HotelWise.Core.SDK.AI.Configuration;
 using HotelWise.Core.SDK.AI.DTO;
-using HotelWise.Core.SDK.AI.Enums;
 using HotelWise.Core.SDK.AI.Helpers;
 using HotelWise.Core.SDK.AI.Services;
 using HotelWise.Core.SDK.AI.Configure;
@@ -75,8 +74,8 @@ public class ConsolidationCoverageTests
         new TimeZoneDisplayDto { Id = "z", Name = "Z" }.Id.Should().Be("z");
         new RepositoryInfo().ImplementationType.Should().BeNull();
         new SecurityDto { Id = "1", Name = "n", Role = "r" }.Name.Should().Be("n");
-        new AskAssistantResponse { Message = "hi", Role = RoleAiPromptsType.Assistant }.Message.Should().Be("hi");
-        new AskAssistantRequest { Message = "q" }.Role.Should().Be(RoleAiPromptsType.User);
+        new AskAssistantResponse { Message = "hi", Role = HotelWise.Core.SDK.AI.Enums.RoleAiPromptsType.Assistant }.Message.Should().Be("hi");
+        new AskAssistantRequest { Message = "q" }.Role.Should().Be(HotelWise.Core.SDK.AI.Enums.RoleAiPromptsType.User);
         HelperCharSet.DefaultCharSet.Should().Be("latin1");
         AppConfigConstants.ConfigurationConfigurationNotBeNull.Should().NotBeNullOrWhiteSpace();
         ValidatorConstants.ValidateSuccessMessage_Message.Should().NotBeNullOrWhiteSpace();
@@ -93,7 +92,7 @@ public class ConsolidationCoverageTests
         ServiceCollectionHelper.GetRegisteredInterfaces(services).Should().Contain(typeof(object));
 
         ConfigureServicesAI.RegisterGenericAiServices(services);
-        services.Should().Contain(d => d.ServiceType == typeof(IAIInferenceAdapterFactory));
+        services.Should().Contain(d => d.ServiceType == typeof(SmartCoreHub.Core.SDK.Domain.AI.Abstractions.IAIInferenceAdapterFactory));
 
         ServiceCollectionConfigureCors.Configure(services);
         ServiceCollectionConfigureAppSettings.AddAndReturnTokenConfiguration(services, new ConfigurationBuilder()

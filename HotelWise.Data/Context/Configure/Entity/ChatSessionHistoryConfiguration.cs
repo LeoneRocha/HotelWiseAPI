@@ -41,7 +41,7 @@ public class ChatSessionHistoryConfiguration : IEntityTypeConfiguration<ChatSess
             .HasColumnType(EntityTypeConfigurationConstants.GetTypeTextByTypeDataBase(ETypeDataBase.Mysql))
             .HasConversion(
                 v => JsonConvert.SerializeObject(v), // Serialização
-                v => JsonConvert.DeserializeObject<HotelWise.Core.SDK.AI.DTO.PromptMessageVO[]>(v)! // Desserialização
+                v => JsonConvert.DeserializeObject<PromptMessageVO[]>(v)! // Desserialização
             );
         // Outros campos
         builder.Property(e => e.CountMessages)

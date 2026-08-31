@@ -2,6 +2,8 @@ using HotelWise.Domain.Dto.IA.SemanticKernel;
 using HotelWise.Domain.Mapper;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using SchAiConfigure = SmartCoreHub.Core.SDK.Service.AI.Configure;
+using SchDiExtensions = SmartCoreHub.Core.SDK.Service.DependenciesCollection.Extensions;
 
 namespace HotelWise.Service.Configure;
 
@@ -17,7 +19,7 @@ public static class SemanticKernelProviderConfigure
     /// <param name="configuration">Configurações da aplicação (IConfiguration).</param>
     public static void SetupSemanticKernelProvider(IServiceCollection services, IConfiguration configuration)
     {
-        HotelWise.Core.SDK.AI.Configure.SemanticKernelProviderConfigure
+        SchAiConfigure.SemanticKernelProviderConfigure
             .SetupSemanticKernelProvider<HotelVector>(services, configuration);
     }
 }
@@ -49,7 +51,7 @@ public static class ServiceCollectionConfigureAppSettings
     /// <param name="configuration">Configuração da aplicação.</param>
     /// <returns>Instância de <see cref="AzureAdConfig"/> preenchida.</returns>
     public static AzureAdConfig AddAndReturnAzureAdConfig(IServiceCollection services, IConfiguration configuration) =>
-        HotelWise.Core.SDK.Extensions.ServiceCollectionConfigureAppSettings.AddAndReturnAzureAdConfig(services, configuration);
+        SchDiExtensions.ServiceCollectionConfigureAppSettings.AddAndReturnAzureAdConfig(services, configuration);
 
     /// <summary>
     /// Faz o bind e registra as opções de emissão de token JWT.
@@ -58,7 +60,7 @@ public static class ServiceCollectionConfigureAppSettings
     /// <param name="configuration">Configuração da aplicação.</param>
     /// <returns>Instância de <see cref="TokenConfigurationDto"/> preenchida.</returns>
     public static TokenConfigurationDto AddAndReturnTokenConfiguration(IServiceCollection services, IConfiguration configuration) =>
-        HotelWise.Core.SDK.Extensions.ServiceCollectionConfigureAppSettings.AddAndReturnTokenConfiguration(services, configuration);
+        SchDiExtensions.ServiceCollectionConfigureAppSettings.AddAndReturnTokenConfiguration(services, configuration);
 }
 
 /// <summary>
@@ -71,6 +73,5 @@ public static class ServiceCollectionConfigureCors
     /// </summary>
     /// <param name="services">Coleção de serviços da aplicação.</param>
     public static void Configure(IServiceCollection services) =>
-        HotelWise.Core.SDK.Extensions.ServiceCollectionConfigureCors.Configure(services);
+        SchDiExtensions.ServiceCollectionConfigureCors.Configure(services);
 }
-

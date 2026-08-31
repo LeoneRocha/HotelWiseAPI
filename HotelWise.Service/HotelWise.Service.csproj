@@ -30,6 +30,6 @@
   <ItemGroup>
     <ProjectReference Include="..\HotelWise.Data\HotelWise.Data.csproj" />
     <ProjectReference Include="..\HotelWise.Domain\HotelWise.Domain.csproj" />
-    <ProjectReference Include="..\HotelWise.Core.SDK\HotelWise.Core.SDK.csproj" />
+    <PackageReference Include="SmartCoreHub.Core.SDK" />
   </ItemGroup>
 </Project>

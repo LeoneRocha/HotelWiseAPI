@@ -1,17 +1,14 @@
 #if NET8_0_OR_GREATER
-using HotelWise.Core.SDK.AI.Abstractions;
-using HotelWise.Core.SDK.AI.Configuration;
-using HotelWise.Core.SDK.Abstractions;
-using HotelWise.Core.SDK.Security;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
+using SchConfig = SmartCoreHub.Core.SDK.Domain.AI.Configuration;
+using SchDi = SmartCoreHub.Core.SDK.Service.DependenciesCollection.Extensions;
+using SchSecurity = SmartCoreHub.Core.SDK.Common.Security;
 
 namespace HotelWise.Core.SDK.Extensions;
 
 /// <summary>
-/// DI bind de AppSettings — registra tipos HW (casca) no container.
-/// Lógica de bind espelha SCH; tipos retornados permanecem HW para hosts.
+/// DI bind de AppSettings — delega ao SCH.
 /// </summary>
 [Obsolete("Depreciado. Migrado para SmartCoreHub.Core.SDK na camada Service. Use o pacote NuGet SmartCoreHub.Core.SDK — tipo SmartCoreHub.Core.SDK.Service.DependenciesCollection.Extensions.ServiceCollectionConfigureAppSettings. Após publicar o NuGet, HotelWise.Core.SDK será só casca (PackageReference + wrappers) e delegará a SmartCoreHub.Core.SDK.")]
 public static class ServiceCollectionConfigureAppSettings
@@ -19,32 +16,13 @@ public static class ServiceCollectionConfigureAppSettings
     /// <summary>
     /// Registra e retorna as configurações do Azure AD / Microsoft Entra ID.
     /// </summary>
-    /// <param name="services">Coleção de serviços de injeção de dependência.</param>
-    /// <param name="configuration">Configuração da aplicação.</param>
-    /// <returns>Instância preenchida de <see cref="AzureAdConfig"/>.</returns>
-    public static AzureAdConfig AddAndReturnAzureAdConfig(IServiceCollection services, IConfiguration configuration)
-    {
-        var appValue = new AzureAdConfig();
-        var configValue = Helpers.ConfigurationAppSettingsHelper.GetAzureAdConfig(configuration);
-        new ConfigureFromConfigurationOptions<AzureAdConfig>(configValue).Configure(appValue);
-        services.AddSingleton<IAzureAdConfig>(appValue);
-        return appValue;
-    }
+    public static SchConfig.AzureAdConfig AddAndReturnAzureAdConfig(IServiceCollection services, IConfiguration configuration) =>
+        SchDi.ServiceCollectionConfigureAppSettings.AddAndReturnAzureAdConfig(services, configuration);
 
     /// <summary>
     /// Registra e retorna as configurações de token JWT.
     /// </summary>
-    /// <param name="services">Coleção de serviços de injeção de dependência.</param>
-    /// <param name="configuration">Configuração da aplicação.</param>
-    /// <returns>Instância preenchida de <see cref="TokenConfigurationDto"/>.</returns>
-    public static TokenConfigurationDto AddAndReturnTokenConfiguration(IServiceCollection services, IConfiguration configuration)
-    {
-        var configValue = Helpers.ConfigurationAppSettingsHelper.GetTokenConfigurations(configuration);
-        var tokenConfigurations = new TokenConfigurationDto();
-        new ConfigureFromConfigurationOptions<TokenConfigurationDto>(configValue).Configure(tokenConfigurations);
-        services.AddSingleton<ITokenConfigurationDto>(tokenConfigurations);
-        services.AddSingleton(tokenConfigurations);
-        return tokenConfigurations;
-    }
+    public static SchSecurity.TokenConfigurationDto AddAndReturnTokenConfiguration(IServiceCollection services, IConfiguration configuration) =>
+        SchDi.ServiceCollectionConfigureAppSettings.AddAndReturnTokenConfiguration(services, configuration);
 }
 #endif

@@ -8,5 +8,6 @@ namespace HotelWise.Core.SDK.Common.Constants;
 public static class AzureADEntraIDConstants
 {
     /// <summary>Nome da seção de configuração do Azure AD / Microsoft Entra ID.</summary>
-    public const string AzureAd = "AzureAD";
+    public const string AzureAd =
+        SmartCoreHub.Core.SDK.Common.Constants.AzureADEntraIDConstants.AzureAd;
 }

@@ -17,7 +17,7 @@ public class Phase0ScaffoldTests
     [Fact]
     public void CoreSdkInfo_Should_Expose_PackageMetadata()
     {
-        CoreSdkInfo.PackageId.Should().Be("HotelWise.Core.SDK");
-        CoreSdkInfo.Version.Should().Be("1.0.0");
+        CoreSdkInfo.PackageId.Should().Be(SmartCoreHub.Core.SDK.Common.CoreSdkInfo.PackageId);
+        CoreSdkInfo.Version.Should().Be(SmartCoreHub.Core.SDK.Common.CoreSdkInfo.Version);
     }
 }

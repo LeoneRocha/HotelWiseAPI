@@ -3,7 +3,9 @@ using HotelWise.Core.SDK.AI.Abstractions;
 using HotelWise.Core.SDK.AI.DTO;
 using Microsoft.Extensions.VectorData;
 using Microsoft.SemanticKernel;
+using SchAbstractions = SmartCoreHub.Core.SDK.Domain.AI.Abstractions;
 using SchAdapters = SmartCoreHub.Core.SDK.Infrastructure.AI.Adapters;
+using SchDto = SmartCoreHub.Core.SDK.Domain.AI.DTO;
 
 namespace HotelWise.Core.SDK.AI.Adapters;
 
@@ -15,15 +17,17 @@ namespace HotelWise.Core.SDK.AI.Adapters;
 public class GenericVectorStoreAdapter<TVector> : IVectorStoreAdapter<TVector>
     where TVector : class, IDataVector
 {
-    private readonly SchAdapters.GenericVectorStoreAdapter<TVector> _inner;
+    private readonly SchAbstractions.IVectorStoreAdapter<TVector> _inner;
 
     /// <summary>
-    /// Inicializa uma nova instância de <see cref="GenericVectorStoreAdapter{TVector}"/>.
+    /// Casca sobre adapter SCH já construído (via fábrica SCH).
     /// </summary>
-    /// <param name="logger">Logger Serilog.</param>
-    /// <param name="applicationConfig">Configuração da aplicação IA.</param>
-    /// <param name="vectorStore">Instância do VectorStore Semantic Kernel.</param>
-    /// <param name="kernel">Instância do Kernel.</param>
+    internal GenericVectorStoreAdapter(SchAbstractions.IVectorStoreAdapter<TVector> inner) =>
+        _inner = inner;
+
+    /// <summary>
+    /// Inicializa uma nova instância construindo o adapter SCH internamente.
+    /// </summary>
     public GenericVectorStoreAdapter(
         Serilog.ILogger logger,
         IApplicationIAConfig applicationConfig,
@@ -32,7 +36,7 @@ public class GenericVectorStoreAdapter<TVector> : IVectorStoreAdapter<TVector>
     {
         _inner = new SchAdapters.GenericVectorStoreAdapter<TVector>(
             logger,
-            ApplicationIAConfigSchBridge.ToSch(applicationConfig),
+            applicationConfig,
             vectorStore,
             kernel);
     }
@@ -54,7 +58,7 @@ public class GenericVectorStoreAdapter<TVector> : IVectorStoreAdapter<TVector>
         _inner.Exists(nameCollection, dataKey);
 
     /// <inheritdoc />
-    public Task<TVector[]> VectorizedSearchAsync(string nameCollection, float[] searchEmbedding, SearchCriteria searchCriteria) =>
+    public Task<TVector[]> VectorizedSearchAsync(string nameCollection, float[] searchEmbedding, SchDto.SearchCriteria searchCriteria) =>
         _inner.VectorizedSearchAsync(nameCollection, searchEmbedding, searchCriteria);
 
     /// <inheritdoc />

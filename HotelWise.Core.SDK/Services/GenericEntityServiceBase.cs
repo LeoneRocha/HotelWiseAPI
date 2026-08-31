@@ -2,29 +2,21 @@
 using AutoMapper;
 using FluentValidation;
 using HotelWise.Core.SDK.Abstractions;
-using HotelWise.Core.SDK.Common;
 
 namespace HotelWise.Core.SDK.Services;
 
 /// <summary>
-/// Serviço genérico de entidade — casca sobre
-/// <see cref="SmartCoreHub.Core.SDK.Service.Services.Generic.GenericEntityServiceBase{T, TDto}"/>.
-/// Reexpõe <see cref="ServiceResponse{TDto}"/> HW para hosts que fazem override.
+/// Serviço genérico de entidade — herda SCH (<see cref="SmartCoreHub.Core.SDK.Domain.Abstractions.IGenericService{TDto}"/>).
 /// </summary>
 [Obsolete("Depreciado. Migrado para SmartCoreHub.Core.SDK na camada Service. Use o pacote NuGet SmartCoreHub.Core.SDK — tipo SmartCoreHub.Core.SDK.Service.Services.Generic.GenericEntityServiceBase. Após publicar o NuGet, HotelWise.Core.SDK será só casca (PackageReference + wrappers) e delegará a SmartCoreHub.Core.SDK.")]
 public abstract class GenericEntityServiceBase<T, TDto>
-    : SmartCoreHub.Core.SDK.Service.Services.Generic.GenericEntityServiceBase<T, TDto>,
-      IGenericService<TDto>
+    : SmartCoreHub.Core.SDK.Service.Services.Generic.GenericEntityServiceBase<T, TDto>
     where T : class, new()
     where TDto : class, new()
 {
     /// <summary>
     /// Inicializa uma nova instância de <see cref="GenericEntityServiceBase{T, TDto}"/>.
     /// </summary>
-    /// <param name="repository">Repositório genérico da entidade.</param>
-    /// <param name="mapper">Instância do AutoMapper.</param>
-    /// <param name="logger">Instância do Serilog logger.</param>
-    /// <param name="entityValidator">Validador FluentValidation da entidade.</param>
     protected GenericEntityServiceBase(
         IGenericRepository<T> repository,
         IMapper mapper,
@@ -32,45 +24,6 @@ public abstract class GenericEntityServiceBase<T, TDto>
         IValidator<T> entityValidator)
         : base(repository, mapper, logger, entityValidator)
     {
-    }
-
-    /// <summary>Reexpõe CreateAsync com <see cref="ServiceResponse{TDto}"/> HW (hosts com override).</summary>
-    public new virtual async Task<ServiceResponse<TDto>> CreateAsync(TDto entityDto)
-        => ToHw(await base.CreateAsync(entityDto));
-
-    /// <summary>Reexpõe UpdateAsync com <see cref="ServiceResponse{TDto}"/> HW (hosts com override).</summary>
-    public new virtual async Task<ServiceResponse<TDto>> UpdateAsync(TDto entityDto)
-        => ToHw(await base.UpdateAsync(entityDto));
-
-    /// <summary>Reexpõe Validate com <see cref="ServiceResponse{TDto}"/> HW.</summary>
-    public new virtual async Task<ServiceResponse<TDto>> Validate(T item)
-        => ToHw(await base.Validate(item));
-
-    private static ServiceResponse<TDto> ToHw(SmartCoreHub.Core.SDK.Common.ServiceResponse<TDto> sch)
-    {
-        var hw = new ServiceResponse<TDto>
-        {
-            Data = sch.Data,
-            Success = sch.Success,
-            Message = sch.Message,
-            Unauthorized = sch.Unauthorized,
-            Errors = new List<ErrorResponse>()
-        };
-        if (sch.Errors is { Count: > 0 })
-        {
-            foreach (var e in sch.Errors)
-            {
-                hw.Errors.Add(new ErrorResponse
-                {
-                    Name = e.Name,
-                    Message = e.Message,
-                    ErrorCode = e.ErrorCode,
-                    DefaultMessage = e.DefaultMessage,
-                    FullMessage = e.FullMessage
-                });
-            }
-        }
-        return hw;
     }
 }
 #endif

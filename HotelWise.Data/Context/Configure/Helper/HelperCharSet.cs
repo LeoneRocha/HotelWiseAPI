@@ -9,12 +9,12 @@ namespace HotelWise.Data.Context.Configure.Helper;
 public static class PomeloCharSetHelper
 {
     /// <summary>
-    /// Aplica o charset padrão canônico (<see cref="HotelWise.Core.SDK.Infrastructure.HelperCharSet.DefaultCharSet"/>) na tabela da entidade.
+    /// Aplica o charset padrão canônico (<see cref="SmartCoreHub.Core.SDK.Infrastructure.Data.Configurations.Helper.Ported.HelperCharSet.DefaultCharSet"/>) na tabela da entidade.
     /// </summary>
     /// <typeparam name="T">Tipo da entidade persistida.</typeparam>
     /// <param name="builder">Construtor de tipo de entidade.</param>
     public static void AddCharSet<T>(EntityTypeBuilder<T> builder) where T : class
     {
-        builder.HasCharSet(HotelWise.Core.SDK.Infrastructure.HelperCharSet.DefaultCharSet);
+        builder.HasCharSet(SmartCoreHub.Core.SDK.Infrastructure.Data.Configurations.Helper.Ported.HelperCharSet.DefaultCharSet);
     }
 }

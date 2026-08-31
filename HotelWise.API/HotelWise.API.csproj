@@ -39,6 +39,6 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\HotelWise.Service\HotelWise.Service.csproj" />
-    <ProjectReference Include="..\HotelWise.Core.SDK\HotelWise.Core.SDK.csproj" />
+    <PackageReference Include="SmartCoreHub.Core.SDK" />
   </ItemGroup>
 </Project>

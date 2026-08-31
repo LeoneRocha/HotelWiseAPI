@@ -1,4 +1,3 @@
-using HotelWise.Core.SDK.AI.Enums;
 using HotelWise.Core.SDK.AI.Abstractions;
 using HotelWise.Core.SDK.AI.Constants;
 using HotelWise.Core.SDK.AI.DTO;

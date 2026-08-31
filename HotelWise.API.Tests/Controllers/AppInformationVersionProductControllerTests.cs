@@ -28,7 +28,7 @@ public class AppInformationVersionProductControllerTests
         // Assert
         result.Result.Should().BeOfType<OkObjectResult>();
         var ok = (OkObjectResult)result.Result!;
-        var list = ok.Value.Should().BeAssignableTo<List<AppInformationVersionProductDto>>().Subject;
+        var list = ok.Value.Should().BeAssignableTo<List<SmartCoreHub.Core.SDK.Service.API.Helpers.AppInformationVersionProductDto>>().Subject;
         list.Should().HaveCount(1);
     }
 }

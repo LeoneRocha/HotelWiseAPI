@@ -8,32 +8,42 @@ namespace HotelWise.Core.SDK.Common.Constants;
 public static class ValidatorConstants
 {
     /// <summary>Nome de resposta para validação de permissão médica.</summary>
-    public const string NameResponseValidate_ValidatePermissionMedical = "ValidatePermissionMedical";
+    public const string NameResponseValidate_ValidatePermissionMedical =
+        SmartCoreHub.Core.SDK.Common.Constants.ValidatorConstants.NameResponseValidate_ValidatePermission;
 
     /// <summary>Chave para mensagem de erro genérica.</summary>
-    public const string GenericErroMessage = "GenericErroMessage";
+    public const string GenericErroMessage =
+        SmartCoreHub.Core.SDK.Common.Constants.ValidatorConstants.GenericErroMessage;
 
     /// <summary>Mensagem quando o usuário não é encontrado.</summary>
-    public const string Validade_UserNotFound = "User not found.";
+    public const string Validade_UserNotFound =
+        SmartCoreHub.Core.SDK.Common.Constants.ValidatorConstants.Validade_UserNotFound;
 
     /// <summary>Identificador para validação de permissão médica.</summary>
-    public const string Validate_Permission_Medical = "Validate_Permission_Medical";
+    public const string Validate_Permission_Medical =
+        SmartCoreHub.Core.SDK.Common.Constants.ValidatorConstants.Validate_Permission;
 
     /// <summary>Chave de recurso para mensagem de erro genérica.</summary>
-    public const string GenericErroMessageKey = "Generic_Erro_Message";
+    public const string GenericErroMessageKey =
+        SmartCoreHub.Core.SDK.Common.Constants.ValidatorConstants.GenericErroMessageKey;
 
     /// <summary>Texto padrão para mensagem de erro genérica de processo.</summary>
-    public const string Generic_Erro_Message = "An error occurred in the process.";
+    public const string Generic_Erro_Message =
+        SmartCoreHub.Core.SDK.Common.Constants.ValidatorConstants.Generic_Erro_Message;
 
     /// <summary>Chave de recurso para mensagem de falha em validações.</summary>
-    public const string ValidateErroMessageKey = "Validate_Erro_Message";
+    public const string ValidateErroMessageKey =
+        SmartCoreHub.Core.SDK.Common.Constants.ValidatorConstants.ValidateErroMessageKey;
 
     /// <summary>Texto padrão quando validações não são atendidas.</summary>
-    public const string ValidateErroMessage_Message = "The validations did not pass";
+    public const string ValidateErroMessage_Message =
+        SmartCoreHub.Core.SDK.Common.Constants.ValidatorConstants.ValidateErroMessage_Message;
 
     /// <summary>Chave de recurso para mensagem de validações atendidas com sucesso.</summary>
-    public const string ValidateSuccessMessageKey = "Validate_Success_Message";
+    public const string ValidateSuccessMessageKey =
+        SmartCoreHub.Core.SDK.Common.Constants.ValidatorConstants.ValidateSuccessMessageKey;
 
     /// <summary>Texto padrão quando todas as validações foram atendidas.</summary>
-    public const string ValidateSuccessMessage_Message = "All validations passed";
+    public const string ValidateSuccessMessage_Message =
+        SmartCoreHub.Core.SDK.Common.Constants.ValidatorConstants.ValidateSuccessMessage_Message;
 }

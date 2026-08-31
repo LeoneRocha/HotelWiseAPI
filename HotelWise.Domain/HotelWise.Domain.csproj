@@ -56,6 +56,6 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\GroqApiLibrary\GroqApiLibrary.csproj" />
-    <ProjectReference Include="..\HotelWise.Core.SDK\HotelWise.Core.SDK.csproj" />
+    <PackageReference Include="SmartCoreHub.Core.SDK" />
   </ItemGroup>
 </Project>

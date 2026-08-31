@@ -1,68 +1,24 @@
 using System.Text.Json.Serialization;
+using SchEnums = SmartCoreHub.Core.SDK.Domain.AI.Enums;
 
 namespace HotelWise.Core.SDK.AI.Enums;
 
 /// <summary>
 /// Tipos de serviço de embeddings suportados no pipeline RAG.
-/// Usado em <see cref="Abstractions.IRagConfig"/> e na resolução de configuração
-/// via <see cref="Abstractions.IApplicationIAConfig.GetEmbeddingServiceConfig"/>.
 /// </summary>
 [JsonConverter(typeof(JsonStringEnumConverter))]
 [Obsolete("Depreciado. Migrado para SmartCoreHub.Core.SDK na camada Domain. Use o pacote NuGet SmartCoreHub.Core.SDK — tipo SmartCoreHub.Core.SDK.Domain.AI.Enums.AIEmbeddingServiceType. Após publicar o NuGet, HotelWise.Core.SDK será só casca (PackageReference + wrappers) e delegará a SmartCoreHub.Core.SDK.")]
 public enum AIEmbeddingServiceType
 {
-    /// <summary>
-    /// Embeddings padrão (fallback da aplicação).
-    /// </summary>
-    DefaultEmbeddings,
-
-    /// <summary>
-    /// Embeddings via Ollama.
-    /// </summary>
-    OllamaEmbeddings,
-
-    /// <summary>
-    /// Embeddings via Azure OpenAI.
-    /// </summary>
-    AzureOpenAIEmbeddings,
-
-    /// <summary>
-    /// Embeddings via OpenAI.
-    /// </summary>
-    OpenAIEmbeddings,
-
-    /// <summary>
-    /// Embeddings via Mistral API.
-    /// </summary>
-    MistralApiEmbeddings,
-
-    /// <summary>
-    /// Embeddings via Cohere.
-    /// </summary>
-    CohereEmbeddings,
-
-    /// <summary>
-    /// Embeddings via Hugging Face.
-    /// </summary>
-    HuggingFaceEmbeddings,
-
-    /// <summary>
-    /// Embeddings orquestrados pelo Semantic Kernel.
-    /// </summary>
-    SemanticKernel,
-
-    /// <summary>
-    /// Gerador de embeddings do Semantic Kernel.
-    /// </summary>
-    SemanticKernelEmbeddings,
-
-    /// <summary>
-    /// Embeddings via adapter Ollama.
-    /// </summary>
-    OllamaAdapter,
-
-    /// <summary>
-    /// Embeddings via Sentence Transformers.
-    /// </summary>
-    SentenceTransformersEmbeddings
+    DefaultEmbeddings = (int)SchEnums.AIEmbeddingServiceType.DefaultEmbeddings,
+    OllamaEmbeddings = (int)SchEnums.AIEmbeddingServiceType.OllamaEmbeddings,
+    AzureOpenAIEmbeddings = (int)SchEnums.AIEmbeddingServiceType.AzureOpenAIEmbeddings,
+    OpenAIEmbeddings = (int)SchEnums.AIEmbeddingServiceType.OpenAIEmbeddings,
+    MistralApiEmbeddings = (int)SchEnums.AIEmbeddingServiceType.MistralApiEmbeddings,
+    CohereEmbeddings = (int)SchEnums.AIEmbeddingServiceType.CohereEmbeddings,
+    HuggingFaceEmbeddings = (int)SchEnums.AIEmbeddingServiceType.HuggingFaceEmbeddings,
+    SemanticKernel = (int)SchEnums.AIEmbeddingServiceType.SemanticKernel,
+    SemanticKernelEmbeddings = (int)SchEnums.AIEmbeddingServiceType.SemanticKernelEmbeddings,
+    OllamaAdapter = (int)SchEnums.AIEmbeddingServiceType.OllamaAdapter,
+    SentenceTransformersEmbeddings = (int)SchEnums.AIEmbeddingServiceType.SentenceTransformersEmbeddings,
 }

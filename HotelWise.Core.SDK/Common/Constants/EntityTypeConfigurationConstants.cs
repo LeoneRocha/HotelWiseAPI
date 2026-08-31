@@ -11,25 +11,32 @@ namespace HotelWise.Core.SDK.Common.Constants;
 public static class EntityTypeConfigurationConstants
 {
     /// <summary>Tipo de coluna varchar de 255 caracteres.</summary>
-    public const string Type_Varchar_255 = "varchar(255)";
+    public const string Type_Varchar_255 =
+        SmartCoreHub.Core.SDK.Common.Constants.EntityTypeConfigurationConstants.Type_Varchar_255;
 
     /// <summary>Tipo de coluna varchar de 40 caracteres.</summary>
-    public const string Type_Varchar_40 = "varchar(40)";
+    public const string Type_Varchar_40 =
+        SmartCoreHub.Core.SDK.Common.Constants.EntityTypeConfigurationConstants.Type_Varchar_40;
 
     /// <summary>Tipo de coluna varchar de 20 caracteres.</summary>
-    public const string Type_Varchar_20 = "varchar(20)";
+    public const string Type_Varchar_20 =
+        SmartCoreHub.Core.SDK.Common.Constants.EntityTypeConfigurationConstants.Type_Varchar_20;
 
     /// <summary>Tipo de coluna text para MySQL.</summary>
-    public const string Type_Text_MySql = "text";
+    public const string Type_Text_MySql =
+        SmartCoreHub.Core.SDK.Common.Constants.EntityTypeConfigurationConstants.Type_Text_MySql;
 
     /// <summary>Tipo de coluna varchar(max) para SQL Server.</summary>
-    public const string Type_Text_SqlServer = "varchar(max)";
+    public const string Type_Text_SqlServer =
+        SmartCoreHub.Core.SDK.Common.Constants.EntityTypeConfigurationConstants.Type_Text_SqlServer;
 
     /// <summary>Código de idioma padrão pt-BR.</summary>
-    public const string Language_Default_PTBR = "pt-BR";
+    public const string Language_Default_PTBR =
+        SmartCoreHub.Core.SDK.Common.Constants.EntityTypeConfigurationConstants.Language_Default_PTBR;
 
     /// <summary>Chave padrão de recurso de idioma compartilhado.</summary>
-    public const string ApplicationLanguage_ResourceKey_Default = "SharedResource";
+    public const string ApplicationLanguage_ResourceKey_Default =
+        SmartCoreHub.Core.SDK.Common.Constants.EntityTypeConfigurationConstants.ApplicationLanguage_ResourceKey_Default;
 
     /// <summary>
     /// Retorna o comprimento máximo padrão para campos de texto conforme o tipo de banco de dados.

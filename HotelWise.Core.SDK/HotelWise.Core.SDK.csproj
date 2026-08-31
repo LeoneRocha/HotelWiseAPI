@@ -60,8 +60,6 @@
     <PackageReference Include="Mistral.SDK" />
     <PackageReference Include="OllamaSharp" />
     <PackageReference Include="Swashbuckle.AspNetCore.Annotations" />
-    <PackageReference Include="Serilog.Enrichers.Environment" />
-    <PackageReference Include="Serilog.Settings.Configuration" />
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>
 
