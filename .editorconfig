@@ -1,0 +1,10 @@
+root = true
+
+[*.cs]
+# Roslyn analyzer rules for Obsolete / Deprecation
+dotnet_diagnostic.CS0618.severity = none
+dotnet_diagnostic.CS0612.severity = none
+
+# Sonar C# rules for Obsolete / Deprecation
+dotnet_diagnostic.S1133.severity = none
+dotnet_diagnostic.S1874.severity = none
