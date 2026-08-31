@@ -14,6 +14,7 @@ namespace HotelWise.Core.SDK.Common;
 /// Expõe nome, mensagem e código para o cliente; campos internos de mensagem padrão
 /// e mensagem completa são ignorados em serialização JSON/XML e no Swagger (quando NET 8+).
 /// </summary>
+[Obsolete("Depreciado. Migrado para SmartCoreHub.Core.SDK na camada Common. Use o pacote NuGet SmartCoreHub.Core.SDK — tipo SmartCoreHub.Core.SDK.Common.ErrorResponse. Após publicar o NuGet, HotelWise.Core.SDK será só casca (PackageReference + wrappers) e delegará a SmartCoreHub.Core.SDK.")]
 public class ErrorResponse
 {
     /// <summary>

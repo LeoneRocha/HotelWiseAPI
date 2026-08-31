@@ -25,6 +25,7 @@ namespace HotelWise.Core.SDK.AI.Adapters;
 /// var results = await adapter.VectorizedSearchAsync("hotels", embedding, criteria);
 /// </code>
 /// </example>
+[Obsolete("Depreciado. Migrado para SmartCoreHub.Core.SDK na camada Infrastructure. Use o pacote NuGet SmartCoreHub.Core.SDK — tipo SmartCoreHub.Core.SDK.Infrastructure.AI.Adapters.GenericVectorStoreAdapter. Após publicar o NuGet, HotelWise.Core.SDK será só casca (PackageReference + wrappers) e delegará a SmartCoreHub.Core.SDK.")]
 public class GenericVectorStoreAdapter<TVector> : IVectorStoreAdapter<TVector> where TVector : class, IDataVector
 {
     /// <summary>

@@ -19,6 +19,7 @@ namespace HotelWise.Core.SDK.AI.Services;
 /// service.SetUserId(userId);
 /// </code>
 /// </example>
+[Obsolete("Depreciado. Migrado para SmartCoreHub.Core.SDK na camada Service. Use o pacote NuGet SmartCoreHub.Core.SDK — tipo SmartCoreHub.Core.SDK.Service.AI.Services.GenericVectorStoreServiceBase. Após publicar o NuGet, HotelWise.Core.SDK será só casca (PackageReference + wrappers) e delegará a SmartCoreHub.Core.SDK.")]
 public abstract class GenericVectorStoreServiceBase
 {
     /// <summary>

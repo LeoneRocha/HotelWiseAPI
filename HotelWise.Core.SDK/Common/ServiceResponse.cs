@@ -8,6 +8,7 @@ namespace HotelWise.Core.SDK.Common;
 /// e indicador de não autorização, para comunicação uniforme com a API e o cliente.
 /// </summary>
 /// <typeparam name="T">Tipo do payload de dados retornado.</typeparam>
+[Obsolete("Depreciado. Migrado para SmartCoreHub.Core.SDK na camada Common. Use o pacote NuGet SmartCoreHub.Core.SDK — tipo SmartCoreHub.Core.SDK.Common.ServiceResponse. Após publicar o NuGet, HotelWise.Core.SDK será só casca (PackageReference + wrappers) e delegará a SmartCoreHub.Core.SDK.")]
 public class ServiceResponse<T> : IServiceResponse<T>
 {
     /// <summary>

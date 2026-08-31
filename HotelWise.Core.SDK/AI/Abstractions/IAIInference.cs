@@ -8,6 +8,7 @@ namespace HotelWise.Core.SDK.AI.Abstractions;
 /// Implementações concretas (Groq, Mistral, Ollama, Semantic Kernel) encapsulam
 /// a comunicação com cada provedor no pipeline de IA/RAG.
 /// </summary>
+[Obsolete("Depreciado. Migrado para SmartCoreHub.Core.SDK na camada Domain. Use o pacote NuGet SmartCoreHub.Core.SDK — tipo SmartCoreHub.Core.SDK.Domain.AI.Abstractions.IAIInferenceAdapter. Após publicar o NuGet, HotelWise.Core.SDK será só casca (PackageReference + wrappers) e delegará a SmartCoreHub.Core.SDK.")]
 public interface IAIInferenceAdapter
 {
     /// <summary>
@@ -44,6 +45,7 @@ public interface IAIInferenceAdapter
 /// Resolve a implementação de <see cref="IAIInferenceAdapter"/> conforme
 /// <see cref="InferenceAiAdapterType"/>.
 /// </summary>
+[Obsolete("Depreciado. Migrado para SmartCoreHub.Core.SDK na camada Domain. Use o pacote NuGet SmartCoreHub.Core.SDK — tipo SmartCoreHub.Core.SDK.Domain.AI.Abstractions.IAIInferenceAdapterFactory. Após publicar o NuGet, HotelWise.Core.SDK será só casca (PackageReference + wrappers) e delegará a SmartCoreHub.Core.SDK.")]
 public interface IAIInferenceAdapterFactory
 {
     /// <summary>
@@ -59,6 +61,7 @@ public interface IAIInferenceAdapterFactory
 /// Encapsula a seleção do adapter e expõe operações de chat e embedding
 /// usadas pelos fluxos conversacionais e RAG da aplicação.
 /// </summary>
+[Obsolete("Depreciado. Migrado para SmartCoreHub.Core.SDK na camada Domain. Use o pacote NuGet SmartCoreHub.Core.SDK — tipo SmartCoreHub.Core.SDK.Domain.AI.Abstractions.IAIInferenceService. Após publicar o NuGet, HotelWise.Core.SDK será só casca (PackageReference + wrappers) e delegará a SmartCoreHub.Core.SDK.")]
 public interface IAIInferenceService
 {
     /// <summary>
@@ -98,6 +101,7 @@ public interface IAIInferenceService
 /// Serviço de assistente conversacional voltado ao usuário final.
 /// Combina embedding, histórico e resposta tipada (<see cref="AskAssistantResponse"/>).
 /// </summary>
+[Obsolete("Depreciado. Migrado para SmartCoreHub.Core.SDK na camada Domain. Use o pacote NuGet SmartCoreHub.Core.SDK — tipo SmartCoreHub.Core.SDK.Domain.AI.Abstractions.IAssistantService. Após publicar o NuGet, HotelWise.Core.SDK será só casca (PackageReference + wrappers) e delegará a SmartCoreHub.Core.SDK.")]
 public interface IAssistantService
 {
     /// <summary>

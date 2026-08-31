@@ -8,6 +8,7 @@ namespace HotelWise.Core.SDK.AI.Configuration;
 /// Implementa <see cref="IAiInferenceConfigBase"/> com endpoint, chave e modelos
 /// compartilhados por provedores de chat e embeddings.
 /// </summary>
+[Obsolete("Depreciado. Migrado para SmartCoreHub.Core.SDK na camada Domain. Use o pacote NuGet SmartCoreHub.Core.SDK — tipo SmartCoreHub.Core.SDK.Domain.AI.Configuration.AiInferenceConfigBase. Após publicar o NuGet, HotelWise.Core.SDK será só casca (PackageReference + wrappers) e delegará a SmartCoreHub.Core.SDK.")]
 public abstract class AiInferenceConfigBase : IAiInferenceConfigBase
 {
     /// <summary>
@@ -50,6 +51,7 @@ public abstract class AiInferenceConfigBase : IAiInferenceConfigBase
 /// <summary>
 /// Configuração do serviço de chat Azure OpenAI (seção <c>AzureOpenAI</c>).
 /// </summary>
+[Obsolete("Depreciado. Migrado para SmartCoreHub.Core.SDK na camada Domain. Use o pacote NuGet SmartCoreHub.Core.SDK — tipo SmartCoreHub.Core.SDK.Domain.AI.Configuration.AzureOpenAIConfig. Após publicar o NuGet, HotelWise.Core.SDK será só casca (PackageReference + wrappers) e delegará a SmartCoreHub.Core.SDK.")]
 public class AzureOpenAIConfig : AiInferenceConfigBase
 {
     /// <summary>
@@ -67,6 +69,7 @@ public class AzureOpenAIConfig : AiInferenceConfigBase
 /// <summary>
 /// Configuração do serviço de embeddings Azure OpenAI (seção <c>AzureOpenAIEmbeddings</c>).
 /// </summary>
+[Obsolete("Depreciado. Migrado para SmartCoreHub.Core.SDK na camada Domain. Use o pacote NuGet SmartCoreHub.Core.SDK — tipo SmartCoreHub.Core.SDK.Domain.AI.Configuration.AzureOpenAIEmbeddingsConfig. Após publicar o NuGet, HotelWise.Core.SDK será só casca (PackageReference + wrappers) e delegará a SmartCoreHub.Core.SDK.")]
 public class AzureOpenAIEmbeddingsConfig : AiInferenceConfigBase
 {
     /// <summary>
@@ -84,6 +87,7 @@ public class AzureOpenAIEmbeddingsConfig : AiInferenceConfigBase
 /// <summary>
 /// Configuração do serviço de chat OpenAI (seção <c>OpenAI</c>).
 /// </summary>
+[Obsolete("Depreciado. Migrado para SmartCoreHub.Core.SDK na camada Domain. Use o pacote NuGet SmartCoreHub.Core.SDK — tipo SmartCoreHub.Core.SDK.Domain.AI.Configuration.OpenAIConfig. Após publicar o NuGet, HotelWise.Core.SDK será só casca (PackageReference + wrappers) e delegará a SmartCoreHub.Core.SDK.")]
 public class OpenAIConfig : AiInferenceConfigBase
 {
     /// <summary>
@@ -95,6 +99,7 @@ public class OpenAIConfig : AiInferenceConfigBase
 /// <summary>
 /// Configuração do serviço de embeddings OpenAI (seção <c>OpenAIEmbeddings</c>).
 /// </summary>
+[Obsolete("Depreciado. Migrado para SmartCoreHub.Core.SDK na camada Domain. Use o pacote NuGet SmartCoreHub.Core.SDK — tipo SmartCoreHub.Core.SDK.Domain.AI.Configuration.OpenAIEmbeddingsConfig. Após publicar o NuGet, HotelWise.Core.SDK será só casca (PackageReference + wrappers) e delegará a SmartCoreHub.Core.SDK.")]
 public class OpenAIEmbeddingsConfig : AiInferenceConfigBase
 {
     /// <summary>
@@ -106,6 +111,7 @@ public class OpenAIEmbeddingsConfig : AiInferenceConfigBase
 /// <summary>
 /// Configuração do serviço de chat Mistral API (seção <c>MistralApi</c>).
 /// </summary>
+[Obsolete("Depreciado. Migrado para SmartCoreHub.Core.SDK na camada Domain. Use o pacote NuGet SmartCoreHub.Core.SDK — tipo SmartCoreHub.Core.SDK.Domain.AI.Configuration.MistralApiConfig. Após publicar o NuGet, HotelWise.Core.SDK será só casca (PackageReference + wrappers) e delegará a SmartCoreHub.Core.SDK.")]
 public class MistralApiConfig : AiInferenceConfigBase
 {
     /// <summary>
@@ -117,6 +123,7 @@ public class MistralApiConfig : AiInferenceConfigBase
 /// <summary>
 /// Configuração do serviço de embeddings Mistral API (seção <c>MistralApiEmbeddings</c>).
 /// </summary>
+[Obsolete("Depreciado. Migrado para SmartCoreHub.Core.SDK na camada Domain. Use o pacote NuGet SmartCoreHub.Core.SDK — tipo SmartCoreHub.Core.SDK.Domain.AI.Configuration.MistralApiEmbeddingsConfig. Após publicar o NuGet, HotelWise.Core.SDK será só casca (PackageReference + wrappers) e delegará a SmartCoreHub.Core.SDK.")]
 public class MistralApiEmbeddingsConfig : AiInferenceConfigBase
 {
     /// <summary>
@@ -128,6 +135,7 @@ public class MistralApiEmbeddingsConfig : AiInferenceConfigBase
 /// <summary>
 /// Configuração do serviço de chat Groq API (seção <c>GroqApi</c>).
 /// </summary>
+[Obsolete("Depreciado. Migrado para SmartCoreHub.Core.SDK na camada Domain. Use o pacote NuGet SmartCoreHub.Core.SDK — tipo SmartCoreHub.Core.SDK.Domain.AI.Configuration.GroqApiConfig. Após publicar o NuGet, HotelWise.Core.SDK será só casca (PackageReference + wrappers) e delegará a SmartCoreHub.Core.SDK.")]
 public class GroqApiConfig : AiInferenceConfigBase
 {
     /// <summary>
@@ -139,6 +147,7 @@ public class GroqApiConfig : AiInferenceConfigBase
 /// <summary>
 /// Configuração do serviço Ollama (seção <c>OllamaApi</c>), incluindo parâmetros de sampling.
 /// </summary>
+[Obsolete("Depreciado. Migrado para SmartCoreHub.Core.SDK na camada Domain. Use o pacote NuGet SmartCoreHub.Core.SDK — tipo SmartCoreHub.Core.SDK.Domain.AI.Configuration.OllamaConfig. Após publicar o NuGet, HotelWise.Core.SDK será só casca (PackageReference + wrappers) e delegará a SmartCoreHub.Core.SDK.")]
 public class OllamaConfig : AiInferenceConfigBase
 {
     /// <summary>
@@ -170,6 +179,7 @@ public class OllamaConfig : AiInferenceConfigBase
 /// <summary>
 /// Configuração do vector store Azure AI Search (seção <c>AzureAISearch</c>).
 /// </summary>
+[Obsolete("Depreciado. Migrado para SmartCoreHub.Core.SDK na camada Domain. Use o pacote NuGet SmartCoreHub.Core.SDK — tipo SmartCoreHub.Core.SDK.Domain.AI.Configuration.AzureAISearchConfig. Após publicar o NuGet, HotelWise.Core.SDK será só casca (PackageReference + wrappers) e delegará a SmartCoreHub.Core.SDK.")]
 public class AzureAISearchConfig : AiInferenceConfigBase
 {
     /// <summary>
@@ -181,6 +191,7 @@ public class AzureAISearchConfig : AiInferenceConfigBase
 /// <summary>
 /// Configuração do vector store Weaviate (seção <c>Weaviate</c>).
 /// </summary>
+[Obsolete("Depreciado. Migrado para SmartCoreHub.Core.SDK na camada Domain. Use o pacote NuGet SmartCoreHub.Core.SDK — tipo SmartCoreHub.Core.SDK.Domain.AI.Configuration.WeaviateConfig. Após publicar o NuGet, HotelWise.Core.SDK será só casca (PackageReference + wrappers) e delegará a SmartCoreHub.Core.SDK.")]
 public class WeaviateConfig : AiInferenceConfigBase
 {
     /// <summary>
@@ -192,6 +203,7 @@ public class WeaviateConfig : AiInferenceConfigBase
 /// <summary>
 /// Configuração do Azure Cosmos DB como vector store (MongoDB ou NoSQL).
 /// </summary>
+[Obsolete("Depreciado. Migrado para SmartCoreHub.Core.SDK na camada Domain. Use o pacote NuGet SmartCoreHub.Core.SDK — tipo SmartCoreHub.Core.SDK.Domain.AI.Configuration.AzureCosmosDBConfig. Após publicar o NuGet, HotelWise.Core.SDK será só casca (PackageReference + wrappers) e delegará a SmartCoreHub.Core.SDK.")]
 public class AzureCosmosDBConfig
 {
     /// <summary>
@@ -220,6 +232,7 @@ public class AzureCosmosDBConfig
 /// <summary>
 /// Configuração do vector store Qdrant (seção <c>Qdrant</c>).
 /// </summary>
+[Obsolete("Depreciado. Migrado para SmartCoreHub.Core.SDK na camada Domain. Use o pacote NuGet SmartCoreHub.Core.SDK — tipo SmartCoreHub.Core.SDK.Domain.AI.Configuration.QdrantConfig. Após publicar o NuGet, HotelWise.Core.SDK será só casca (PackageReference + wrappers) e delegará a SmartCoreHub.Core.SDK.")]
 public class QdrantConfig
 {
     /// <summary>
@@ -252,6 +265,7 @@ public class QdrantConfig
 /// <summary>
 /// Configuração do vector store Redis (seção <c>Redis</c>).
 /// </summary>
+[Obsolete("Depreciado. Migrado para SmartCoreHub.Core.SDK na camada Domain. Use o pacote NuGet SmartCoreHub.Core.SDK — tipo SmartCoreHub.Core.SDK.Domain.AI.Configuration.RedisConfig. Após publicar o NuGet, HotelWise.Core.SDK será só casca (PackageReference + wrappers) e delegará a SmartCoreHub.Core.SDK.")]
 public class RedisConfig
 {
     /// <summary>
@@ -269,6 +283,7 @@ public class RedisConfig
 /// <summary>
 /// Configuração Azure AD / Microsoft Entra ID implementando <see cref="IAzureAdConfig"/>.
 /// </summary>
+[Obsolete("Depreciado. Migrado para SmartCoreHub.Core.SDK na camada Domain. Use o pacote NuGet SmartCoreHub.Core.SDK — tipo SmartCoreHub.Core.SDK.Domain.AI.Configuration.AzureAdConfig. Após publicar o NuGet, HotelWise.Core.SDK será só casca (PackageReference + wrappers) e delegará a SmartCoreHub.Core.SDK.")]
 public class AzureAdConfig : IAzureAdConfig
 {
     /// <summary>

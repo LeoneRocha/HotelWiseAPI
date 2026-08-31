@@ -12,6 +12,7 @@ namespace HotelWise.Core.SDK.AI.Validation;
 /// Aplica regras de papel, conteúdo, comprimento e limites de tokens,
 /// com tratamento especial para mensagens de contexto RAG.
 /// </summary>
+[Obsolete("Depreciado. Migrado para SmartCoreHub.Core.SDK na camada Service. Use o pacote NuGet SmartCoreHub.Core.SDK — tipo SmartCoreHub.Core.SDK.Service.AI.Validation.PromptMessageValidator. Após publicar o NuGet, HotelWise.Core.SDK será só casca (PackageReference + wrappers) e delegará a SmartCoreHub.Core.SDK.")]
 public class PromptMessageValidator : AbstractValidator<PromptMessageVO>
 {
     /// <summary>

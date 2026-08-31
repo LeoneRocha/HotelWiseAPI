@@ -9,6 +9,7 @@ namespace HotelWise.Core.SDK.AI.Validation;
 /// Valida solicitações ao assistente conversacional (<see cref="AskAssistantRequest"/>).
 /// Garante mensagem obrigatória e limites de comprimento para mensagem e token de sessão.
 /// </summary>
+[Obsolete("Depreciado. Migrado para SmartCoreHub.Core.SDK na camada Service. Use o pacote NuGet SmartCoreHub.Core.SDK — tipo SmartCoreHub.Core.SDK.Service.AI.Validation.AskAssistantRequestValidator. Após publicar o NuGet, HotelWise.Core.SDK será só casca (PackageReference + wrappers) e delegará a SmartCoreHub.Core.SDK.")]
 public class AskAssistantRequestValidator : AbstractValidator<AskAssistantRequest>
 {
     /// <summary>

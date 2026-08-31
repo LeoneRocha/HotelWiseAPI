@@ -10,6 +10,7 @@ namespace HotelWise.Core.SDK.AI.Validation;
 /// Garante quantidade mínima/máxima de mensagens, validação individual via
 /// <see cref="PromptMessageValidator"/> e limite total de tokens para chat completion.
 /// </summary>
+[Obsolete("Depreciado. Migrado para SmartCoreHub.Core.SDK na camada Service. Use o pacote NuGet SmartCoreHub.Core.SDK — tipo SmartCoreHub.Core.SDK.Service.AI.Validation.HistoryPromptsValidator. Após publicar o NuGet, HotelWise.Core.SDK será só casca (PackageReference + wrappers) e delegará a SmartCoreHub.Core.SDK.")]
 public class HistoryPromptsValidator : AbstractValidator<PromptMessageVO[]>
 {
     /// <summary>

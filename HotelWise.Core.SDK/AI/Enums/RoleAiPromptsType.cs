@@ -8,6 +8,7 @@ namespace HotelWise.Core.SDK.AI.Enums;
 /// Alinhados aos papéis de chat completion e extensões do pipeline RAG
 /// (Agent para instruções de agente; Context para fragmentos recuperados).
 /// </summary>
+[Obsolete("Depreciado. Migrado para SmartCoreHub.Core.SDK na camada Domain. Use o pacote NuGet SmartCoreHub.Core.SDK — tipo SmartCoreHub.Core.SDK.Domain.AI.Enums.RoleAiPromptsType. Após publicar o NuGet, HotelWise.Core.SDK será só casca (PackageReference + wrappers) e delegará a SmartCoreHub.Core.SDK.")]
 public enum RoleAiPromptsType
 {
     /// <summary>

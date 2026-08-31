@@ -8,6 +8,16 @@
 
 Núcleo reutilizável, canônico e transversal do ecossistema **HotelWise**. O pacote consolida abstrações base, infraestrutura genérica de acesso a dados (Entity Framework Core), pipeline de segurança JWT, middlewares HTTP para ASP.NET Core, serviços base com AutoMapper e FluentValidation, e uma suíte completa de Inteligência Artificial com orquestração de Semantic Kernel, adaptadores LLM agnósticos e suporte a RAG vetorial.
 
+### Migração para SmartCoreHub.Core.SDK
+
+Tipos já unificados no **SmartCoreHub.Core.SDK** estão `[Obsolete]` com mensagem que cita:
+1. a **camada** (`Common` / `Domain` / `Infrastructure` / `Service`);
+2. o **pacote NuGet** `SmartCoreHub.Core.SDK` + FQN do tipo;
+3. que, após publicar o NuGet, este pacote vira **casca** e **delega a SmartCoreHub.Core.SDK**.
+
+Placeholders Version/feed e checklist: **[MIGRATION-TO-SMARTCOREHUB.md](./MIGRATION-TO-SMARTCOREHUB.md)**.
+
+
 ---
 
 ## 1. Visão Geral e Propósito

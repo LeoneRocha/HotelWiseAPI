@@ -15,6 +15,7 @@ namespace HotelWise.Core.SDK.Extensions;
 /// genéricos (Azure AD e Token JWT) a partir de <see cref="IConfiguration"/>,
 /// registrando as instâncias como singletons no DI.
 /// </summary>
+[Obsolete("Depreciado. Migrado para SmartCoreHub.Core.SDK na camada Service. Use o pacote NuGet SmartCoreHub.Core.SDK — tipo SmartCoreHub.Core.SDK.Service.DependenciesCollection.Extensions.ServiceCollectionConfigureAppSettings. Após publicar o NuGet, HotelWise.Core.SDK será só casca (PackageReference + wrappers) e delegará a SmartCoreHub.Core.SDK.")]
 public static class ServiceCollectionConfigureAppSettings
 {
     /// <summary>

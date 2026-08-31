@@ -22,6 +22,7 @@ namespace HotelWise.Core.SDK.Logging;
 /// LogAppHelper.LogException(Log.Logger, ex, "API");
 /// </code>
 /// </example>
+[Obsolete("Depreciado. Migrado para SmartCoreHub.Core.SDK na camada Service. Use o pacote NuGet SmartCoreHub.Core.SDK — tipo SmartCoreHub.Core.SDK.Service.API.Helpers.Ported.LogAppHelper. Após publicar o NuGet, HotelWise.Core.SDK será só casca (PackageReference + wrappers) e delegará a SmartCoreHub.Core.SDK.")]
 public static class LogAppHelper
 {
     /// <summary>

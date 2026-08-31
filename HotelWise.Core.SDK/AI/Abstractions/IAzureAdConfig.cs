@@ -5,6 +5,7 @@ namespace HotelWise.Core.SDK.AI.Abstractions;
 /// Usado para autenticação OAuth/OIDC em cenários em que a API de IA
 /// ou recursos Azure exigem identidade corporativa.
 /// </summary>
+[Obsolete("Depreciado. Migrado para SmartCoreHub.Core.SDK na camada Domain. Use o pacote NuGet SmartCoreHub.Core.SDK — tipo SmartCoreHub.Core.SDK.Domain.AI.Abstractions.IAzureAdConfig. Após publicar o NuGet, HotelWise.Core.SDK será só casca (PackageReference + wrappers) e delegará a SmartCoreHub.Core.SDK.")]
 public interface IAzureAdConfig
 {
     /// <summary>

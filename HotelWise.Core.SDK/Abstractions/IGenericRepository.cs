@@ -8,6 +8,7 @@ namespace HotelWise.Core.SDK.Abstractions;
 /// sobre o tipo <typeparamref name="T"/>.
 /// </summary>
 /// <typeparam name="T">Tipo da entidade de domínio gerenciada pelo repositório.</typeparam>
+[Obsolete("Depreciado. Migrado para SmartCoreHub.Core.SDK na camada Domain. Use o pacote NuGet SmartCoreHub.Core.SDK — tipo SmartCoreHub.Core.SDK.Domain.Abstractions.IGenericRepository. Após publicar o NuGet, HotelWise.Core.SDK será só casca (PackageReference + wrappers) e delegará a SmartCoreHub.Core.SDK.")]
 public interface IGenericRepository<T> where T : class
 {
     /// <summary>

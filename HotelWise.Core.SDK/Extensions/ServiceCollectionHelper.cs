@@ -9,6 +9,7 @@ namespace HotelWise.Core.SDK.Extensions;
 /// Helpers de registro de serviços e descoberta de pares interface/implementação
 /// por sufixo de classe em assemblies, para registro Scoped automático no DI.
 /// </summary>
+[Obsolete("Depreciado. Migrado para SmartCoreHub.Core.SDK na camada Service. Use o pacote NuGet SmartCoreHub.Core.SDK — tipo SmartCoreHub.Core.SDK.Service.DependenciesCollection.Extensions.ServiceCollectionHelper. Após publicar o NuGet, HotelWise.Core.SDK será só casca (PackageReference + wrappers) e delegará a SmartCoreHub.Core.SDK.")]
 public static class ServiceCollectionHelper
 {
     /// <summary>

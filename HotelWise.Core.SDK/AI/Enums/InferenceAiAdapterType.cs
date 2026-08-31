@@ -6,6 +6,7 @@ namespace HotelWise.Core.SDK.AI.Enums;
 /// Tipos de adapter de inferência LLM disponíveis na fábrica
 /// <see cref="Abstractions.IAIInferenceAdapterFactory"/>.
 /// </summary>
+[Obsolete("Depreciado. Migrado para SmartCoreHub.Core.SDK na camada Domain. Use o pacote NuGet SmartCoreHub.Core.SDK — tipo SmartCoreHub.Core.SDK.Domain.AI.Enums.InferenceAiAdapterType. Após publicar o NuGet, HotelWise.Core.SDK será só casca (PackageReference + wrappers) e delegará a SmartCoreHub.Core.SDK.")]
 public enum InferenceAiAdapterType
 {
     /// <summary>

@@ -23,6 +23,19 @@
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
   </PropertyGroup>
 
+  <!--
+    TODO CASCA (ativar após publicar SmartCoreHub.Core.SDK no feed NuGet):
+    1) Preencher Version / feed em MIGRATION-TO-SMARTCOREHUB.md
+    2) Descomentar o PackageReference abaixo
+    3) Substituir implementações migradas por wrappers [Obsolete] que herdam/delegam a SmartCoreHub.Core.SDK
+    Ver: MIGRATION-TO-SMARTCOREHUB.md | SmartCoreHub Documentation/CoreFinal/sdk-migration.md §10
+  -->
+  <!--
+  <ItemGroup>
+    <PackageReference Include="SmartCoreHub.Core.SDK" Version="__TODO_NUGET_VERSION__" />
+  </ItemGroup>
+  -->
+
   <!-- Dependências leves (todos os TFMs) -->
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" />

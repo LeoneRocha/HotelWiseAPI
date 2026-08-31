@@ -8,6 +8,7 @@ namespace HotelWise.Core.SDK.AI.Abstractions;
 /// sobre documentos tipados por <typeparamref name="TVector"/> no pipeline RAG.
 /// </summary>
 /// <typeparam name="TVector">Tipo do registro vetorial, implementando <see cref="IDataVector"/>.</typeparam>
+[Obsolete("Depreciado. Migrado para SmartCoreHub.Core.SDK na camada Domain. Use o pacote NuGet SmartCoreHub.Core.SDK — tipo SmartCoreHub.Core.SDK.Domain.AI.Abstractions.IVectorStoreAdapter. Após publicar o NuGet, HotelWise.Core.SDK será só casca (PackageReference + wrappers) e delegará a SmartCoreHub.Core.SDK.")]
 public interface IVectorStoreAdapter<TVector> where TVector : class, IDataVector
 {
     /// <summary>
@@ -73,6 +74,7 @@ public interface IVectorStoreAdapter<TVector> where TVector : class, IDataVector
 /// Fábrica de adapters de vector store tipados por <see cref="IDataVector"/>.
 /// Usada para obter instâncias de <see cref="IVectorStoreAdapter{TVector}"/> no DI.
 /// </summary>
+[Obsolete("Depreciado. Migrado para SmartCoreHub.Core.SDK na camada Domain. Use o pacote NuGet SmartCoreHub.Core.SDK — tipo SmartCoreHub.Core.SDK.Domain.AI.Abstractions.IVectorStoreAdapterFactory. Após publicar o NuGet, HotelWise.Core.SDK será só casca (PackageReference + wrappers) e delegará a SmartCoreHub.Core.SDK.")]
 public interface IVectorStoreAdapterFactory
 {
     /// <summary>
@@ -88,6 +90,7 @@ public interface IVectorStoreAdapterFactory
 /// Abstrai upsert, busca semântica, geração de embedding e exclusão no fluxo RAG.
 /// </summary>
 /// <typeparam name="TEntity">Tipo da entidade de domínio mapeada para o vector store.</typeparam>
+[Obsolete("Depreciado. Migrado para SmartCoreHub.Core.SDK na camada Domain. Use o pacote NuGet SmartCoreHub.Core.SDK — tipo SmartCoreHub.Core.SDK.Domain.AI.Abstractions.IVectorStoreService. Após publicar o NuGet, HotelWise.Core.SDK será só casca (PackageReference + wrappers) e delegará a SmartCoreHub.Core.SDK.")]
 public interface IVectorStoreService<TEntity>
 {
     /// <summary>

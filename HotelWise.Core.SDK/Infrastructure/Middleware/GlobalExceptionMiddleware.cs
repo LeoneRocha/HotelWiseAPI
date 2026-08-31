@@ -20,6 +20,7 @@ namespace HotelWise.Core.SDK.Infrastructure.Middleware;
 /// app.UseMiddleware&lt;GlobalExceptionMiddleware&gt;();
 /// </code>
 /// </remarks>
+[Obsolete("Depreciado. Migrado para SmartCoreHub.Core.SDK na camada Infrastructure. Use o pacote NuGet SmartCoreHub.Core.SDK — tipo SmartCoreHub.Core.SDK.Infrastructure.Middleware.GlobalExceptionMiddleware. Após publicar o NuGet, HotelWise.Core.SDK será só casca (PackageReference + wrappers) e delegará a SmartCoreHub.Core.SDK.")]
 public class GlobalExceptionMiddleware
 {
     private static readonly JsonSerializerOptions JsonOptions = new()

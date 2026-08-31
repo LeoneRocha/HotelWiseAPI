@@ -8,6 +8,7 @@ namespace HotelWise.Core.SDK.AI.Enums;
 /// via <see cref="Abstractions.IApplicationIAConfig.GetEmbeddingServiceConfig"/>.
 /// </summary>
 [JsonConverter(typeof(JsonStringEnumConverter))]
+[Obsolete("Depreciado. Migrado para SmartCoreHub.Core.SDK na camada Domain. Use o pacote NuGet SmartCoreHub.Core.SDK — tipo SmartCoreHub.Core.SDK.Domain.AI.Enums.AIEmbeddingServiceType. Após publicar o NuGet, HotelWise.Core.SDK será só casca (PackageReference + wrappers) e delegará a SmartCoreHub.Core.SDK.")]
 public enum AIEmbeddingServiceType
 {
     /// <summary>

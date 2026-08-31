@@ -9,6 +9,7 @@ namespace HotelWise.Core.SDK.Validation;
 /// <see cref="ValidationFailure"/>) para o contrato de erro do SDK
 /// (<see cref="ErrorResponse"/>), incluindo normalização de códigos de erro.
 /// </summary>
+[Obsolete("Depreciado. Migrado para SmartCoreHub.Core.SDK na camada Service. Use o pacote NuGet SmartCoreHub.Core.SDK — tipo SmartCoreHub.Core.SDK.Service.Validation.HelperValidation. Após publicar o NuGet, HotelWise.Core.SDK será só casca (PackageReference + wrappers) e delegará a SmartCoreHub.Core.SDK.")]
 public static class HelperValidation
 {
     /// <summary>

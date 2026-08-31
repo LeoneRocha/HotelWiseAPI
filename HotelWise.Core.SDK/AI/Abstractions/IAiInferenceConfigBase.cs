@@ -5,6 +5,7 @@ namespace HotelWise.Core.SDK.AI.Abstractions;
 /// Define endpoint, chave, modelos de chat e embeddings compartilhados
 /// pelos provedores (OpenAI, Azure OpenAI, Mistral, Groq, Ollama, etc.).
 /// </summary>
+[Obsolete("Depreciado. Migrado para SmartCoreHub.Core.SDK na camada Domain. Use o pacote NuGet SmartCoreHub.Core.SDK — tipo SmartCoreHub.Core.SDK.Domain.AI.Abstractions.IAiInferenceConfigBase. Após publicar o NuGet, HotelWise.Core.SDK será só casca (PackageReference + wrappers) e delegará a SmartCoreHub.Core.SDK.")]
 public interface IAiInferenceConfigBase
 {
     /// <summary>

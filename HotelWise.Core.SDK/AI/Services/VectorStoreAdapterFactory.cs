@@ -21,6 +21,7 @@ namespace HotelWise.Core.SDK.AI.Services;
 /// await adapter.UpsertDataAsync("hotels", vector);
 /// </code>
 /// </example>
+[Obsolete("Depreciado. Migrado para SmartCoreHub.Core.SDK na camada Service. Use o pacote NuGet SmartCoreHub.Core.SDK — tipo SmartCoreHub.Core.SDK.Service.AI.Services.VectorStoreAdapterFactory. Após publicar o NuGet, HotelWise.Core.SDK será só casca (PackageReference + wrappers) e delegará a SmartCoreHub.Core.SDK.")]
 public class VectorStoreAdapterFactory : IVectorStoreAdapterFactory
 {
     /// <summary>

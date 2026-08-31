@@ -25,6 +25,7 @@ namespace HotelWise.Core.SDK.AI.Adapters;
 /// float[] emb = await adapter.GenerateEmbeddingAsync("texto");
 /// </code>
 /// </example>
+[Obsolete("Depreciado. Migrado para SmartCoreHub.Core.SDK na camada Infrastructure. Use o pacote NuGet SmartCoreHub.Core.SDK — tipo SmartCoreHub.Core.SDK.Infrastructure.AI.Adapters.SemanticKernelAdapter. Após publicar o NuGet, HotelWise.Core.SDK será só casca (PackageReference + wrappers) e delegará a SmartCoreHub.Core.SDK.")]
 public class SemanticKernelAdapter : IAIInferenceAdapter
 {
     /// <summary>

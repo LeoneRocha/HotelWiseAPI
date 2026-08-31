@@ -10,6 +10,7 @@ namespace HotelWise.Core.SDK.AI.Configuration;
 /// Implementa <see cref="IApplicationIAConfig"/> com seções de RAG, serviços de chat/embeddings
 /// e vector stores sob a chave <see cref="ConfigSectionName"/>.
 /// </summary>
+[Obsolete("Depreciado. Migrado para SmartCoreHub.Core.SDK na camada Domain. Use o pacote NuGet SmartCoreHub.Core.SDK — tipo SmartCoreHub.Core.SDK.Domain.AI.Configuration.ApplicationIAConfig. Após publicar o NuGet, HotelWise.Core.SDK será só casca (PackageReference + wrappers) e delegará a SmartCoreHub.Core.SDK.")]
 public sealed class ApplicationIAConfig : IApplicationIAConfig
 {
     /// <summary>

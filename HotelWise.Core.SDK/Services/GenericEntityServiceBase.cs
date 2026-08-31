@@ -28,6 +28,7 @@ namespace HotelWise.Core.SDK.Services;
 /// }
 /// </code>
 /// </example>
+[Obsolete("Depreciado. Migrado para SmartCoreHub.Core.SDK na camada Service. Use o pacote NuGet SmartCoreHub.Core.SDK — tipo SmartCoreHub.Core.SDK.Service.Services.Generic.GenericEntityServiceBase. Após publicar o NuGet, HotelWise.Core.SDK será só casca (PackageReference + wrappers) e delegará a SmartCoreHub.Core.SDK.")]
 public abstract class GenericEntityServiceBase<T, TDto> : IGenericService<TDto>
     where T : class, new()
     where TDto : class, new()

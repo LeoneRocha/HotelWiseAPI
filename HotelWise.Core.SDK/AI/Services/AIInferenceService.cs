@@ -21,6 +21,7 @@ namespace HotelWise.Core.SDK.AI.Services;
 ///     messages, InferenceAiAdapterType.SemanticKernel);
 /// </code>
 /// </example>
+[Obsolete("Depreciado. Migrado para SmartCoreHub.Core.SDK na camada Service. Use o pacote NuGet SmartCoreHub.Core.SDK — tipo SmartCoreHub.Core.SDK.Service.AI.Services.AIInferenceService. Após publicar o NuGet, HotelWise.Core.SDK será só casca (PackageReference + wrappers) e delegará a SmartCoreHub.Core.SDK.")]
 public class AIInferenceService : IAIInferenceService
 {
     /// <summary>

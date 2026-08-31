@@ -8,6 +8,7 @@ namespace HotelWise.Core.SDK.AI.Abstractions;
 /// Centraliza provedores de chat, embeddings e vector stores usados no pipeline RAG
 /// e pelos adapters de inferência (<see cref="IAIInferenceAdapter"/>).
 /// </summary>
+[Obsolete("Depreciado. Migrado para SmartCoreHub.Core.SDK na camada Domain. Use o pacote NuGet SmartCoreHub.Core.SDK — tipo SmartCoreHub.Core.SDK.Domain.AI.Abstractions.IApplicationIAConfig. Após publicar o NuGet, HotelWise.Core.SDK será só casca (PackageReference + wrappers) e delegará a SmartCoreHub.Core.SDK.")]
 public interface IApplicationIAConfig
 {
     /// <summary>

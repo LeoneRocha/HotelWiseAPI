@@ -13,6 +13,7 @@ namespace HotelWise.Core.SDK.AI.Helpers;
 /// int total = TokenCounterHelper.CalculateTotalTokens(mensagens);
 /// </code>
 /// </example>
+[Obsolete("Depreciado. Migrado para SmartCoreHub.Core.SDK na camada Service. Use o pacote NuGet SmartCoreHub.Core.SDK — tipo SmartCoreHub.Core.SDK.Service.AI.Helpers.TokenCounterHelper. Após publicar o NuGet, HotelWise.Core.SDK será só casca (PackageReference + wrappers) e delegará a SmartCoreHub.Core.SDK.")]
 public static class TokenCounterHelper
 {
     /// <summary>

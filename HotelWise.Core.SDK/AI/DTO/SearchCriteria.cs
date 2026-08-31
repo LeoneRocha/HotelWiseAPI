@@ -5,6 +5,7 @@ namespace HotelWise.Core.SDK.AI.DTO;
 /// Usados por <see cref="Abstractions.IVectorStoreAdapter{TVector}.VectorizedSearchAsync"/>
 /// e serviços de vector store tipados.
 /// </summary>
+[Obsolete("Depreciado. Migrado para SmartCoreHub.Core.SDK na camada Domain. Use o pacote NuGet SmartCoreHub.Core.SDK — tipo SmartCoreHub.Core.SDK.Domain.AI.DTO.SearchCriteria. Após publicar o NuGet, HotelWise.Core.SDK será só casca (PackageReference + wrappers) e delegará a SmartCoreHub.Core.SDK.")]
 public class SearchCriteria
 {
     /// <summary>

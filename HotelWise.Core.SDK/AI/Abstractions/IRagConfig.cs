@@ -8,6 +8,7 @@ namespace HotelWise.Core.SDK.AI.Abstractions;
 /// Define provedores de chat/embeddings, vector store, dimensões e parâmetros
 /// de carga usados na indexação e na busca semântica.
 /// </summary>
+[Obsolete("Depreciado. Migrado para SmartCoreHub.Core.SDK na camada Domain. Use o pacote NuGet SmartCoreHub.Core.SDK — tipo SmartCoreHub.Core.SDK.Domain.AI.Abstractions.IRagConfig. Após publicar o NuGet, HotelWise.Core.SDK será só casca (PackageReference + wrappers) e delegará a SmartCoreHub.Core.SDK.")]
 public interface IRagConfig
 {
     /// <summary>

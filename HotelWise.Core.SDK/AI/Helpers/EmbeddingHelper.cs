@@ -10,6 +10,7 @@ namespace HotelWise.Core.SDK.AI.Helpers;
 /// ReadOnlyMemory&lt;float&gt; memory = EmbeddingHelper.ConvertToReadOnlyMemory(vetor);
 /// </code>
 /// </example>
+[Obsolete("Depreciado. Migrado para SmartCoreHub.Core.SDK na camada Service. Use o pacote NuGet SmartCoreHub.Core.SDK — tipo SmartCoreHub.Core.SDK.Service.AI.Helpers.EmbeddingHelper. Após publicar o NuGet, HotelWise.Core.SDK será só casca (PackageReference + wrappers) e delegará a SmartCoreHub.Core.SDK.")]
 public static class EmbeddingHelper
 {
     /// <summary>

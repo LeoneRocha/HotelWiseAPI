@@ -6,6 +6,7 @@ namespace HotelWise.Core.SDK.AI.DTO;
 /// Resposta do assistente conversacional retornada por <see cref="Abstractions.IAssistantService"/>.
 /// Representa uma mensagem tipada por papel (role) no diálogo.
 /// </summary>
+[Obsolete("Depreciado. Migrado para SmartCoreHub.Core.SDK na camada Domain. Use o pacote NuGet SmartCoreHub.Core.SDK — tipo SmartCoreHub.Core.SDK.Domain.AI.DTO.AskAssistantResponse. Após publicar o NuGet, HotelWise.Core.SDK será só casca (PackageReference + wrappers) e delegará a SmartCoreHub.Core.SDK.")]
 public class AskAssistantResponse
 {
     /// <summary>
@@ -28,6 +29,7 @@ public class AskAssistantResponse
 /// Solicitação ao assistente conversacional.
 /// Enviada a <see cref="Abstractions.IAssistantService.AskAssistant"/> com a mensagem do usuário.
 /// </summary>
+[Obsolete("Depreciado. Migrado para SmartCoreHub.Core.SDK na camada Domain. Use o pacote NuGet SmartCoreHub.Core.SDK — tipo SmartCoreHub.Core.SDK.Domain.AI.DTO.AskAssistantRequest. Após publicar o NuGet, HotelWise.Core.SDK será só casca (PackageReference + wrappers) e delegará a SmartCoreHub.Core.SDK.")]
 public class AskAssistantRequest
 {
     /// <summary>

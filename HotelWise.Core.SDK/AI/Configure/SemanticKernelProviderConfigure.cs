@@ -31,6 +31,7 @@ namespace HotelWise.Core.SDK.AI.Configure;
 ///     builder.Services, builder.Configuration);
 /// </code>
 /// </example>
+[Obsolete("Depreciado. Migrado para SmartCoreHub.Core.SDK na camada Service. Use o pacote NuGet SmartCoreHub.Core.SDK — tipo SmartCoreHub.Core.SDK.Service.AI.Configure.SemanticKernelProviderConfigure. Após publicar o NuGet, HotelWise.Core.SDK será só casca (PackageReference + wrappers) e delegará a SmartCoreHub.Core.SDK.")]
 public static class SemanticKernelProviderConfigure
 {
     /// <summary>

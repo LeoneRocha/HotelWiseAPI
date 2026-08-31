@@ -4,6 +4,7 @@ namespace HotelWise.Core.SDK.Common.Constants;
 /// Constantes de configuração geral da aplicação.
 /// Agrupa content-types HTTP, formatos de data/hora e mensagens de configuração inválida.
 /// </summary>
+[Obsolete("Depreciado. Migrado para SmartCoreHub.Core.SDK na camada Common. Use o pacote NuGet SmartCoreHub.Core.SDK — tipo SmartCoreHub.Core.SDK.Common.Constants.AppConfigConstants. Após publicar o NuGet, HotelWise.Core.SDK será só casca (PackageReference + wrappers) e delegará a SmartCoreHub.Core.SDK.")]
 public static class AppConfigConstants
 {
     /// <summary>

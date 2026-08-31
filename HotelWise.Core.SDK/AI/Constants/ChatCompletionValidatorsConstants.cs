@@ -5,6 +5,7 @@ namespace HotelWise.Core.SDK.AI.Constants;
 /// Consumidos pelos validators FluentValidation em <c>AI/Validation</c>
 /// para restringir quantidade de mensagens, tamanho de texto e tokens.
 /// </summary>
+[Obsolete("Depreciado. Migrado para SmartCoreHub.Core.SDK na camada Domain. Use o pacote NuGet SmartCoreHub.Core.SDK — tipo SmartCoreHub.Core.SDK.Domain.AI.Constants.ChatCompletionValidatorsConstants. Após publicar o NuGet, HotelWise.Core.SDK será só casca (PackageReference + wrappers) e delegará a SmartCoreHub.Core.SDK.")]
 public static class ChatCompletionValidatorsConstants
 {
     /// <summary>

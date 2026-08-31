@@ -19,6 +19,7 @@ namespace HotelWise.Core.SDK.AI.Adapters;
 /// float[] emb = await adapter.GenerateEmbeddingAsync("texto");
 /// </code>
 /// </example>
+[Obsolete("Depreciado. Migrado para SmartCoreHub.Core.SDK na camada Infrastructure. Use o pacote NuGet SmartCoreHub.Core.SDK — tipo SmartCoreHub.Core.SDK.Infrastructure.AI.Adapters.MistralApiAdapter. Após publicar o NuGet, HotelWise.Core.SDK será só casca (PackageReference + wrappers) e delegará a SmartCoreHub.Core.SDK.")]
 public class MistralApiAdapter : IAIInferenceAdapter
 {
     /// <summary>

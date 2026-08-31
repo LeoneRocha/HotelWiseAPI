@@ -12,6 +12,7 @@ namespace HotelWise.Core.SDK.AI.DTO;
 /// Implementa <see cref="IDataVector"/> para registros indexáveis no pipeline RAG
 /// via Microsoft.Extensions.VectorData.
 /// </summary>
+[Obsolete("Depreciado. Migrado para SmartCoreHub.Core.SDK na camada Domain. Use o pacote NuGet SmartCoreHub.Core.SDK — tipo SmartCoreHub.Core.SDK.Domain.AI.DTO.DataVectorBase. Após publicar o NuGet, HotelWise.Core.SDK será só casca (PackageReference + wrappers) e delegará a SmartCoreHub.Core.SDK.")]
 public abstract class DataVectorBase : IDataVector
 {
     /// <summary>
