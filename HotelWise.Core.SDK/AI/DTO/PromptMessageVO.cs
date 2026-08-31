@@ -20,6 +20,7 @@ public class DataVectorVO : SchDto.DataVectorVO
 [Obsolete("Depreciado. Migrado para SmartCoreHub.Core.SDK na camada Domain. Use o pacote NuGet SmartCoreHub.Core.SDK — tipo SmartCoreHub.Core.SDK.Domain.AI.DTO.PromptMessageVO. Após publicar o NuGet, HotelWise.Core.SDK será só casca (PackageReference + wrappers) e delegará a SmartCoreHub.Core.SDK.")]
 public class PromptMessageVO : SchDto.PromptMessageVO
 {
+    /// <summary>Contexto de dados vetoriais RAG associado à mensagem.</summary>
     public new DataVectorVO[] DataContextRag
     {
         get
@@ -36,11 +37,13 @@ public class PromptMessageVO : SchDto.PromptMessageVO
         set => base.DataContextRag = value ?? Array.Empty<DataVectorVO>();
     }
 
+    /// <summary>Tipo de papel do emissor da mensagem no prompt.</summary>
     public new RoleAiPromptsType RoleType
     {
         get => (RoleAiPromptsType)(int)base.RoleType;
         set => base.RoleType = (SchEnums.RoleAiPromptsType)(int)value;
     }
 
+    /// <summary>Descrição textual do papel do emissor.</summary>
     public new string Role => RoleType.GetDescription();
 }

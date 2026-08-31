@@ -7,7 +7,7 @@ param(
 $ErrorActionPreference = 'Stop'
 $hwRoot = "C:\git\HotelWise\HotelWiseAPI\HotelWise.Core.SDK"
 
-function Classify-File([string]$RelPath) {
+function Get-FileWaveCategory([string]$RelPath) {
   $p = $RelPath -replace '\\','/'
   if ($p -match '^(Abstractions/|Common/|Security/Token(ConfigurationDto|VO)|AI/Abstractions/|AI/Configuration/|AI/DTO/|AI/Enums/|AI/Constants/|CoreSdkInfo)') {
     return 'contracts'
@@ -19,194 +19,242 @@ function Classify-File([string]$RelPath) {
 }
 
 function Get-Namespace([string]$Content) {
-  if ($Content -match 'namespace\s+([\w.]+)') { return $Matches[1] }
+  $matchObj = [regex]::Match($Content, 'namespace\s+([\w.]+)')
+  if ($matchObj.Success) { return $matchObj.Groups[1].Value }
   return $null
 }
 
-function Extract-ObsoleteTypes {
+function Get-ObsoleteAttrInfo([string[]]$Lines, [int]$Idx) {
+  $j = $Idx
+  while ($Lines[$j] -notmatch '\]\s*$' -and $j -lt $Lines.Count - 1) { $j++ }
+  $attrText = ($Lines[$Idx..$j] -join "`n").Trim()
+  $rgxMatch = [regex]::Match($attrText, 'tipo (SmartCoreHub\.Core\.SDK\.[A-Za-z0-9_.]+)')
+  $schTarget = if ($rgxMatch.Success) { $rgxMatch.Groups[1].Value.TrimEnd('.') } else { $null }
+  return [PSCustomObject]@{
+    EndIdx = $j
+    AttrText = $attrText
+    SchTarget = $schTarget
+  }
+}
+
+function Get-DocAndPreAttrs([string[]]$Lines, [int]$AttrStart) {
+  $docStart = $AttrStart - 1
+  while ($docStart -ge 0 -and ($Lines[$docStart] -match '^\s*///' -or $Lines[$docStart] -match '^\s*$' -or $Lines[$docStart] -match '^\s*\[JsonConverter' -or $Lines[$docStart] -match '^\s*\[Required')) {
+    $docStart--
+  }
+  $docStart++
+  while ($docStart -lt $AttrStart -and $Lines[$docStart] -match '^\s*$') { $docStart++ }
+  
+  $preAttrsList = @()
+  $docLinesList = @()
+  for ($p = $docStart; $p -lt $AttrStart; $p++) {
+    if ($Lines[$p] -match '^\s*\[' -and $Lines[$p] -notmatch 'Obsolete') {
+      $preAttrsList += $Lines[$p].Trim()
+    }
+    if ($Lines[$p] -match '^\s*///') {
+      $docLinesList += $Lines[$p].TrimEnd()
+    }
+  }
+  return [PSCustomObject]@{
+    DocStart = $docStart
+    PreAttrs = $preAttrsList
+    XmlDoc = $docLinesList
+  }
+}
+
+function Get-BlockBoundaries([string[]]$Lines, [int]$StartLine) {
+  $bodyStart = $StartLine
+  while ($bodyStart -lt $Lines.Count -and $Lines[$bodyStart] -notmatch '\{') { $bodyStart++ }
+  $depth = 0
+  $bodyEnd = $bodyStart
+  for ($b = $bodyStart; $b -lt $Lines.Count; $b++) {
+    $depth += ([regex]::Matches($Lines[$b], '\{')).Count
+    $depth -= ([regex]::Matches($Lines[$b], '\}')).Count
+    if ($depth -eq 0 -and $b -ge $bodyStart) { $bodyEnd = $b; break }
+  }
+  return [PSCustomObject]@{ BodyStart = $bodyStart; BodyEnd = $bodyEnd }
+}
+
+function Get-ConstraintsAndInterfaces([string[]]$Lines, [int]$DeclStart, [int]$BodyStart) {
+  $constraintList = @()
+  $interfaceList = @()
+  for ($d = $DeclStart; $d -le $BodyStart; $d++) {
+    if ($d -ge $Lines.Count) { break }
+    $curLine = $Lines[$d]
+    $matchWhere = [regex]::Match($curLine, '\bwhere\s+(.+)$')
+    if ($matchWhere.Success) {
+      $clause = "where " + $matchWhere.Groups[1].Value.Trim()
+      $clause = $clause -replace '\s*\{.*$',''
+      $constraintList += $clause.Trim()
+    }
+    $matchDecl = [regex]::Match($curLine, '(?:interface|class)\s+\w+(?:<[^>]+>)?\s*:\s*(.+)$')
+    if ($matchDecl.Success) {
+      $bases = $matchDecl.Groups[1].Value -replace '\s*where\s+.*$','' -replace '\s*\{.*$',''
+      foreach ($baseItem in ($bases -split ',')) {
+        $trimmed = $baseItem.Trim()
+        if ($trimmed -match '^I[A-Z]\w*' -and $trimmed -notmatch '^SmartCoreHub') {
+          $interfaceList += $trimmed
+        }
+      }
+    }
+  }
+  return [PSCustomObject]@{ Constraints = $constraintList; HwInterfaces = $interfaceList }
+}
+
+function Get-ObsoleteTypes {
   param([string[]]$Lines)
   $blocks = @()
   $i = 0
   while ($i -lt $Lines.Count) {
-    if ($Lines[$i] -match '^\s*\[Obsolete\(') {
-      $attrStart = $i
-      $j = $i
-      while ($Lines[$j] -notmatch '\]\s*$' -and $j -lt $Lines.Count - 1) { $j++ }
-      $attr = ($Lines[$attrStart..$j] -join "`n").Trim()
-      $sch = if ($attr -match 'tipo (SmartCoreHub\.Core\.SDK\.[A-Za-z0-9_.]+)') { $Matches[1].TrimEnd('.') } else { $null }
+    if ($Lines[$i] -notmatch '^\s*\[Obsolete\(') { $i++; continue }
 
-      # xml doc above
-      $docStart = $attrStart - 1
-      while ($docStart -ge 0 -and ($Lines[$docStart] -match '^\s*///' -or $Lines[$docStart] -match '^\s*$' -or $Lines[$docStart] -match '^\s*\[JsonConverter' -or $Lines[$docStart] -match '^\s*\[Required')) {
-        $docStart--
-      }
-      $docStart++
-      while ($docStart -lt $attrStart -and $Lines[$docStart] -match '^\s*$') { $docStart++ }
-      # Include attributes that are NOT Obsolete between docs and Obsolete (e.g. JsonConverter)
-      $preAttrs = @()
-      for ($pa = $docStart; $pa -lt $attrStart; $pa++) {
-        if ($Lines[$pa] -match '^\s*\[' -and $Lines[$pa] -notmatch 'Obsolete') {
-          $preAttrs += $Lines[$pa].Trim()
-        }
-      }
-      $xmlDoc = @()
-      for ($d = $docStart; $d -lt $attrStart; $d++) {
-        if ($Lines[$d] -match '^\s*///') { $xmlDoc += $Lines[$d].TrimEnd() }
-      }
+    $attrInfo = Get-ObsoleteAttrInfo -Lines $Lines -Idx $i
+    $docInfo = Get-DocAndPreAttrs -Lines $Lines -AttrStart $i
 
-      $k = $j + 1
-      while ($k -lt $Lines.Count -and $Lines[$k] -match '^\s*$') { $k++ }
-      if ($k -ge $Lines.Count) { $i = $j + 1; continue }
-      if ($Lines[$k] -notmatch '^\s*(public|internal)\s+(static\s+)?(abstract\s+)?(sealed\s+)?(partial\s+)?(interface|class|enum|record)\s+(\w+)(<[^>]+>)?') {
-        $i = $j + 1; continue
-      }
-      $isStatic = [bool]$Matches[2]
-      $isAbstract = [bool]$Matches[3]
-      $kind = $Matches[6]
-      $name = $Matches[7]
-      $generics = if ($Matches[8]) { $Matches[8] } else { "" }
-
-      $bodyStart = $k
-      while ($bodyStart -lt $Lines.Count -and $Lines[$bodyStart] -notmatch '\{') { $bodyStart++ }
-      $depth = 0
-      $bodyEnd = $bodyStart
-      for ($b = $bodyStart; $b -lt $Lines.Count; $b++) {
-        $depth += ([regex]::Matches($Lines[$b], '\{')).Count
-        $depth -= ([regex]::Matches($Lines[$b], '\}')).Count
-        if ($depth -eq 0 -and $b -ge $bodyStart) { $bodyEnd = $b; break }
-      }
-
-      $declLines = @()
-      for ($d = $k; $d -le $bodyStart; $d++) { $declLines += $Lines[$d] }
-      $constraints = @()
-      $hwInterfaces = @()
-      for ($d = $k; $d -le $bodyStart; $d++) {
-        if ($d -ge $Lines.Count) { break }
-        $line = $Lines[$d]
-        if ($line -match '\bwhere\s+(.+)$') {
-          $clause = "where " + $Matches[1].Trim()
-          $clause = $clause -replace '\s*\{.*$',''
-          $constraints += $clause.Trim()
-        }
-        # Capture HW interfaces from ": IFoo, IBar" (not SCH)
-        if ($line -match '(?:interface|class)\s+\w+(?:<[^>]+>)?\s*:\s*(.+)$') {
-          $bases = $Matches[1] -replace '\s*where\s+.*$','' -replace '\s*\{.*$',''
-          foreach ($baseItem in ($bases -split ',')) {
-            $baseItem = $baseItem.Trim()
-            if ($baseItem -match '^I[A-Z]\w*' -and $baseItem -notmatch '^SmartCoreHub') {
-              $hwInterfaces += $baseItem
-            }
-          }
-        }
-      }
-
-      $bodyLines = @()
-      if ($bodyEnd -gt $bodyStart) {
-        $bodyLines = $Lines[($bodyStart)..$bodyEnd]
-      }
-
-      $blocks += [PSCustomObject]@{
-        Attr = $attr
-        PreAttrs = $preAttrs
-        Sch = $sch
-        Kind = $kind
-        Name = $name
-        Generics = $generics
-        IsStatic = $isStatic
-        IsAbstract = $isAbstract
-        XmlDoc = $xmlDoc
-        Constraints = $constraints
-        HwInterfaces = $hwInterfaces
-        BodyLines = $bodyLines
-        DeclStart = $k
-        BodyStart = $bodyStart
-        BodyEnd = $bodyEnd
-        FileStart = $(if ($xmlDoc.Count -gt 0) { $docStart } else { $attrStart })
-      }
-      $i = $bodyEnd + 1
-      continue
+    $k = $attrInfo.EndIdx + 1
+    while ($k -lt $Lines.Count -and ($Lines[$k] -match '^\s*\[' -or $Lines[$k] -match '^\s*$')) {
+      if ($Lines[$k] -match '^\s*\[') { $docInfo.PreAttrs += $Lines[$k].Trim() }
+      $k++
     }
-    $i++
+    if ($k -ge $Lines.Count) { break }
+
+    $declLine = $Lines[$k]
+    $declMatch = [regex]::Match($declLine, 'public\s+(?:(abstract|sealed|static)\s+)?(class|interface|enum)\s+(\w+)(<[^>]+>)?')
+    if (-not $declMatch.Success) { $i = $k + 1; continue }
+
+    $mod = $declMatch.Groups[1].Value
+    $kind = $declMatch.Groups[2].Value
+    $name = $declMatch.Groups[3].Value
+    $gen = $declMatch.Groups[4].Value
+
+    $bounds = Get-BlockBoundaries -Lines $Lines -StartLine $k
+    $ci = Get-ConstraintsAndInterfaces -Lines $Lines -DeclStart $k -BodyStart $bounds.BodyStart
+
+    $schTarget = if ($attrInfo.SchTarget) { $attrInfo.SchTarget } else { "SmartCoreHub.Core.SDK.Domain.$name" }
+
+    $blocks += [PSCustomObject]@{
+      Kind = $kind
+      Name = $name
+      Generics = $gen
+      IsAbstract = ($mod -eq 'abstract')
+      IsStatic = ($mod -eq 'static')
+      IsSealed = ($mod -eq 'sealed')
+      Sch = $schTarget
+      PreAttrs = $docInfo.PreAttrs
+      XmlDoc = $docInfo.XmlDoc
+      Attr = $attrInfo.AttrText
+      Constraints = $ci.Constraints
+      HwInterfaces = $ci.HwInterfaces
+      FileStart = $docInfo.DocStart
+      DeclLine = $k
+      BodyStart = $bounds.BodyStart
+      BodyEnd = $bounds.BodyEnd
+      BodyLines = $Lines[($bounds.BodyStart + 1)..($bounds.BodyEnd - 1)]
+    }
+    $i = $bounds.BodyEnd + 1
   }
   return $blocks
 }
 
-function Extract-PublicCtors([string[]]$BodyLines, [string]$TypeName) {
+function Get-PublicCtors([string[]]$BodyLines, [string]$TypeName) {
   $text = $BodyLines -join "`n"
   $ctors = @()
-  # Allow newline between ) and { ; also multi-line params
-  $matches = [regex]::Matches($text, "(?s)public\s+$TypeName\s*\((.*?)\)\s*(?::\s*base\s*\((.*?)\))?\s*\{")
-  foreach ($m in $matches) {
-    $params = ($m.Groups[1].Value -replace '\s+', ' ').Trim()
-    if ([string]::IsNullOrWhiteSpace($params)) { continue }
-    $args = @()
-    foreach ($part in ($params -split ',')) {
-      $part = $part.Trim()
-      if (-not $part) { continue }
-      $withoutDefault = ($part -split '=')[0].Trim()
+  $ctorMatches = [regex]::Matches($text, "(?s)public\s+$TypeName\s*\((.*?)\)\s*(?::\s*base\s*\((.*?)\))?\s*\{")
+  foreach ($m in $ctorMatches) {
+    $paramText = ($m.Groups[1].Value -replace '\s+', ' ').Trim()
+    if ([string]::IsNullOrWhiteSpace($paramText)) { continue }
+    $paramNames = @()
+    foreach ($part in ($paramText -split ',')) {
+      $trimmedPart = $part.Trim()
+      if (-not $trimmedPart) { continue }
+      $withoutDefault = ($trimmedPart -split '=')[0].Trim()
       $tokens = $withoutDefault -split '\s+'
-      $args += $tokens[-1].TrimStart('@')
+      $paramNames += $tokens[-1].TrimStart('@')
     }
-    $ctors += [PSCustomObject]@{ Params = $params; Args = ($args -join ', ') }
+    $ctors += [PSCustomObject]@{ Params = $paramText; Args = ($paramNames -join ', ') }
   }
   return $ctors
 }
 
-function Extract-StaticMembers([string[]]$BodyLines, [string]$SchFqn) {
+function Get-StaticPropertiesAndFields([string]$Text, [string]$SchFqn) {
   $out = @()
-  $text = $BodyLines -join "`n"
-  # const fields - keep literals
-  foreach ($m in [regex]::Matches($text, '(?m)^\s*public\s+const\s+(\S+)\s+(\w+)\s*=\s*([^;]+);')) {
+  foreach ($m in [regex]::Matches($Text, '(?m)^\s*public\s+const\s+(\S+)\s+(\w+)\s*=\s*([^;]+);')) {
     $out += "    public const $($m.Groups[1].Value) $($m.Groups[2].Value) = $($m.Groups[3].Value.Trim());"
   }
-  # static readonly
-  foreach ($m in [regex]::Matches($text, '(?m)^\s*public\s+static\s+readonly\s+(\S+)\s+(\w+)\s*=')) {
+  foreach ($m in [regex]::Matches($Text, '(?m)^\s*public\s+static\s+readonly\s+(\S+)\s+(\w+)\s*=')) {
     $out += "    public static readonly $($m.Groups[1].Value) $($m.Groups[2].Value) = $SchFqn.$($m.Groups[2].Value);"
   }
-  # static properties with get/set (simple)
-  foreach ($m in [regex]::Matches($text, '(?m)^\s*public\s+static\s+(\S+)\s+(\w+)\s*\{\s*get;\s*set;\s*\}')) {
+  foreach ($m in [regex]::Matches($Text, '(?m)^\s*public\s+static\s+(\S+)\s+(\w+)\s*\{\s*get;\s*set;\s*\}')) {
     $out += "    public static $($m.Groups[1].Value) $($m.Groups[2].Value) { get => $SchFqn.$($m.Groups[2].Value); set => $SchFqn.$($m.Groups[2].Value) = value; }"
   }
-  foreach ($m in [regex]::Matches($text, '(?m)^\s*public\s+static\s+(\S+)\s+(\w+)\s*=>')) {
+  foreach ($m in [regex]::Matches($Text, '(?m)^\s*public\s+static\s+(\S+)\s+(\w+)\s*=>')) {
     $out += "    public static $($m.Groups[1].Value) $($m.Groups[2].Value) => $SchFqn.$($m.Groups[2].Value);"
-  }
-  # Methods: public static [async] ReturnType Name<...>(params)
-  $methodMatches = [regex]::Matches($text, '(?m)^\s*public\s+static\s+(?:async\s+)?([\w.<>,\[\]\?]+)\s+(\w+)(<[^>]+>)?\s*\(([^)]*)\)')
-  foreach ($m in $methodMatches) {
-    $ret = $m.Groups[1].Value
-    if ($ret -eq 'async') { continue }
-    $name = $m.Groups[2].Value
-    # skip if this looks like a property we already handled
-    $gen = $m.Groups[3].Value
-    $params = $m.Groups[4].Value.Trim()
-    $args = @()
-    if ($params) {
-      foreach ($part in ($params -split ',')) {
-        $part = $part.Trim()
-        if (-not $part) { continue }
-        $isThis = $part.StartsWith('this ')
-        $p = $part -replace '^this\s+','' -replace '^out\s+','' -replace '^ref\s+','' -replace '^in\s+',''
-        $withoutDefault = ($p -split '=')[0].Trim()
-        $tokens = $withoutDefault -split '\s+'
-        $pname = $tokens[-1].TrimStart('@')
-        if ($part -match '^\s*out\s+') { $args += "out $pname" }
-        elseif ($part -match '^\s*ref\s+') { $args += "ref $pname" }
-        else { $args += $pname }
-      }
-    }
-    $argStr = $args -join ', '
-    # Preserve 'this' on first param for extensions
-    $paramStr = $params
-    if ($ret -eq 'void') {
-      $out += "    public static void $name$gen($paramStr) =>`n        $SchFqn.$name$gen($argStr);"
-    } else {
-      $out += "    public static $ret $name$gen($paramStr) =>`n        $SchFqn.$name$gen($argStr);"
-    }
   }
   return $out
 }
 
-function Build-WrapperType($b) {
+function Get-StaticMethods([string]$Text, [string]$SchFqn) {
+  $out = @()
+  $methodMatches = [regex]::Matches($Text, '(?m)^\s*public\s+static\s+(?:async\s+)?([\w.<>,\[\]\?]+)\s+(\w+)(<[^>]+>)?\s*\(([^)]*)\)')
+  foreach ($m in $methodMatches) {
+    $ret = $m.Groups[1].Value
+    if ($ret -eq 'async') { continue }
+    $name = $m.Groups[2].Value
+    $gen = $m.Groups[3].Value
+    $params = $m.Groups[4].Value.Trim()
+    $callArgs = @()
+    if ($params) {
+      foreach ($part in ($params -split ',')) {
+        $pTrim = $part.Trim()
+        if (-not $pTrim) { continue }
+        $withoutModifiers = $pTrim -replace '^this\s+','' -replace '^out\s+','' -replace '^ref\s+','' -replace '^in\s+',''
+        $withoutDefault = ($withoutModifiers -split '=')[0].Trim()
+        $tokens = $withoutDefault -split '\s+'
+        $pname = $tokens[-1].TrimStart('@')
+        if ($part -match '^\s*out\s+') { $callArgs += "out $pname" }
+        elseif ($part -match '^\s*ref\s+') { $callArgs += "ref $pname" }
+        else { $callArgs += $pname }
+      }
+    }
+    $argStr = $callArgs -join ', '
+    $signature = "    public static $ret $name$gen($params) =>`n        $SchFqn.$name$gen($argStr);"
+    $out += $signature
+  }
+  return $out
+}
+
+function Get-StaticMembers([string[]]$BodyLines, [string]$SchFqn) {
+  $text = $BodyLines -join "`n"
+  $props = Get-StaticPropertiesAndFields -Text $text -SchFqn $SchFqn
+  $methods = Get-StaticMethods -Text $text -SchFqn $SchFqn
+  return @($props + $methods)
+}
+
+function New-ClassCtors([string[]]$BodyLines, [string]$TypeName) {
+  $ctors = @(Get-PublicCtors -BodyLines $BodyLines -TypeName $TypeName)
+  $textAll = ($BodyLines -join "`n")
+  $protMatches = [regex]::Matches($textAll, "(?s)protected\s+$TypeName\s*\((.*?)\)\s*(?::\s*base\s*\((.*?)\))?\s*\{")
+  foreach ($m in $protMatches) {
+    $params = ($m.Groups[1].Value -replace '\s+', ' ').Trim()
+    if ([string]::IsNullOrWhiteSpace($params)) { continue }
+    $ctorArgs = @()
+    foreach ($part in ($params -split ',')) {
+      $pTrim = $part.Trim(); if (-not $pTrim) { continue }
+      $tokens = (($pTrim -split '=')[0].Trim() -split '\s+')
+      $ctorArgs += $tokens[-1].TrimStart('@')
+    }
+    $ctors += [PSCustomObject]@{ Params = $params; Args = ($ctorArgs -join ', '); Mod = 'protected' }
+  }
+  if ($ctors.Count -eq 0) { return "" }
+  $parts = @()
+  foreach ($c in $ctors) {
+    $mod = if ($c.Mod) { $c.Mod } else { "public" }
+    $parts += "    $mod $TypeName($($c.Params))`n        : base($($c.Args))`n    {`n    }"
+  }
+  return ($parts -join "`n`n")
+}
+
+function New-WrapperType($b) {
   $doc = if ($b.XmlDoc.Count) { ($b.XmlDoc -join "`n") + "`n" } else { "" }
   $pre = if ($b.PreAttrs.Count) { ($b.PreAttrs -join "`n") + "`n" } else { "" }
   $attr = $b.Attr + "`n"
@@ -214,75 +262,25 @@ function Build-WrapperType($b) {
   $gen = $b.Generics
   $constraints = if ($b.Constraints.Count) { "`n    " + ($b.Constraints -join "`n    ") } else { "" }
 
-  if ($b.Kind -eq 'enum') {
-    # Keep original enum intact (from xml through body)
-    return $null  # signal keep original slice
-  }
-
+  if ($b.Kind -eq 'enum') { return $null }
   if ($b.Kind -eq 'interface') {
     return "${doc}${pre}${attr}public interface $($b.Name)$gen : $sch$gen$constraints`n{`n}"
   }
-
   if ($b.IsStatic) {
-    $members = Extract-StaticMembers -BodyLines @($b.BodyLines) -SchFqn $sch
+    $members = Get-StaticMembers -BodyLines @($b.BodyLines) -SchFqn $sch
     $body = if ($members.Count) { ($members -join "`n`n") } else { "    // no public members detected" }
     return "${doc}${pre}${attr}public static class $($b.Name)`n{`n$body`n}"
   }
-
-  # Sealed SCH types cannot be inherited — skip (restore originals after gen)
-  if ($b.Name -in @('ApplicationIAConfig','RagConfig')) {
-    return $null
-  }
-
-  # Special SearchCriteria
+  if ($b.Name -in @('ApplicationIAConfig','RagConfig')) { return $null }
   if ($b.Name -eq 'SearchCriteria') {
-    return @"
-${doc}${pre}${attr}public class SearchCriteria : $sch
-{
-    /// <summary>Alias legado HW → MaxRetrieve.</summary>
-    public int MaxHotelRetrieve
-    {
-        get => MaxRetrieve;
-        set => MaxRetrieve = value;
-    }
-}
-"@.TrimEnd()
+    return "${doc}${pre}${attr}public class SearchCriteria : $sch`n{`n    /// <summary>Alias legado HW → MaxRetrieve.</summary>`n    public int MaxHotelRetrieve { get => MaxRetrieve; set => MaxRetrieve = value; }`n}"
   }
 
   $abs = if ($b.IsAbstract) { "abstract " } else { "" }
-  $ctors = @(Extract-PublicCtors -BodyLines @($b.BodyLines) -TypeName $b.Name)
-  # include protected ctors for abstract bases
-  $textAll = (@($b.BodyLines) -join "`n")
-  $prot = [regex]::Matches($textAll, "(?s)protected\s+$($b.Name)\s*\((.*?)\)\s*(?::\s*base\s*\((.*?)\))?\s*\{")
-  foreach ($m in $prot) {
-    $params = ($m.Groups[1].Value -replace '\s+', ' ').Trim()
-    if ([string]::IsNullOrWhiteSpace($params)) { continue }
-    $args = @()
-    foreach ($part in ($params -split ',')) {
-      $part = $part.Trim(); if (-not $part) { continue }
-      $tokens = (($part -split '=')[0].Trim() -split '\s+')
-      $args += $tokens[-1].TrimStart('@')
-    }
-    $ctors += [PSCustomObject]@{ Params = $params; Args = ($args -join ', '); Mod = 'protected' }
-  }
-  if ($b.Name -eq 'GroqApiAdapter') {
-    Write-Host "DEBUG Groq BodyLines=$(@($b.BodyLines).Count) ctors=$($ctors.Count)"
-  }
-  $ctorText = ""
-  if ($ctors.Count) {
-    $ctorParts = @()
-    foreach ($c in $ctors) {
-      $mod = if ($c.Mod) { $c.Mod } else { "public" }
-      $ctorParts += "    $mod $($b.Name)($($c.Params))`n        : base($($c.Args))`n    {`n    }"
-    }
-    $ctorText = ($ctorParts -join "`n`n")
-  }
-
-  # Also implement HW interfaces that were on the original declaration (for DI)
-  $extraIfaces = ""
-  if ($b.HwInterfaces -and @($b.HwInterfaces).Count -gt 0) {
-    $extraIfaces = ", " + ((@($b.HwInterfaces) | Select-Object -Unique) -join ", ")
-  }
+  $ctorText = New-ClassCtors -BodyLines @($b.BodyLines) -TypeName $b.Name
+  $extraIfaces = if ($b.HwInterfaces -and @($b.HwInterfaces).Count -gt 0) {
+    ", " + ((@($b.HwInterfaces) | Select-Object -Unique) -join ", ")
+  } else { "" }
 
   return "${doc}${pre}${attr}public ${abs}class $($b.Name)$gen : $sch$gen$extraIfaces$constraints`n{`n$ctorText`n}".TrimEnd() + "`n"
 }
@@ -295,19 +293,17 @@ $converted = 0; $skipped = 0; $errors = @()
 
 foreach ($file in $files) {
   $rel = $file.FullName.Substring($hwRoot.Length + 1)
-  $waveOf = Classify-File $rel
+  $waveOf = Get-FileWaveCategory $rel
   if ($Wave -ne 'all' -and $waveOf -ne $Wave) { continue }
 
   $raw = [IO.File]::ReadAllText($file.FullName, [Text.UTF8Encoding]::new($false))
   $lines = $raw -split "`r?`n"
   $ns = Get-Namespace $raw
   $hasNet8 = $raw -match '(?m)^#if\s+NET8_0_OR_GREATER'
-  $blocks = @(Extract-ObsoleteTypes $lines)
+  $blocks = @(Get-ObsoleteTypes $lines)
   if ($blocks.Count -eq 0) { $errors += "parse fail $rel"; continue }
 
-  # enums-only file: leave untouched
   if (($blocks | Where-Object Kind -eq 'enum').Count -eq $blocks.Count) {
-    Write-Host "SKIP enum: $rel"
     $skipped++
     continue
   }
@@ -315,12 +311,11 @@ foreach ($file in $files) {
   $parts = @()
   foreach ($b in $blocks) {
     if ($b.Kind -eq 'enum') {
-      # keep original from FileStart through BodyEnd — approximate using XmlDoc+attr+enum body
       $slice = ($lines[$b.FileStart..$b.BodyEnd] -join "`n")
       $parts += $slice.TrimEnd()
       continue
     }
-    $w = Build-WrapperType $b
+    $w = New-WrapperType $b
     if ($null -eq $w) { $errors += "null wrapper $($b.Name) $rel"; continue }
     $parts += $w.TrimEnd()
   }
@@ -328,15 +323,11 @@ foreach ($file in $files) {
   $sb = New-Object System.Text.StringBuilder
   if ($hasNet8) { [void]$sb.AppendLine("#if NET8_0_OR_GREATER") }
 
-  # Collect ALL usings (including after #if and HotelWise usings needed by ctors/signatures)
   $usingLines = @()
   foreach ($ln in $lines) {
-    if ($ln -match '^\s*using\s+') {
-      $usingLines += $ln.TrimEnd()
-    }
+    if ($ln -match '^\s*using\s+') { $usingLines += $ln.TrimEnd() }
     if ($ln -match '^\s*namespace\s+') { break }
   }
-  # Deduplicate while preserving order
   $seen = New-Object 'System.Collections.Generic.HashSet[string]'
   $uniqueUsings = @()
   foreach ($u in $usingLines) {
@@ -354,10 +345,8 @@ foreach ($file in $files) {
   if ($hasNet8) { [void]$sb.AppendLine("#endif") }
 
   [IO.File]::WriteAllText($file.FullName, $sb.ToString().TrimEnd() + "`r`n", [Text.UTF8Encoding]::new($false))
-  Write-Host "OK [$waveOf]: $rel ($($blocks.Count))"
+  Write-Output "OK [$waveOf]: $rel ($($blocks.Count))"
   $converted++
 }
 
-Write-Host "Done. converted=$converted skipped=$skipped errors=$($errors.Count)"
-$errors | ForEach-Object { Write-Host "ERR $_" }
-$errors | Set-Content "$hwRoot\_tools\gen-errors.txt"
+Write-Output "Done. converted=$converted skipped=$skipped errors=$($errors.Count)"

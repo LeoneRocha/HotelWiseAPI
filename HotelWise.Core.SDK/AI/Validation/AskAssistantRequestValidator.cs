@@ -12,6 +12,9 @@ public class AskAssistantRequestValidator : AbstractValidator<AskAssistantReques
 {
     private static readonly SmartCoreHub.Core.SDK.Service.AI.Validation.AskAssistantRequestValidator SchValidator = new();
 
+    /// <summary>
+    /// Inicializa as regras de validação para <see cref="AskAssistantRequest"/>.
+    /// </summary>
     public AskAssistantRequestValidator()
     {
         RuleFor(x => x).Custom((instance, context) =>

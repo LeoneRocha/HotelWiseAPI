@@ -23,10 +23,13 @@ namespace HotelWise.Core.SDK.Security;
 [Obsolete("Depreciado. Migrado para SmartCoreHub.Core.SDK na camada Service. Use o pacote NuGet SmartCoreHub.Core.SDK — tipo SmartCoreHub.Core.SDK.Service.Security.Ported.TokenService. Após publicar o NuGet, HotelWise.Core.SDK será só casca (PackageReference + wrappers) e delegará a SmartCoreHub.Core.SDK.")]
 public class TokenService : SmartCoreHub.Core.SDK.Service.Security.Ported.TokenService, ITokenService
 {
+    /// <summary>
+    /// Inicializa uma nova instância de <see cref="TokenService"/> com as configurações de token.
+    /// </summary>
+    /// <param name="configuration">Configurações de JWT.</param>
     public TokenService(ITokenConfigurationDto configuration)
         : base(configuration)
     {
     }
 }
-
 #endif

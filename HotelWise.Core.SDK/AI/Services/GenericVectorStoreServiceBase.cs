@@ -9,6 +9,11 @@ namespace HotelWise.Core.SDK.AI.Services;
 [Obsolete("Depreciado. Migrado para SmartCoreHub.Core.SDK na camada Service. Use o pacote NuGet SmartCoreHub.Core.SDK — tipo SmartCoreHub.Core.SDK.Service.AI.Services.GenericVectorStoreServiceBase. Após publicar o NuGet, HotelWise.Core.SDK será só casca (PackageReference + wrappers) e delegará a SmartCoreHub.Core.SDK.")]
 public abstract class GenericVectorStoreServiceBase : SmartCoreHub.Core.SDK.Service.AI.Services.GenericVectorStoreServiceBase
 {
+    /// <summary>
+    /// Inicializa uma nova instância de <see cref="GenericVectorStoreServiceBase"/>.
+    /// </summary>
+    /// <param name="mapper">Instância do AutoMapper.</param>
+    /// <param name="logger">Logger Serilog.</param>
     protected GenericVectorStoreServiceBase(IMapper mapper, Serilog.ILogger logger)
         : base(mapper, logger)
     {

@@ -18,10 +18,14 @@ public abstract class GenericRepositoryBase<T, TContext> : SmartCoreHub.Core.SDK
     where T : class
     where TContext : DbContext
 {
+    /// <summary>
+    /// Inicializa uma nova instância de <see cref="GenericRepositoryBase{T, TContext}"/>.
+    /// </summary>
+    /// <param name="context">Instância do DbContext.</param>
+    /// <param name="options">Opções de configuração do DbContext.</param>
     protected GenericRepositoryBase(TContext context, DbContextOptions<TContext> options)
         : base(context, options)
     {
     }
 }
-
 #endif

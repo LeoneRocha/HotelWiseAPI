@@ -18,6 +18,13 @@ public abstract class GenericEntityServiceBase<T, TDto>
     where T : class, new()
     where TDto : class, new()
 {
+    /// <summary>
+    /// Inicializa uma nova instância de <see cref="GenericEntityServiceBase{T, TDto}"/>.
+    /// </summary>
+    /// <param name="repository">Repositório genérico da entidade.</param>
+    /// <param name="mapper">Instância do AutoMapper.</param>
+    /// <param name="logger">Instância do Serilog logger.</param>
+    /// <param name="entityValidator">Validador FluentValidation da entidade.</param>
     protected GenericEntityServiceBase(
         IGenericRepository<T> repository,
         IMapper mapper,

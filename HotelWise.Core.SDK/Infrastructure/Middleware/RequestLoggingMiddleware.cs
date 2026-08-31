@@ -19,10 +19,14 @@ namespace HotelWise.Core.SDK.Infrastructure.Middleware;
 [Obsolete("Depreciado. Migrado para SmartCoreHub.Core.SDK na camada Infrastructure. Use o pacote NuGet SmartCoreHub.Core.SDK — tipo SmartCoreHub.Core.SDK.Infrastructure.Middleware.Ported.RequestLoggingMiddleware. Após publicar o NuGet, HotelWise.Core.SDK será só casca (PackageReference + wrappers) e delegará a SmartCoreHub.Core.SDK.")]
 public class RequestLoggingMiddleware : SmartCoreHub.Core.SDK.Infrastructure.Middleware.Ported.RequestLoggingMiddleware
 {
+    /// <summary>
+    /// Inicializa uma nova instância de <see cref="RequestLoggingMiddleware"/>.
+    /// </summary>
+    /// <param name="next">Próximo delegate na esteira HTTP.</param>
+    /// <param name="logger">Instância do logger Serilog.</param>
     public RequestLoggingMiddleware(RequestDelegate next, Serilog.ILogger logger)
         : base(next, logger)
     {
     }
 }
-
 #endif

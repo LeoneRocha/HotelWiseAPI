@@ -10,9 +10,19 @@ namespace HotelWise.Core.SDK.AI.Helpers;
 [Obsolete("Depreciado. Migrado para SmartCoreHub.Core.SDK na camada Service. Use o pacote NuGet SmartCoreHub.Core.SDK — tipo SmartCoreHub.Core.SDK.Service.AI.Helpers.ChatSessionHelper. Após publicar o NuGet, HotelWise.Core.SDK será só casca (PackageReference + wrappers) e delegará a SmartCoreHub.Core.SDK.")]
 public static class ChatSessionHelper
 {
+    /// <summary>
+    /// Obtém o contexto textual formatado a partir do histórico de prompts.
+    /// </summary>
+    /// <param name="history">Histórico de mensagens de prompt.</param>
+    /// <returns>String com o contexto montado.</returns>
     public static string GetHistoryContext(PromptMessageVO[] history) =>
         SchHelpers.ChatSessionHelper.GetHistoryContext(history);
 
+    /// <summary>
+    /// Gera a mensagem de contexto formatada a partir do histórico de prompts.
+    /// </summary>
+    /// <param name="history">Histórico de mensagens de prompt.</param>
+    /// <returns>String formatada com a mensagem de contexto.</returns>
     public static string GenerateContextMessage(PromptMessageVO[] history) =>
         SchHelpers.ChatSessionHelper.GenerateContextMessage(history);
 }

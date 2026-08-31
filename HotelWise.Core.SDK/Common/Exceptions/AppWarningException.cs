@@ -8,15 +8,21 @@ namespace HotelWise.Core.SDK.Common.Exceptions;
 [Obsolete("Depreciado. Migrado para SmartCoreHub.Core.SDK na camada Common. Use o pacote NuGet SmartCoreHub.Core.SDK — tipo SmartCoreHub.Core.SDK.Common.Exceptions.AppWarningException. Após publicar o NuGet, HotelWise.Core.SDK será só casca (PackageReference + wrappers) e delegará a SmartCoreHub.Core.SDK.")]
 public class AppWarningException : SmartCoreHub.Core.SDK.Common.Exceptions.AppWarningException
 {
+    /// <summary>Inicializa uma nova instância de <see cref="AppWarningException"/>.</summary>
     public AppWarningException()
     {
     }
 
+    /// <summary>Inicializa uma nova instância de <see cref="AppWarningException"/> com mensagem descritiva.</summary>
+    /// <param name="message">Mensagem de aviso.</param>
     public AppWarningException(string? message)
         : base(message)
     {
     }
 
+    /// <summary>Inicializa uma nova instância de <see cref="AppWarningException"/> com mensagem e exceção interna.</summary>
+    /// <param name="message">Mensagem de aviso.</param>
+    /// <param name="innerException">Exceção interna que causou o aviso.</param>
     public AppWarningException(string? message, Exception? innerException)
         : base(message, innerException)
     {

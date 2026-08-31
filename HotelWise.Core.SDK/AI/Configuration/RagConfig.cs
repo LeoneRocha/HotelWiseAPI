@@ -27,6 +27,9 @@ public sealed class RagConfig : IRagConfig
     /// </summary>
     internal SchConfig.RagConfig Inner => _inner;
 
+    /// <summary>
+    /// Inicializa uma nova instância de <see cref="RagConfig"/>.
+    /// </summary>
     public RagConfig() : this(new SchConfig.RagConfig())
     {
     }
@@ -42,6 +45,7 @@ public sealed class RagConfig : IRagConfig
     internal static RagConfig FromSch(SchConfig.RagConfig inner) =>
         inner is null ? new RagConfig() : new RagConfig(inner);
 
+    /// <summary>Provedor de API de chat IA padrão.</summary>
     [Required]
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public AIChatServiceType AIChatServiceApi
@@ -50,6 +54,7 @@ public sealed class RagConfig : IRagConfig
         set => _inner.AIChatServiceApi = (SchEnums.AIChatServiceType)(int)value;
     }
 
+    /// <summary>Provedor de API de embedding IA padrão.</summary>
     [Required]
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public AIEmbeddingServiceType AIEmbeddingServiceApi
@@ -58,6 +63,7 @@ public sealed class RagConfig : IRagConfig
         set => _inner.AIEmbeddingServiceApi = (SchEnums.AIEmbeddingServiceType)(int)value;
     }
 
+    /// <summary>Adapter de serviço de chat IA padrão.</summary>
     [Required]
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public AIChatServiceType AIChatServiceAdapter
@@ -66,6 +72,7 @@ public sealed class RagConfig : IRagConfig
         set => _inner.AIChatServiceAdapter = (SchEnums.AIChatServiceType)(int)value;
     }
 
+    /// <summary>Adapter de serviço de embedding IA padrão.</summary>
     [Required]
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public AIEmbeddingServiceType AIEmbeddingServiceAdapter
@@ -74,6 +81,7 @@ public sealed class RagConfig : IRagConfig
         set => _inner.AIEmbeddingServiceAdapter = (SchEnums.AIEmbeddingServiceType)(int)value;
     }
 
+    /// <summary>Indica se a coleção deve ser criada automaticamente na inicialização.</summary>
     [Required]
     public bool BuildCollection
     {
@@ -81,6 +89,7 @@ public sealed class RagConfig : IRagConfig
         set => _inner.BuildCollection = value;
     }
 
+    /// <summary>Prefixo para nome de coleções no vector store.</summary>
     [Required]
     public string VectorStoreCollectionPrefixName
     {
@@ -88,6 +97,7 @@ public sealed class RagConfig : IRagConfig
         set => _inner.VectorStoreCollectionPrefixName = value;
     }
 
+    /// <summary>Dimensões do vetor de embedding.</summary>
     [Required]
     public int VectorStoreDimensions
     {
@@ -95,6 +105,7 @@ public sealed class RagConfig : IRagConfig
         set => _inner.VectorStoreDimensions = value;
     }
 
+    /// <summary>Tamanho do lote para carga de dados vetoriais.</summary>
     [Required]
     public int DataLoadingBatchSize
     {
@@ -102,6 +113,7 @@ public sealed class RagConfig : IRagConfig
         set => _inner.DataLoadingBatchSize = value;
     }
 
+    /// <summary>Atraso em milissegundos entre lotes de carga de dados.</summary>
     [Required]
     public int DataLoadingBetweenBatchDelayInMilliseconds
     {
@@ -109,6 +121,7 @@ public sealed class RagConfig : IRagConfig
         set => _inner.DataLoadingBetweenBatchDelayInMilliseconds = value;
     }
 
+    /// <summary>Caminhos de arquivos PDF para ingestão RAG.</summary>
     [Required]
     public string[]? PdfFilePaths
     {
@@ -116,6 +129,7 @@ public sealed class RagConfig : IRagConfig
         set => _inner.PdfFilePaths = value;
     }
 
+    /// <summary>Tipo do provedor de vector store configurado.</summary>
     [Required]
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public VectorStoreType VectorStoreType
@@ -124,6 +138,7 @@ public sealed class RagConfig : IRagConfig
         set => _inner.VectorStoreType = (SchEnums.VectorStoreType)(int)value;
     }
 
+    /// <summary>Configurações de busca e thresholds de similaridade.</summary>
     public SearchSettings SearchSettings
     {
         get => _searchSettings;
@@ -134,6 +149,10 @@ public sealed class RagConfig : IRagConfig
         }
     }
 
+    /// <summary>
+    /// Obtém o tipo de adapter de inferência configurado.
+    /// </summary>
+    /// <returns>Tipo de adapter de inferência.</returns>
     public InferenceAiAdapterType GetAInferenceAdapterType() =>
         (InferenceAiAdapterType)(int)_inner.GetAInferenceAdapterType();
 }

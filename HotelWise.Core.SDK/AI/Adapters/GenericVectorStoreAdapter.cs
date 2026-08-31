@@ -17,6 +17,13 @@ public class GenericVectorStoreAdapter<TVector> : IVectorStoreAdapter<TVector>
 {
     private readonly SchAdapters.GenericVectorStoreAdapter<TVector> _inner;
 
+    /// <summary>
+    /// Inicializa uma nova instância de <see cref="GenericVectorStoreAdapter{TVector}"/>.
+    /// </summary>
+    /// <param name="logger">Logger Serilog.</param>
+    /// <param name="applicationConfig">Configuração da aplicação IA.</param>
+    /// <param name="vectorStore">Instância do VectorStore Semantic Kernel.</param>
+    /// <param name="kernel">Instância do Kernel.</param>
     public GenericVectorStoreAdapter(
         Serilog.ILogger logger,
         IApplicationIAConfig applicationConfig,
@@ -30,24 +37,31 @@ public class GenericVectorStoreAdapter<TVector> : IVectorStoreAdapter<TVector>
             kernel);
     }
 
+    /// <inheritdoc />
     public Task UpsertDataAsync(string nameCollection, TVector dataVector) =>
         _inner.UpsertDataAsync(nameCollection, dataVector);
 
+    /// <inheritdoc />
     public Task UpsertDatasAsync(string nameCollection, TVector[] dataVectors) =>
         _inner.UpsertDatasAsync(nameCollection, dataVectors);
 
+    /// <inheritdoc />
     public Task<TVector?> GetByKey(string nameCollection, ulong dataKey) =>
         _inner.GetByKey(nameCollection, dataKey);
 
+    /// <inheritdoc />
     public Task<bool> Exists(string nameCollection, ulong dataKey) =>
         _inner.Exists(nameCollection, dataKey);
 
+    /// <inheritdoc />
     public Task<TVector[]> VectorizedSearchAsync(string nameCollection, float[] searchEmbedding, SearchCriteria searchCriteria) =>
         _inner.VectorizedSearchAsync(nameCollection, searchEmbedding, searchCriteria);
 
+    /// <inheritdoc />
     public Task<TVector[]> SearchAndAnalyzePluginAsync(string nameCollection, string searchQuery, float[] searchEmbedding) =>
         _inner.SearchAndAnalyzePluginAsync(nameCollection, searchQuery, searchEmbedding);
 
+    /// <inheritdoc />
     public Task DeleteAsync(string nameCollection, long dataKey) =>
         _inner.DeleteAsync(nameCollection, dataKey);
 }

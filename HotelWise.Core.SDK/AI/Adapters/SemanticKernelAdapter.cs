@@ -13,20 +13,29 @@ public class SemanticKernelAdapter : IAIInferenceAdapter
 {
     private readonly SchAdapters.SemanticKernelAdapter _inner;
 
+    /// <summary>
+    /// Inicializa uma nova instância de <see cref="SemanticKernelAdapter"/>.
+    /// </summary>
+    /// <param name="applicationConfig">Configuração da aplicação IA.</param>
+    /// <param name="serviceProvider">Provedor de serviços para injeção de dependência.</param>
     public SemanticKernelAdapter(IApplicationIAConfig applicationConfig, IServiceProvider serviceProvider)
     {
         _inner = new SchAdapters.SemanticKernelAdapter(ApplicationIAConfigSchBridge.ToSch(applicationConfig), serviceProvider);
     }
 
+    /// <inheritdoc />
     public Task<string> GenerateChatCompletionAsync(PromptMessageVO[] messages) =>
         _inner.GenerateChatCompletionAsync(messages);
 
+    /// <inheritdoc />
     public Task<string> GenerateChatCompletionByAgentAsync(PromptMessageVO[] messages) =>
         _inner.GenerateChatCompletionByAgentAsync(messages);
 
+    /// <inheritdoc />
     public Task<float[]> GenerateEmbeddingAsync(string text) =>
         _inner.GenerateEmbeddingAsync(text);
 
+    /// <inheritdoc />
     public Task<string> GenerateChatCompletionByAgentSimpleRagAsync(PromptMessageVO[] messages) =>
         _inner.GenerateChatCompletionByAgentSimpleRagAsync(messages);
 }

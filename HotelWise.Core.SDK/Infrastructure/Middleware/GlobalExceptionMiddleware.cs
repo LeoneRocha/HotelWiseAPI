@@ -23,10 +23,15 @@ namespace HotelWise.Core.SDK.Infrastructure.Middleware;
 [Obsolete("Depreciado. Migrado para SmartCoreHub.Core.SDK na camada Infrastructure. Use o pacote NuGet SmartCoreHub.Core.SDK — tipo SmartCoreHub.Core.SDK.Infrastructure.Middleware.GlobalExceptionMiddleware. Após publicar o NuGet, HotelWise.Core.SDK será só casca (PackageReference + wrappers) e delegará a SmartCoreHub.Core.SDK.")]
 public class GlobalExceptionMiddleware : SmartCoreHub.Core.SDK.Infrastructure.Middleware.GlobalExceptionMiddleware
 {
+    /// <summary>
+    /// Inicializa uma nova instância de <see cref="GlobalExceptionMiddleware"/>.
+    /// </summary>
+    /// <param name="next">Próximo delegate na esteira HTTP.</param>
+    /// <param name="logger">Instância do logger Serilog.</param>
+    /// <param name="environment">Ambiente de hospedagem da aplicação.</param>
     public GlobalExceptionMiddleware(RequestDelegate next, Serilog.ILogger logger, IWebHostEnvironment environment)
         : base(next, logger, environment)
     {
     }
 }
-
 #endif

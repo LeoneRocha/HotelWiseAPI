@@ -12,6 +12,9 @@ public class HistoryPromptsValidator : AbstractValidator<PromptMessageVO[]>
 {
     private static readonly SmartCoreHub.Core.SDK.Service.AI.Validation.HistoryPromptsValidator SchValidator = new();
 
+    /// <summary>
+    /// Inicializa as regras de validação para arrays de <see cref="PromptMessageVO"/>.
+    /// </summary>
     public HistoryPromptsValidator()
     {
         RuleFor(x => x).Custom((instance, context) =>

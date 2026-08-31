@@ -15,5 +15,6 @@ namespace HotelWise.Core.SDK.Infrastructure;
 [Obsolete("Depreciado. Migrado para SmartCoreHub.Core.SDK na camada Infrastructure. Use o pacote NuGet SmartCoreHub.Core.SDK — tipo SmartCoreHub.Core.SDK.Infrastructure.Data.Configurations.Helper.Ported.HelperCharSet. Após publicar o NuGet, HotelWise.Core.SDK será só casca (PackageReference + wrappers) e delegará a SmartCoreHub.Core.SDK.")]
 public static class HelperCharSet
 {
+    /// <summary>Conjunto de caracteres padrão (latin1) para entidades do SDK.</summary>
     public const string DefaultCharSet = "latin1";
 }

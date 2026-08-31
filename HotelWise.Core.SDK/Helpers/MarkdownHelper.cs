@@ -17,14 +17,22 @@ namespace HotelWise.Core.SDK.Helpers;
 [Obsolete("Depreciado. Migrado para SmartCoreHub.Core.SDK na camada Domain. Use o pacote NuGet SmartCoreHub.Core.SDK — tipo SmartCoreHub.Core.SDK.Domain.Helpers.MarkdownHelper. Após publicar o NuGet, HotelWise.Core.SDK será só casca (PackageReference + wrappers) e delegará a SmartCoreHub.Core.SDK.")]
 public static class MarkdownHelper
 {
+    /// <summary>Remove formatações Markdown do texto informado.</summary>
+    /// <param name="markdownText">Texto com formatação Markdown.</param>
+    /// <returns>Texto sem sintaxe Markdown.</returns>
     public static string RemoveMarkdown(string markdownText) =>
         SmartCoreHub.Core.SDK.Domain.Helpers.MarkdownHelper.RemoveMarkdown(markdownText);
 
+    /// <summary>Verifica se o texto contém sintaxe ou marcações Markdown.</summary>
+    /// <param name="text">Texto de entrada.</param>
+    /// <returns>True se contém Markdown; caso contrário false.</returns>
     public static bool HasMarkdown(string text) =>
         SmartCoreHub.Core.SDK.Domain.Helpers.MarkdownHelper.HasMarkdown(text);
 
+    /// <summary>Converte o texto para HTML caso contenha sintaxe Markdown.</summary>
+    /// <param name="markdownText">Texto de entrada.</param>
+    /// <returns>HTML gerado ou o próprio texto original.</returns>
     public static string ConvertToHtmlIfMarkdown(string markdownText) =>
         SmartCoreHub.Core.SDK.Domain.Helpers.MarkdownHelper.ConvertToHtmlIfMarkdown(markdownText);
 }
-
 #endif

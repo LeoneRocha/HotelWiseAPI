@@ -16,6 +16,12 @@ namespace HotelWise.Core.SDK.Extensions;
 [Obsolete("Depreciado. Migrado para SmartCoreHub.Core.SDK na camada Service. Use o pacote NuGet SmartCoreHub.Core.SDK — tipo SmartCoreHub.Core.SDK.Service.DependenciesCollection.Extensions.ServiceCollectionConfigureAppSettings. Após publicar o NuGet, HotelWise.Core.SDK será só casca (PackageReference + wrappers) e delegará a SmartCoreHub.Core.SDK.")]
 public static class ServiceCollectionConfigureAppSettings
 {
+    /// <summary>
+    /// Registra e retorna as configurações do Azure AD / Microsoft Entra ID.
+    /// </summary>
+    /// <param name="services">Coleção de serviços de injeção de dependência.</param>
+    /// <param name="configuration">Configuração da aplicação.</param>
+    /// <returns>Instância preenchida de <see cref="AzureAdConfig"/>.</returns>
     public static AzureAdConfig AddAndReturnAzureAdConfig(IServiceCollection services, IConfiguration configuration)
     {
         var appValue = new AzureAdConfig();
@@ -25,6 +31,12 @@ public static class ServiceCollectionConfigureAppSettings
         return appValue;
     }
 
+    /// <summary>
+    /// Registra e retorna as configurações de token JWT.
+    /// </summary>
+    /// <param name="services">Coleção de serviços de injeção de dependência.</param>
+    /// <param name="configuration">Configuração da aplicação.</param>
+    /// <returns>Instância preenchida de <see cref="TokenConfigurationDto"/>.</returns>
     public static TokenConfigurationDto AddAndReturnTokenConfiguration(IServiceCollection services, IConfiguration configuration)
     {
         var configValue = Helpers.ConfigurationAppSettingsHelper.GetTokenConfigurations(configuration);

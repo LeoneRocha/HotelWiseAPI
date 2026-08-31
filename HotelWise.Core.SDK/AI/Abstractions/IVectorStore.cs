@@ -49,7 +49,7 @@ public interface IVectorStoreAdapter<TVector> where TVector : class, IDataVector
     /// <param name="nameCollection">Nome da coleção no vector store.</param>
     /// <param name="searchEmbedding">Vetor de embedding da consulta.</param>
     /// <param name="searchCriteria">Critérios de busca (limite, texto, tags).</param>
-    /// <returns>Registros mais similares, com <see cref="IDataVector.Score"/> preenchido quando disponível.</returns>
+    /// <returns>Registros mais similares, com <see cref="SmartCoreHub.Core.SDK.Domain.AI.Abstractions.IDataVector.Score"/> preenchido quando disponível.</returns>
     Task<TVector[]> VectorizedSearchAsync(string nameCollection, float[] searchEmbedding, SearchCriteria searchCriteria);
 
     /// <summary>

@@ -13,20 +13,28 @@ public class MistralApiAdapter : IAIInferenceAdapter
 {
     private readonly SchAdapters.MistralApiAdapter _inner;
 
+    /// <summary>
+    /// Inicializa uma nova instância de <see cref="MistralApiAdapter"/>.
+    /// </summary>
+    /// <param name="applicationConfig">Configuração da aplicação IA.</param>
     public MistralApiAdapter(IApplicationIAConfig applicationConfig)
     {
         _inner = new SchAdapters.MistralApiAdapter(ApplicationIAConfigSchBridge.ToSch(applicationConfig));
     }
 
+    /// <inheritdoc />
     public Task<string> GenerateChatCompletionAsync(PromptMessageVO[] messages) =>
         _inner.GenerateChatCompletionAsync(messages);
 
+    /// <inheritdoc />
     public Task<string> GenerateChatCompletionByAgentAsync(PromptMessageVO[] messages) =>
         _inner.GenerateChatCompletionByAgentAsync(messages);
 
+    /// <inheritdoc />
     public Task<float[]> GenerateEmbeddingAsync(string text) =>
         _inner.GenerateEmbeddingAsync(text);
 
+    /// <inheritdoc />
     public Task<string> GenerateChatCompletionByAgentSimpleRagAsync(PromptMessageVO[] messages) =>
         _inner.GenerateChatCompletionByAgentSimpleRagAsync(messages);
 }

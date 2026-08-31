@@ -18,10 +18,13 @@ namespace HotelWise.Core.SDK.Infrastructure.Middleware;
 [Obsolete("Depreciado. Migrado para SmartCoreHub.Core.SDK na camada Infrastructure. Use o pacote NuGet SmartCoreHub.Core.SDK — tipo SmartCoreHub.Core.SDK.Infrastructure.Middleware.Ported.CorrelationIdMiddleware. Após publicar o NuGet, HotelWise.Core.SDK será só casca (PackageReference + wrappers) e delegará a SmartCoreHub.Core.SDK.")]
 public class CorrelationIdMiddleware : SmartCoreHub.Core.SDK.Infrastructure.Middleware.Ported.CorrelationIdMiddleware
 {
+    /// <summary>
+    /// Inicializa uma nova instância de <see cref="CorrelationIdMiddleware"/>.
+    /// </summary>
+    /// <param name="next">Próximo delegate na esteira HTTP.</param>
     public CorrelationIdMiddleware(RequestDelegate next)
         : base(next)
     {
     }
 }
-
 #endif

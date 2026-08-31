@@ -10,6 +10,7 @@ namespace HotelWise.Core.SDK.AI.DTO;
 [Obsolete("Depreciado. Migrado para SmartCoreHub.Core.SDK na camada Domain. Use o pacote NuGet SmartCoreHub.Core.SDK — tipo SmartCoreHub.Core.SDK.Domain.AI.DTO.AskAssistantResponse. Após publicar o NuGet, HotelWise.Core.SDK será só casca (PackageReference + wrappers) e delegará a SmartCoreHub.Core.SDK.")]
 public class AskAssistantResponse : SchDto.AskAssistantResponse
 {
+    /// <summary>Papel do emissor da resposta.</summary>
     public new RoleAiPromptsType Role
     {
         get => (RoleAiPromptsType)(int)base.Role;
@@ -23,5 +24,6 @@ public class AskAssistantResponse : SchDto.AskAssistantResponse
 [Obsolete("Depreciado. Migrado para SmartCoreHub.Core.SDK na camada Domain. Use o pacote NuGet SmartCoreHub.Core.SDK — tipo SmartCoreHub.Core.SDK.Domain.AI.DTO.AskAssistantRequest. Após publicar o NuGet, HotelWise.Core.SDK será só casca (PackageReference + wrappers) e delegará a SmartCoreHub.Core.SDK.")]
 public class AskAssistantRequest : SchDto.AskAssistantRequest
 {
+    /// <summary>Papel do emissor da solicitação.</summary>
     public new RoleAiPromptsType Role => (RoleAiPromptsType)(int)base.Role;
 }

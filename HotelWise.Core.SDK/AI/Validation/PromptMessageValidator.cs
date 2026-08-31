@@ -12,6 +12,9 @@ public class PromptMessageValidator : AbstractValidator<PromptMessageVO>
 {
     private static readonly SmartCoreHub.Core.SDK.Service.AI.Validation.PromptMessageValidator SchValidator = new();
 
+    /// <summary>
+    /// Inicializa as regras de validação para <see cref="PromptMessageVO"/>.
+    /// </summary>
     public PromptMessageValidator()
     {
         RuleFor(x => x).Custom((instance, context) =>

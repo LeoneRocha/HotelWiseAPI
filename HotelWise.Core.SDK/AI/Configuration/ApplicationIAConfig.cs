@@ -41,22 +41,55 @@ public sealed class ApplicationIAConfig : IApplicationIAConfig
     /// </summary>
     internal SchConfig.ApplicationIAConfig Inner => _inner;
 
+    /// <summary>Configuração para o provedor Azure OpenAI.</summary>
     public AzureOpenAIConfig AzureOpenAIConfig => _azureOpenAIConfig;
+
+    /// <summary>Configuração de embeddings para o provedor Azure OpenAI.</summary>
     public AzureOpenAIEmbeddingsConfig AzureOpenAIEmbeddingsConfig => _azureOpenAIEmbeddingsConfig;
+
+    /// <summary>Configuração para o provedor OpenAI direto.</summary>
     public OpenAIConfig OpenAIConfig => _openAIConfig;
+
+    /// <summary>Configuração de embeddings para o provedor OpenAI direto.</summary>
     public OpenAIEmbeddingsConfig OpenAIEmbeddingsConfig => _openAIEmbeddingsConfig;
+
+    /// <summary>Configuração RAG da aplicação.</summary>
     public RagConfig RagConfig => _ragConfig;
+
+    /// <summary>Configuração para o serviço Azure AI Search.</summary>
     public AzureAISearchConfig AzureAISearchConfig => _azureAISearchConfig;
+
+    /// <summary>Configuração para o Azure Cosmos DB MongoDB.</summary>
     public AzureCosmosDBConfig AzureCosmosDBMongoDBConfig => _azureCosmosDBMongoDBConfig;
+
+    /// <summary>Configuração para o Azure Cosmos DB NoSQL.</summary>
     public AzureCosmosDBConfig AzureCosmosDBNoSQLConfig => _azureCosmosDBNoSQLConfig;
+
+    /// <summary>Configuração para o vector store Qdrant.</summary>
     public QdrantConfig QdrantConfig => _qdrantConfig;
+
+    /// <summary>Configuração para o cache/vector store Redis.</summary>
     public RedisConfig RedisConfig => _redisConfig;
+
+    /// <summary>Configuração para o vector store Weaviate.</summary>
     public WeaviateConfig WeaviateConfig => _weaviateConfig;
+
+    /// <summary>Configuração para a API do provedor Mistral.</summary>
     public MistralApiConfig MistralApiConfig => _mistralApiConfig;
+
+    /// <summary>Configuração de embeddings para a API do provedor Mistral.</summary>
     public MistralApiEmbeddingsConfig MistralApiEmbeddingsConfig => _mistralApiEmbeddingsConfig;
+
+    /// <summary>Configuração para a API do provedor Groq.</summary>
     public GroqApiConfig GroqApiConfig => _groqApiConfig;
+
+    /// <summary>Configuração para o provedor local Ollama.</summary>
     public OllamaConfig OllamaConfig => _ollamaConfig;
 
+    /// <summary>
+    /// Inicializa uma nova instância de <see cref="ApplicationIAConfig"/> a partir de <see cref="IConfiguration"/>.
+    /// </summary>
+    /// <param name="configurationManager">Gerenciador de configuração.</param>
     public ApplicationIAConfig(IConfiguration configurationManager)
     {
         _inner = new SchConfig.ApplicationIAConfig(configurationManager);
@@ -77,15 +110,19 @@ public sealed class ApplicationIAConfig : IApplicationIAConfig
         _ollamaConfig = Wrap(_inner.OllamaConfig, () => new OllamaConfig());
     }
 
+    /// <inheritdoc />
     public IAiInferenceConfigBase GetChatServiceConfig(AIChatServiceType serviceType) =>
         WrapInference(_inner.GetChatServiceConfig((SchAI.Enums.AIChatServiceType)(int)serviceType));
 
+    /// <inheritdoc />
     public IAiInferenceConfigBase GetChatServiceConfig() =>
         WrapInference(_inner.GetChatServiceConfig());
 
+    /// <inheritdoc />
     public IAiInferenceConfigBase GetEmbeddingServiceConfig(AIEmbeddingServiceType embeddingType) =>
         WrapInference(_inner.GetEmbeddingServiceConfig((SchAI.Enums.AIEmbeddingServiceType)(int)embeddingType));
 
+    /// <inheritdoc />
     public object? GetVectorStoreConfig(VectorStoreType storeType) =>
         storeType switch
         {
