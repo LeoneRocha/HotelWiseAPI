@@ -7,23 +7,11 @@ namespace HotelWise.Core.SDK.Common.Constants;
 [Obsolete("Depreciado. Migrado para SmartCoreHub.Core.SDK na camada Common. Use o pacote NuGet SmartCoreHub.Core.SDK — tipo SmartCoreHub.Core.SDK.Common.Constants.AppConfigConstants. Após publicar o NuGet, HotelWise.Core.SDK será só casca (PackageReference + wrappers) e delegará a SmartCoreHub.Core.SDK.")]
 public static class AppConfigConstants
 {
-    /// <summary>
-    /// Content-Type HTTP para JSON (<c>application/json</c>).
-    /// </summary>
     public const string ApplicationContentJon = "application/json";
 
-    /// <summary>
-    /// Formato de data/hora padrão: <c>yyyy-MM-dd HH:mm:ss</c>.
-    /// </summary>
     public const string DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
 
-    /// <summary>
-    /// Formato de data/hora ISO com sufixo Z: <c>yyyy-MM-ddTHH:mm:ssZ</c>.
-    /// </summary>
     public const string DATE_FORMAT2 = "yyyy-MM-ddTHH:mm:ssZ";
 
-    /// <summary>
-    /// Mensagem de erro quando a configuração da aplicação é nula.
-    /// </summary>
     public const string ConfigurationConfigurationNotBeNull = "Configuration cannot be null.";
 }

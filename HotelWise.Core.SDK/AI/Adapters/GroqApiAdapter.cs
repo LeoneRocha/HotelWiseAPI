@@ -1,110 +1,85 @@
 #if NET8_0_OR_GREATER
-using System.Text.Json.Nodes;
-using GroqApiLibrary;
 using HotelWise.Core.SDK.AI.Abstractions;
+using HotelWise.Core.SDK.AI.Configuration;
 using HotelWise.Core.SDK.AI.DTO;
-using HotelWise.Core.SDK.AI.Enums;
+using SchAbstractions = SmartCoreHub.Core.SDK.Domain.AI.Abstractions;
+using SchAdapters = SmartCoreHub.Core.SDK.Infrastructure.AI.Adapters;
+using SchConfig = SmartCoreHub.Core.SDK.Domain.AI.Configuration;
+using SchEnums = SmartCoreHub.Core.SDK.Domain.AI.Enums;
 
 namespace HotelWise.Core.SDK.AI.Adapters;
 
 /// <summary>
-/// Adapter de inferência via Groq API.
-/// Implementa <see cref="IAIInferenceAdapter"/> para chat completion JSON;
-/// embeddings não estão implementados neste adapter.
+/// Bridge HW <see cref="IApplicationIAConfig"/> → SCH (prefer <see cref="ApplicationIAConfig.Inner"/>).
 /// </summary>
-/// <example>
-/// <code>
-/// var adapter = new GroqApiAdapter(appConfig);
-/// string reply = await adapter.GenerateChatCompletionAsync(messages);
-/// </code>
-/// </example>
+internal static class ApplicationIAConfigSchBridge
+{
+    public static SchAbstractions.IApplicationIAConfig ToSch(IApplicationIAConfig applicationConfig)
+    {
+        if (applicationConfig is ApplicationIAConfig concrete)
+            return concrete.Inner;
+        return new Adapter(applicationConfig);
+    }
+
+    private sealed class Adapter : SchAbstractions.IApplicationIAConfig
+    {
+        private readonly IApplicationIAConfig _hw;
+
+        public Adapter(IApplicationIAConfig hw) => _hw = hw;
+
+        public SchConfig.RagConfig RagConfig => _hw.RagConfig.Inner;
+        public SchConfig.AzureOpenAIConfig AzureOpenAIConfig => _hw.AzureOpenAIConfig;
+        public SchConfig.AzureOpenAIEmbeddingsConfig AzureOpenAIEmbeddingsConfig => _hw.AzureOpenAIEmbeddingsConfig;
+        public SchConfig.MistralApiConfig MistralApiConfig => _hw.MistralApiConfig;
+        public SchConfig.MistralApiEmbeddingsConfig MistralApiEmbeddingsConfig => _hw.MistralApiEmbeddingsConfig;
+        public SchConfig.GroqApiConfig GroqApiConfig => _hw.GroqApiConfig;
+        public SchConfig.OllamaConfig OllamaConfig => _hw.OllamaConfig;
+        public SchConfig.AzureAISearchConfig AzureAISearchConfig => _hw.AzureAISearchConfig;
+        public SchConfig.AzureCosmosDBConfig AzureCosmosDBMongoDBConfig => _hw.AzureCosmosDBMongoDBConfig;
+        public SchConfig.AzureCosmosDBConfig AzureCosmosDBNoSQLConfig => _hw.AzureCosmosDBNoSQLConfig;
+        public SchConfig.OpenAIConfig OpenAIConfig => _hw.OpenAIConfig;
+        public SchConfig.OpenAIEmbeddingsConfig OpenAIEmbeddingsConfig => _hw.OpenAIEmbeddingsConfig;
+        public SchConfig.QdrantConfig QdrantConfig => _hw.QdrantConfig;
+        public SchConfig.RedisConfig RedisConfig => _hw.RedisConfig;
+        public SchConfig.WeaviateConfig WeaviateConfig => _hw.WeaviateConfig;
+
+        public SchAbstractions.IAiInferenceConfigBase GetChatServiceConfig(SchEnums.AIChatServiceType serviceType) =>
+            _hw.GetChatServiceConfig((Enums.AIChatServiceType)(int)serviceType);
+
+        public SchAbstractions.IAiInferenceConfigBase GetChatServiceConfig() =>
+            _hw.GetChatServiceConfig();
+
+        public SchAbstractions.IAiInferenceConfigBase GetEmbeddingServiceConfig(SchEnums.AIEmbeddingServiceType embeddingType) =>
+            _hw.GetEmbeddingServiceConfig((Enums.AIEmbeddingServiceType)(int)embeddingType);
+
+        public object? GetVectorStoreConfig(SchEnums.VectorStoreType storeType) =>
+            _hw.GetVectorStoreConfig((Enums.VectorStoreType)(int)storeType);
+    }
+}
+
+/// <summary>
+/// Adapter de inferência via Groq API — casca sobre SCH.
+/// </summary>
 [Obsolete("Depreciado. Migrado para SmartCoreHub.Core.SDK na camada Infrastructure. Use o pacote NuGet SmartCoreHub.Core.SDK — tipo SmartCoreHub.Core.SDK.Infrastructure.AI.Adapters.GroqApiAdapter. Após publicar o NuGet, HotelWise.Core.SDK será só casca (PackageReference + wrappers) e delegará a SmartCoreHub.Core.SDK.")]
 public class GroqApiAdapter : IAIInferenceAdapter
 {
-    /// <summary>
-    /// Cliente da biblioteca Groq.
-    /// </summary>
-    private readonly GroqApiClient _groqApiClient;
+    private readonly SchAdapters.GroqApiAdapter _inner;
 
-    /// <summary>
-    /// Identificador do modelo de chat configurado.
-    /// </summary>
-    private readonly string _model;
-
-    /// <summary>
-    /// Inicializa o cliente Groq com chave e modelo de <see cref="IApplicationIAConfig.GroqApiConfig"/>.
-    /// </summary>
-    /// <param name="applicationConfig">Configuração agregada de IA.</param>
     public GroqApiAdapter(IApplicationIAConfig applicationConfig)
     {
-        _groqApiClient = new GroqApiClient(applicationConfig.GroqApiConfig.ApiKey);
-        _model = applicationConfig.GroqApiConfig.ModelId;
+        _inner = new SchAdapters.GroqApiAdapter(ApplicationIAConfigSchBridge.ToSch(applicationConfig));
     }
 
-    /// <summary>
-    /// Gera chat completion enviando mensagens em formato JSON à Groq API.
-    /// </summary>
-    /// <param name="messages">Histórico de prompts.</param>
-    /// <returns>Conteúdo da primeira choice, ou string vazia.</returns>
-    /// <example>
-    /// <code>
-    /// string reply = await adapter.GenerateChatCompletionAsync(messages);
-    /// </code>
-    /// </example>
-    public async Task<string> GenerateChatCompletionAsync(PromptMessageVO[] messages)
-    {
-        var request = new JsonObject
-        {
-            ["model"] = _model,
-            ["messages"] = new JsonArray(messages.Select(m => new JsonObject
-            {
-                ["role"] = GetRole(m.RoleType),
-                ["content"] = m.Content
-            }).ToArray())
-        };
+    public Task<string> GenerateChatCompletionAsync(PromptMessageVO[] messages) =>
+        _inner.GenerateChatCompletionAsync(messages);
 
-        var result = await _groqApiClient.CreateChatCompletionAsync(request);
-        var resultOut = result?["choices"]?[0]?["message"]?["content"]?.ToString();
-        return resultOut ?? string.Empty;
-    }
+    public Task<string> GenerateChatCompletionByAgentAsync(PromptMessageVO[] messages) =>
+        _inner.GenerateChatCompletionByAgentAsync(messages);
 
-    /// <summary>
-    /// Mapeia o papel HotelWise para a string de role da Groq API.
-    /// </summary>
-    /// <param name="roleType">Tipo de papel da mensagem.</param>
-    /// <returns>Role textual (<c>system</c>, <c>user</c> ou <c>assistant</c>).</returns>
-    private static string GetRole(RoleAiPromptsType roleType) =>
-        roleType switch
-        {
-            RoleAiPromptsType.System => "system",
-            RoleAiPromptsType.Agent => "system",
-            RoleAiPromptsType.User => "user",
-            RoleAiPromptsType.Assistant => "assistant",
-            _ => "user"
-        };
-
-    /// <summary>
-    /// Gera chat por agente; na Groq delega para <see cref="GenerateChatCompletionAsync"/>.
-    /// </summary>
-    /// <param name="messages">Histórico de prompts.</param>
-    /// <returns>Conteúdo textual da resposta.</returns>
-    public async Task<string> GenerateChatCompletionByAgentAsync(PromptMessageVO[] messages) =>
-        await GenerateChatCompletionAsync(messages);
-
-    /// <summary>
-    /// Embeddings não são suportados neste adapter.
-    /// </summary>
-    /// <param name="text">Texto a vetorizar.</param>
-    /// <returns>Não retorna; sempre lança <see cref="NotImplementedException"/>.</returns>
     public Task<float[]> GenerateEmbeddingAsync(string text) =>
-        throw new NotImplementedException();
+        _inner.GenerateEmbeddingAsync(text);
 
-    /// <summary>
-    /// Gera chat por agente com RAG simples; na Groq delega para <see cref="GenerateChatCompletionAsync"/>.
-    /// </summary>
-    /// <param name="messages">Histórico de prompts.</param>
-    /// <returns>Conteúdo textual da resposta.</returns>
-    public async Task<string> GenerateChatCompletionByAgentSimpleRagAsync(PromptMessageVO[] messages) =>
-        await GenerateChatCompletionAsync(messages);
+    public Task<string> GenerateChatCompletionByAgentSimpleRagAsync(PromptMessageVO[] messages) =>
+        _inner.GenerateChatCompletionByAgentSimpleRagAsync(messages);
 }
 #endif

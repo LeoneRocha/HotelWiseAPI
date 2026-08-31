@@ -5,58 +5,13 @@ namespace HotelWise.Core.SDK.AI.Services;
 
 /// <summary>
 /// Base mínima para serviços de vector store tipados por entidade.
-/// Expõe mapper, logger e escopo de usuário (<see cref="UserId"/>) compartilhados
-/// pelas implementações concretas de <see cref="Abstractions.IVectorStoreService{TEntity}"/>.
 /// </summary>
-/// <example>
-/// <code>
-/// public class HotelVectorStoreService : GenericVectorStoreServiceBase, IVectorStoreService&lt;Hotel&gt;
-/// {
-///     public HotelVectorStoreService(IMapper mapper, Serilog.ILogger logger)
-///         : base(mapper, logger) { }
-/// }
-///
-/// service.SetUserId(userId);
-/// </code>
-/// </example>
 [Obsolete("Depreciado. Migrado para SmartCoreHub.Core.SDK na camada Service. Use o pacote NuGet SmartCoreHub.Core.SDK — tipo SmartCoreHub.Core.SDK.Service.AI.Services.GenericVectorStoreServiceBase. Após publicar o NuGet, HotelWise.Core.SDK será só casca (PackageReference + wrappers) e delegará a SmartCoreHub.Core.SDK.")]
-public abstract class GenericVectorStoreServiceBase
+public abstract class GenericVectorStoreServiceBase : SmartCoreHub.Core.SDK.Service.AI.Services.GenericVectorStoreServiceBase
 {
-    /// <summary>
-    /// Mapper AutoMapper para conversão entidade ↔ vetor.
-    /// </summary>
-    protected readonly IMapper _mapper;
-
-    /// <summary>
-    /// Logger estruturado.
-    /// </summary>
-    protected readonly Serilog.ILogger _logger;
-
-    /// <summary>
-    /// Identificador do usuário autenticado no contexto do serviço.
-    /// </summary>
-    protected long UserId { get; private set; }
-
-    /// <summary>
-    /// Inicializa a base com mapper e logger obrigatórios.
-    /// </summary>
-    /// <param name="mapper">Instância do AutoMapper.</param>
-    /// <param name="logger">Logger Serilog.</param>
     protected GenericVectorStoreServiceBase(IMapper mapper, Serilog.ILogger logger)
+        : base(mapper, logger)
     {
-        _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
-        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
-
-    /// <summary>
-    /// Define o identificador do usuário no contexto do serviço.
-    /// </summary>
-    /// <param name="id">Identificador do usuário.</param>
-    /// <example>
-    /// <code>
-    /// service.SetUserId(42);
-    /// </code>
-    /// </example>
-    public void SetUserId(long id) => UserId = id;
 }
 #endif

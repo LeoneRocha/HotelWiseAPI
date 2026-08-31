@@ -9,23 +9,7 @@ namespace HotelWise.Core.SDK.Domain;
 /// (por exemplo, usuários, hóspedes ou responsáveis).
 /// </summary>
 [Obsolete("Depreciado. Migrado para SmartCoreHub.Core.SDK na camada Domain. Use o pacote NuGet SmartCoreHub.Core.SDK — tipo SmartCoreHub.Core.SDK.Domain.Entities.Common.Ported.EntityBaseWithNameEmail. Após publicar o NuGet, HotelWise.Core.SDK será só casca (PackageReference + wrappers) e delegará a SmartCoreHub.Core.SDK.")]
-public abstract class EntityBaseWithNameEmail : EntityBase
+public abstract class EntityBaseWithNameEmail : SmartCoreHub.Core.SDK.Domain.Entities.Common.Ported.EntityBaseWithNameEmail
 {
-    /// <summary>
-    /// Nome completo ou razão social associado à entidade.
-    /// Persistido como <c>varchar(255)</c>, obrigatório, com comprimento máximo de 255.
-    /// </summary>
-    [Column("Name", TypeName = "varchar(255)", Order = 2)]
-    [MaxLength(255)]
-    [Required]
-    public string Name { get; set; } = string.Empty;
 
-    /// <summary>
-    /// Endereço de e-mail associado à entidade.
-    /// Persistido como <c>varchar(100)</c>, obrigatório, com comprimento máximo de 100.
-    /// </summary>
-    [Column("Email", TypeName = "varchar(100)", Order = 3)]
-    [MaxLength(100)]
-    [Required]
-    public string Email { get; set; } = string.Empty;
 }

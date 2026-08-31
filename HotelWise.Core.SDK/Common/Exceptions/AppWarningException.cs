@@ -6,29 +6,19 @@ namespace HotelWise.Core.SDK.Common.Exceptions;
 /// tratada e comunicada sem interromper o fluxo como erro crítico.
 /// </summary>
 [Obsolete("Depreciado. Migrado para SmartCoreHub.Core.SDK na camada Common. Use o pacote NuGet SmartCoreHub.Core.SDK — tipo SmartCoreHub.Core.SDK.Common.Exceptions.AppWarningException. Após publicar o NuGet, HotelWise.Core.SDK será só casca (PackageReference + wrappers) e delegará a SmartCoreHub.Core.SDK.")]
-public class AppWarningException : Exception
+public class AppWarningException : SmartCoreHub.Core.SDK.Common.Exceptions.AppWarningException
 {
-    /// <summary>
-    /// Inicializa uma nova instância de <see cref="AppWarningException"/> sem mensagem.
-    /// </summary>
     public AppWarningException()
     {
     }
 
-    /// <summary>
-    /// Inicializa uma nova instância de <see cref="AppWarningException"/> com a mensagem especificada.
-    /// </summary>
-    /// <param name="message">Mensagem que descreve o aviso; pode ser <c>null</c>.</param>
-    public AppWarningException(string? message) : base(message)
+    public AppWarningException(string? message)
+        : base(message)
     {
     }
 
-    /// <summary>
-    /// Inicializa uma nova instância de <see cref="AppWarningException"/> com mensagem e exceção interna.
-    /// </summary>
-    /// <param name="message">Mensagem que descreve o aviso; pode ser <c>null</c>.</param>
-    /// <param name="innerException">Exceção que causou o aviso atual; pode ser <c>null</c>.</param>
-    public AppWarningException(string? message, Exception? innerException) : base(message, innerException)
+    public AppWarningException(string? message, Exception? innerException)
+        : base(message, innerException)
     {
     }
 }

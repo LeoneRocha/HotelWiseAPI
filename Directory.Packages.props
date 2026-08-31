@@ -45,6 +45,7 @@
     <PackageVersion Include="Swashbuckle.AspNetCore" Version="10.2.3" />
     <PackageVersion Include="Swashbuckle.AspNetCore.Annotations" Version="10.2.3" />
     <PackageVersion Include="Swashbuckle.AspNetCore.Filters" Version="10.0.1" />
+    <PackageVersion Include="SmartCoreHub.Core.SDK" Version="20260831.2105.0" />
     <PackageVersion Include="Serilog" Version="4.4.0" />
     <PackageVersion Include="Serilog.AspNetCore" Version="10.0.0" />
     <PackageVersion Include="Serilog.Enrichers.Environment" Version="3.0.1" />

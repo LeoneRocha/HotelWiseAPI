@@ -5,15 +5,6 @@ namespace HotelWise.Core.SDK.Abstractions;
 /// Base comum para entidades persistidas que suportam ativação/desativação lógica.
 /// </summary>
 [Obsolete("Depreciado. Migrado para SmartCoreHub.Core.SDK na camada Domain. Use o pacote NuGet SmartCoreHub.Core.SDK — tipo SmartCoreHub.Core.SDK.Domain.Abstractions.IEntityBase. Após publicar o NuGet, HotelWise.Core.SDK será só casca (PackageReference + wrappers) e delegará a SmartCoreHub.Core.SDK.")]
-public interface IEntityBase
+public interface IEntityBase : SmartCoreHub.Core.SDK.Domain.Abstractions.IEntityBase
 {
-    /// <summary>
-    /// Identificador único da entidade.
-    /// </summary>
-    long Id { get; set; }
-
-    /// <summary>
-    /// Indica se a entidade está habilitada (ativa) no sistema.
-    /// </summary>
-    bool Enable { get; set; }
 }

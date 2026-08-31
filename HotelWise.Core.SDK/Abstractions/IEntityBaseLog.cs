@@ -6,20 +6,6 @@ namespace HotelWise.Core.SDK.Abstractions;
 /// usadas para rastreabilidade e políticas de retenção/atividade.
 /// </summary>
 [Obsolete("Depreciado. Migrado para SmartCoreHub.Core.SDK na camada Domain. Use o pacote NuGet SmartCoreHub.Core.SDK — tipo SmartCoreHub.Core.SDK.Domain.Abstractions.IEntityBaseLog. Após publicar o NuGet, HotelWise.Core.SDK será só casca (PackageReference + wrappers) e delegará a SmartCoreHub.Core.SDK.")]
-public interface IEntityBaseLog
+public interface IEntityBaseLog : SmartCoreHub.Core.SDK.Domain.Abstractions.IEntityBaseLog
 {
-    /// <summary>
-    /// Data e hora de criação do registro.
-    /// </summary>
-    DateTime CreatedDate { get; set; }
-
-    /// <summary>
-    /// Data e hora da última alteração do registro.
-    /// </summary>
-    DateTime ModifyDate { get; set; }
-
-    /// <summary>
-    /// Data e hora do último acesso ao registro.
-    /// </summary>
-    DateTime LastAccessDate { get; set; }
 }

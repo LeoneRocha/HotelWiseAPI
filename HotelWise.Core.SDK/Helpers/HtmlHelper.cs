@@ -16,18 +16,8 @@ namespace HotelWise.Core.SDK.Helpers;
 [Obsolete("Depreciado. Migrado para SmartCoreHub.Core.SDK na camada Domain. Use o pacote NuGet SmartCoreHub.Core.SDK — tipo SmartCoreHub.Core.SDK.Domain.Helpers.HtmlHelper. Após publicar o NuGet, HotelWise.Core.SDK será só casca (PackageReference + wrappers) e delegará a SmartCoreHub.Core.SDK.")]
 public static class HtmlHelper
 {
-    /// <summary>
-    /// Remove tags HTML e retorna apenas o texto interno do documento.
-    /// </summary>
-    /// <param name="html">Fragmento ou documento HTML; nulo/vazio resulta em string vazia.</param>
-    /// <returns>Texto plano sem markup.</returns>
-    public static string RemoveHtml(string html)
-    {
-        if (string.IsNullOrWhiteSpace(html)) return string.Empty;
-
-        var htmlDocument = new HtmlDocument();
-        htmlDocument.LoadHtml(html);
-        return htmlDocument.DocumentNode.InnerText;
-    }
+    public static string RemoveHtml(string html) =>
+        SmartCoreHub.Core.SDK.Domain.Helpers.HtmlHelper.RemoveHtml(html);
 }
+
 #endif

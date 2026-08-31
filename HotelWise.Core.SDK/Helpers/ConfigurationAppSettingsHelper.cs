@@ -18,93 +18,26 @@ namespace HotelWise.Core.SDK.Helpers;
 [Obsolete("Depreciado. Migrado para SmartCoreHub.Core.SDK na camada Domain. Use o pacote NuGet SmartCoreHub.Core.SDK — tipo SmartCoreHub.Core.SDK.Domain.Helpers.ConfigurationAppSettingsHelper. Após publicar o NuGet, HotelWise.Core.SDK será só casca (PackageReference + wrappers) e delegará a SmartCoreHub.Core.SDK.")]
 public static class ConfigurationAppSettingsHelper
 {
-    /// <summary>
-    /// Obtém uma seção nomeada da configuração da aplicação.
-    /// </summary>
-    /// <param name="configuration">Raiz de configuração; não pode ser nula.</param>
-    /// <param name="sectionName">Nome da seção (ex.: "Rag").</param>
-    /// <returns>A seção <see cref="IConfiguration"/> correspondente.</returns>
-    /// <exception cref="ArgumentNullException">Quando <paramref name="configuration"/> é nula.</exception>
-    public static IConfiguration GetSectionApp(IConfiguration? configuration, string sectionName)
-    {
-        if (configuration == null)
-        {
-            throw new ArgumentNullException(nameof(configuration), AppConfigConstants.ConfigurationConfigurationNotBeNull);
-        }
-        return configuration.GetSection(sectionName);
-    }
+    public static IConfiguration GetSectionApp(IConfiguration? configuration, string sectionName) =>
+        SmartCoreHub.Core.SDK.Domain.Helpers.ConfigurationAppSettingsHelper.GetSectionApp(configuration, sectionName);
 
-    /// <summary>
-    /// Obtém uma connection string pelo nome.
-    /// </summary>
-    /// <param name="configuration">Raiz de configuração; não pode ser nula.</param>
-    /// <param name="connectionName">Nome da connection string.</param>
-    /// <returns>Valor da connection string ou string vazia se ausente.</returns>
-    /// <exception cref="ArgumentNullException">Quando <paramref name="configuration"/> é nula.</exception>
-    public static string GetConnectionStringApp(IConfiguration? configuration, string connectionName)
-    {
-        if (configuration == null)
-        {
-            throw new ArgumentNullException(nameof(configuration), AppConfigConstants.ConfigurationConfigurationNotBeNull);
-        }
-        return configuration.GetConnectionString(connectionName) ?? string.Empty;
-    }
+    public static string GetConnectionStringApp(IConfiguration? configuration, string connectionName) =>
+        SmartCoreHub.Core.SDK.Domain.Helpers.ConfigurationAppSettingsHelper.GetConnectionStringApp(configuration, connectionName);
 
-    /// <summary>
-    /// Obtém o valor string de uma chave de configuração (índice simples).
-    /// </summary>
-    /// <param name="configuration">Raiz de configuração; não pode ser nula.</param>
-    /// <param name="configurationName">Nome da chave (ex.: "APP_ENVIRONMENT").</param>
-    /// <returns>Valor da chave ou string vazia se ausente.</returns>
-    /// <exception cref="ArgumentNullException">Quando <paramref name="configuration"/> é nula.</exception>
-    public static string GetValueStringConfiguration(IConfiguration? configuration, string configurationName)
-    {
-        if (configuration == null)
-        {
-            throw new ArgumentNullException(nameof(configuration), AppConfigConstants.ConfigurationConfigurationNotBeNull);
-        }
-        string appsettingsValue = configuration[configurationName] ?? string.Empty;
-        return appsettingsValue;
-    }
+    public static string GetValueStringConfiguration(IConfiguration? configuration, string configurationName) =>
+        SmartCoreHub.Core.SDK.Domain.Helpers.ConfigurationAppSettingsHelper.GetValueStringConfiguration(configuration, configurationName);
 
-    /// <summary>
-    /// Obtém a connection string MySQL padrão (<c>DBConnectionMySQL</c>).
-    /// </summary>
-    /// <param name="configuration">Raiz de configuração; não pode ser nula.</param>
-    /// <returns>Connection string MySQL ou string vazia.</returns>
-    public static string GetConnectionStringMySQL(IConfiguration? configuration)
-    {
-        return GetConnectionStringApp(configuration, "DBConnectionMySQL");
-    }
+    public static string GetConnectionStringMySQL(IConfiguration? configuration) =>
+        SmartCoreHub.Core.SDK.Domain.Helpers.ConfigurationAppSettingsHelper.GetConnectionStringMySQL(configuration);
 
-    /// <summary>
-    /// Obtém a seção de configuração RAG.
-    /// </summary>
-    /// <param name="configuration">Raiz de configuração.</param>
-    /// <returns>Seção <c>Rag</c>.</returns>
-    public static IConfiguration GetRagConfig(IConfiguration configuration)
-    {
-        return GetSectionApp(configuration, "Rag");
-    }
+    public static IConfiguration GetRagConfig(IConfiguration configuration) =>
+        SmartCoreHub.Core.SDK.Domain.Helpers.ConfigurationAppSettingsHelper.GetRagConfig(configuration);
 
-    /// <summary>
-    /// Obtém a seção de configuração de tokens JWT.
-    /// </summary>
-    /// <param name="configuration">Raiz de configuração; não pode ser nula.</param>
-    /// <returns>Seção <c>TokenConfigurations</c>.</returns>
-    public static IConfiguration GetTokenConfigurations(IConfiguration? configuration)
-    {
-        return GetSectionApp(configuration, "TokenConfigurations");
-    }
+    public static IConfiguration GetTokenConfigurations(IConfiguration? configuration) =>
+        SmartCoreHub.Core.SDK.Domain.Helpers.ConfigurationAppSettingsHelper.GetTokenConfigurations(configuration);
 
-    /// <summary>
-    /// Obtém a seção de configuração Azure AD.
-    /// </summary>
-    /// <param name="configuration">Raiz de configuração.</param>
-    /// <returns>Seção <c>AzureAd</c>.</returns>
-    public static IConfiguration GetAzureAdConfig(IConfiguration configuration)
-    {
-        return GetSectionApp(configuration, "AzureAd");
-    }
+    public static IConfiguration GetAzureAdConfig(IConfiguration configuration) =>
+        SmartCoreHub.Core.SDK.Domain.Helpers.ConfigurationAppSettingsHelper.GetAzureAdConfig(configuration);
 }
+
 #endif

@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFrameworks>net10.0;net8.0;netstandard2.1;netstandard2.0</TargetFrameworks>
@@ -23,18 +23,10 @@
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
   </PropertyGroup>
 
-  <!--
-    TODO CASCA (ativar após publicar SmartCoreHub.Core.SDK no feed NuGet):
-    1) Preencher Version / feed em MIGRATION-TO-SMARTCOREHUB.md
-    2) Descomentar o PackageReference abaixo
-    3) Substituir implementações migradas por wrappers [Obsolete] que herdam/delegam a SmartCoreHub.Core.SDK
-    Ver: MIGRATION-TO-SMARTCOREHUB.md | SmartCoreHub Documentation/CoreFinal/sdk-migration.md §10
-  -->
-  <!--
+  <!-- Casca: implementação canônica vive em SmartCoreHub.Core.SDK (NuGet). -->
   <ItemGroup>
-    <PackageReference Include="SmartCoreHub.Core.SDK" Version="__TODO_NUGET_VERSION__" />
+    <PackageReference Include="SmartCoreHub.Core.SDK" />
   </ItemGroup>
-  -->
 
   <!-- Dependências leves (todos os TFMs) -->
   <ItemGroup>
@@ -81,14 +73,16 @@
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" VersionOverride="8.0.16" />
   </ItemGroup>
 
-  <!-- GroqApiLibrary: apenas TFMs compatíveis (net8.0 / net10.0) -->
-  <ItemGroup Condition="'$(TargetFramework)' == 'net10.0' OR '$(TargetFramework)' == 'net8.0'">
-    <ProjectReference Include="..\GroqApiLibrary\GroqApiLibrary.csproj" />
-  </ItemGroup>
+  <!-- GroqApiLibrary: embutido no SmartCoreHub.Core.SDK (Infrastructure.AI.ThirdParty). -->
+  <!-- ProjectReference removido na casca para evitar CS0433 (GroqApiClient duplicado). -->
 
   <ItemGroup>
     <None Include="README.md" Pack="true" PackagePath="\" />
     <None Include="LICENSE" Pack="true" PackagePath="\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Compile Remove="_tools\**" />
+    <None Include="_tools\**" />
+  </ItemGroup>
 </Project>

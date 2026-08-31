@@ -1,27 +1,12 @@
 # HotelWise.Core.SDK → casca sobre SmartCoreHub.Core.SDK
 
-**Status:** preparação (Etapa 1 concluída; casca **ainda não** ativada)  
-**Atualizado:** 2026-08-31 (mensagens `[Obsolete]` alinhadas às camadas Common/Domain/Infrastructure/Service)
+**Status:** ✅ casca **ativada** (Etapa 3 — AI cluster convertido; retenções de contrato/DI documentadas)  
+**Atualizado:** 2026-08-31
 
-Os tipos já migrados neste pacote estão marcados com `[Obsolete]`:
+Os tipos migrados neste pacote estão marcados com `[Obsolete]`:
 - citam a **camada** SCH (`Common` / `Domain` / `Infrastructure` / `Service`);
 - citam o **pacote NuGet** `SmartCoreHub.Core.SDK` e o **FQN** do tipo destino;
-- avisam que, **após publicar o NuGet**, `HotelWise.Core.SDK` vira **só casca** (`PackageReference` + wrappers) e **delega a `SmartCoreHub.Core.SDK`** (não a si mesmo).
-
-`DiagnosticId = "HW_MIGRATED"` entra na **casca** (Etapa 3) — hoje omitido por compatibilidade `netstandard2.0`.
-
-
-
-## Layout SCH (camadas)
-
-No `SmartCoreHub.Core.SDK`, o material migrado vive sob:
-
-- `Common/` — Attributes, DTOs/constants HW, `Security/`
-- `Domain/` — `Abstractions/`, `AI/` (contratos), `Helpers/` (+ `Ported/`), `Extensions/`
-- `Infrastructure/` — `AI/Adapters`, ThirdParty, `Data/ModelBuilderExtensions`, Middleware
-- `Service/` — `AI/` (runtime), DI, `Services/Generic`, `Validation/`, `API/Helpers/Ported`
-
-FQNs nas mensagens `[Obsolete]` já apontam esses namespaces.
+- a maioria **delega/herda** de `SmartCoreHub.Core.SDK` (thin wrapper).
 
 ## Informações do Pacote Publicado
 
@@ -31,32 +16,47 @@ FQNs nas mensagens `[Obsolete]` já apontam esses namespaces.
 | **Versão Publicada** | `20260831.2105.0` |
 | **Feed NuGet Oficial** | [https://www.nuget.org/packages/SmartCoreHub.Core.SDK/](https://www.nuget.org/packages/SmartCoreHub.Core.SDK/) |
 | **Comando de Instalação** | `dotnet add package SmartCoreHub.Core.SDK --version 20260831.2105.0` |
-| **DiagnosticId depreciação** | `HW_MIGRATED` |
+| **DiagnosticId depreciação** | `HW_MIGRATED` (opcional; omitido em parte por compat `netstandard2.0`) |
 | **Docs unificação** | `SmartCoreHub/Documentation/CoreFinal/implementacao-hotelwise-core-sdk.md` |
 
-## Checklist para ativar a casca
+## Checklist da casca
 
-1. Publicar `SmartCoreHub.Core.SDK` no feed e preencher os placeholders acima.
-2. No `HotelWise.Core.SDK.csproj`, **descomentar** o `PackageReference` para `SmartCoreHub.Core.SDK` (bloco `TODO CASCA`).
-3. Remover (ou esvaziar) a implementação dos tipos migrados e substituir por thin-wrappers, por exemplo:
-
-```csharp
-namespace HotelWise.Core.SDK.Abstractions;
-
-[Obsolete(
-    "Depreciado. Migrado para SmartCoreHub.Core.SDK na camada Domain. Use o pacote NuGet SmartCoreHub.Core.SDK — tipo SmartCoreHub.Core.SDK.Domain.Abstractions.IGenericService. Após publicar o NuGet, HotelWise.Core.SDK será só casca (PackageReference + wrappers) e delegará a SmartCoreHub.Core.SDK.",
-    DiagnosticId = "HW_MIGRATED")]
-public interface IGenericService<TDto> : SmartCoreHub.Core.SDK.Domain.Abstractions.IGenericService<TDto>
-    where TDto : class
-{
-}
-```
-
-4. Manter no HW apenas o que **não** foi portado (ex.: `EntityBase`, `TokenService`, middlewares Correlation/RequestLogging) até Etapa 3 / reuse explícito.
-5. Validar: `HotelWise.Core.SDK.Tests` 79/79; hosts compilam com CS0618 (não bloqueante).
+1. [x] Publicar `SmartCoreHub.Core.SDK` no feed (`20260831.2105.0`).
+2. [x] `PackageReference` + CPM `PackageVersion` no HotelWiseAPI.
+3. [x] Thin wrappers (herança / delegação estática / enum espelho) nos tipos migráveis.
+4. [x] Alias `SearchCriteria.MaxHotelRetrieve` ↔ SCH `MaxRetrieve`.
+5. [x] Destinos **Ported** usados onde o `[Obsolete]` indica Ported.
+6. [x] Removido `ProjectReference` → `GroqApiLibrary` (Groq embutido no SCH; evita CS0433).
+7. [x] Cluster AI: configs (herança + sealed composition), DTOs, helpers, validation, adapters.
+8. [x] `HotelWise.Core.SDK.Tests` **79/79** + `HotelWiseAPI.sln` Release.
+9. [ ] Hosts migrados para FQNs SCH (CS0618 esperado até lá).
 
 ## O que já está feito
 
-- Port aditivo no `SmartCoreHub.Core.SDK` (Etapa 1).
-- `[Obsolete]` nos **97** tipos migrados, com mensagem citando o pacote NuGet `SmartCoreHub.Core.SDK` e o FQN de destino (casca + `DiagnosticId = HW_MIGRATED` na Etapa 3).
-- Este arquivo + bloco comentado no `.csproj` prontos para preencher após publish.
+- Port aditivo no `SmartCoreHub.Core.SDK` (Etapa 1) — **110/110**.
+- `[Obsolete]` nos **110** tipos, com NuGet + FQN.
+- **Casca ativada:** `SmartCoreHub.Core.SDK` **20260831.2105.0** via CPM.
+- Wrappers thin para Abstractions (maioria), Common, Helpers, Extensions, Logging, Security, Domain EntityBase*, Infra, Services genéricos, **cluster AI**.
+- Enums: **espelho** (não `TypeForwardedTo`).
+- `ApplicationIAConfig` / `RagConfig` (sealed no SCH): **composição** + `Inner` / bridge para adapters SCH.
+- Adapters: composição sobre SCH + `ApplicationIAConfigSchBridge`.
+
+## Retenções locais (intencionais)
+
+| Retenção | Motivo |
+| :--- | :--- |
+| `AI/Enums/*` | Espelho (regra de casca; não herda) |
+| `AI/Abstractions` de runtime (`IAIInference*`, `IApplicationIAConfig`, `IRagConfig`, `IVectorStore*`, `IAssistantService`) | Assinaturas com DTOs/enums HW; herdar SCH quebraria hosts |
+| `AI/Configure/SemanticKernelProviderConfigure` + `ConfigureServicesAI` | DI shim: registra tipos **HW** (`IApplicationIAConfig` / factories HW) |
+| `AI/Services` factories (`AIInferenceAdapterFactory`, `VectorStoreAdapterFactory`, `AIInferenceService`) | Orquestração thin com tipos HW (não SCH factory) |
+| `IGenericService` / `ServiceResponse` / `IServiceResponse` | Compat hosts (`ServiceResponse` HW); `ErrorResponse` / `GenericEntityServiceBase` já wrapped |
+| `ServiceCollectionConfigureAppSettings` | DI shim HW (`AzureAdConfig` / token HW) |
+
+Follow-up opcional: unseal SCH `ApplicationIAConfig`/`RagConfig` ou migrar hosts para FQNs SCH e apagar casca.
+
+## Layout SCH (camadas)
+
+- `Common/` — Attributes, DTOs/constants HW, `Security/`
+- `Domain/` — `Abstractions/`, `AI/` (contratos), `Helpers/` (+ `Ported/`), `Extensions/`
+- `Infrastructure/` — `AI/Adapters`, ThirdParty, `Data/ModelBuilderExtensions`, Middleware
+- `Service/` — `AI/` (runtime), DI, `Services/Generic`, `Validation/`, `API/Helpers/Ported`
