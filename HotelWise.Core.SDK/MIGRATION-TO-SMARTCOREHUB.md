@@ -23,16 +23,16 @@ No `SmartCoreHub.Core.SDK`, o material migrado vive sob:
 
 FQNs nas mensagens `[Obsolete]` já apontam esses namespaces.
 
-## Placeholders — preencher após publicação
+## Informações do Pacote Publicado
 
-| Campo | Valor atual / TODO |
+| Campo | Valor |
 | :--- | :--- |
 | **PackageId canônico** | `SmartCoreHub.Core.SDK` |
-| **Versão mínima alvo** | `__TODO_NUGET_VERSION__` *(artifact local Etapa 1: `2.0.0`; Etapa 3 planejada: `3.0.0`)* |
-| **Feed NuGet** | `__TODO_NUGET_FEED_URL__` *(nuget.org / Azure Artifacts / feed interno)* |
-| **Artifact local (pré-publish)** | `SmartCoreHub/.../artifacts/SmartCoreHub.Core.SDK.2.0.0.nupkg` |
-| **DiagnosticId depreciação** | `HW_MIGRATED` *(aplicar na casca Etapa 3; hoje só na mensagem/docs)* |
-| **Docs unificação** | `repos/SmartCoreHub/Documentation/CoreFinal/` (`PROGRESSO.md` Etapa 3, `sdk-migration.md` §10) |
+| **Versão Publicada** | `20260831.2105.0` |
+| **Feed NuGet Oficial** | [https://www.nuget.org/packages/SmartCoreHub.Core.SDK/](https://www.nuget.org/packages/SmartCoreHub.Core.SDK/) |
+| **Comando de Instalação** | `dotnet add package SmartCoreHub.Core.SDK --version 20260831.2105.0` |
+| **DiagnosticId depreciação** | `HW_MIGRATED` |
+| **Docs unificação** | `SmartCoreHub/Documentation/CoreFinal/implementacao-hotelwise-core-sdk.md` |
 
 ## Checklist para ativar a casca
 
