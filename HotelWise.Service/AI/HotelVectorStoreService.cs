@@ -116,6 +116,11 @@ public class HotelVectorStoreService : GenericVectorStoreServiceBase, IVectorSto
         ServiceResponse<HotelVector[]> response = new ServiceResponse<HotelVector[]>();
         try
         {
+            if (searchCriteria.MaxRetrieve <= 0)
+            {
+                searchCriteria.MaxRetrieve = 1000;
+            }
+
             //Get semantic search 
             var embeddingSearchText = await _aIInferenceService.GenerateEmbeddingAsync(searchCriteria.SearchTextCriteria, _eIAInferenceAdapterType);
 

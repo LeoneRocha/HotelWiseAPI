@@ -64,8 +64,17 @@ public class HotelSearchService : GenericEntityServiceBase<Hotel, HotelDto>, IHo
                 response.Success = false;
                 return response;
             }
+
             //NEXSTEP: ENVIAR PARA UM CACHE to que pesquisar toda vez no banco de dados 
             var allHotelsFromDb = (await fetchHotelsAsync()).Data;
+
+            // Se o chamador não especificou um limite ou passou <= 0, usa o total de hotéis do banco ou padrão amplo (1000) para não cortar resultados
+            if (searchCriteria.MaxRetrieve <= 0)
+            {
+                searchCriteria.MaxRetrieve = (allHotelsFromDb != null && allHotelsFromDb.Length > 0)
+                    ? allHotelsFromDb.Length
+                    : 1000;
+            }
 
             //Search Vector  
             await searchFromVector(searchCriteria, response, allHotelsFromDb);
