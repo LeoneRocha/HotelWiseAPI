@@ -6,7 +6,8 @@
 **SDK de Referência:** `.NET SDK 10.0.301` ([global.json](file:///c:/git/HotelWise/HotelWiseAPI/global.json))  
 **Governança de Pacotes:** Central Package Management via [Directory.Packages.props](file:///c:/git/HotelWise/HotelWiseAPI/Directory.Packages.props)  
 **Processo-Base Genérico:** [GuiaGenericoAtualizacaoPacotes.md](file:///c:/git/HotelWise/HotelWiseAPI/DOCUMENTACAO/UpdatePackages/GuiaGenericoAtualizacaoPacotes.md)  
-**Data:** 2026-08-22  
+**Ciclo Homologado:** [2026-08-31-ConjuntoHomologado-HotelWiseAPI.md](file:///c:/git/HotelWise/HotelWiseAPI/DOCUMENTACAO/UpdatePackages/2026-08-31-ConjuntoHomologado-HotelWiseAPI.md)  
+**Data:** 2026-08-31  
 
 ---
 
@@ -259,6 +260,7 @@ dotnet pack GroqApiLibrary/GroqApiLibrary.csproj -c Release
 - [README.md](file:///c:/git/HotelWise/HotelWiseAPI/README.md) — Guia geral da API e arquitetura
 - [check_packages.ps1](file:///c:/git/HotelWise/HotelWiseAPI/check_packages.ps1) — Script de verificação de dependências
 - [2026-07-LevantamentoConjuntoHomologado-HotelWiseAPI.md](file:///c:/git/HotelWise/HotelWiseAPI/DOCUMENTACAO/API/2026-07-LevantamentoConjuntoHomologado-HotelWiseAPI.md) — Inventário e Conjunto Homologado v1
+- [2026-08-31-ConjuntoHomologado-HotelWiseAPI.md](file:///c:/git/HotelWise/HotelWiseAPI/DOCUMENTACAO/UpdatePackages/2026-08-31-ConjuntoHomologado-HotelWiseAPI.md) — Ciclo NuGet 2026-08-31 (SK 1.80 + FluentAssertions 8.10)
 - [PlanoImplementacaoMigracaoDotNet10-HotelWiseAPI.md](file:///c:/git/HotelWise/HotelWiseAPI/DOCUMENTACAO/API/PlanoImplementacaoMigracaoDotNet10-HotelWiseAPI.md) — Plano de implementação fase a fase
 - [RelatorioMigracaoDotNet10.md](file:///c:/git/HotelWise/HotelWiseAPI/DOCUMENTACAO/UpdateDotNet10/RelatorioMigracaoDotNet10.md) — Relatório e evidências de migração
 - [GuiaGenericoAtualizacaoPacotes.md](file:///c:/git/HotelWise/HotelWiseAPI/DOCUMENTACAO/UpdatePackages/GuiaGenericoAtualizacaoPacotes.md) — Processo genérico de atualização
