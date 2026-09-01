@@ -2,15 +2,12 @@
 using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
 
-using SmartCoreHub.Core.SDK.Common.Attributes;
-
 namespace HotelWise.Core.SDK.Extensions;
 
 /// <summary>
 /// Helpers de registro de serviços e descoberta de pares interface/implementação
 /// por sufixo de classe em assemblies, para registro Scoped automático no DI.
 /// </summary>
-[SdkWrappedSource(targetType: "SmartCoreHub.Core.SDK.Service.DependenciesCollection.Extensions.ServiceCollectionHelper", targetPackage: "SmartCoreHub.Core.SDK", description: "Casca/wrapper delegando para SmartCoreHub.Core.SDK.Service.DependenciesCollection.Extensions.ServiceCollectionHelper em SmartCoreHub.Core.SDK.")]
 public static class ServiceCollectionHelper
 {
     /// <summary>

@@ -1,11 +1,9 @@
-using SmartCoreHub.Core.SDK.Common.Attributes;
 
 namespace HotelWise.Core.SDK.AI.Constants;
 
 /// <summary>
 /// Limites de validação para chat completion e assistente conversacional.
 /// </summary>
-[SdkWrappedSource(targetType: "SmartCoreHub.Core.SDK.Domain.AI.Constants.ChatCompletionValidatorsConstants", targetPackage: "SmartCoreHub.Core.SDK", description: "Casca/wrapper delegando para SmartCoreHub.Core.SDK.Domain.AI.Constants.ChatCompletionValidatorsConstants em SmartCoreHub.Core.SDK.")]
 public static class ChatCompletionValidatorsConstants
 {
     /// <summary>Número máximo de mensagens no histórico de conversa.</summary>

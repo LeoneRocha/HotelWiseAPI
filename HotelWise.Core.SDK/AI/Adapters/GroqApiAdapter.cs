@@ -3,14 +3,11 @@ using HotelWise.Core.SDK.AI.Abstractions;
 using SchAdapters = SmartCoreHub.Core.SDK.Infrastructure.AI.Adapters;
 using SchDto = SmartCoreHub.Core.SDK.Domain.AI.DTO;
 
-using SmartCoreHub.Core.SDK.Common.Attributes;
-
 namespace HotelWise.Core.SDK.AI.Adapters;
 
 /// <summary>
 /// Adapter de inferência via Groq API — casca sobre SCH.
 /// </summary>
-[SdkWrappedSource(targetType: "SmartCoreHub.Core.SDK.Infrastructure.AI.Adapters.GroqApiAdapter", targetPackage: "SmartCoreHub.Core.SDK", description: "Casca/wrapper delegando para SmartCoreHub.Core.SDK.Infrastructure.AI.Adapters.GroqApiAdapter em SmartCoreHub.Core.SDK.")]
 public class GroqApiAdapter : IAIInferenceAdapter
 {
     private readonly SchAdapters.GroqApiAdapter _inner;

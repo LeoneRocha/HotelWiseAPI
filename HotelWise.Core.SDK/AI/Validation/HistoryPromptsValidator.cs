@@ -2,14 +2,11 @@
 using FluentValidation;
 using HotelWise.Core.SDK.AI.DTO;
 
-using SmartCoreHub.Core.SDK.Common.Attributes;
-
 namespace HotelWise.Core.SDK.AI.Validation;
 
 /// <summary>
 /// Valida históricos de prompts (arrays de <see cref="PromptMessageVO"/>).
 /// </summary>
-[SdkWrappedSource(targetType: "SmartCoreHub.Core.SDK.Service.AI.Validation.HistoryPromptsValidator", targetPackage: "SmartCoreHub.Core.SDK", description: "Casca/wrapper delegando para SmartCoreHub.Core.SDK.Service.AI.Validation.HistoryPromptsValidator em SmartCoreHub.Core.SDK.")]
 public class HistoryPromptsValidator : AbstractValidator<PromptMessageVO[]>
 {
     private static readonly SmartCoreHub.Core.SDK.Service.AI.Validation.HistoryPromptsValidator SchValidator = new();

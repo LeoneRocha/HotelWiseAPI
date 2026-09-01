@@ -5,14 +5,11 @@ using SchConfig = SmartCoreHub.Core.SDK.Domain.AI.Configuration;
 using SchDi = SmartCoreHub.Core.SDK.Service.DependenciesCollection.Extensions;
 using SchSecurity = SmartCoreHub.Core.SDK.Common.Security;
 
-using SmartCoreHub.Core.SDK.Common.Attributes;
-
 namespace HotelWise.Core.SDK.Extensions;
 
 /// <summary>
 /// DI bind de AppSettings — delega ao SCH.
 /// </summary>
-[SdkWrappedSource(targetType: "SmartCoreHub.Core.SDK.Service.DependenciesCollection.Extensions.ServiceCollectionConfigureAppSettings", targetPackage: "SmartCoreHub.Core.SDK", description: "Casca/wrapper delegando para SmartCoreHub.Core.SDK.Service.DependenciesCollection.Extensions.ServiceCollectionConfigureAppSettings em SmartCoreHub.Core.SDK.")]
 public static class ServiceCollectionConfigureAppSettings
 {
     /// <summary>

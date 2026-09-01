@@ -7,15 +7,12 @@ using SchAbstractions = SmartCoreHub.Core.SDK.Domain.AI.Abstractions;
 using SchAdapters = SmartCoreHub.Core.SDK.Infrastructure.AI.Adapters;
 using SchDto = SmartCoreHub.Core.SDK.Domain.AI.DTO;
 
-using SmartCoreHub.Core.SDK.Common.Attributes;
-
 namespace HotelWise.Core.SDK.AI.Adapters;
 
 /// <summary>
 /// Adapter genérico de vector store — casca sobre SCH.
 /// </summary>
 /// <typeparam name="TVector">Tipo do registro vetorial, implementando <see cref="IDataVector"/>.</typeparam>
-[SdkWrappedSource(targetType: "SmartCoreHub.Core.SDK.Infrastructure.AI.Adapters.GenericVectorStoreAdapter", targetPackage: "SmartCoreHub.Core.SDK", description: "Casca/wrapper delegando para SmartCoreHub.Core.SDK.Infrastructure.AI.Adapters.GenericVectorStoreAdapter em SmartCoreHub.Core.SDK.")]
 public class GenericVectorStoreAdapter<TVector> : IVectorStoreAdapter<TVector>
     where TVector : class, IDataVector
 {

@@ -1,4 +1,3 @@
-using SmartCoreHub.Core.SDK.Common.Attributes;
 
 namespace HotelWise.Core.SDK.AI.Configuration;
 
@@ -8,7 +7,6 @@ namespace HotelWise.Core.SDK.AI.Configuration;
 /// <see cref="SmartCoreHub.Core.SDK.Domain.AI.Configuration.ApplicationIAConfig"/>.
 /// Use os FQNs SCH diretamente (ou global usings do projeto).
 /// </summary>
-[SdkWrappedSource(targetType: "SmartCoreHub.Core.SDK.Domain.AI.Configuration", targetPackage: "SmartCoreHub.Core.SDK", description: "Tipos sealed migrados para SmartCoreHub.Core.SDK.Domain.AI.Configuration.")]
 public static class SealedConfigurationTypesMigrated
 {
     /// <summary>FQN SCH de <c>RagConfig</c>.</summary>

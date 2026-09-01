@@ -4,15 +4,12 @@ using HotelWise.Core.SDK.Common;
 using Microsoft.Extensions.Configuration;
 using Serilog;
 
-using SmartCoreHub.Core.SDK.Common.Attributes;
-
 namespace HotelWise.Core.SDK.Logging;
 
 /// <summary>
 /// Helpers de logging Serilog — casca sobre
 /// <see cref="SmartCoreHub.Core.SDK.Service.API.Helpers.Ported.LogAppHelper"/>.
 /// </summary>
-[SdkWrappedSource(targetType: "SmartCoreHub.Core.SDK.Service.API.Helpers.Ported.LogAppHelper", targetPackage: "SmartCoreHub.Core.SDK", description: "Casca/wrapper delegando para SmartCoreHub.Core.SDK.Service.API.Helpers.Ported.LogAppHelper em SmartCoreHub.Core.SDK.")]
 public static class LogAppHelper
 {
     /// <summary>Calcula e formata o tempo decorrido do Stopwatch.</summary>

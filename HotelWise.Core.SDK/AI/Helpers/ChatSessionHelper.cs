@@ -2,14 +2,11 @@
 using HotelWise.Core.SDK.AI.DTO;
 using SchHelpers = SmartCoreHub.Core.SDK.Service.AI.Helpers;
 
-using SmartCoreHub.Core.SDK.Common.Attributes;
-
 namespace HotelWise.Core.SDK.AI.Helpers;
 
 /// <summary>
 /// Utilitários para montagem de contexto de sessão de chat a partir do histórico de prompts.
 /// </summary>
-[SdkWrappedSource(targetType: "SmartCoreHub.Core.SDK.Service.AI.Helpers.ChatSessionHelper", targetPackage: "SmartCoreHub.Core.SDK", description: "Casca/wrapper delegando para SmartCoreHub.Core.SDK.Service.AI.Helpers.ChatSessionHelper em SmartCoreHub.Core.SDK.")]
 public static class ChatSessionHelper
 {
     /// <summary>

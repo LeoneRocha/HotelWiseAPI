@@ -1,4 +1,3 @@
-using SmartCoreHub.Core.SDK.Common.Attributes;
 
 namespace HotelWise.Core.SDK.Infrastructure;
 
@@ -14,7 +13,6 @@ namespace HotelWise.Core.SDK.Infrastructure;
 ///     .HasCharSet(HelperCharSet.DefaultCharSet);
 /// </code>
 /// </remarks>
-[SdkWrappedSource(targetType: "SmartCoreHub.Core.SDK.Infrastructure.Data.Configurations.Helper.Ported.HelperCharSet", targetPackage: "SmartCoreHub.Core.SDK", description: "Casca/wrapper delegando para SmartCoreHub.Core.SDK.Infrastructure.Data.Configurations.Helper.Ported.HelperCharSet em SmartCoreHub.Core.SDK.")]
 public static class HelperCharSet
 {
     /// <summary>Conjunto de caracteres padrão (latin1) para entidades do SDK.</summary>

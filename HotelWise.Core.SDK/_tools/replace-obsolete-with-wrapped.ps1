@@ -1,4 +1,6 @@
-# Replace [Obsolete] on wrappers with [SdkWrappedSource] across HotelWise.Core.SDK
+# Replace [Obsolete] on wrappers with [SdkWrappedSource] across HotelWise.Core.SDK.
+# PRE-REQUISITE: SmartCoreHub.Core.SDK NuGet must include SdkWrappedSourceAttribute
+# (SmartCoreHub.Core.SDK.Common.Attributes). Do NOT run until a new package version is published.
 param(
   [string]$Path = "C:\git\HotelWise\HotelWiseAPI\HotelWise.Core.SDK"
 )

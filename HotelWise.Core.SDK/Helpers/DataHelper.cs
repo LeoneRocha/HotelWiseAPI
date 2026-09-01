@@ -1,7 +1,5 @@
 using System.Globalization;
 
-using SmartCoreHub.Core.SDK.Common.Attributes;
-
 namespace HotelWise.Core.SDK.Helpers;
 
 /// <summary>
@@ -16,7 +14,6 @@ namespace HotelWise.Core.SDK.Helpers;
 /// var formatado = DataHelper.GetDateTimeCustomFormat(agoraBr);
 /// </code>
 /// </example>
-[SdkWrappedSource(targetType: "SmartCoreHub.Core.SDK.Domain.Helpers.DataHelper", targetPackage: "SmartCoreHub.Core.SDK", description: "Casca/wrapper delegando para SmartCoreHub.Core.SDK.Domain.Helpers.DataHelper em SmartCoreHub.Core.SDK.")]
 public static class DataHelper
 {
     /// <summary>Converte valor numérico em segundos para texto formatado HH:mm:ss.</summary>

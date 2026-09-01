@@ -6,8 +6,6 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 
-using SmartCoreHub.Core.SDK.Common.Attributes;
-
 namespace HotelWise.Core.SDK.Security;
 
 /// <summary>
@@ -22,7 +20,6 @@ namespace HotelWise.Core.SDK.Security;
 /// string jwt = SecurityHelper.CreateToken(securityDto);
 /// </code>
 /// </example>
-[SdkWrappedSource(targetType: "SmartCoreHub.Core.SDK.Service.Security.Ported.SecurityHelper", targetPackage: "SmartCoreHub.Core.SDK", description: "Casca/wrapper delegando para SmartCoreHub.Core.SDK.Service.Security.Ported.SecurityHelper em SmartCoreHub.Core.SDK.")]
 public static class SecurityHelper
 {
     /// <summary>Cria hash e salt seguros para a senha informada usando HMAC-SHA512.</summary>

@@ -3,14 +3,11 @@ using FluentValidation.Results;
 using SchCommon = SmartCoreHub.Core.SDK.Common;
 using SchValidation = SmartCoreHub.Core.SDK.Service.Validation;
 
-using SmartCoreHub.Core.SDK.Common.Attributes;
-
 namespace HotelWise.Core.SDK.Validation;
 
 /// <summary>
 /// Mapeamento FluentValidation → <see cref="SchCommon.ErrorResponse"/> — delega ao SCH.
 /// </summary>
-[SdkWrappedSource(targetType: "SmartCoreHub.Core.SDK.Service.Validation.HelperValidation", targetPackage: "SmartCoreHub.Core.SDK", description: "Casca/wrapper delegando para SmartCoreHub.Core.SDK.Service.Validation.HelperValidation em SmartCoreHub.Core.SDK.")]
 public static class HelperValidation
 {
     /// <inheritdoc cref="SchValidation.HelperValidation.GetErrorsMap(ValidationResult?)"/>

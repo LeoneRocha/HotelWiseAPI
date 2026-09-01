@@ -7,8 +7,6 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Hosting;
 
-using SmartCoreHub.Core.SDK.Common.Attributes;
-
 namespace HotelWise.Core.SDK.Infrastructure.Middleware;
 
 /// <summary>
@@ -22,7 +20,6 @@ namespace HotelWise.Core.SDK.Infrastructure.Middleware;
 /// app.UseMiddleware&lt;GlobalExceptionMiddleware&gt;();
 /// </code>
 /// </remarks>
-[SdkWrappedSource(targetType: "SmartCoreHub.Core.SDK.Infrastructure.Middleware.GlobalExceptionMiddleware", targetPackage: "SmartCoreHub.Core.SDK", description: "Casca/wrapper delegando para SmartCoreHub.Core.SDK.Infrastructure.Middleware.GlobalExceptionMiddleware em SmartCoreHub.Core.SDK.")]
 public class GlobalExceptionMiddleware : SmartCoreHub.Core.SDK.Infrastructure.Middleware.GlobalExceptionMiddleware
 {
     /// <summary>

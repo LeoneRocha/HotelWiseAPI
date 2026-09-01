@@ -3,14 +3,11 @@ using HotelWise.Core.SDK.AI.Abstractions;
 using HotelWise.Core.SDK.AI.Enums;
 using SchFactory = SmartCoreHub.Core.SDK.Service.AI.Services.AIInferenceAdapterFactory;
 
-using SmartCoreHub.Core.SDK.Common.Attributes;
-
 namespace HotelWise.Core.SDK.AI.Services;
 
 /// <summary>
 /// Fábrica de adapters de inferência LLM — herda SCH.
 /// </summary>
-[SdkWrappedSource(targetType: "SmartCoreHub.Core.SDK.Service.AI.Services.AIInferenceAdapterFactory", targetPackage: "SmartCoreHub.Core.SDK", description: "Casca/wrapper delegando para SmartCoreHub.Core.SDK.Service.AI.Services.AIInferenceAdapterFactory em SmartCoreHub.Core.SDK.")]
 public class AIInferenceAdapterFactory : SchFactory, IAIInferenceAdapterFactory
 {
     /// <summary>

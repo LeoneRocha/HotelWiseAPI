@@ -1,4 +1,3 @@
-using SmartCoreHub.Core.SDK.Common.Attributes;
 
 namespace HotelWise.Core.SDK.Security;
 
@@ -6,7 +5,6 @@ namespace HotelWise.Core.SDK.Security;
 /// Value object imutável (após construção) que representa o resultado de autenticação:
 /// flag de autenticado, timestamps e pares access/refresh token.
 /// </summary>
-[SdkWrappedSource(targetType: "SmartCoreHub.Core.SDK.Common.Security.TokenVO", targetPackage: "SmartCoreHub.Core.SDK", description: "Casca/wrapper delegando para SmartCoreHub.Core.SDK.Common.Security.TokenVO em SmartCoreHub.Core.SDK.")]
 public class TokenVO : SmartCoreHub.Core.SDK.Common.Security.TokenVO
 {
     /// <summary>Inicializa uma nova instância vazia de <see cref="TokenVO"/>.</summary>

@@ -2,14 +2,11 @@
 using AutoMapper;
 using Microsoft.Extensions.DependencyInjection;
 
-using SmartCoreHub.Core.SDK.Common.Attributes;
-
 namespace HotelWise.Core.SDK.Extensions;
 
 /// <summary>
 /// Extensões de <see cref="IServiceCollection"/> para configuração de AutoMapper Profiles.
 /// </summary>
-[SdkWrappedSource(targetType: "SmartCoreHub.Core.SDK.Service.DependenciesCollection.Extensions.ServiceCollectionConfigureAutoMapper", targetPackage: "SmartCoreHub.Core.SDK", description: "Casca/wrapper delegando para SmartCoreHub.Core.SDK.Service.DependenciesCollection.Extensions.ServiceCollectionConfigureAutoMapper em SmartCoreHub.Core.SDK.")]
 public static class ServiceCollectionConfigureAutoMapper
 {
     /// <summary>

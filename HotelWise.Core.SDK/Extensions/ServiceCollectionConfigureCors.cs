@@ -1,8 +1,6 @@
 #if NET8_0_OR_GREATER
 using Microsoft.Extensions.DependencyInjection;
 
-using SmartCoreHub.Core.SDK.Common.Attributes;
-
 namespace HotelWise.Core.SDK.Extensions;
 
 /// <summary>
@@ -10,7 +8,6 @@ namespace HotelWise.Core.SDK.Extensions;
 /// (política padrão e política nomeada AllowAnyOrigin), adequada a APIs de desenvolvimento
 /// e hosts que expõem Content-Disposition.
 /// </summary>
-[SdkWrappedSource(targetType: "SmartCoreHub.Core.SDK.Service.DependenciesCollection.Extensions.ServiceCollectionConfigureCors", targetPackage: "SmartCoreHub.Core.SDK", description: "Casca/wrapper delegando para SmartCoreHub.Core.SDK.Service.DependenciesCollection.Extensions.ServiceCollectionConfigureCors em SmartCoreHub.Core.SDK.")]
 public static class ServiceCollectionConfigureCors
 {
     /// <summary>

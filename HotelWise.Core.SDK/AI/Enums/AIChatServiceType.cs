@@ -1,15 +1,12 @@
 using System.Text.Json.Serialization;
 using SchEnums = SmartCoreHub.Core.SDK.Domain.AI.Enums;
 
-using SmartCoreHub.Core.SDK.Common.Attributes;
-
 namespace HotelWise.Core.SDK.AI.Enums;
 
 /// <summary>
 /// Tipos de serviço de chat/completion suportados no pipeline de IA.
 /// </summary>
 [JsonConverter(typeof(JsonStringEnumConverter))]
-[SdkWrappedSource(targetType: "SmartCoreHub.Core.SDK.Domain.AI.Enums.AIChatServiceType", targetPackage: "SmartCoreHub.Core.SDK", description: "Casca/wrapper delegando para SmartCoreHub.Core.SDK.Domain.AI.Enums.AIChatServiceType em SmartCoreHub.Core.SDK.")]
 public enum AIChatServiceType
 {
     Default = (int)SchEnums.AIChatServiceType.Default,

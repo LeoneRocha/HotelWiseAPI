@@ -32,6 +32,16 @@ Os tipos migrados neste pacote estão marcados com `[Obsolete]`:
 9. [x] `CoreSdkInfo` delega metadados ao SCH; `IServiceResponse<T>` herda SCH.
 10. [x] `HotelWise.Core.SDK.Tests` **79/79** + `HotelWiseAPI.sln` Release.
 11. [x] Hosts migrados para FQNs SCH (`Domain`, `Data`, `Service`, `API`, `*.Tests`); `PackageReference` SCH; testes **264/264**.
+12. [ ] **`[SdkWrappedSource]`** — atributo vive em `SmartCoreHub.Core.SDK.Common.Attributes` (NuGet); **não** redefinir na casca HW. Anotações removidas da casca até publicar nova versão do pacote SCH que inclua o atributo; depois aplicar `_tools/replace-obsolete-with-wrapped.ps1`.
+
+## `[SdkWrappedSource]` — pendente nova versão NuGet
+
+| Item | Status |
+| :--- | :--- |
+| Definição canônica | `SmartCoreHub.Core.SDK/Common/Attributes/SdkWrappedSourceAttribute.cs` (repo SCH) |
+| Versão publicada `20260831.2105.0` | **Sem** o atributo no pacote |
+| Casca `HotelWise.Core.SDK` | **Sem** cópia local; **sem** anotações `[SdkWrappedSource]` por enquanto |
+| Próximo passo | Publicar SCH → bump CPM → rodar `replace-obsolete-with-wrapped.ps1` |
 
 ## Convertido nesta passagem (2026-08-31)
 

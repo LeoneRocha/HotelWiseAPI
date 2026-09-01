@@ -3,14 +3,11 @@ using AutoMapper;
 using FluentValidation;
 using HotelWise.Core.SDK.Abstractions;
 
-using SmartCoreHub.Core.SDK.Common.Attributes;
-
 namespace HotelWise.Core.SDK.Services;
 
 /// <summary>
 /// Serviço genérico de entidade — herda SCH (<see cref="SmartCoreHub.Core.SDK.Domain.Abstractions.IGenericService{TDto}"/>).
 /// </summary>
-[SdkWrappedSource(targetType: "SmartCoreHub.Core.SDK.Service.Services.Generic.GenericEntityServiceBase", targetPackage: "SmartCoreHub.Core.SDK", description: "Casca/wrapper delegando para SmartCoreHub.Core.SDK.Service.Services.Generic.GenericEntityServiceBase em SmartCoreHub.Core.SDK.")]
 public abstract class GenericEntityServiceBase<T, TDto>
     : SmartCoreHub.Core.SDK.Service.Services.Generic.GenericEntityServiceBase<T, TDto>
     where T : class, new()

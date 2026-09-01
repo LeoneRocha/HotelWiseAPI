@@ -2,14 +2,11 @@
 using FluentValidation;
 using HotelWise.Core.SDK.AI.DTO;
 
-using SmartCoreHub.Core.SDK.Common.Attributes;
-
 namespace HotelWise.Core.SDK.AI.Validation;
 
 /// <summary>
 /// Valida solicitações ao assistente conversacional (<see cref="AskAssistantRequest"/>).
 /// </summary>
-[SdkWrappedSource(targetType: "SmartCoreHub.Core.SDK.Service.AI.Validation.AskAssistantRequestValidator", targetPackage: "SmartCoreHub.Core.SDK", description: "Casca/wrapper delegando para SmartCoreHub.Core.SDK.Service.AI.Validation.AskAssistantRequestValidator em SmartCoreHub.Core.SDK.")]
 public class AskAssistantRequestValidator : AbstractValidator<AskAssistantRequest>
 {
     private static readonly SmartCoreHub.Core.SDK.Service.AI.Validation.AskAssistantRequestValidator SchValidator = new();

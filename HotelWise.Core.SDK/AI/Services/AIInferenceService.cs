@@ -5,14 +5,11 @@ using HotelWise.Core.SDK.AI.Enums;
 using Microsoft.Extensions.Configuration;
 using SchService = SmartCoreHub.Core.SDK.Service.AI.Services.AIInferenceService;
 
-using SmartCoreHub.Core.SDK.Common.Attributes;
-
 namespace HotelWise.Core.SDK.AI.Services;
 
 /// <summary>
 /// Orquestra inferência LLM — herda implementação SCH.
 /// </summary>
-[SdkWrappedSource(targetType: "SmartCoreHub.Core.SDK.Service.AI.Services.AIInferenceService", targetPackage: "SmartCoreHub.Core.SDK", description: "Casca/wrapper delegando para SmartCoreHub.Core.SDK.Service.AI.Services.AIInferenceService em SmartCoreHub.Core.SDK.")]
 public class AIInferenceService : SchService, IAIInferenceService
 {
     /// <summary>

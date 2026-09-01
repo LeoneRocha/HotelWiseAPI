@@ -2,8 +2,6 @@
 using Microsoft.AspNetCore.Http;
 using Serilog.Context;
 
-using SmartCoreHub.Core.SDK.Common.Attributes;
-
 namespace HotelWise.Core.SDK.Infrastructure.Middleware;
 
 /// <summary>
@@ -17,7 +15,6 @@ namespace HotelWise.Core.SDK.Infrastructure.Middleware;
 /// app.UseMiddleware&lt;CorrelationIdMiddleware&gt;();
 /// </code>
 /// </remarks>
-[SdkWrappedSource(targetType: "SmartCoreHub.Core.SDK.Infrastructure.Middleware.Ported.CorrelationIdMiddleware", targetPackage: "SmartCoreHub.Core.SDK", description: "Casca/wrapper delegando para SmartCoreHub.Core.SDK.Infrastructure.Middleware.Ported.CorrelationIdMiddleware em SmartCoreHub.Core.SDK.")]
 public class CorrelationIdMiddleware : SmartCoreHub.Core.SDK.Infrastructure.Middleware.Ported.CorrelationIdMiddleware
 {
     /// <summary>

@@ -3,14 +3,11 @@ using HotelWise.Core.SDK.AI.Abstractions;
 using SchAdapters = SmartCoreHub.Core.SDK.Infrastructure.AI.Adapters;
 using SchDto = SmartCoreHub.Core.SDK.Domain.AI.DTO;
 
-using SmartCoreHub.Core.SDK.Common.Attributes;
-
 namespace HotelWise.Core.SDK.AI.Adapters;
 
 /// <summary>
 /// Adapter de inferência via Ollama — casca sobre SCH.
 /// </summary>
-[SdkWrappedSource(targetType: "SmartCoreHub.Core.SDK.Infrastructure.AI.Adapters.OllamaAdapter", targetPackage: "SmartCoreHub.Core.SDK", description: "Casca/wrapper delegando para SmartCoreHub.Core.SDK.Infrastructure.AI.Adapters.OllamaAdapter em SmartCoreHub.Core.SDK.")]
 public class OllamaAdapter : IAIInferenceAdapter
 {
     private readonly SchAdapters.OllamaAdapter _inner;
