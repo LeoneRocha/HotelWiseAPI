@@ -1,5 +1,6 @@
 using AutoMapper;
 using HotelWise.Domain.Dto.IA.SemanticKernel;
+using Microsoft.Extensions.Configuration;
 
 namespace HotelWise.Service.AI;
 
@@ -12,6 +13,8 @@ public class HotelVectorStoreService : GenericVectorStoreServiceBase, IVectorSto
     private readonly IAIInferenceService _aIInferenceService;
     private readonly string nameCollection;
     private readonly InferenceAiAdapterType _eIAInferenceAdapterType;
+    private readonly IApplicationIAConfig _applicationIAConfig;
+    private readonly IConfiguration? _configuration;
 
     /// <summary>
     /// Inicializa uma nova instância de <see cref="HotelVectorStoreService"/> com os adaptadores de inferência e de armazenamento vetorial.
@@ -21,13 +24,17 @@ public class HotelVectorStoreService : GenericVectorStoreServiceBase, IVectorSto
     /// <param name="applicationIAConfig">Configuração de IA e Vector Store.</param>
     /// <param name="adapterFactory">Fábrica de adaptadores de Vector Store.</param>
     /// <param name="aIInferenceService">Serviço de inferência de IA.</param>
+    /// <param name="configuration">Configuração global da aplicação (IConfiguration).</param>
     public HotelVectorStoreService(
         Serilog.ILogger logger,
         IMapper mapper,
         IApplicationIAConfig applicationIAConfig,
         IVectorStoreAdapterFactory adapterFactory,
-        IAIInferenceService aIInferenceService) : base(mapper, logger)
+        IAIInferenceService aIInferenceService,
+        IConfiguration? configuration = null) : base(mapper, logger)
     {
+        _applicationIAConfig = applicationIAConfig;
+        _configuration = configuration;
         _eIAInferenceAdapterType = applicationIAConfig.RagConfig.GetAInferenceAdapterType();
         _adapter = adapterFactory.CreateAdapter<HotelVector>();
         _aIInferenceService = aIInferenceService;
@@ -118,7 +125,8 @@ public class HotelVectorStoreService : GenericVectorStoreServiceBase, IVectorSto
         {
             if (searchCriteria.MaxRetrieve <= 0)
             {
-                searchCriteria.MaxRetrieve = 1000;
+                var configuredMax = _configuration?.GetValue<int?>("ApplicationIAConfig:Rag:SearchSettings:MaxRetrieve") ?? 0;
+                searchCriteria.MaxRetrieve = configuredMax > 0 ? configuredMax : 50;
             }
 
             //Get semantic search 

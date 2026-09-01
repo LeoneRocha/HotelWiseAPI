@@ -8,6 +8,7 @@ using HotelWise.Domain.Interfaces.Entity.HotelInterfaces.Service;
 using HotelWise.Domain.Model.HotelModels;
 using HotelWise.Service.Bussines;
 using HotelWise.Service.Prompts;
+using Microsoft.Extensions.Configuration;
 
 namespace HotelWise.Service.Entity;
 
@@ -20,6 +21,8 @@ public class HotelSearchService : GenericEntityServiceBase<Hotel, HotelDto>, IHo
     private readonly IHotelRepository _hotelRepository;
     private readonly IAIInferenceService _aIInferenceService;
     private readonly InferenceAiAdapterType _eIAInferenceAdapterType;
+    private readonly IApplicationIAConfig _applicationConfig;
+    private readonly IConfiguration? _configuration;
 
     /// <summary>
     /// Inicializa uma nova instância de <see cref="HotelSearchService"/> com as dependências de Vector Store, repositório e inferência de IA.
@@ -31,6 +34,7 @@ public class HotelSearchService : GenericEntityServiceBase<Hotel, HotelDto>, IHo
     /// <param name="hotelVectorStoreService">Serviço de busca vetorial.</param>
     /// <param name="entityValidator">Validador de hotel.</param>
     /// <param name="aIInferenceService">Serviço de inferência de IA.</param>
+    /// <param name="configuration">Configuração global da aplicação (IConfiguration).</param>
     public HotelSearchService(
         Serilog.ILogger logger,
         IMapper mapper,
@@ -38,11 +42,14 @@ public class HotelSearchService : GenericEntityServiceBase<Hotel, HotelDto>, IHo
         IHotelRepository hotelRepository,
         IVectorStoreService<HotelVector> hotelVectorStoreService,
         IValidator<Hotel> entityValidator,
-        IAIInferenceService aIInferenceService)
+        IAIInferenceService aIInferenceService,
+        IConfiguration? configuration = null)
         : base(hotelRepository, mapper, logger, entityValidator)
     {
         _hotelVectorStoreService = hotelVectorStoreService;
         _hotelRepository = hotelRepository;
+        _applicationConfig = applicationConfig;
+        _configuration = configuration;
         _eIAInferenceAdapterType = applicationConfig.RagConfig.GetAInferenceAdapterType();
         _aIInferenceService = aIInferenceService;
     }
@@ -68,12 +75,13 @@ public class HotelSearchService : GenericEntityServiceBase<Hotel, HotelDto>, IHo
             //NEXSTEP: ENVIAR PARA UM CACHE to que pesquisar toda vez no banco de dados 
             var allHotelsFromDb = (await fetchHotelsAsync()).Data;
 
-            // Se o chamador não especificou um limite ou passou <= 0, usa o total de hotéis do banco ou padrão amplo (1000) para não cortar resultados
+            // Se o chamador não especificou um limite ou passou <= 0, usa a configuração do JSON (SearchSettings:MaxRetrieve) ou o total de hotéis do banco
             if (searchCriteria.MaxRetrieve <= 0)
             {
-                searchCriteria.MaxRetrieve = (allHotelsFromDb != null && allHotelsFromDb.Length > 0)
-                    ? allHotelsFromDb.Length
-                    : 1000;
+                var configuredMax = _configuration?.GetValue<int?>("ApplicationIAConfig:Rag:SearchSettings:MaxRetrieve") ?? 0;
+                searchCriteria.MaxRetrieve = configuredMax > 0
+                    ? configuredMax
+                    : (allHotelsFromDb != null && allHotelsFromDb.Length > 0 ? allHotelsFromDb.Length : 50);
             }
 
             //Search Vector  
