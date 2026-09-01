@@ -1,5 +1,7 @@
 using System.Security.Claims;
 
+using SmartCoreHub.Core.SDK.Common.Attributes;
+
 namespace HotelWise.Core.SDK.Security;
 
 /// <summary>
@@ -11,7 +13,7 @@ namespace HotelWise.Core.SDK.Security;
 /// long userId = SecurityHelperApi.GetUserIdApi(HttpContext.User);
 /// </code>
 /// </example>
-[Obsolete("Depreciado. Migrado para SmartCoreHub.Core.SDK na camada Service. Use o pacote NuGet SmartCoreHub.Core.SDK — tipo SmartCoreHub.Core.SDK.Service.Security.Ported.SecurityHelperApi. Após publicar o NuGet, HotelWise.Core.SDK será só casca (PackageReference + wrappers) e delegará a SmartCoreHub.Core.SDK.")]
+[SdkWrappedSource(targetType: "SmartCoreHub.Core.SDK.Service.Security.Ported.SecurityHelperApi", targetPackage: "SmartCoreHub.Core.SDK", description: "Casca/wrapper delegando para SmartCoreHub.Core.SDK.Service.Security.Ported.SecurityHelperApi em SmartCoreHub.Core.SDK.")]
 public static class SecurityHelperApi
 {
     /// <summary>Extrai o ID numérico do usuário a partir dos claims do token JWT.</summary>

@@ -1,3 +1,5 @@
+using SmartCoreHub.Core.SDK.Common.Attributes;
+
 namespace HotelWise.Core.SDK.Abstractions;
 
 /// <summary>
@@ -5,7 +7,7 @@ namespace HotelWise.Core.SDK.Abstractions;
 /// Define audiência, emissor, segredo de assinatura e prazos de validade
 /// consumidos pelos serviços de autenticação do SDK.
 /// </summary>
-[Obsolete("Depreciado. Migrado para SmartCoreHub.Core.SDK na camada Domain. Use o pacote NuGet SmartCoreHub.Core.SDK — tipo SmartCoreHub.Core.SDK.Domain.Abstractions.ITokenConfigurationDto. Após publicar o NuGet, HotelWise.Core.SDK será só casca (PackageReference + wrappers) e delegará a SmartCoreHub.Core.SDK.")]
+[SdkWrappedSource(targetType: "SmartCoreHub.Core.SDK.Domain.Abstractions.ITokenConfigurationDto", targetPackage: "SmartCoreHub.Core.SDK", description: "Casca/wrapper delegando para SmartCoreHub.Core.SDK.Domain.Abstractions.ITokenConfigurationDto em SmartCoreHub.Core.SDK.")]
 public interface ITokenConfigurationDto : SmartCoreHub.Core.SDK.Domain.Abstractions.ITokenConfigurationDto
 {
 }

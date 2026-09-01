@@ -3,12 +3,14 @@ using HotelWise.Core.SDK.AI.Abstractions;
 using SchAdapters = SmartCoreHub.Core.SDK.Infrastructure.AI.Adapters;
 using SchDto = SmartCoreHub.Core.SDK.Domain.AI.DTO;
 
+using SmartCoreHub.Core.SDK.Common.Attributes;
+
 namespace HotelWise.Core.SDK.AI.Adapters;
 
 /// <summary>
 /// Adapter de inferência via Semantic Kernel — casca sobre SCH.
 /// </summary>
-[Obsolete("Depreciado. Migrado para SmartCoreHub.Core.SDK na camada Infrastructure. Use o pacote NuGet SmartCoreHub.Core.SDK — tipo SmartCoreHub.Core.SDK.Infrastructure.AI.Adapters.SemanticKernelAdapter. Após publicar o NuGet, HotelWise.Core.SDK será só casca (PackageReference + wrappers) e delegará a SmartCoreHub.Core.SDK.")]
+[SdkWrappedSource(targetType: "SmartCoreHub.Core.SDK.Infrastructure.AI.Adapters.SemanticKernelAdapter", targetPackage: "SmartCoreHub.Core.SDK", description: "Casca/wrapper delegando para SmartCoreHub.Core.SDK.Infrastructure.AI.Adapters.SemanticKernelAdapter em SmartCoreHub.Core.SDK.")]
 public class SemanticKernelAdapter : IAIInferenceAdapter
 {
     private readonly SchAdapters.SemanticKernelAdapter _inner;

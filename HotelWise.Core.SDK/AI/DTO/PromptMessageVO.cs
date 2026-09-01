@@ -1,11 +1,13 @@
 using SchDto = SmartCoreHub.Core.SDK.Domain.AI.DTO;
 
+using SmartCoreHub.Core.SDK.Common.Attributes;
+
 namespace HotelWise.Core.SDK.AI.DTO;
 
 /// <summary>
 /// Fragmento de contexto vetorial embutido em prompts RAG.
 /// </summary>
-[Obsolete("Depreciado. Migrado para SmartCoreHub.Core.SDK na camada Domain. Use o pacote NuGet SmartCoreHub.Core.SDK — tipo SmartCoreHub.Core.SDK.Domain.AI.DTO.DataVectorVO. Após publicar o NuGet, HotelWise.Core.SDK será só casca (PackageReference + wrappers) e delegará a SmartCoreHub.Core.SDK.")]
+[SdkWrappedSource(targetType: "SmartCoreHub.Core.SDK.Domain.AI.DTO.DataVectorVO", targetPackage: "SmartCoreHub.Core.SDK", description: "Casca/wrapper delegando para SmartCoreHub.Core.SDK.Domain.AI.DTO.DataVectorVO em SmartCoreHub.Core.SDK.")]
 public class DataVectorVO : SchDto.DataVectorVO
 {
 }
@@ -13,7 +15,7 @@ public class DataVectorVO : SchDto.DataVectorVO
 /// <summary>
 /// Mensagem de prompt para adapters de inferência — herda SCH.
 /// </summary>
-[Obsolete("Depreciado. Migrado para SmartCoreHub.Core.SDK na camada Domain. Use o pacote NuGet SmartCoreHub.Core.SDK — tipo SmartCoreHub.Core.SDK.Domain.AI.DTO.PromptMessageVO. Após publicar o NuGet, HotelWise.Core.SDK será só casca (PackageReference + wrappers) e delegará a SmartCoreHub.Core.SDK.")]
+[SdkWrappedSource(targetType: "SmartCoreHub.Core.SDK.Domain.AI.DTO.PromptMessageVO", targetPackage: "SmartCoreHub.Core.SDK", description: "Casca/wrapper delegando para SmartCoreHub.Core.SDK.Domain.AI.DTO.PromptMessageVO em SmartCoreHub.Core.SDK.")]
 public class PromptMessageVO : SchDto.PromptMessageVO
 {
 }

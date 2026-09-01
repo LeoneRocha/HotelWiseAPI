@@ -1,9 +1,11 @@
+using SmartCoreHub.Core.SDK.Common.Attributes;
+
 namespace HotelWise.Core.SDK.AI.Helpers;
 
 /// <summary>
 /// Utilitário de conversão de embeddings para tipos usados pelo vector store.
 /// </summary>
-[Obsolete("Depreciado. Migrado para SmartCoreHub.Core.SDK na camada Service. Use o pacote NuGet SmartCoreHub.Core.SDK — tipo SmartCoreHub.Core.SDK.Service.AI.Helpers.EmbeddingHelper. Após publicar o NuGet, HotelWise.Core.SDK será só casca (PackageReference + wrappers) e delegará a SmartCoreHub.Core.SDK.")]
+[SdkWrappedSource(targetType: "SmartCoreHub.Core.SDK.Service.AI.Helpers.EmbeddingHelper", targetPackage: "SmartCoreHub.Core.SDK", description: "Casca/wrapper delegando para SmartCoreHub.Core.SDK.Service.AI.Helpers.EmbeddingHelper em SmartCoreHub.Core.SDK.")]
 public static class EmbeddingHelper
 {
     /// <summary>

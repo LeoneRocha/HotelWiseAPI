@@ -2,12 +2,14 @@ using System.Collections.ObjectModel;
 using System.Globalization;
 using HotelWise.Core.SDK.Common;
 
+using SmartCoreHub.Core.SDK.Common.Attributes;
+
 namespace HotelWise.Core.SDK.Helpers;
 
 /// <summary>
 /// Utilitários de cultura e fuso horário.
 /// </summary>
-[Obsolete("Depreciado. Migrado para SmartCoreHub.Core.SDK na camada Domain. Use o pacote NuGet SmartCoreHub.Core.SDK — tipo SmartCoreHub.Core.SDK.Domain.Helpers.Ported.CultureDateTimeHelper. Após publicar o NuGet, HotelWise.Core.SDK será só casca (PackageReference + wrappers) e delegará a SmartCoreHub.Core.SDK.")]
+[SdkWrappedSource(targetType: "SmartCoreHub.Core.SDK.Domain.Helpers.Ported.CultureDateTimeHelper", targetPackage: "SmartCoreHub.Core.SDK", description: "Casca/wrapper delegando para SmartCoreHub.Core.SDK.Domain.Helpers.Ported.CultureDateTimeHelper em SmartCoreHub.Core.SDK.")]
 public static class CultureDateTimeHelper
 {
     /// <summary>Obtém a lista de identificadores de fusos horários disponíveis.</summary>

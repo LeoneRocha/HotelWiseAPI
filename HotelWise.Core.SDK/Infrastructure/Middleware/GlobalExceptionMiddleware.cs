@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Hosting;
 
+using SmartCoreHub.Core.SDK.Common.Attributes;
+
 namespace HotelWise.Core.SDK.Infrastructure.Middleware;
 
 /// <summary>
@@ -20,7 +22,7 @@ namespace HotelWise.Core.SDK.Infrastructure.Middleware;
 /// app.UseMiddleware&lt;GlobalExceptionMiddleware&gt;();
 /// </code>
 /// </remarks>
-[Obsolete("Depreciado. Migrado para SmartCoreHub.Core.SDK na camada Infrastructure. Use o pacote NuGet SmartCoreHub.Core.SDK — tipo SmartCoreHub.Core.SDK.Infrastructure.Middleware.GlobalExceptionMiddleware. Após publicar o NuGet, HotelWise.Core.SDK será só casca (PackageReference + wrappers) e delegará a SmartCoreHub.Core.SDK.")]
+[SdkWrappedSource(targetType: "SmartCoreHub.Core.SDK.Infrastructure.Middleware.GlobalExceptionMiddleware", targetPackage: "SmartCoreHub.Core.SDK", description: "Casca/wrapper delegando para SmartCoreHub.Core.SDK.Infrastructure.Middleware.GlobalExceptionMiddleware em SmartCoreHub.Core.SDK.")]
 public class GlobalExceptionMiddleware : SmartCoreHub.Core.SDK.Infrastructure.Middleware.GlobalExceptionMiddleware
 {
     /// <summary>

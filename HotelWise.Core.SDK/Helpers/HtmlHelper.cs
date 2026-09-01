@@ -1,6 +1,8 @@
 #if NET8_0_OR_GREATER
 using HtmlAgilityPack;
 
+using SmartCoreHub.Core.SDK.Common.Attributes;
+
 namespace HotelWise.Core.SDK.Helpers;
 
 /// <summary>
@@ -13,7 +15,7 @@ namespace HotelWise.Core.SDK.Helpers;
 /// // plain == "Olá"
 /// </code>
 /// </example>
-[Obsolete("Depreciado. Migrado para SmartCoreHub.Core.SDK na camada Domain. Use o pacote NuGet SmartCoreHub.Core.SDK — tipo SmartCoreHub.Core.SDK.Domain.Helpers.HtmlHelper. Após publicar o NuGet, HotelWise.Core.SDK será só casca (PackageReference + wrappers) e delegará a SmartCoreHub.Core.SDK.")]
+[SdkWrappedSource(targetType: "SmartCoreHub.Core.SDK.Domain.Helpers.HtmlHelper", targetPackage: "SmartCoreHub.Core.SDK", description: "Casca/wrapper delegando para SmartCoreHub.Core.SDK.Domain.Helpers.HtmlHelper em SmartCoreHub.Core.SDK.")]
 public static class HtmlHelper
 {
     /// <summary>

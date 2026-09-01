@@ -7,12 +7,14 @@ using AutoMapper.Configuration.Annotations;
 using Swashbuckle.AspNetCore.Annotations;
 #endif
 
+using SmartCoreHub.Core.SDK.Common.Attributes;
+
 namespace HotelWise.Core.SDK.Common;
 
 /// <summary>
 /// Detalhe de erro padronizado em respostas de serviço.
 /// </summary>
-[Obsolete("Depreciado. Migrado para SmartCoreHub.Core.SDK na camada Common. Use o pacote NuGet SmartCoreHub.Core.SDK — tipo SmartCoreHub.Core.SDK.Common.ErrorResponse. Após publicar o NuGet, HotelWise.Core.SDK será só casca (PackageReference + wrappers) e delegará a SmartCoreHub.Core.SDK.")]
+[SdkWrappedSource(targetType: "SmartCoreHub.Core.SDK.Common.ErrorResponse", targetPackage: "SmartCoreHub.Core.SDK", description: "Casca/wrapper delegando para SmartCoreHub.Core.SDK.Common.ErrorResponse em SmartCoreHub.Core.SDK.")]
 public class ErrorResponse : SmartCoreHub.Core.SDK.Common.ErrorResponse
 {
 }

@@ -2,12 +2,14 @@ using HotelWise.Core.SDK.AI.Enums;
 using SchDto = SmartCoreHub.Core.SDK.Domain.AI.DTO;
 using SchEnums = SmartCoreHub.Core.SDK.Domain.AI.Enums;
 
+using SmartCoreHub.Core.SDK.Common.Attributes;
+
 namespace HotelWise.Core.SDK.AI.DTO;
 
 /// <summary>
 /// Resposta do assistente conversacional.
 /// </summary>
-[Obsolete("Depreciado. Migrado para SmartCoreHub.Core.SDK na camada Domain. Use o pacote NuGet SmartCoreHub.Core.SDK — tipo SmartCoreHub.Core.SDK.Domain.AI.DTO.AskAssistantResponse. Após publicar o NuGet, HotelWise.Core.SDK será só casca (PackageReference + wrappers) e delegará a SmartCoreHub.Core.SDK.")]
+[SdkWrappedSource(targetType: "SmartCoreHub.Core.SDK.Domain.AI.DTO.AskAssistantResponse", targetPackage: "SmartCoreHub.Core.SDK", description: "Casca/wrapper delegando para SmartCoreHub.Core.SDK.Domain.AI.DTO.AskAssistantResponse em SmartCoreHub.Core.SDK.")]
 public class AskAssistantResponse : SchDto.AskAssistantResponse
 {
     /// <summary>Papel do emissor da resposta.</summary>
@@ -21,7 +23,7 @@ public class AskAssistantResponse : SchDto.AskAssistantResponse
 /// <summary>
 /// Solicitação ao assistente conversacional.
 /// </summary>
-[Obsolete("Depreciado. Migrado para SmartCoreHub.Core.SDK na camada Domain. Use o pacote NuGet SmartCoreHub.Core.SDK — tipo SmartCoreHub.Core.SDK.Domain.AI.DTO.AskAssistantRequest. Após publicar o NuGet, HotelWise.Core.SDK será só casca (PackageReference + wrappers) e delegará a SmartCoreHub.Core.SDK.")]
+[SdkWrappedSource(targetType: "SmartCoreHub.Core.SDK.Domain.AI.DTO.AskAssistantRequest", targetPackage: "SmartCoreHub.Core.SDK", description: "Casca/wrapper delegando para SmartCoreHub.Core.SDK.Domain.AI.DTO.AskAssistantRequest em SmartCoreHub.Core.SDK.")]
 public class AskAssistantRequest : SchDto.AskAssistantRequest
 {
     /// <summary>Papel do emissor da solicitação.</summary>

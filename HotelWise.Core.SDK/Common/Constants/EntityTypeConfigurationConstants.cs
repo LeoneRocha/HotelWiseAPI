@@ -1,5 +1,7 @@
 using HotelWise.Core.SDK.Common;
 
+using SmartCoreHub.Core.SDK.Common.Attributes;
+
 namespace HotelWise.Core.SDK.Common.Constants;
 
 /// <summary>
@@ -7,7 +9,7 @@ namespace HotelWise.Core.SDK.Common.Constants;
 /// Centraliza literais de <c>TypeName</c>, idioma padrão e funções auxiliares
 /// que adaptam comprimento e tipo de texto conforme o <see cref="ETypeDataBase"/> em uso.
 /// </summary>
-[Obsolete("Depreciado. Migrado para SmartCoreHub.Core.SDK na camada Common. Use o pacote NuGet SmartCoreHub.Core.SDK — tipo SmartCoreHub.Core.SDK.Common.Constants.EntityTypeConfigurationConstants. Após publicar o NuGet, HotelWise.Core.SDK será só casca (PackageReference + wrappers) e delegará a SmartCoreHub.Core.SDK.")]
+[SdkWrappedSource(targetType: "SmartCoreHub.Core.SDK.Common.Constants.EntityTypeConfigurationConstants", targetPackage: "SmartCoreHub.Core.SDK", description: "Casca/wrapper delegando para SmartCoreHub.Core.SDK.Common.Constants.EntityTypeConfigurationConstants em SmartCoreHub.Core.SDK.")]
 public static class EntityTypeConfigurationConstants
 {
     /// <summary>Tipo de coluna varchar de 255 caracteres.</summary>

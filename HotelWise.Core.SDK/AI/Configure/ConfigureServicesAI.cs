@@ -3,12 +3,14 @@ using HotelWise.Core.SDK.AI.Abstractions;
 using Microsoft.Extensions.DependencyInjection;
 using SchConfigure = SmartCoreHub.Core.SDK.Service.AI.Configure.ConfigureServicesAI;
 
+using SmartCoreHub.Core.SDK.Common.Attributes;
+
 namespace HotelWise.Core.SDK.AI.Configure;
 
 /// <summary>
 /// Registro DI genérico de IA — delega integralmente ao SCH.
 /// </summary>
-[Obsolete("Depreciado. Migrado para SmartCoreHub.Core.SDK na camada Service. Use o pacote NuGet SmartCoreHub.Core.SDK — tipo SmartCoreHub.Core.SDK.Service.AI.Configure.ConfigureServicesAI. Após publicar o NuGet, HotelWise.Core.SDK será só casca (PackageReference + wrappers) e delegará a SmartCoreHub.Core.SDK.")]
+[SdkWrappedSource(targetType: "SmartCoreHub.Core.SDK.Service.AI.Configure.ConfigureServicesAI", targetPackage: "SmartCoreHub.Core.SDK", description: "Casca/wrapper delegando para SmartCoreHub.Core.SDK.Service.AI.Configure.ConfigureServicesAI em SmartCoreHub.Core.SDK.")]
 public static class ConfigureServicesAI
 {
     /// <summary>

@@ -1,12 +1,14 @@
 using HotelWise.Core.SDK.AI.DTO;
 using SchHelpers = SmartCoreHub.Core.SDK.Service.AI.Helpers;
 
+using SmartCoreHub.Core.SDK.Common.Attributes;
+
 namespace HotelWise.Core.SDK.AI.Helpers;
 
 /// <summary>
 /// Contagem aproximada de tokens para prompts e contextos RAG.
 /// </summary>
-[Obsolete("Depreciado. Migrado para SmartCoreHub.Core.SDK na camada Service. Use o pacote NuGet SmartCoreHub.Core.SDK — tipo SmartCoreHub.Core.SDK.Service.AI.Helpers.TokenCounterHelper. Após publicar o NuGet, HotelWise.Core.SDK será só casca (PackageReference + wrappers) e delegará a SmartCoreHub.Core.SDK.")]
+[SdkWrappedSource(targetType: "SmartCoreHub.Core.SDK.Service.AI.Helpers.TokenCounterHelper", targetPackage: "SmartCoreHub.Core.SDK", description: "Casca/wrapper delegando para SmartCoreHub.Core.SDK.Service.AI.Helpers.TokenCounterHelper em SmartCoreHub.Core.SDK.")]
 public static class TokenCounterHelper
 {
     /// <summary>Calcula a quantidade estimada de tokens para um texto.</summary>

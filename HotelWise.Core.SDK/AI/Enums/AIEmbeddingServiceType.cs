@@ -1,13 +1,15 @@
 using System.Text.Json.Serialization;
 using SchEnums = SmartCoreHub.Core.SDK.Domain.AI.Enums;
 
+using SmartCoreHub.Core.SDK.Common.Attributes;
+
 namespace HotelWise.Core.SDK.AI.Enums;
 
 /// <summary>
 /// Tipos de serviço de embeddings suportados no pipeline RAG.
 /// </summary>
 [JsonConverter(typeof(JsonStringEnumConverter))]
-[Obsolete("Depreciado. Migrado para SmartCoreHub.Core.SDK na camada Domain. Use o pacote NuGet SmartCoreHub.Core.SDK — tipo SmartCoreHub.Core.SDK.Domain.AI.Enums.AIEmbeddingServiceType. Após publicar o NuGet, HotelWise.Core.SDK será só casca (PackageReference + wrappers) e delegará a SmartCoreHub.Core.SDK.")]
+[SdkWrappedSource(targetType: "SmartCoreHub.Core.SDK.Domain.AI.Enums.AIEmbeddingServiceType", targetPackage: "SmartCoreHub.Core.SDK", description: "Casca/wrapper delegando para SmartCoreHub.Core.SDK.Domain.AI.Enums.AIEmbeddingServiceType em SmartCoreHub.Core.SDK.")]
 public enum AIEmbeddingServiceType
 {
     DefaultEmbeddings = (int)SchEnums.AIEmbeddingServiceType.DefaultEmbeddings,

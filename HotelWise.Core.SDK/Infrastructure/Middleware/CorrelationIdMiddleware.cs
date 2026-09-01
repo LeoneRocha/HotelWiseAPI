@@ -2,6 +2,8 @@
 using Microsoft.AspNetCore.Http;
 using Serilog.Context;
 
+using SmartCoreHub.Core.SDK.Common.Attributes;
+
 namespace HotelWise.Core.SDK.Infrastructure.Middleware;
 
 /// <summary>
@@ -15,7 +17,7 @@ namespace HotelWise.Core.SDK.Infrastructure.Middleware;
 /// app.UseMiddleware&lt;CorrelationIdMiddleware&gt;();
 /// </code>
 /// </remarks>
-[Obsolete("Depreciado. Migrado para SmartCoreHub.Core.SDK na camada Infrastructure. Use o pacote NuGet SmartCoreHub.Core.SDK — tipo SmartCoreHub.Core.SDK.Infrastructure.Middleware.Ported.CorrelationIdMiddleware. Após publicar o NuGet, HotelWise.Core.SDK será só casca (PackageReference + wrappers) e delegará a SmartCoreHub.Core.SDK.")]
+[SdkWrappedSource(targetType: "SmartCoreHub.Core.SDK.Infrastructure.Middleware.Ported.CorrelationIdMiddleware", targetPackage: "SmartCoreHub.Core.SDK", description: "Casca/wrapper delegando para SmartCoreHub.Core.SDK.Infrastructure.Middleware.Ported.CorrelationIdMiddleware em SmartCoreHub.Core.SDK.")]
 public class CorrelationIdMiddleware : SmartCoreHub.Core.SDK.Infrastructure.Middleware.Ported.CorrelationIdMiddleware
 {
     /// <summary>

@@ -1,12 +1,14 @@
 using System.ComponentModel;
 using System.Reflection;
 
+using SmartCoreHub.Core.SDK.Common.Attributes;
+
 namespace HotelWise.Core.SDK.Extensions;
 
 /// <summary>
 /// Extensões para enumerações, incluindo leitura de <see cref="DescriptionAttribute"/>.
 /// </summary>
-[Obsolete("Depreciado. Migrado para SmartCoreHub.Core.SDK na camada Domain. Use o pacote NuGet SmartCoreHub.Core.SDK — tipo SmartCoreHub.Core.SDK.Domain.Extensions.EnumExtensions. Após publicar o NuGet, HotelWise.Core.SDK será só casca (PackageReference + wrappers) e delegará a SmartCoreHub.Core.SDK.")]
+[SdkWrappedSource(targetType: "SmartCoreHub.Core.SDK.Domain.Extensions.EnumExtensions", targetPackage: "SmartCoreHub.Core.SDK", description: "Casca/wrapper delegando para SmartCoreHub.Core.SDK.Domain.Extensions.EnumExtensions em SmartCoreHub.Core.SDK.")]
 public static class EnumExtensions
 {
     /// <summary>

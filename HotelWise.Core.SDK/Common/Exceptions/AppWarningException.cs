@@ -1,3 +1,5 @@
+using SmartCoreHub.Core.SDK.Common.Attributes;
+
 namespace HotelWise.Core.SDK.Common.Exceptions;
 
 /// <summary>
@@ -5,7 +7,7 @@ namespace HotelWise.Core.SDK.Common.Exceptions;
 /// (por exemplo, validação de negócio ou alerta operacional) que deve ser
 /// tratada e comunicada sem interromper o fluxo como erro crítico.
 /// </summary>
-[Obsolete("Depreciado. Migrado para SmartCoreHub.Core.SDK na camada Common. Use o pacote NuGet SmartCoreHub.Core.SDK — tipo SmartCoreHub.Core.SDK.Common.Exceptions.AppWarningException. Após publicar o NuGet, HotelWise.Core.SDK será só casca (PackageReference + wrappers) e delegará a SmartCoreHub.Core.SDK.")]
+[SdkWrappedSource(targetType: "SmartCoreHub.Core.SDK.Common.Exceptions.AppWarningException", targetPackage: "SmartCoreHub.Core.SDK", description: "Casca/wrapper delegando para SmartCoreHub.Core.SDK.Common.Exceptions.AppWarningException em SmartCoreHub.Core.SDK.")]
 public class AppWarningException : SmartCoreHub.Core.SDK.Common.Exceptions.AppWarningException
 {
     /// <summary>Inicializa uma nova instância de <see cref="AppWarningException"/>.</summary>

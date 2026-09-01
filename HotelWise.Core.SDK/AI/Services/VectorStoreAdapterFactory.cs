@@ -4,12 +4,14 @@ using HotelWise.Core.SDK.AI.Adapters;
 using HotelWise.Core.SDK.AI.DTO;
 using SchFactory = SmartCoreHub.Core.SDK.Service.AI.Services.VectorStoreAdapterFactory;
 
+using SmartCoreHub.Core.SDK.Common.Attributes;
+
 namespace HotelWise.Core.SDK.AI.Services;
 
 /// <summary>
 /// Fábrica de adapters de vector store — herda SCH; retorna casca HW nos adapters.
 /// </summary>
-[Obsolete("Depreciado. Migrado para SmartCoreHub.Core.SDK na camada Service. Use o pacote NuGet SmartCoreHub.Core.SDK — tipo SmartCoreHub.Core.SDK.Service.AI.Services.VectorStoreAdapterFactory. Após publicar o NuGet, HotelWise.Core.SDK será só casca (PackageReference + wrappers) e delegará a SmartCoreHub.Core.SDK.")]
+[SdkWrappedSource(targetType: "SmartCoreHub.Core.SDK.Service.AI.Services.VectorStoreAdapterFactory", targetPackage: "SmartCoreHub.Core.SDK", description: "Casca/wrapper delegando para SmartCoreHub.Core.SDK.Service.AI.Services.VectorStoreAdapterFactory em SmartCoreHub.Core.SDK.")]
 public class VectorStoreAdapterFactory : SchFactory, IVectorStoreAdapterFactory
 {
     /// <summary>

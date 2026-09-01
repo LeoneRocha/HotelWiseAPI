@@ -1,3 +1,5 @@
+using SmartCoreHub.Core.SDK.Common.Attributes;
+
 namespace HotelWise.Core.SDK.Helpers;
 
 /// <summary>
@@ -10,7 +12,7 @@ namespace HotelWise.Core.SDK.Helpers;
 /// // ex.: "01:05:09"
 /// </code>
 /// </example>
-[Obsolete("Depreciado. Migrado para SmartCoreHub.Core.SDK na camada Domain. Use o pacote NuGet SmartCoreHub.Core.SDK — tipo SmartCoreHub.Core.SDK.Domain.Helpers.TimeFormatter. Após publicar o NuGet, HotelWise.Core.SDK será só casca (PackageReference + wrappers) e delegará a SmartCoreHub.Core.SDK.")]
+[SdkWrappedSource(targetType: "SmartCoreHub.Core.SDK.Domain.Helpers.TimeFormatter", targetPackage: "SmartCoreHub.Core.SDK", description: "Casca/wrapper delegando para SmartCoreHub.Core.SDK.Domain.Helpers.TimeFormatter em SmartCoreHub.Core.SDK.")]
 public static class TimeFormatter
 {
     /// <summary>Formata um intervalo <see cref="TimeSpan"/> no padrão HH:mm:ss.</summary>

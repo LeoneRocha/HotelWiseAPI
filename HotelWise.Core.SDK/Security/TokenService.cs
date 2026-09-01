@@ -6,6 +6,8 @@ using System.Text;
 using HotelWise.Core.SDK.Abstractions;
 using Microsoft.IdentityModel.Tokens;
 
+using SmartCoreHub.Core.SDK.Common.Attributes;
+
 namespace HotelWise.Core.SDK.Security;
 
 /// <summary>
@@ -20,7 +22,7 @@ namespace HotelWise.Core.SDK.Security;
 /// var principal = tokenService.GetPrincipalFromExpiredToken(expiredAccess);
 /// </code>
 /// </example>
-[Obsolete("Depreciado. Migrado para SmartCoreHub.Core.SDK na camada Service. Use o pacote NuGet SmartCoreHub.Core.SDK — tipo SmartCoreHub.Core.SDK.Service.Security.Ported.TokenService. Após publicar o NuGet, HotelWise.Core.SDK será só casca (PackageReference + wrappers) e delegará a SmartCoreHub.Core.SDK.")]
+[SdkWrappedSource(targetType: "SmartCoreHub.Core.SDK.Service.Security.Ported.TokenService", targetPackage: "SmartCoreHub.Core.SDK", description: "Casca/wrapper delegando para SmartCoreHub.Core.SDK.Service.Security.Ported.TokenService em SmartCoreHub.Core.SDK.")]
 public class TokenService : SmartCoreHub.Core.SDK.Service.Security.Ported.TokenService, ITokenService
 {
     /// <summary>

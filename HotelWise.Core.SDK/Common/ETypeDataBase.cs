@@ -1,11 +1,13 @@
 using SchCommon = SmartCoreHub.Core.SDK.Common;
 
+using SmartCoreHub.Core.SDK.Common.Attributes;
+
 namespace HotelWise.Core.SDK.Common;
 
 /// <summary>
 /// Enumeração dos tipos de banco de dados suportados pela infraestrutura genérica do SDK.
 /// </summary>
-[Obsolete("Depreciado. Migrado para SmartCoreHub.Core.SDK na camada Common. Use o pacote NuGet SmartCoreHub.Core.SDK — tipo SmartCoreHub.Core.SDK.Common.ETypeDataBase. Após publicar o NuGet, HotelWise.Core.SDK será só casca (PackageReference + wrappers) e delegará a SmartCoreHub.Core.SDK.")]
+[SdkWrappedSource(targetType: "SmartCoreHub.Core.SDK.Common.ETypeDataBase", targetPackage: "SmartCoreHub.Core.SDK", description: "Casca/wrapper delegando para SmartCoreHub.Core.SDK.Common.ETypeDataBase em SmartCoreHub.Core.SDK.")]
 public enum ETypeDataBase
 {
     MSsqlServer = (int)SchCommon.ETypeDataBase.MSsqlServer,
