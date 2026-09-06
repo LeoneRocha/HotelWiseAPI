@@ -76,13 +76,12 @@ public class HotelSearchService : DtoEntityServiceBase<Hotel, HotelDto>, IHotelS
             //NEXSTEP: ENVIAR PARA UM CACHE to que pesquisar toda vez no banco de dados 
             var allHotelsFromDb = (await fetchHotelsAsync()).Data;
 
-            // Se o chamador não especificou um limite ou passou <= 0, usa a configuração do JSON (SearchSettings:MaxRetrieve) ou o total de hotéis do banco
+            // Se o chamador não especificou um limite ou passou <= 0, usa appsettings (SearchSettings:MaxRetrieve)
             if (searchCriteria.MaxRetrieve <= 0)
             {
                 var configuredMax = _configuration?.GetValue<int?>("ApplicationIAConfig:Rag:SearchSettings:MaxRetrieve") ?? 0;
-                searchCriteria.MaxRetrieve = configuredMax > 0
-                    ? configuredMax
-                    : (allHotelsFromDb != null && allHotelsFromDb.Length > 0 ? allHotelsFromDb.Length : 50);
+                // Fallback 25 alinhado a SearchCriteria.DefaultMaxRetrieve / appsettings
+                searchCriteria.MaxRetrieve = configuredMax > 0 ? configuredMax : 25;
             }
 
             //Search Vector  

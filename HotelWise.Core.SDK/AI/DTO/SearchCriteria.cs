@@ -1,4 +1,3 @@
-
 using SmartCoreHub.Core.SDK.Common.Attributes;
 
 namespace HotelWise.Core.SDK.AI.DTO;
@@ -11,25 +10,18 @@ namespace HotelWise.Core.SDK.AI.DTO;
 public class SearchCriteria : SmartCoreHub.Core.SDK.Domain.AI.DTO.SearchCriteria
 {
     /// <summary>
-    /// Limite padrão elevado para não restringir artificialmente a busca quando não especificado.
+    /// Fallback quando a requisição não informa limite e o appsettings também não.
+    /// O valor operacional vem de <c>ApplicationIAConfig:Rag:SearchSettings:MaxRetrieve</c>.
     /// </summary>
-    public const int DefaultMaxRetrieve = 1000;
+    public const int DefaultMaxRetrieve = 25;
 
     /// <summary>
-    /// Construtor garantindo valor mínimo padrão para MaxRetrieve (top > 0).
+    /// Alias legado HW para MaxRetrieve.
+    /// Valor &lt;= 0 significa "usar appsettings" (não força o default aqui).
     /// </summary>
-    public SearchCriteria()
-    {
-        if (MaxRetrieve <= 0)
-        {
-            MaxRetrieve = DefaultMaxRetrieve;
-        }
-    }
-
-    /// <summary>Alias legado HW para MaxRetrieve.</summary>
     public int MaxHotelRetrieve
     {
-        get => MaxRetrieve > 0 ? MaxRetrieve : DefaultMaxRetrieve;
-        set => MaxRetrieve = value > 0 ? value : DefaultMaxRetrieve;
+        get => MaxRetrieve > 0 ? MaxRetrieve : 0;
+        set => MaxRetrieve = value > 0 ? value : 0;
     }
 }

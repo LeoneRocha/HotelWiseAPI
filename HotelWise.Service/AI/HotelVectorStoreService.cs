@@ -125,7 +125,8 @@ public class HotelVectorStoreService : GenericVectorStoreServiceBase, IVectorSto
             if (searchCriteria.MaxRetrieve <= 0)
             {
                 var configuredMax = _configuration?.GetValue<int?>("ApplicationIAConfig:Rag:SearchSettings:MaxRetrieve") ?? 0;
-                searchCriteria.MaxRetrieve = configuredMax > 0 ? configuredMax : 50;
+                // Fallback 25 alinhado a SearchCriteria.DefaultMaxRetrieve / appsettings
+                searchCriteria.MaxRetrieve = configuredMax > 0 ? configuredMax : 25;
             }
 
             //Get semantic search 

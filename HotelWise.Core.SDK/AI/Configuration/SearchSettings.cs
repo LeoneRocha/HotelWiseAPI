@@ -10,7 +10,8 @@ namespace HotelWise.Core.SDK.AI.Configuration;
 public class SearchSettings : SmartCoreHub.Core.SDK.Domain.AI.Configuration.SearchSettings
 {
     /// <summary>
-    /// Limite máximo padrão de registros recuperados na busca vetorial quando não especificado na requisição (configurável via appsettings.json).
+    /// Limite máximo padrão de registros recuperados na busca vetorial quando não especificado na requisição
+    /// (<c>ApplicationIAConfig:Rag:SearchSettings:MaxRetrieve</c>).
     /// </summary>
-    public int MaxRetrieve { get; set; } = 50;
+    public int MaxRetrieve { get; set; } = 25;
 }
