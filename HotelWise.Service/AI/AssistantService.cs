@@ -262,52 +262,41 @@ public class AssistantService : IAssistantService
     /// </summary>
     private static PromptMessageVO[] CreatePrompts(AskAssistantRequest request, ChatSessionHistoryDto? existingSession)
     {
-        var msgAgent = new StringBuilder().AppendLine("Você é um especializado em viagens e turismo. Responda exclusivamente a perguntas relacionadas a:")
-            .AppendLine("- Planejamento de viagens.")
-            .AppendLine("- Reservas de hotéis, voos e transporte.")
-            .AppendLine("- Recomendações de destinos turísticos, passeios, atrações e pacotes de viagem.")
-            .AppendLine("- Seu nome é StayMate. Invente uma persona e personalidade para seu nome.")
+        // Prática recomendada: uma Instruction (Agent) + User (+ Context de sessão no turno user via composer).
+        var agentInstructions = new StringBuilder()
+            .AppendLine("Você é StayMate, assistente especializado em viagens e turismo.")
+            .AppendLine("Responda apenas sobre planejamento de viagens, reservas (hotéis/voos/transporte), destinos, passeios e pacotes.")
             .AppendLine()
             .AppendLine("Diretrizes:")
-            .AppendLine("1. Forneça respostas completas e confiáveis sobre turismo.")
-            .AppendLine("2. Adote um tom positivo e amigável para encorajar o usuário.")
-            .AppendLine("3. Utilize formatos visuais em Markdown para apresentar informações, sempre em português brasileiro.")
-            .AppendLine()
-            .AppendLine("Limitações:")
-            .AppendLine("- Não forneça informações fora do escopo de viagens e turismo.")
-            .AppendLine("- Caso a pergunta esteja fora do escopo, responda com respeito e objetividade, indicando que não pode ajudar com o tópico abordado.")
+            .AppendLine("1. Respostas completas e confiáveis, tom positivo e amigável.")
+            .AppendLine("2. Sempre em português brasileiro (pt-BR), em Markdown/HTML adequado à UI.")
+            .AppendLine("3. Fora do escopo: recuse com educação e objetividade.")
             .ToString();
 
-        var msgSystem = "Você é um assistente especializado em viagens e turismo. Sua função é responder exclusivamente a perguntas relacionadas a viagens, reservas de hotéis e turismo. Limite suas respostas a esses tópicos, e quando uma pergunta estiver fora desse escopo, responda de forma educada, objetiva e concisa, informando que não pode ajudar com o tópico mencionado. Responda sempre em português brasileiro (pt-BR), utilizando linguagem clara e fluida. Formate suas respostas para exibição em HTML ou Markdown, utilizando tags adequadas para renderização correta no site.";
-        var sysMsgRuleAgent = new PromptMessageVO()
+        var prompts = new List<PromptMessageVO>
         {
-            RoleType = RoleAiPromptsType.Agent,
-            Content = msgAgent,
-        };
-        PromptMessageVO sysMsgUnified = new PromptMessageVO()
-        {
-            RoleType = RoleAiPromptsType.System,
-            Content = msgSystem,
-        };
-        PromptMessageVO userMsg = new PromptMessageVO()
-        {
-            RoleType = RoleAiPromptsType.User,
-            Content = request.Message,
+            new()
+            {
+                RoleType = RoleAiPromptsType.Agent,
+                AgentName = "StayMate",
+                Content = agentInstructions
+            },
+            new()
+            {
+                RoleType = RoleAiPromptsType.User,
+                Content = request.Message
+            }
         };
 
-        List<PromptMessageVO> promptMessageVOs = new List<PromptMessageVO>() { sysMsgRuleAgent, sysMsgUnified, userMsg };
-
-        if (existingSession != null)
+        if (existingSession?.PromptMessageHistory is { Length: > 0 })
         {
-            string context = ChatSessionHelper.GetHistoryContext(existingSession.PromptMessageHistory);
-
-            PromptMessageVO histories = new PromptMessageVO()
+            prompts.Add(new PromptMessageVO
             {
                 RoleType = RoleAiPromptsType.Context,
-                Content = HtmlHelper.RemoveHtml(context),
-            };
-            promptMessageVOs.Add(histories);
+                Content = ChatSessionHelper.GetHistoryContext(existingSession.PromptMessageHistory)
+            });
         }
-        return promptMessageVOs.ToArray();
+
+        return prompts.ToArray();
     }
 }

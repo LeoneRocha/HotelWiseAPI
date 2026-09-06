@@ -241,22 +241,21 @@ public class HotelSearchService : DtoEntityServiceBase<Hotel, HotelDto>, IHotelS
     /// </summary>
     private static PromptMessageVO[] createPrompts(SearchCriteria request, HotelDto[]? allHotelsFromDb)
     {
-        PromptMessageVO sysMsgHotelAgent = StayMatePromptGenerator.CreateHotelAgentPrompt();
-        PromptMessageVO sysMsgHotelSearch = StayMatePromptGenerator.CreateHotelSystemPrompt();
-
-        PromptMessageVO ragMsg = new PromptMessageVO()
-        {
-            RoleType = RoleAiPromptsType.Context,
-            DataContextRag = convertDataContext(allHotelsFromDb)
-        };
-
-        PromptMessageVO userMsg = new PromptMessageVO()
-        {
-            RoleType = RoleAiPromptsType.User,
-            Content = request.SearchTextCriteria,
-        };
-        PromptMessageVO[] messages = [sysMsgHotelAgent, sysMsgHotelSearch, userMsg, ragMsg];
-        return messages;
+        // Canônico: Agent (1 instruction) + User + Context(RAG) — o composer anexa RAG no turno user.
+        return
+        [
+            StayMatePromptGenerator.CreateHotelAgentPrompt(),
+            new PromptMessageVO
+            {
+                RoleType = RoleAiPromptsType.User,
+                Content = request.SearchTextCriteria
+            },
+            new PromptMessageVO
+            {
+                RoleType = RoleAiPromptsType.Context,
+                DataContextRag = convertDataContext(allHotelsFromDb)
+            }
+        ];
     }
 
     /// <summary>

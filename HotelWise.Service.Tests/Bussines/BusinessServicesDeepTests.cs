@@ -39,22 +39,21 @@ public class BusinessServicesDeepTests
     // Cenário: Geração de prompts StayMate (Agent e System).
     // Objetivo: Cobrir StayMatePromptGenerator.CreateHotelAgentPrompt e CreateHotelSystemPrompt.
     [Fact]
-    public void StayMatePromptGenerator_ShouldGenerateAgentAndSystemPrompts()
+    public void StayMatePromptGenerator_ShouldGenerateCanonicalAgentPrompt()
     {
-        // Act
         var agentPrompt = StayMatePromptGenerator.CreateHotelAgentPrompt();
-        var systemPrompt = StayMatePromptGenerator.CreateHotelSystemPrompt();
+#pragma warning disable CS0618
+        var legacySystemAlias = StayMatePromptGenerator.CreateHotelSystemPrompt();
+#pragma warning restore CS0618
 
-        // Assert
         Assert.Multiple(() =>
         {
             agentPrompt.Should().NotBeNull();
             agentPrompt.Content.Should().Contain("StayMate");
             agentPrompt.RoleType.Should().Be(RoleAiPromptsType.Agent);
 
-            systemPrompt.Should().NotBeNull();
-            systemPrompt.Content.Should().Contain("StayMate");
-            systemPrompt.RoleType.Should().Be(RoleAiPromptsType.System);
+            legacySystemAlias.RoleType.Should().Be(RoleAiPromptsType.Agent);
+            legacySystemAlias.Content.Should().Contain("StayMate");
         });
     }
 }

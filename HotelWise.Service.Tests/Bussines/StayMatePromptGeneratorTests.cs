@@ -16,14 +16,15 @@ public class StayMatePromptGeneratorTests
     }
 
     [Fact]
-    public void CreateHotelSystemPrompt_Should_Return_NonEmpty_System_Prompt()
+    public void CreateHotelSystemPrompt_Should_Delegate_To_Canonical_Agent_Prompt()
     {
+#pragma warning disable CS0618 // Obsolete alias retained for compatibility
         var prompt = StayMatePromptGenerator.CreateHotelSystemPrompt();
+#pragma warning restore CS0618
 
         prompt.Should().NotBeNull();
-        prompt.RoleType.Should().Be(RoleAiPromptsType.System);
+        prompt.RoleType.Should().Be(RoleAiPromptsType.Agent);
         prompt.Content.Should().NotBeNullOrWhiteSpace();
         prompt.Content.Should().Contain("StayMate");
     }
 }
-
