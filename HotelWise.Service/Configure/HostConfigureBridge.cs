@@ -58,8 +58,8 @@ public static class ServiceCollectionConfigureAppSettings
     /// </summary>
     /// <param name="services">Coleção de serviços.</param>
     /// <param name="configuration">Configuração da aplicação.</param>
-    /// <returns>Instância de <see cref="TokenConfigurationDto"/> preenchida.</returns>
-    public static TokenConfigurationDto AddAndReturnTokenConfiguration(IServiceCollection services, IConfiguration configuration) =>
+    /// <returns>Instância de <see cref="SmartCoreHub.Core.SDK.Domain.DTOs.Entities.TokenConfigurationDto"/> preenchida.</returns>
+    public static SmartCoreHub.Core.SDK.Domain.DTOs.Entities.TokenConfigurationDto AddAndReturnTokenConfiguration(IServiceCollection services, IConfiguration configuration) =>
         SchDiExtensions.ServiceCollectionConfigureAppSettings.AddAndReturnTokenConfiguration(services, configuration);
 }
 

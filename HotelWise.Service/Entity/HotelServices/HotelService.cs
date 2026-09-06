@@ -12,7 +12,7 @@ namespace HotelWise.Service.Entity.HotelServices;
 /// <summary>
 /// Serviço de domínio para gestão do cadastro de hotéis, sincronização com base vetorial e extração de tags agregadas.
 /// </summary>
-public class HotelService : GenericEntityServiceBase<Hotel, HotelDto>, IHotelService
+public class HotelService : DtoEntityServiceBase<Hotel, HotelDto>, IHotelService
 {
     private readonly IGenerateHotelService _generateHotelService;
     private readonly IVectorStoreService<HotelVector> _hotelVectorStoreService;
@@ -56,12 +56,10 @@ public class HotelService : GenericEntityServiceBase<Hotel, HotelDto>, IHotelSer
             var hotelDtos = _mapper.Map<HotelDto[]>(hotels);
 
             response.Data = hotelDtos.OrderBy(h => h.HotelName).ToArray();
-            response.Success = true;
         }
         catch (Exception ex)
         {
             _logger.Error(ex, "GetAllHotelsAsync: {Message} at: {Time}", ex.Message, DataHelper.GetDateTimeNowToLog());
-            response.Success = false;
             response.Errors.Add(new ErrorResponse() { Message = ex.Message });
         }
         return response;
@@ -82,13 +80,11 @@ public class HotelService : GenericEntityServiceBase<Hotel, HotelDto>, IHotelSer
             var hotelDto = _mapper.Map<HotelDto>(hotel);
 
             await addOrUpdateDataVector(hotelDto);
-            response.Success = true;
             response.Data = true;
         }
         catch (Exception ex)
         {
             _logger.Error(ex, "InsertHotelInVectorStore: {Message} at: {Time}", ex.Message, DataHelper.GetDateTimeNowToLog());
-            response.Success = false;
             response.Errors.Add(new ErrorResponse() { Message = ex.Message });
         }
         return response;
@@ -114,13 +110,11 @@ public class HotelService : GenericEntityServiceBase<Hotel, HotelDto>, IHotelSer
             {
                 hotelDto.IsHotelInVectorStore = true;
             }
-            response.Success = true;
             response.Data = hotelDto;
         }
         catch (Exception ex)
         {
             _logger.Error(ex, "GetHotelByIdAsync: {Message} at: {Time}", ex.Message, DataHelper.GetDateTimeNowToLog());
-            response.Success = false;
             response.Errors.Add(new ErrorResponse() { Message = ex.Message });
         }
         return response;
@@ -139,13 +133,11 @@ public class HotelService : GenericEntityServiceBase<Hotel, HotelDto>, IHotelSer
 
             var hotelDto = _mapper.Map<HotelDto>(hotel);
 
-            response.Success = true;
             response.Data = hotelDto;
         }
         catch (Exception ex)
         {
             _logger.Error(ex, "GenerateHotelByIA: {Message} at: {Time}", ex.Message, DataHelper.GetDateTimeNowToLog());
-            response.Success = false;
             response.Errors.Add(new ErrorResponse() { Message = ex.Message });
         }
         return response;
@@ -178,13 +170,11 @@ public class HotelService : GenericEntityServiceBase<Hotel, HotelDto>, IHotelSer
             // Add Vector
             await addOrUpdateDataVector(hotelDto);
 
-            response.Success = true;
             response.Data = true;
         }
         catch (Exception ex)
         {
             _logger.Error(ex, "AddHotelAsync: {Message} at: {Time}", ex.Message, DataHelper.GetDateTimeNowToLog());
-            response.Success = false;
             response.Errors.Add(new ErrorResponse() { Message = ex.Message });
         }
         return response;
@@ -214,13 +204,11 @@ public class HotelService : GenericEntityServiceBase<Hotel, HotelDto>, IHotelSer
 
             await addOrUpdateDataVector(hotelDto);
 
-            response.Success = true;
             response.Data = true;
         }
         catch (Exception ex)
         {
             _logger.Error(ex, "UpdateHotelAsync: {Message} at: {Time}", ex.Message, DataHelper.GetDateTimeNowToLog());
-            response.Success = false;
             response.Errors.Add(new ErrorResponse() { Message = ex.Message });
         }
         return response;
@@ -280,13 +268,11 @@ public class HotelService : GenericEntityServiceBase<Hotel, HotelDto>, IHotelSer
 
             await _hotelVectorStoreService.DeleteAsync(id);
 
-            response.Success = true;
             response.Data = true;
         }
         catch (Exception ex)
         {
             _logger.Error(ex, "DeleteHotelAsync: {Message} at: {Time}", ex.Message, DataHelper.GetDateTimeNowToLog());
-            response.Success = false;
             response.Errors.Add(new ErrorResponse() { Message = ex.Message });
         }
         return response;

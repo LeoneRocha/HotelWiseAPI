@@ -1,8 +1,10 @@
-global using SmartCoreHub.Core.SDK.Common;
+global using SmartCoreHub.Core.SDK.Domain.DTOs.Common;
 global using EntityTypeConfigurationConstants = SmartCoreHub.Core.SDK.Common.Constants.EntityTypeConfigurationConstants;
-global using SmartCoreHub.Core.SDK.Domain.Abstractions;
-global using SmartCoreHub.Core.SDK.Infrastructure.Repositories.Ported;
+global using ETypeDataBase = SmartCoreHub.Core.SDK.Common.ETypeDataBase;
+global using SmartCoreHub.Core.SDK.Domain.Entities.Common;
+global using SmartCoreHub.Core.SDK.EntityFrameworkCore.Repositories;
+global using SmartCoreHub.Core.SDK.Infrastructure.Repositories.Generic;
+global using SmartCoreHub.Core.SDK.Domain.Interfaces.Common;
 global using SmartCoreHub.Core.SDK.Domain.AI.DTO;
-global using SmartCoreHub.Core.SDK.Domain.Helpers.Ported;
-global using SmartCoreHub.Core.SDK.Service.Security.Ported;
+global using SmartCoreHub.Core.SDK.Domain.Helpers;
 global using SmartCoreHub.Core.SDK.Infrastructure.Data;

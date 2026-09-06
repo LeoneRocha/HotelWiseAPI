@@ -21,7 +21,7 @@ public static class HotelsMockData
         [
             new Hotel
             {
-                HotelId = 1,
+                Id = 1,
                 HotelName = "Hotel Example",
                 Description = "An example hotel",
                 Tags = _tags,
@@ -33,8 +33,8 @@ public static class HotelsMockData
                 StateCode = "SP",
                 CreatedUserId = 1,
                 ModifyUserId = 1,
-                CreatedDate = SeedCreatedDate,
-                ModifyDate = SeedModifyDate
+                CreatedAt = SeedCreatedDate,
+                UpdatedAt = SeedModifyDate
             }
         ];
     }

@@ -1,11 +1,13 @@
 using HotelWise.Domain.Dto.Enitty.HotelDtos;
+using HotelWise.Domain.Interfaces.Generic;
+using SmartCoreHub.Core.SDK.Domain.DTOs.Common;
 
 namespace HotelWise.Domain.Interfaces.Entity.HotelInterfaces.Service;
 
 /// <summary>
 /// Contrato de serviço para gerenciamento e consulta de disponibilidade e precificação de quartos.
 /// </summary>
-public interface IRoomAvailabilityService : IGenericService<RoomAvailabilityDto>
+public interface IRoomAvailabilityService : IGenericDtoService<RoomAvailabilityDto>
 {
     /// <summary>
     /// Recupera todas as disponibilidades cadastradas para um determinado quarto.
@@ -28,4 +30,3 @@ public interface IRoomAvailabilityService : IGenericService<RoomAvailabilityDto>
     /// <returns>Resposta contendo o array de disponibilidades correspondentes.</returns>
     Task<ServiceResponse<RoomAvailabilityDto[]>> GetAvailabilitiesBySearchCriteriaAsync(RoomAvailabilitySearchDto searchDto);
 }
-

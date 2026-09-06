@@ -55,7 +55,6 @@ public static class ServicesDomainService
 
         var ignoredInterfaces = new List<Type>
         {
-            typeof(ITokenService),
             typeof(IHotelService),
             typeof(IUserService),
         };

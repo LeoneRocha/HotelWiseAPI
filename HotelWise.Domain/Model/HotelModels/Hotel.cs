@@ -1,15 +1,23 @@
+using System.ComponentModel.DataAnnotations.Schema;
+using SmartCoreHub.Core.SDK.Domain.Abstractions;
 
 namespace HotelWise.Domain.Model.HotelModels;
 
 /// <summary>
 /// Entidade de domínio que representa um estabelecimento hoteleiro com localização, classificação e dados de auditoria.
 /// </summary>
-public class Hotel : IEntityFieldBaseLog
+public class Hotel : LongEntityBase, IEntityFieldBaseLog
 {
     /// <summary>
-    /// Identificador único do hotel.
+    /// Alias de API/compat para a PK legada <c>HotelId</c> (coluna mapeada em <see cref="LongEntityBase.Id"/>).
+    /// Não usar em predicados EF traduzidos — preferir <see cref="LongEntityBase.Id"/>.
     /// </summary>
-    public long HotelId { get; set; }
+    [NotMapped]
+    public long HotelId
+    {
+        get => Id;
+        set => Id = value;
+    }
 
     /// <summary>
     /// Nome comercial do hotel.
@@ -77,12 +85,22 @@ public class Hotel : IEntityFieldBaseLog
     public long? ModifyUserId { get; set; }
 
     /// <summary>
-    /// Data e hora de criação do registro no sistema.
+    /// Alias legado de <see cref="LongEntityBase.CreatedAt"/>.
     /// </summary>
-    public DateTime CreatedDate { get; set; }
+    [NotMapped]
+    public DateTime CreatedDate
+    {
+        get => CreatedAt;
+        set => CreatedAt = value;
+    }
 
     /// <summary>
-    /// Data e hora da última modificação do registro.
+    /// Alias legado de <see cref="LongEntityBase.UpdatedAt"/>.
     /// </summary>
-    public DateTime ModifyDate { get; set; }
+    [NotMapped]
+    public DateTime ModifyDate
+    {
+        get => UpdatedAt;
+        set => UpdatedAt = value;
+    }
 }

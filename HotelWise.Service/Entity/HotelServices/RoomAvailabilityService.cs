@@ -11,7 +11,7 @@ namespace HotelWise.Service.Entity;
 /// <summary>
 /// Serviço de aplicação para gerenciamento de disponibilidades, processamento em lote e consultas de ocupação por período.
 /// </summary>
-public class RoomAvailabilityService : GenericEntityServiceBase<RoomAvailability, RoomAvailabilityDto>, IRoomAvailabilityService
+public class RoomAvailabilityService : DtoEntityServiceBase<RoomAvailability, RoomAvailabilityDto>, IRoomAvailabilityService
 {
     private readonly IRoomAvailabilityRepository _roomAvailabilityRepository;
     private readonly IRoomRepository _roomRepository;
@@ -52,8 +52,8 @@ public class RoomAvailabilityService : GenericEntityServiceBase<RoomAvailability
         var validationResult = await _entityValidator.ValidateAsync(roomAvailability);
         if (!validationResult.IsValid)
         {
-            response.Success = false;
             response.Message = string.Join("; ", validationResult.Errors.Select(e => e.ErrorMessage));
+            response.Errors.Add(new ErrorResponse { Message = response.Message });
             return response;
         }
 
@@ -62,7 +62,6 @@ public class RoomAvailabilityService : GenericEntityServiceBase<RoomAvailability
 
         // Retorna a disponibilidade criada no formato DTO
         response.Data = _mapper.Map<RoomAvailabilityDto>(createdAvailability);
-        response.Success = true;
         response.Message = "Disponibilidade criada com sucesso.";
         return response;
     }
@@ -181,13 +180,13 @@ public class RoomAvailabilityService : GenericEntityServiceBase<RoomAvailability
         /// Constrói uma resposta de sucesso com mensagem.
         /// </summary>
         public static ServiceResponse<T> BuildSuccess(string message) =>
-            new ServiceResponse<T> { Success = true, Message = message };
+            new ServiceResponse<T> { Message = message };
 
         /// <summary>
         /// Constrói uma resposta de erro com mensagem.
         /// </summary>
         public static ServiceResponse<T> BuildError(string message) =>
-            new ServiceResponse<T> { Success = false, Message = message };
+            ServiceResponse<T>.Error([new ErrorResponse { Message = message }], message);
     }
 
     /// <summary>
@@ -204,8 +203,8 @@ public class RoomAvailabilityService : GenericEntityServiceBase<RoomAvailability
         var existingAvailability = await _roomAvailabilityRepository.GetByIdAsync(availabilityId);
         if (existingAvailability == null)
         {
-            response.Success = false;
             response.Message = "Disponibilidade não encontrada.";
+            response.Errors.Add(new ErrorResponse { Message = response.Message });
             return response;
         }
 
@@ -217,8 +216,8 @@ public class RoomAvailabilityService : GenericEntityServiceBase<RoomAvailability
         var validationResult = await _entityValidator.ValidateAsync(roomAvailability);
         if (!validationResult.IsValid)
         {
-            response.Success = false;
             response.Message = string.Join("; ", validationResult.Errors.Select(e => e.ErrorMessage));
+            response.Errors.Add(new ErrorResponse { Message = response.Message });
             return response;
         }
 
@@ -227,7 +226,6 @@ public class RoomAvailabilityService : GenericEntityServiceBase<RoomAvailability
 
         // Retorna a disponibilidade atualizada no formato DTO
         response.Data = _mapper.Map<RoomAvailabilityDto>(updatedAvailability);
-        response.Success = true;
         response.Message = "Disponibilidade atualizada com sucesso.";
         return response;
     }
@@ -245,15 +243,14 @@ public class RoomAvailabilityService : GenericEntityServiceBase<RoomAvailability
         var existingAvailability = await _roomAvailabilityRepository.GetByIdAsync(id);
         if (existingAvailability == null)
         {
-            response.Success = false;
             response.Message = "Disponibilidade não encontrada.";
+            response.Errors.Add(new ErrorResponse { Message = response.Message });
             return response;
         }
 
         // Exclui a disponibilidade
         await _repository.DeleteAsync(id);
 
-        response.Success = true;
         response.Message = "Disponibilidade excluída com sucesso.";
         return response;
     }
@@ -271,8 +268,8 @@ public class RoomAvailabilityService : GenericEntityServiceBase<RoomAvailability
         var roomExists = await _roomRepository.ExistsAsync(r => r.Id == roomId);
         if (!roomExists)
         {
-            response.Success = false;
             response.Message = "O quarto informado não existe.";
+            response.Errors.Add(new ErrorResponse { Message = response.Message });
             return response;
         }
 
@@ -281,7 +278,6 @@ public class RoomAvailabilityService : GenericEntityServiceBase<RoomAvailability
 
         // Retorna as disponibilidades no formato DTO
         response.Data = _mapper.Map<RoomAvailabilityDto[]>(availabilities);
-        response.Success = true;
         response.Message = "Disponibilidades recuperadas com sucesso.";
         return response;
     }
@@ -306,7 +302,6 @@ public class RoomAvailabilityService : GenericEntityServiceBase<RoomAvailability
 
         // Retorna as disponibilidades no formato DTO
         response.Data = _mapper.Map<RoomAvailabilityDto[]>(availabilities);
-        response.Success = true;
         response.Message = "Disponibilidades recuperadas com sucesso.";
         return response;
     }

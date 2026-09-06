@@ -2,6 +2,8 @@
 using HotelWise.Core.SDK.Common.Constants;
 using Microsoft.Extensions.Configuration;
 
+using SmartCoreHub.Core.SDK.Common.Attributes;
+
 namespace HotelWise.Core.SDK.Helpers;
 
 /// <summary>
@@ -15,6 +17,7 @@ namespace HotelWise.Core.SDK.Helpers;
 /// var mysql = ConfigurationAppSettingsHelper.GetConnectionStringMySQL(configuration);
 /// </code>
 /// </example>
+[SdkWrappedSource(targetType: "SmartCoreHub.Core.SDK.Domain.Helpers.ConfigurationAppSettingsHelper", targetPackage: "SmartCoreHub.Core.SDK", description: "Casca/wrapper delegando para SmartCoreHub.Core.SDK.Domain.Helpers.ConfigurationAppSettingsHelper em SmartCoreHub.Core.SDK.")]
 public static class ConfigurationAppSettingsHelper
 {
     /// <summary>Obtém uma seção de configuração validando sua existência.</summary>

@@ -27,6 +27,11 @@ public class ReservationConfiguration : IEntityTypeConfiguration<Reservation>
             .ValueGeneratedOnAdd();
         #endregion  KEY
 
+        // LongEntityBase audit fields not present in Reservation schema
+        builder.Ignore(e => e.CreatedAt);
+        builder.Ignore(e => e.UpdatedAt);
+        builder.Ignore(e => e.IsActive);
+
         builder.Property(r => r.CheckInDate)
                .IsRequired();
         builder.Property(r => r.CheckOutDate)

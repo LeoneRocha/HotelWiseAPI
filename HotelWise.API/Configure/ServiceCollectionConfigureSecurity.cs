@@ -19,7 +19,7 @@ public static class ServiceCollectionConfigureSecurity
     /// <param name="tokenConfigurations">Parâmetros de configuração do token JWT interno.</param>
     /// <param name="configuration">Configurações globais da aplicação.</param>
     /// <param name="azureConfig">Configurações de integração com Azure AD.</param>
-    public static void Configure(IServiceCollection services, TokenConfigurationDto tokenConfigurations, IConfiguration configuration, AzureAdConfig azureConfig)
+    public static void Configure(IServiceCollection services, SmartCoreHub.Core.SDK.Domain.DTOs.Entities.ITokenConfigurationDto tokenConfigurations, IConfiguration configuration, AzureAdConfig azureConfig)
     {
         addSecurity(services, tokenConfigurations, configuration);
     }
@@ -27,7 +27,7 @@ public static class ServiceCollectionConfigureSecurity
     /// <summary>
     /// Configura esquemas de autenticação e políticas de autorização Bearer e AzureAd.
     /// </summary>
-    private static void addSecurity(IServiceCollection services, TokenConfigurationDto tokenConfigurations, IConfiguration configuration)
+    private static void addSecurity(IServiceCollection services, SmartCoreHub.Core.SDK.Domain.DTOs.Entities.ITokenConfigurationDto tokenConfigurations, IConfiguration configuration)
     {
         services.AddAuthentication(options =>
         {

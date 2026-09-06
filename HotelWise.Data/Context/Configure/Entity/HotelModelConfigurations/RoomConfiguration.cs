@@ -28,6 +28,12 @@ public class RoomConfiguration : IEntityTypeConfiguration<Room>
             .ValueGeneratedOnAdd();
         #endregion KEY
 
+        builder.Property(e => e.CreatedAt).HasColumnName("CreatedDate");
+        builder.Property(e => e.UpdatedAt).HasColumnName("ModifyDate");
+        builder.Ignore(e => e.IsActive);
+        builder.Ignore(e => e.CreatedDate);
+        builder.Ignore(e => e.ModifyDate);
+
         builder.Property(r => r.RoomType)
                .IsRequired()
                .HasConversion<byte>();

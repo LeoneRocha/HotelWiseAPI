@@ -31,8 +31,8 @@ public static class RoomsMockData
                 MinimumNights = 1,
                 CreatedUserId = 1,
                 ModifyUserId = 1,
-                CreatedDate = SeedCreatedDate,
-                ModifyDate = SeedModifyDate
+                CreatedAt = SeedCreatedDate,
+                UpdatedAt = SeedModifyDate
             }
         ];
     }

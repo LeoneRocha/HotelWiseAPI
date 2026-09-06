@@ -70,6 +70,6 @@ public class RoomValidator : AbstractValidator<Room>
     /// <returns><c>true</c> se o hotel existir; caso contrário, <c>false</c>.</returns>
     private async Task<bool> HotelExistsAsync(long hotelId, CancellationToken cancellationToken)
     {
-        return await _hotelRepository.ExistsAsync(h => h.HotelId == hotelId);
+        return await _hotelRepository.ExistsAsync(h => h.Id == hotelId);
     }
 }

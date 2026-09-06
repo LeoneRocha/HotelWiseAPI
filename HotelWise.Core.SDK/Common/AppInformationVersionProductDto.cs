@@ -1,4 +1,6 @@
 
+using SmartCoreHub.Core.SDK.Common.Attributes;
+
 namespace HotelWise.Core.SDK.Common;
 
 /// <summary>
@@ -6,7 +8,8 @@ namespace HotelWise.Core.SDK.Common;
 /// Utilizado para expor metadados da aplicação (identidade, nome, versão e ambiente)
 /// em endpoints de health, diagnóstico ou about.
 /// </summary>
-public class AppInformationVersionProductDto : SmartCoreHub.Core.SDK.Common.AppInformationVersionProductDto
+[SdkWrappedSource(targetType: "SmartCoreHub.Core.SDK.Domain.DTOs.Common.AppInformationVersionProductDto", targetPackage: "SmartCoreHub.Core.SDK", description: "Casca/wrapper delegando para SmartCoreHub.Core.SDK.Domain.DTOs.Common.AppInformationVersionProductDto em SmartCoreHub.Core.SDK.")]
+public class AppInformationVersionProductDto : SmartCoreHub.Core.SDK.Domain.DTOs.Common.AppInformationVersionProductDto
 {
 
 }

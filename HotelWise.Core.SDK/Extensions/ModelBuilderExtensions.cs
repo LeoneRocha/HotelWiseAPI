@@ -2,6 +2,8 @@
 using System.Reflection;
 using Microsoft.EntityFrameworkCore;
 
+using SmartCoreHub.Core.SDK.Common.Attributes;
+
 namespace HotelWise.Core.SDK.Extensions;
 
 /// <summary>
@@ -9,6 +11,7 @@ namespace HotelWise.Core.SDK.Extensions;
 /// de classes <see cref="IEntityTypeConfiguration{TEntity}"/> em um assembly,
 /// excluindo tipos já configurados manualmente.
 /// </summary>
+[SdkWrappedSource(targetType: "SmartCoreHub.Core.SDK.Infrastructure.Data.ModelBuilderExtensions", targetPackage: "SmartCoreHub.Core.SDK", description: "Casca/wrapper delegando para SmartCoreHub.Core.SDK.Infrastructure.Data.ModelBuilderExtensions em SmartCoreHub.Core.SDK.")]
 public static class ModelBuilderExtensions
 {
     /// <summary>

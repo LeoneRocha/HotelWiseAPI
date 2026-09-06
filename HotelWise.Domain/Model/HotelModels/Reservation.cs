@@ -5,13 +5,8 @@ namespace HotelWise.Domain.Model.HotelModels;
 /// <summary>
 /// Entidade de domínio que representa a reserva de um quarto por um período específico.
 /// </summary>
-public class Reservation
+public class Reservation : LongEntityBase
 {
-    /// <summary>
-    /// Identificador único da reserva.
-    /// </summary>
-    public long Id { get; set; }
-
     /// <summary>
     /// Identificador do quarto reservado.
     /// </summary>

@@ -7,11 +7,14 @@ using AutoMapper.Configuration.Annotations;
 using Swashbuckle.AspNetCore.Annotations;
 #endif
 
+using SmartCoreHub.Core.SDK.Common.Attributes;
+
 namespace HotelWise.Core.SDK.Common;
 
 /// <summary>
 /// Detalhe de erro padronizado em respostas de serviço.
 /// </summary>
-public class ErrorResponse : SmartCoreHub.Core.SDK.Common.ErrorResponse
+[SdkWrappedSource(targetType: "SmartCoreHub.Core.SDK.Domain.DTOs.Common.ErrorResponse", targetPackage: "SmartCoreHub.Core.SDK", description: "Casca/wrapper delegando para SmartCoreHub.Core.SDK.Domain.DTOs.Common.ErrorResponse em SmartCoreHub.Core.SDK.")]
+public class ErrorResponse : SmartCoreHub.Core.SDK.Domain.DTOs.Common.ErrorResponse
 {
 }

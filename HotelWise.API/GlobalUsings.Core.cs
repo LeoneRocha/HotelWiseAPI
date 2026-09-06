@@ -1,14 +1,13 @@
-global using SmartCoreHub.Core.SDK.Domain.Abstractions;
-global using SmartCoreHub.Core.SDK.Common;
+global using SmartCoreHub.Core.SDK.Domain.DTOs.Common;
 global using SmartCoreHub.Core.SDK.Common.Constants;
 global using SmartCoreHub.Core.SDK.Common.Exceptions;
 global using SmartCoreHub.Core.SDK.Domain.Helpers;
-global using SmartCoreHub.Core.SDK.Service.API.Helpers.Ported;
+global using SmartCoreHub.Core.SDK.Service.API.Helpers;
 global using SmartCoreHub.Core.SDK.Common.Security;
 global using SmartCoreHub.Core.SDK.Infrastructure.Middleware;
-global using SmartCoreHub.Core.SDK.Infrastructure.Middleware.Ported;
-global using SmartCoreHub.Core.SDK.Service.Security.Ported;
+global using SmartCoreHub.Core.SDK.Service.API.Middleware;
 global using SmartCoreHub.Core.SDK.Domain.AI.DTO;
 global using SmartCoreHub.Core.SDK.Domain.AI.Enums;
 global using SmartCoreHub.Core.SDK.Domain.AI.Abstractions;
 global using SmartCoreHub.Core.SDK.Domain.AI.Configuration;
+global using SecurityDto = SmartCoreHub.Core.SDK.Common.SecurityDto;

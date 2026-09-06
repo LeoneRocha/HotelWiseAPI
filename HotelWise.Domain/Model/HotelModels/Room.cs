@@ -1,19 +1,16 @@
+using System.ComponentModel.DataAnnotations.Schema;
 using HotelWise.Domain.Enuns.Hotel;
+using SmartCoreHub.Core.SDK.Domain.Abstractions;
 
 namespace HotelWise.Domain.Model.HotelModels;
 
 /// <summary>
 /// Entidade de domínio que representa uma acomodação/quarto pertencente a um hotel.
 /// </summary>
-public class Room : IEntityFieldBaseLog
+public class Room : LongEntityBase, IEntityFieldBaseLog
 {
     /// <summary>
-    /// Identificador único do quarto.
-    /// </summary>
-    public long Id { get; set; }
-
-    /// <summary>
-    /// Identificador do hotel ao qual o quarto pertence.
+    /// Identificador do hotel ao qual o quarto pertence (FK → coluna Hotels.HotelId).
     /// </summary>
     public long HotelId { get; set; }
 
@@ -70,14 +67,24 @@ public class Room : IEntityFieldBaseLog
     public long? ModifyUserId { get; set; }
 
     /// <summary>
-    /// Data e hora de criação do registro.
+    /// Alias legado de <see cref="LongEntityBase.CreatedAt"/>.
     /// </summary>
-    public DateTime CreatedDate { get; set; }
+    [NotMapped]
+    public DateTime CreatedDate
+    {
+        get => CreatedAt;
+        set => CreatedAt = value;
+    }
 
     /// <summary>
-    /// Data e hora da última modificação do registro.
+    /// Alias legado de <see cref="LongEntityBase.UpdatedAt"/>.
     /// </summary>
-    public DateTime ModifyDate { get; set; }
+    [NotMapped]
+    public DateTime ModifyDate
+    {
+        get => UpdatedAt;
+        set => UpdatedAt = value;
+    }
 
     /// <summary>
     /// Coleção de períodos de disponibilidade cadastrados para o quarto.

@@ -32,13 +32,13 @@ public class AppInformationVersionProductController : ControllerBase
     /// </summary>
     /// <returns>Lista contendo o DTO de metadados da aplicação.</returns>
     [HttpGet("GetAppInformationVersionProduct")]
-    public async Task<ActionResult<List<SmartCoreHub.Core.SDK.Service.API.Helpers.AppInformationVersionProductDto>>> Get()
+    public async Task<ActionResult<List<SmartCoreHub.Core.SDK.Domain.DTOs.Common.AppInformationVersionProductDto>>> Get()
     {
         await Task.FromResult(0);
         var responseVO = LogAppHelper.GetInformationVersionProduct();
         if (responseVO != null)
         {
-            List<SmartCoreHub.Core.SDK.Service.API.Helpers.AppInformationVersionProductDto> response =
+            List<SmartCoreHub.Core.SDK.Domain.DTOs.Common.AppInformationVersionProductDto> response =
                 [responseVO];
             return Ok(response);
         }

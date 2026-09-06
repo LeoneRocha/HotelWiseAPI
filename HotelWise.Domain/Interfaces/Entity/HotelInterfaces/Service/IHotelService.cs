@@ -1,11 +1,13 @@
 using HotelWise.Domain.Dto.Enitty.HotelDtos;
+using HotelWise.Domain.Interfaces.Generic;
+using SmartCoreHub.Core.SDK.Domain.DTOs.Common;
 
 namespace HotelWise.Domain.Interfaces.Entity.HotelInterfaces.Service;
 
 /// <summary>
 /// Contrato de serviço para gerenciamento e operações de negócio de estabelecimentos hoteleiros.
 /// </summary>
-public interface IHotelService : IGenericService<HotelDto>
+public interface IHotelService : IGenericDtoService<HotelDto>
 {
     /// <summary>
     /// Indexa o hotel correspondente na base vetorial (Vector Store) para permitir busca por similaridade semântica.

@@ -3,13 +3,8 @@ namespace HotelWise.Domain.Model.HotelModels;
 /// <summary>
 /// Entidade de domínio que representa a vigência de disponibilidade e precificação de um quarto em um determinado período.
 /// </summary>
-public class RoomAvailability
+public class RoomAvailability : LongEntityBase
 {
-    /// <summary>
-    /// Identificador único da disponibilidade.
-    /// </summary>
-    public long Id { get; set; }
-
     /// <summary>
     /// Identificador do quarto correspondente.
     /// </summary>

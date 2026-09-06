@@ -16,7 +16,18 @@ public class HotelConfiguration : IEntityTypeConfiguration<Hotel>
     /// <param name="builder">Construtor de configuração da entidade.</param>
     public void Configure(EntityTypeBuilder<Hotel> builder)
     {
-        builder.HasKey(e => e.HotelId);
+        builder.HasKey(e => e.Id);
+        builder.Property(e => e.Id)
+            .HasColumnName("HotelId")
+            .ValueGeneratedOnAdd();
+
+        builder.Property(e => e.CreatedAt).HasColumnName("CreatedDate").IsRequired(true);
+        builder.Property(e => e.UpdatedAt).HasColumnName("ModifyDate").IsRequired(true);
+        builder.Ignore(e => e.IsActive);
+        builder.Ignore(e => e.HotelId);
+        builder.Ignore(e => e.CreatedDate);
+        builder.Ignore(e => e.ModifyDate);
+
         builder.Property(e => e.HotelName).IsRequired().HasMaxLength(100).HasColumnType("varchar(100)");
 
         builder.Property(e => e.Description).HasMaxLength(1000).HasColumnType("varchar(1000)");
@@ -39,11 +50,9 @@ public class HotelConfiguration : IEntityTypeConfiguration<Hotel>
 
         builder.Property(e => e.CreatedUserId).IsRequired(false).HasDefaultValue((long)1);
         builder.Property(e => e.ModifyUserId).IsRequired(false).HasDefaultValue((long)1);
-
-        builder.Property(e => e.CreatedDate).IsRequired(true);
         builder.Property(e => e.ModifyUserId).IsRequired(true);
 
-        // Relationship                                    
+        // Relationship
         builder.HasOne(e => e.CreatedUser).WithMany().HasForeignKey(e => e.CreatedUserId);
         builder.HasOne(e => e.ModifyUser).WithMany().HasForeignKey(e => e.ModifyUserId);
 

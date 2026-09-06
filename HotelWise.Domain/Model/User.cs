@@ -1,10 +1,12 @@
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace HotelWise.Domain.Model;
 
 /// <summary>
 /// Entidade de domínio que representa um usuário do sistema, com credenciais, controle de acesso e dados de sessão.
 /// </summary>
-public class User : EntityBaseWithNameEmail
+public class User : LongEntityBase
 {
     /// <summary>
     /// Inicializa uma nova instância de <see cref="User"/>.
@@ -13,7 +15,54 @@ public class User : EntityBaseWithNameEmail
     {
     }
 
-    #region Columns 
+    #region LongEntityBase aliases (API/compat)
+
+    /// <summary>Alias legado de <see cref="LongEntityBase.IsActive"/>.</summary>
+    [NotMapped]
+    public bool Enable
+    {
+        get => IsActive;
+        set => IsActive = value;
+    }
+
+    /// <summary>Alias legado de <see cref="LongEntityBase.CreatedAt"/>.</summary>
+    [NotMapped]
+    public DateTime CreatedDate
+    {
+        get => CreatedAt;
+        set => CreatedAt = value;
+    }
+
+    /// <summary>Alias legado de <see cref="LongEntityBase.UpdatedAt"/>.</summary>
+    [NotMapped]
+    public DateTime ModifyDate
+    {
+        get => UpdatedAt;
+        set => UpdatedAt = value;
+    }
+
+    #endregion
+
+    #region Columns
+
+    /// <summary>
+    /// Nome completo do usuário.
+    /// </summary>
+    [MaxLength(255)]
+    [Required]
+    public string Name { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Endereço de e-mail do usuário.
+    /// </summary>
+    [MaxLength(100)]
+    [Required]
+    public string Email { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Data/hora do último acesso ao sistema.
+    /// </summary>
+    public DateTime LastAccessDate { get; set; }
 
     /// <summary>
     /// Nome de login único do usuário para acesso ao sistema.
@@ -60,6 +109,5 @@ public class User : EntityBaseWithNameEmail
     /// </summary>
     public DateTime? RefreshTokenExpiryTime { get; set; }
 
-    #endregion Columns 
+    #endregion Columns
 }
-

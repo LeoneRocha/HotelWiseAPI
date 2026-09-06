@@ -12,7 +12,7 @@ namespace HotelWise.Service.Entity;
 /// <summary>
 /// Serviço de domínio para criação, validação de regras de estadia, cancelamento e consulta de reservas hoteleiras.
 /// </summary>
-public class ReservationService : GenericEntityServiceBase<Reservation, ReservationDto>, IReservationService
+public class ReservationService : DtoEntityServiceBase<Reservation, ReservationDto>, IReservationService
 {
     private readonly IRoomRepository _roomRepository;
     private readonly IReservationRepository _reservationRepository;
@@ -73,8 +73,8 @@ public class ReservationService : GenericEntityServiceBase<Reservation, Reservat
         var validationResult = await _entityValidator.ValidateAsync(reservation);
         if (!validationResult.IsValid)
         {
-            response.Success = false;
             response.Message = string.Join("; ", validationResult.Errors.Select(e => e.ErrorMessage));
+            response.Errors.Add(new ErrorResponse { Message = response.Message });
             return response;
         }
 
@@ -83,7 +83,6 @@ public class ReservationService : GenericEntityServiceBase<Reservation, Reservat
 
         // Retorna a reserva criada no formato DTO
         response.Data = _mapper.Map<ReservationDto>(createdReservation);
-        response.Success = true;
         response.Message = "Reserva criada com sucesso.";
         return response;
     }
@@ -101,8 +100,8 @@ public class ReservationService : GenericEntityServiceBase<Reservation, Reservat
         var reservation = await _repository.GetByIdAsync(reservationId);
         if (reservation == null)
         {
-            response.Success = false;
             response.Message = "Reserva não encontrada.";
+            response.Errors.Add(new ErrorResponse { Message = response.Message });
             return response;
         }
 
@@ -112,15 +111,14 @@ public class ReservationService : GenericEntityServiceBase<Reservation, Reservat
         var validationResult = await _entityValidator.ValidateAsync(reservation);
         if (!validationResult.IsValid)
         {
-            response.Success = false;
             response.Message = string.Join("; ", validationResult.Errors.Select(e => e.ErrorMessage));
+            response.Errors.Add(new ErrorResponse { Message = response.Message });
             return response;
         }
 
         // Atualiza a reserva no banco
         await _repository.UpdateAsync(reservation);
 
-        response.Success = true;
         response.Message = "Reserva cancelada com sucesso.";
         return response;
     }
@@ -137,13 +135,12 @@ public class ReservationService : GenericEntityServiceBase<Reservation, Reservat
         var reservation = await _repository.GetByIdAsync(reservationId);
         if (reservation == null)
         {
-            response.Success = false;
             response.Message = "Reserva não encontrada.";
+            response.Errors.Add(new ErrorResponse { Message = response.Message });
             return response;
         }
 
         response.Data = _mapper.Map<ReservationDto>(reservation);
-        response.Success = true;
         response.Message = "Reserva encontrada com sucesso.";
         return response;
     }
@@ -160,15 +157,14 @@ public class ReservationService : GenericEntityServiceBase<Reservation, Reservat
         var roomExists = await _roomRepository.ExistsAsync(r => r.Id == roomId);
         if (!roomExists)
         {
-            response.Success = false;
             response.Message = "Quarto informado não existe.";
+            response.Errors.Add(new ErrorResponse { Message = response.Message });
             return response;
         }
 
         var reservations = await _reservationRepository.GetReservationsByRoomIdAsync(roomId);
 
         response.Data = _mapper.Map<ReservationDto[]>(reservations);
-        response.Success = true;
         response.Message = "Reservas recuperadas com sucesso.";
         return response;
     }

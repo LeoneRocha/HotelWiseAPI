@@ -1,10 +1,13 @@
 
+using SmartCoreHub.Core.SDK.Common.Attributes;
+
 namespace HotelWise.Core.SDK.Common.Constants;
 
 /// <summary>
 /// Constantes de configuração geral da aplicação.
 /// Agrupa content-types HTTP, formatos de data/hora e mensagens de configuração inválida.
 /// </summary>
+[SdkWrappedSource(targetType: "SmartCoreHub.Core.SDK.Common.Constants.AppConfigConstants", targetPackage: "SmartCoreHub.Core.SDK", description: "Casca/wrapper delegando para SmartCoreHub.Core.SDK.Common.Constants.AppConfigConstants em SmartCoreHub.Core.SDK.")]
 public static class AppConfigConstants
 {
     /// <summary>Content-type JSON para requisições e respostas HTTP.</summary>

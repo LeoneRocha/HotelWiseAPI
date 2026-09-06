@@ -1,11 +1,11 @@
+using SmartCoreHub.Core.SDK.Common.Attributes;
 
 namespace HotelWise.Core.SDK.Abstractions;
 
 /// <summary>
-/// Contrato de configuração utilizada na emissão e validação de tokens JWT.
-/// Define audiência, emissor, segredo de assinatura e prazos de validade
-/// consumidos pelos serviços de autenticação do SDK.
+/// Contrato de configuração JWT — casca sobre Domain.DTOs.Entities (não Obsolete Abstractions).
 /// </summary>
-public interface ITokenConfigurationDto : SmartCoreHub.Core.SDK.Domain.Abstractions.ITokenConfigurationDto
+[SdkWrappedSource(targetType: "SmartCoreHub.Core.SDK.Domain.DTOs.Entities.ITokenConfigurationDto", targetPackage: "SmartCoreHub.Core.SDK", description: "Casca/wrapper delegando para Domain.DTOs.Entities.ITokenConfigurationDto.")]
+public interface ITokenConfigurationDto : SmartCoreHub.Core.SDK.Domain.DTOs.Entities.ITokenConfigurationDto
 {
 }

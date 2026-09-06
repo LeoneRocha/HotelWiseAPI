@@ -1,3 +1,4 @@
+using HotelWise.Domain.Helpers;
 using HotelWise.Domain.Interfaces.Entity.IA;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -36,8 +37,7 @@ public class AssistantController : ControllerBase
     /// </summary>
     private long GetUserIdCurrent()
     {
-        long idUser = SecurityHelperApi.GetUserIdApi(User);
-        return idUser;
+        return UserClaimsHelper.GetUserId(User);
     }
 
     /// <summary>

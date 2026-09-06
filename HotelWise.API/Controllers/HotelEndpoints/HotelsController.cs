@@ -1,4 +1,5 @@
 using HotelWise.Domain.Dto.Enitty.HotelDtos;
+using HotelWise.Domain.Helpers;
 using HotelWise.Domain.Interfaces.Entity.HotelInterfaces.Service;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -40,8 +41,7 @@ public class HotelsController : ControllerBase
     /// </summary>
     private long GetUserIdCurrent()
     {
-        long idUser = SecurityHelperApi.GetUserIdApi(User);
-        return idUser;
+        return UserClaimsHelper.GetUserId(User);
     }
 
     /// <summary>

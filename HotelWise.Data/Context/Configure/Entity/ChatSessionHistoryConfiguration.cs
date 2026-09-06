@@ -26,6 +26,11 @@ public class ChatSessionHistoryConfiguration : IEntityTypeConfiguration<ChatSess
         builder.Property(e => e.Id)
             .ValueGeneratedOnAdd();
 
+        // LongEntityBase audit fields not present in ChatSessionHistory schema
+        builder.Ignore(e => e.CreatedAt);
+        builder.Ignore(e => e.UpdatedAt);
+        builder.Ignore(e => e.IsActive);
+
         builder.Property(e => e.Title)
             .HasMaxLength(100)
             .IsRequired();

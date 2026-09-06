@@ -1,3 +1,4 @@
+using HotelWise.Domain.Helpers;
 using HotelWise.Domain.Model;
 
 namespace HotelWise.Data.Context.Configure.Mock;
@@ -24,15 +25,15 @@ public static class UserMockData
             Login = "admin",
             Admin = true,
             Email = "admin@sistemas.com",
-            CreatedDate = SeedCreatedDate,
-            Enable = true,
+            CreatedAt = SeedCreatedDate,
+            IsActive = true,
             LastAccessDate = SeedLastAccessDate,
-            ModifyDate = SeedModifyDate,
+            UpdatedAt = SeedModifyDate,
             Role = "Admin",
             Language = CultureDateTimeHelper.GetCultureBrazil(),
             TimeZone = CultureDateTimeHelper.GetTimeZoneBrazil()
         };
-        SecurityHelper.CreatePasswordHash("admin123", out byte[] passwordHash, out byte[] passwordSalt);
+        PasswordHashHelper.CreatePasswordHash("admin123", out byte[] passwordHash, out byte[] passwordSalt);
         newAddUser.PasswordHash = passwordHash;
         newAddUser.PasswordSalt = passwordSalt;
 

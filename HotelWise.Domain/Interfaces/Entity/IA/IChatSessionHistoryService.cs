@@ -1,11 +1,12 @@
 using HotelWise.Domain.Dto.IA;
+using HotelWise.Domain.Interfaces.Generic;
 
 namespace HotelWise.Domain.Interfaces.Entity.IA;
 
 /// <summary>
 /// Contrato de serviço para manipulação, armazenamento e limpeza do histórico de conversas do assistente virtual.
 /// </summary>
-public interface IChatSessionHistoryService : IGenericService<ChatSessionHistoryDto>
+public interface IChatSessionHistoryService : IGenericDtoService<ChatSessionHistoryDto>
 {
     /// <summary>
     /// Recupera o histórico de mensagens de uma sessão pelo token/GUID identificador.
@@ -21,4 +22,3 @@ public interface IChatSessionHistoryService : IGenericService<ChatSessionHistory
     /// <returns>Tarefa representando a operação assíncrona.</returns>
     Task DeleteByIdTokenAsync(string token);
 }
-

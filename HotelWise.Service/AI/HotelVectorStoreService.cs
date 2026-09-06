@@ -118,9 +118,8 @@ public class HotelVectorStoreService : GenericVectorStoreServiceBase, IVectorSto
     /// </summary>
     /// <param name="searchCriteria">Critérios contendo a consulta e limites.</param>
     /// <returns>Resposta contendo o array de registros <see cref="HotelVector"/> encontrados.</returns>
-    public async Task<ServiceResponse<HotelVector[]>> VectorizedSearchAsync(SearchCriteria searchCriteria)
+    public async Task<SmartCoreHub.Core.SDK.Domain.DTOs.Common.ServiceResponse<HotelVector[]>> VectorizedSearchAsync(SearchCriteria searchCriteria)
     {
-        ServiceResponse<HotelVector[]> response = new ServiceResponse<HotelVector[]>();
         try
         {
             if (searchCriteria.MaxRetrieve <= 0)
@@ -133,21 +132,19 @@ public class HotelVectorStoreService : GenericVectorStoreServiceBase, IVectorSto
             var embeddingSearchText = await _aIInferenceService.GenerateEmbeddingAsync(searchCriteria.SearchTextCriteria, _eIAInferenceAdapterType);
 
             var hotelsVector = await _adapter.VectorizedSearchAsync(nameCollection, embeddingSearchText, searchCriteria);
-            response.Success = true;
-            response.Data = hotelsVector;
+            return SmartCoreHub.Core.SDK.Domain.DTOs.Common.ServiceResponse<HotelVector[]>.Ok(hotelsVector);
         }
         catch (Exception ex)
         {
             _logger.Error(ex, "An error occurred in VectorizedSearchAsync at: {Message} at: {Time}", ex.Message, DateTime.UtcNow);
 
 #pragma warning disable S6776
-            response.Success = false;
-            response.Message = ex.Message;
             // NOSONAR
-            response.Errors = new List<ErrorResponse>() { new ErrorResponse() { Message = ex.Message } };
+            return SmartCoreHub.Core.SDK.Domain.DTOs.Common.ServiceResponse<HotelVector[]>.Error(
+                [new SmartCoreHub.Core.SDK.Domain.DTOs.Common.ErrorResponse { Message = ex.Message }],
+                ex.Message);
 #pragma warning restore S6776
         }
-        return response;
     }
 
     /// <summary>
@@ -155,9 +152,8 @@ public class HotelVectorStoreService : GenericVectorStoreServiceBase, IVectorSto
     /// </summary>
     /// <param name="searchText">Texto da consulta do usuário.</param>
     /// <returns>Resposta contendo os registros vetoriais filtrados.</returns>
-    public async Task<ServiceResponse<HotelVector[]>> SearchAndAnalyzePluginAsync(string searchText)
+    public async Task<SmartCoreHub.Core.SDK.Domain.DTOs.Common.ServiceResponse<HotelVector[]>> SearchAndAnalyzePluginAsync(string searchText)
     {
-        ServiceResponse<HotelVector[]> response = new ServiceResponse<HotelVector[]>();
         try
         {
             //Get semantic search 
@@ -165,22 +161,19 @@ public class HotelVectorStoreService : GenericVectorStoreServiceBase, IVectorSto
 
             var resultIA = await _adapter.SearchAndAnalyzePluginAsync(nameCollection, searchText, embeddingSearchText);
 
-            response.Success = true;
-            response.Data = resultIA;
+            return SmartCoreHub.Core.SDK.Domain.DTOs.Common.ServiceResponse<HotelVector[]>.Ok(resultIA);
         }
         catch (Exception ex)
         {
             _logger.Error(ex, "An error occurred in SearchAndAnalyzePluginAsync at: {Message} at: {Time}", ex.Message, DateTime.UtcNow);
 
-            response.Success = false;
-            response.Message = ex.Message;
-
 #pragma warning disable S6776
             // NOSONAR
-            response.Errors = new List<ErrorResponse>() { new ErrorResponse() { Message = ex.Message } };
+            return SmartCoreHub.Core.SDK.Domain.DTOs.Common.ServiceResponse<HotelVector[]>.Error(
+                [new SmartCoreHub.Core.SDK.Domain.DTOs.Common.ErrorResponse { Message = ex.Message }],
+                ex.Message);
 #pragma warning restore S6776
         }
-        return response;
     }
 
     /// <summary>

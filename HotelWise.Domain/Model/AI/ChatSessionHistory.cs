@@ -6,16 +6,8 @@ namespace HotelWise.Domain.Model.AI;
 /// <summary>
 /// Entidade de domínio para persistência do histórico completo de conversação de uma sessão de IA.
 /// </summary>
-public class ChatSessionHistory
+public class ChatSessionHistory : LongEntityBase
 {
-    /// <summary>
-    /// Identificador primário numérico autoincremento.
-    /// </summary>
-    [Column("Id", Order = 0)]
-    [Key]
-    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-    public long Id { get; set; }
-
     /// <summary>
     /// Título descritivo ou assunto resumido da sessão de conversa.
     /// </summary>
@@ -51,4 +43,3 @@ public class ChatSessionHistory
     /// </summary>
     public long? IdUser { get; set; }
 }
-

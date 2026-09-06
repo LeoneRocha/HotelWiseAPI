@@ -22,7 +22,15 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
         builder.HasKey(e => e.Id);
 
         builder.Property(e => e.Id).ValueGeneratedOnAdd();
-        builder.Property(e => e.Enable);
+        // LongEntityBase canônico → colunas legadas Enable/CreatedDate/ModifyDate/LastAccessDate
+        builder.Property(e => e.IsActive).HasColumnName("Enable");
+        builder.Property(e => e.CreatedAt).HasColumnName("CreatedDate");
+        builder.Property(e => e.UpdatedAt).HasColumnName("ModifyDate");
+        builder.Property(e => e.LastAccessDate).HasColumnName("LastAccessDate");
+        builder.Ignore(e => e.Enable);
+        builder.Ignore(e => e.CreatedDate);
+        builder.Ignore(e => e.ModifyDate);
+
         builder.Property(e => e.Name).HasMaxLength(255).IsRequired().HasColumnType(EntityTypeConfigurationConstants.Type_Varchar_255);
 
         builder.Property(e => e.Email).HasMaxLength(100).IsRequired().HasColumnType("varchar(100)");
@@ -39,4 +47,3 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
         builder.HasData(UserMockData.GetMock());
     }
 }
-

@@ -2,6 +2,8 @@
 using System.Text.RegularExpressions;
 using Markdig;
 
+using SmartCoreHub.Core.SDK.Common.Attributes;
+
 namespace HotelWise.Core.SDK.Helpers;
 
 /// <summary>
@@ -14,6 +16,7 @@ namespace HotelWise.Core.SDK.Helpers;
 ///     html = MarkdownHelper.ConvertToHtmlIfMarkdown(text);
 /// </code>
 /// </example>
+[SdkWrappedSource(targetType: "SmartCoreHub.Core.SDK.Domain.Helpers.MarkdownHelper", targetPackage: "SmartCoreHub.Core.SDK", description: "Casca/wrapper delegando para SmartCoreHub.Core.SDK.Domain.Helpers.MarkdownHelper em SmartCoreHub.Core.SDK.")]
 public static class MarkdownHelper
 {
     /// <summary>Remove formatações Markdown do texto informado.</summary>

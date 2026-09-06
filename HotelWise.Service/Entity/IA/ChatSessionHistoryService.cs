@@ -11,7 +11,7 @@ namespace HotelWise.Service.Entity;
 /// <summary>
 /// Serviço de aplicação para gerenciamento de histórico de conversas do assistente inteligente.
 /// </summary>
-public class ChatSessionHistoryService : GenericEntityServiceBase<ChatSessionHistory, ChatSessionHistoryDto>, IChatSessionHistoryService
+public class ChatSessionHistoryService : DtoEntityServiceBase<ChatSessionHistory, ChatSessionHistoryDto>, IChatSessionHistoryService
 {
     private readonly IChatSessionHistoryRepository _entitylRepository;
 

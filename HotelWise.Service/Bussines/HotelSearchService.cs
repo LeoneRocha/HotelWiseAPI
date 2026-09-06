@@ -15,7 +15,7 @@ namespace HotelWise.Service.Entity;
 /// <summary>
 /// Serviço de busca semântica inteligente de hotéis, combinando busca vetorial com análise e síntese via modelo de linguagem (RAG).
 /// </summary>
-public class HotelSearchService : GenericEntityServiceBase<Hotel, HotelDto>, IHotelSearchService
+public class HotelSearchService : DtoEntityServiceBase<Hotel, HotelDto>, IHotelSearchService
 {
     private readonly IVectorStoreService<HotelVector> _hotelVectorStoreService;
     private readonly IHotelRepository _hotelRepository;
@@ -68,7 +68,8 @@ public class HotelSearchService : GenericEntityServiceBase<Hotel, HotelDto>, IHo
         {
             if (string.IsNullOrEmpty(searchCriteria.SearchTextCriteria))
             {
-                response.Success = false;
+                response.Message = "Operation failed.";
+                response.Errors.Add(new ErrorResponse { Message = response.Message });
                 return response;
             }
 
@@ -95,16 +96,10 @@ public class HotelSearchService : GenericEntityServiceBase<Hotel, HotelDto>, IHo
 
             // Filtra os resultados de HotelsVectorResult com base nos IDs retornados pela inferência
             response.Data = FilterHotelsByIAResult(response.Data, hotelsResultInterference);
-
-            if (response.Errors.Count == 0)
-            {
-                response.Success = true;
-            }
         }
         catch (Exception ex)
         {
             _logger.Error(ex, "SemanticSearch: {Message} at: {Time}", ex.Message, DataHelper.GetDateTimeNowToLog());
-            response.Success = false;
             response.Errors.Add(new ErrorResponse() { Message = ex.Message });
             response.Data.HotelsVectorResult = [];
             response.Data.HotelsIAResult = [];
@@ -160,7 +155,6 @@ public class HotelSearchService : GenericEntityServiceBase<Hotel, HotelDto>, IHo
             });
             var result = allHotels.Distinct().OrderBy(hotel => hotel.HotelId).ToArray();
 
-            response.Success = true;
             response.Data = result;
         }
         catch (Exception ex)

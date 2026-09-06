@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using SmartCoreHub.Core.SDK.Infrastructure.Security;
+using SmartCoreHub.Core.SDK.Service.Security;
 
 namespace HotelWise.Service.Configure;
 
@@ -15,11 +17,8 @@ public static class ServiceCollectionConfigureServicesDomain
     /// <summary>
     /// Configura todos os serviços, repositórios, validadores e provedores de IA da aplicação.
     /// </summary>
-    /// <param name="services">Coleção de serviços da aplicação.</param>
-    /// <param name="_configuration">Instância de configuração global (IConfiguration).</param>
     public static void Configure(IServiceCollection services, IConfiguration _configuration)
     {
-        // AutoMapper
         ServiceCollectionConfigureAutoMapper.Configure(services);
         AddDependenciesSingleton(services);
 
@@ -33,7 +32,6 @@ public static class ServiceCollectionConfigureServicesDomain
         SemanticKernelProviderConfigure.SetupSemanticKernelProvider(services, _configuration);
         #endregion KERNEL
 
-        // Validators
         services.AddValidatorsFromAssemblyContaining<HotelValidator>();
 
         ServicesDomainRepository.AddDependenciesAuto(services);
@@ -41,13 +39,18 @@ public static class ServiceCollectionConfigureServicesDomain
     }
 
     /// <summary>
-    /// Registra dependências singleton utilitárias como HttpContextAccessor e TokenService.
+    /// Registra dependências singleton utilitárias como HttpContextAccessor e IJwtAccessTokenService.
     /// </summary>
     private static void AddDependenciesSingleton(IServiceCollection services)
     {
         services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
-        services.AddSingleton<ITokenService, TokenService>();
+        services.AddSingleton<IJwtAccessTokenService>(sp =>
+        {
+            var tokenDto = sp.GetRequiredService<SmartCoreHub.Core.SDK.Domain.DTOs.Entities.TokenConfigurationDto>();
+            var configuration = sp.GetRequiredService<IConfiguration>();
+            var factory = new SecurityTokenAdapterFactory(configuration, tokenDto);
+            return new JwtAccessTokenService(factory);
+        });
     }
 }
-

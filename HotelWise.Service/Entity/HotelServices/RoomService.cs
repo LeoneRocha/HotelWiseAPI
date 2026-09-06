@@ -11,7 +11,7 @@ namespace HotelWise.Service.Entity.HotelServices;
 /// <summary>
 /// Serviço de domínio para gestão do cadastro de quartos, suas características, capacidade e vinculação a hotéis.
 /// </summary>
-public class RoomService : GenericEntityServiceBase<Room, RoomDto>, IRoomService
+public class RoomService : DtoEntityServiceBase<Room, RoomDto>, IRoomService
 {
     private readonly IRoomRepository _roomRepository;
 
@@ -53,8 +53,8 @@ public class RoomService : GenericEntityServiceBase<Room, RoomDto>, IRoomService
         var validationResult = await _entityValidator.ValidateAsync(room);
         if (!validationResult.IsValid)
         {
-            response.Success = false;
             response.Message = string.Join("; ", validationResult.Errors.Select(e => e.ErrorMessage));
+            response.Errors.Add(new ErrorResponse { Message = response.Message });
             return response;
         }
 
@@ -63,7 +63,6 @@ public class RoomService : GenericEntityServiceBase<Room, RoomDto>, IRoomService
 
         // Retorna o quarto criado no formato DTO
         response.Data = _mapper.Map<RoomDto>(createdRoom);
-        response.Success = true;
         response.Message = "Quarto criado com sucesso.";
         return response;
     }
@@ -82,8 +81,8 @@ public class RoomService : GenericEntityServiceBase<Room, RoomDto>, IRoomService
         var existingRoom = await _roomRepository.ExistsAsync(x => x.Id == roomId);
         if (!existingRoom)
         {
-            response.Success = false;
             response.Message = "Quarto não encontrado.";
+            response.Errors.Add(new ErrorResponse { Message = response.Message });
             return response;
         }
 
@@ -99,8 +98,8 @@ public class RoomService : GenericEntityServiceBase<Room, RoomDto>, IRoomService
         var validationResult = await _entityValidator.ValidateAsync(room);
         if (!validationResult.IsValid)
         {
-            response.Success = false;
             response.Message = string.Join("; ", validationResult.Errors.Select(e => e.ErrorMessage));
+            response.Errors.Add(new ErrorResponse { Message = response.Message });
             return response;
         }
 
@@ -109,7 +108,6 @@ public class RoomService : GenericEntityServiceBase<Room, RoomDto>, IRoomService
 
         // Retorna o quarto atualizado no formato DTO
         response.Data = _mapper.Map<RoomDto>(updatedRoom);
-        response.Success = true;
         response.Message = "Quarto atualizado com sucesso.";
         return response;
     }
@@ -127,15 +125,14 @@ public class RoomService : GenericEntityServiceBase<Room, RoomDto>, IRoomService
         var existingRoom = await _roomRepository.GetByIdAsync(id);
         if (existingRoom == null)
         {
-            response.Success = false;
             response.Message = "Quarto não encontrado.";
+            response.Errors.Add(new ErrorResponse { Message = response.Message });
             return response;
         }
 
         // Exclui o quarto
         await _repository.DeleteAsync(id);
 
-        response.Success = true;
         response.Message = "Quarto excluído com sucesso.";
         return response;
     }
@@ -153,14 +150,13 @@ public class RoomService : GenericEntityServiceBase<Room, RoomDto>, IRoomService
         var rooms = await _roomRepository.GetRoomsByHotelIdAsync(hotelId);
         if (rooms == null || rooms.Length == 0)
         {
-            response.Success = false;
             response.Message = "Nenhum quarto encontrado para o hotel informado.";
+            response.Errors.Add(new ErrorResponse { Message = response.Message });
             return response;
         }
 
         // Retorna os quartos no formato DTO
         response.Data = _mapper.Map<RoomDto[]>(rooms);
-        response.Success = true;
         response.Message = "Quartos recuperados com sucesso.";
         return response;
     }

@@ -28,6 +28,11 @@ public class RoomAvailabilityConfiguration : IEntityTypeConfiguration<RoomAvaila
             .ValueGeneratedOnAdd();
         #endregion  KEY
 
+        // LongEntityBase audit fields not present in RoomAvailability schema
+        builder.Ignore(e => e.CreatedAt);
+        builder.Ignore(e => e.UpdatedAt);
+        builder.Ignore(e => e.IsActive);
+
         builder.Property(ra => ra.StartDate)
                    .IsRequired();
 

@@ -1,11 +1,13 @@
 using HotelWise.Domain.Dto.Enitty.HotelDtos;
+using HotelWise.Domain.Interfaces.Generic;
+using SmartCoreHub.Core.SDK.Domain.DTOs.Common;
 
 namespace HotelWise.Domain.Interfaces.Entity.HotelInterfaces.Service;
 
 /// <summary>
 /// Contrato de serviço para gerenciamento do ciclo de vida, consultas e cancelamento de reservas hoteleiras.
 /// </summary>
-public interface IReservationService : IGenericService<ReservationDto>
+public interface IReservationService : IGenericDtoService<ReservationDto>
 {
     /// <summary>
     /// Cancela uma reserva existente de acordo com as regras de negócio de antecedência.

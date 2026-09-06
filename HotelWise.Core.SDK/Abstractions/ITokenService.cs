@@ -1,12 +1,22 @@
 using System.Security.Claims;
 
+using SmartCoreHub.Core.SDK.Common.Attributes;
+
 namespace HotelWise.Core.SDK.Abstractions;
 
 /// <summary>
-/// Contrato de serviço responsável pela emissão, renovação e validação de tokens de autenticação (JWT).
-/// Abstrai a geração de access tokens a partir de claims, a emissão de refresh tokens
-/// e a recuperação do principal de segurança a partir de um token expirado.
+/// Contrato local de emissão JWT (mesma superfície do legado, sem herdar SCH Obsolete).
+/// Preferir <c>IJwtAccessTokenService</c> nos hosts.
 /// </summary>
-public interface ITokenService : SmartCoreHub.Core.SDK.Domain.Abstractions.ITokenService
+[SdkWrappedSource(targetType: "SmartCoreHub.Core.SDK.Service.Security.IJwtAccessTokenService", targetPackage: "SmartCoreHub.Core.SDK", description: "Casca local compatível com IJwtAccessTokenService (3 métodos).")]
+public interface ITokenService
 {
+    /// <summary>Gera um access token JWT contendo as claims informadas.</summary>
+    string GenerateAccessToken(IEnumerable<Claim> claims);
+
+    /// <summary>Gera um refresh token opaco para renovação de sessão.</summary>
+    string GenerateRefreshToken();
+
+    /// <summary>Obtém o <see cref="ClaimsPrincipal"/> a partir de um access token expirado.</summary>
+    ClaimsPrincipal GetPrincipalFromExpiredToken(string token);
 }
