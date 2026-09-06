@@ -107,7 +107,7 @@ public class ConsolidationCoverageGapsTests
             Mock.Of<IApplicationIAConfig>(),
             Mock.Of<VectorStore>(),
             Kernel.CreateBuilder().Build(),
-            Mock.Of<Serilog.ILogger>());
+            Mock.Of<SmartCoreHub.Core.SDK.Domain.Interfaces.Common.IAppLogger>());
 
         var adapter = factory.CreateAdapter<GapDataVector>();
         adapter.Should().NotBeNull();

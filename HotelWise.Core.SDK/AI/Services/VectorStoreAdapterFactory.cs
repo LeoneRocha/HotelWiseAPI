@@ -2,6 +2,7 @@
 using HotelWise.Core.SDK.AI.Abstractions;
 using HotelWise.Core.SDK.AI.Adapters;
 using HotelWise.Core.SDK.AI.DTO;
+using SmartCoreHub.Core.SDK.Domain.Interfaces.Common;
 using SchFactory = SmartCoreHub.Core.SDK.Service.AI.Services.VectorStoreAdapterFactory;
 
 using SmartCoreHub.Core.SDK.Common.Attributes;
@@ -15,13 +16,13 @@ namespace HotelWise.Core.SDK.AI.Services;
 public class VectorStoreAdapterFactory : SchFactory, IVectorStoreAdapterFactory
 {
     /// <summary>
-    /// Inicializa a fábrica delegando configuração SCH.
+    /// Inicializa a fábrica delegando configuração SCH (IAppLogger canônico).
     /// </summary>
     public VectorStoreAdapterFactory(
         IApplicationIAConfig applicationConfig,
         Microsoft.Extensions.VectorData.VectorStore vectorStore,
         Microsoft.SemanticKernel.Kernel kernel,
-        Serilog.ILogger logger)
+        IAppLogger? logger = null)
         : base(applicationConfig, vectorStore, kernel, logger)
     {
     }
