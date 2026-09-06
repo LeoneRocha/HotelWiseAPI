@@ -244,7 +244,7 @@ public class ConsolidationCoverageTests
     {
         var context = new DefaultHttpContext();
         context.Response.Body = new MemoryStream();
-        var logger = new Mock<Microsoft.Extensions.Logging.ILogger<SmartCoreHub.Core.SDK.Service.API.Middleware.RequestLoggingMiddleware>>();
+        var logger = new Mock<Microsoft.Extensions.Logging.ILogger<RequestLoggingMiddleware>>();
         var invoked = false;
         var mw = new RequestLoggingMiddleware(_ => { invoked = true; return Task.CompletedTask; }, logger.Object);
         await mw.InvokeAsync(context);

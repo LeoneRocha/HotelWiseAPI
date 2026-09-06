@@ -91,7 +91,7 @@ public class LoteD4MiddlewareTests
         context.Items[CorrelationIdMiddleware.ItemKey] = "corr-2";
         var called = false;
 
-        var logger = new Mock<Microsoft.Extensions.Logging.ILogger<SmartCoreHub.Core.SDK.Service.API.Middleware.RequestLoggingMiddleware>>();
+        var logger = new Mock<Microsoft.Extensions.Logging.ILogger<RequestLoggingMiddleware>>();
 
         var middleware = new RequestLoggingMiddleware(_ =>
         {

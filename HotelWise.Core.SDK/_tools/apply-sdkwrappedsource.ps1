@@ -137,15 +137,15 @@ foreach ($file in $files) {
   $content = [System.IO.File]::ReadAllText($file.FullName, $utf8)
   if ($content -match '\[SdkWrappedSource') { continue }
 
-  $matches = $typeDeclRegex.Matches($content)
-  if ($matches.Count -eq 0) {
+  $matchedTypeDecls = $typeDeclRegex.Matches($content)
+  if ($matchedTypeDecls.Count -eq 0) {
     $skipped.Add("$($file.Name): no type decl") | Out-Null
     continue
   }
 
   $newContent = $content
-  for ($i = $matches.Count - 1; $i -ge 0; $i--) {
-    $m = $matches[$i]
+  for ($i = $matchedTypeDecls.Count - 1; $i -ge 0; $i--) {
+    $m = $matchedTypeDecls[$i]
     $typeName = $m.Groups[4].Value
     $inherit = $m.Groups[7].Value
     $indent = $m.Groups[2].Value
@@ -160,7 +160,7 @@ foreach ($file in $files) {
       $target = Get-InheritSchTarget $inherit
       if (-not $target) {
         $start = $m.Index
-        $end = if ($i -lt $matches.Count - 1) { $matches[$i + 1].Index } else { $content.Length }
+        $end = if ($i -lt $matchedTypeDecls.Count - 1) { $matchedTypeDecls[$i + 1].Index } else { $content.Length }
         $slice = $content.Substring($start, $end - $start)
         $target = Get-StaticDelegateTarget $slice
       }

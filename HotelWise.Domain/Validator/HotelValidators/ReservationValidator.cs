@@ -113,7 +113,7 @@ public class ReservationValidator : AbstractValidator<Reservation>
     /// <returns><c>true</c> se o quarto existir; caso contrário, <c>false</c>.</returns>
     private async Task<bool> RoomExistenceAsync(Reservation reservation, CancellationToken cancellationToken)
     {
-        return await _roomRepository.ExistsAsync(r => r.Id == reservation.RoomId);
+        return await _roomRepository.ExistsAsync(r => r.Id == reservation.RoomId, cancellationToken);
     }
 
     /// <summary>

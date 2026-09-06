@@ -25,10 +25,10 @@ public class RequestLoggingMiddleware : SmartCoreHub.Core.SDK.Service.API.Middle
     /// Inicializa uma nova instância de <see cref="RequestLoggingMiddleware"/>.
     /// </summary>
     /// <param name="next">Próximo delegate na esteira HTTP.</param>
-    /// <param name="logger">Logger MS.Extensions para o middleware canônico SCH.</param>
+    /// <param name="logger">Logger MS.Extensions para o middleware.</param>
     public RequestLoggingMiddleware(
         RequestDelegate next,
-        ILogger<SmartCoreHub.Core.SDK.Service.API.Middleware.RequestLoggingMiddleware> logger)
+        ILogger<RequestLoggingMiddleware> logger)
         : base(next, logger)
     {
     }

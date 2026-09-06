@@ -101,6 +101,43 @@ function Get-ConstraintsAndInterfaces([string[]]$Lines, [int]$DeclStart, [int]$B
   return [PSCustomObject]@{ Constraints = $constraintList; HwInterfaces = $interfaceList }
 }
 
+function Find-DeclarationLineIndex([string[]]$Lines, [int]$StartIdx, [object]$DocInfo) {
+  $k = $StartIdx
+  while ($k -lt $Lines.Count -and ($Lines[$k] -match '^\s*\[' -or $Lines[$k] -match '^\s*$')) {
+    if ($Lines[$k] -match '^\s*\[') { $DocInfo.PreAttrs += $Lines[$k].Trim() }
+    $k++
+  }
+  return $k
+}
+
+function Build-ObsoleteTypeBlock([string[]]$Lines, [object]$AttrInfo, [object]$DocInfo, [int]$DeclIdx, [object]$DeclMatch) {
+  $mod = $DeclMatch.Groups[1].Value
+  $name = $DeclMatch.Groups[3].Value
+  $bounds = Get-BlockBoundaries -Lines $Lines -StartLine $DeclIdx
+  $ci = Get-ConstraintsAndInterfaces -Lines $Lines -DeclStart $DeclIdx -BodyStart $bounds.BodyStart
+  $schTarget = if ($AttrInfo.SchTarget) { $AttrInfo.SchTarget } else { "SmartCoreHub.Core.SDK.Domain.$name" }
+
+  return [PSCustomObject]@{
+    Kind = $DeclMatch.Groups[2].Value
+    Name = $name
+    Generics = $DeclMatch.Groups[4].Value
+    IsAbstract = ($mod -eq 'abstract')
+    IsStatic = ($mod -eq 'static')
+    IsSealed = ($mod -eq 'sealed')
+    Sch = $schTarget
+    PreAttrs = $DocInfo.PreAttrs
+    XmlDoc = $DocInfo.XmlDoc
+    Attr = $AttrInfo.AttrText
+    Constraints = $ci.Constraints
+    HwInterfaces = $ci.HwInterfaces
+    FileStart = $DocInfo.DocStart
+    DeclLine = $DeclIdx
+    BodyStart = $bounds.BodyStart
+    BodyEnd = $bounds.BodyEnd
+    BodyLines = $Lines[($bounds.BodyStart + 1)..($bounds.BodyEnd - 1)]
+  }
+}
+
 function Get-ObsoleteTypes {
   param([string[]]$Lines)
   $blocks = @()
@@ -111,47 +148,15 @@ function Get-ObsoleteTypes {
     $attrInfo = Get-ObsoleteAttrInfo -Lines $Lines -Idx $i
     $docInfo = Get-DocAndPreAttrs -Lines $Lines -AttrStart $i
 
-    $k = $attrInfo.EndIdx + 1
-    while ($k -lt $Lines.Count -and ($Lines[$k] -match '^\s*\[' -or $Lines[$k] -match '^\s*$')) {
-      if ($Lines[$k] -match '^\s*\[') { $docInfo.PreAttrs += $Lines[$k].Trim() }
-      $k++
-    }
+    $k = Find-DeclarationLineIndex -Lines $Lines -StartIdx ($attrInfo.EndIdx + 1) -DocInfo $docInfo
     if ($k -ge $Lines.Count) { break }
 
-    $declLine = $Lines[$k]
-    $declMatch = [regex]::Match($declLine, 'public\s+(?:(abstract|sealed|static)\s+)?(class|interface|enum)\s+(\w+)(<[^>]+>)?')
+    $declMatch = [regex]::Match($Lines[$k], 'public\s+(?:(abstract|sealed|static)\s+)?(class|interface|enum)\s+(\w+)(<[^>]+>)?')
     if (-not $declMatch.Success) { $i = $k + 1; continue }
 
-    $mod = $declMatch.Groups[1].Value
-    $kind = $declMatch.Groups[2].Value
-    $name = $declMatch.Groups[3].Value
-    $gen = $declMatch.Groups[4].Value
-
-    $bounds = Get-BlockBoundaries -Lines $Lines -StartLine $k
-    $ci = Get-ConstraintsAndInterfaces -Lines $Lines -DeclStart $k -BodyStart $bounds.BodyStart
-
-    $schTarget = if ($attrInfo.SchTarget) { $attrInfo.SchTarget } else { "SmartCoreHub.Core.SDK.Domain.$name" }
-
-    $blocks += [PSCustomObject]@{
-      Kind = $kind
-      Name = $name
-      Generics = $gen
-      IsAbstract = ($mod -eq 'abstract')
-      IsStatic = ($mod -eq 'static')
-      IsSealed = ($mod -eq 'sealed')
-      Sch = $schTarget
-      PreAttrs = $docInfo.PreAttrs
-      XmlDoc = $docInfo.XmlDoc
-      Attr = $attrInfo.AttrText
-      Constraints = $ci.Constraints
-      HwInterfaces = $ci.HwInterfaces
-      FileStart = $docInfo.DocStart
-      DeclLine = $k
-      BodyStart = $bounds.BodyStart
-      BodyEnd = $bounds.BodyEnd
-      BodyLines = $Lines[($bounds.BodyStart + 1)..($bounds.BodyEnd - 1)]
-    }
-    $i = $bounds.BodyEnd + 1
+    $block = Build-ObsoleteTypeBlock -Lines $Lines -AttrInfo $attrInfo -DocInfo $docInfo -DeclIdx $k -DeclMatch $declMatch
+    $blocks += $block
+    $i = $block.BodyEnd + 1
   }
   return $blocks
 }
@@ -193,6 +198,28 @@ function Get-StaticPropertiesAndFields([string]$Text, [string]$SchFqn) {
   return $out
 }
 
+function Format-CallArgument([string]$Part) {
+  $pTrim = $Part.Trim()
+  if (-not $pTrim) { return $null }
+  $withoutModifiers = $pTrim -replace '^this\s+','' -replace '^out\s+','' -replace '^ref\s+','' -replace '^in\s+',''
+  $withoutDefault = ($withoutModifiers -split '=')[0].Trim()
+  $tokens = $withoutDefault -split '\s+'
+  $pname = $tokens[-1].TrimStart('@')
+  if ($Part -match '^\s*out\s+') { return "out $pname" }
+  if ($Part -match '^\s*ref\s+') { return "ref $pname" }
+  return $pname
+}
+
+function Format-CallArguments([string]$Params) {
+  if (-not $Params) { return "" }
+  $callArgs = @()
+  foreach ($part in ($Params -split ',')) {
+    $arg = Format-CallArgument $part
+    if ($arg) { $callArgs += $arg }
+  }
+  return ($callArgs -join ', ')
+}
+
 function Get-StaticMethods([string]$Text, [string]$SchFqn) {
   $out = @()
   $methodMatches = [regex]::Matches($Text, '(?m)^\s*public\s+static\s+(?:async\s+)?([\w.<>,\[\]\?]+)\s+(\w+)(<[^>]+>)?\s*\(([^)]*)\)')
@@ -202,21 +229,7 @@ function Get-StaticMethods([string]$Text, [string]$SchFqn) {
     $name = $m.Groups[2].Value
     $gen = $m.Groups[3].Value
     $params = $m.Groups[4].Value.Trim()
-    $callArgs = @()
-    if ($params) {
-      foreach ($part in ($params -split ',')) {
-        $pTrim = $part.Trim()
-        if (-not $pTrim) { continue }
-        $withoutModifiers = $pTrim -replace '^this\s+','' -replace '^out\s+','' -replace '^ref\s+','' -replace '^in\s+',''
-        $withoutDefault = ($withoutModifiers -split '=')[0].Trim()
-        $tokens = $withoutDefault -split '\s+'
-        $pname = $tokens[-1].TrimStart('@')
-        if ($part -match '^\s*out\s+') { $callArgs += "out $pname" }
-        elseif ($part -match '^\s*ref\s+') { $callArgs += "ref $pname" }
-        else { $callArgs += $pname }
-      }
-    }
-    $argStr = $callArgs -join ', '
+    $argStr = Format-CallArguments $params
     $signature = "    public static $ret $name$gen($params) =>`n        $SchFqn.$name$gen($argStr);"
     $out += $signature
   }
@@ -254,35 +267,45 @@ function New-ClassCtors([string[]]$BodyLines, [string]$TypeName) {
   return ($parts -join "`n`n")
 }
 
-function New-WrapperType($b) {
+function Get-WrapperHeader($b) {
   $doc = if ($b.XmlDoc.Count) { ($b.XmlDoc -join "`n") + "`n" } else { "" }
   $pre = if ($b.PreAttrs.Count) { ($b.PreAttrs -join "`n") + "`n" } else { "" }
-  $attr = $b.Attr + "`n"
-  $sch = $b.Sch
-  $gen = $b.Generics
-  $constraints = if ($b.Constraints.Count) { "`n    " + ($b.Constraints -join "`n    ") } else { "" }
+  return "${doc}${pre}$($b.Attr)`n"
+}
 
-  if ($b.Kind -eq 'enum') { return $null }
-  if ($b.Kind -eq 'interface') {
-    return "${doc}${pre}${attr}public interface $($b.Name)$gen : $sch$gen$constraints`n{`n}"
-  }
-  if ($b.IsStatic) {
-    $members = Get-StaticMembers -BodyLines @($b.BodyLines) -SchFqn $sch
-    $body = if ($members.Count) { ($members -join "`n`n") } else { "    // no public members detected" }
-    return "${doc}${pre}${attr}public static class $($b.Name)`n{`n$body`n}"
-  }
-  if ($b.Name -in @('ApplicationIAConfig','RagConfig')) { return $null }
-  if ($b.Name -eq 'SearchCriteria') {
-    return "${doc}${pre}${attr}public class SearchCriteria : $sch`n{`n    /// <summary>Alias legado HW → MaxRetrieve.</summary>`n    public int MaxHotelRetrieve { get => MaxRetrieve; set => MaxRetrieve = value; }`n}"
-  }
+function New-StaticWrapperType($b, [string]$Header) {
+  $members = Get-StaticMembers -BodyLines @($b.BodyLines) -SchFqn $b.Sch
+  $body = if ($members.Count) { ($members -join "`n`n") } else { "    // no public members detected" }
+  return "${Header}public static class $($b.Name)`n{`n$body`n}"
+}
 
+function New-ClassWrapperType($b, [string]$Header, [string]$Constraints) {
   $abs = if ($b.IsAbstract) { "abstract " } else { "" }
   $ctorText = New-ClassCtors -BodyLines @($b.BodyLines) -TypeName $b.Name
-  $extraIfaces = if ($b.HwInterfaces -and @($b.HwInterfaces).Count -gt 0) {
-    ", " + ((@($b.HwInterfaces) | Select-Object -Unique) -join ", ")
-  } else { "" }
+  $extraIfaces = ""
+  if ($b.HwInterfaces -and @($b.HwInterfaces).Count -gt 0) {
+    $extraIfaces = ", " + ((@($b.HwInterfaces) | Select-Object -Unique) -join ", ")
+  }
+  return "${Header}public ${abs}class $($b.Name)$($b.Generics) : $($b.Sch)$($b.Generics)$extraIfaces$Constraints`n{`n$ctorText`n}".TrimEnd() + "`n"
+}
 
-  return "${doc}${pre}${attr}public ${abs}class $($b.Name)$gen : $sch$gen$extraIfaces$constraints`n{`n$ctorText`n}".TrimEnd() + "`n"
+function New-WrapperType($b) {
+  if ($b.Kind -eq 'enum' -or $b.Name -in @('ApplicationIAConfig','RagConfig')) { return $null }
+
+  $header = Get-WrapperHeader $b
+  $constraints = if ($b.Constraints.Count) { "`n    " + ($b.Constraints -join "`n    ") } else { "" }
+
+  if ($b.Kind -eq 'interface') {
+    return "${header}public interface $($b.Name)$($b.Generics) : $($b.Sch)$($b.Generics)$constraints`n{`n}"
+  }
+  if ($b.IsStatic) {
+    return New-StaticWrapperType -b $b -Header $header
+  }
+  if ($b.Name -eq 'SearchCriteria') {
+    return "${header}public class SearchCriteria : $($b.Sch)`n{`n    /// <summary>Alias legado HW → MaxRetrieve.</summary>`n    public int MaxHotelRetrieve { get => MaxRetrieve; set => MaxRetrieve = value; }`n}"
+  }
+
+  return New-ClassWrapperType -b $b -Header $header -Constraints $constraints
 }
 
 # ---------- main ----------

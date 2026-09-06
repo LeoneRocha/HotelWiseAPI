@@ -21,7 +21,6 @@ public class HotelSearchService : DtoEntityServiceBase<Hotel, HotelDto>, IHotelS
     private readonly IHotelRepository _hotelRepository;
     private readonly IAIInferenceService _aIInferenceService;
     private readonly InferenceAiAdapterType _eIAInferenceAdapterType;
-    private readonly IApplicationIAConfig _applicationConfig;
     private readonly IConfiguration? _configuration;
 
     /// <summary>
@@ -48,7 +47,6 @@ public class HotelSearchService : DtoEntityServiceBase<Hotel, HotelDto>, IHotelS
     {
         _hotelVectorStoreService = hotelVectorStoreService;
         _hotelRepository = hotelRepository;
-        _applicationConfig = applicationConfig;
         _configuration = configuration;
         _eIAInferenceAdapterType = applicationConfig.RagConfig.GetAInferenceAdapterType();
         _aIInferenceService = aIInferenceService;

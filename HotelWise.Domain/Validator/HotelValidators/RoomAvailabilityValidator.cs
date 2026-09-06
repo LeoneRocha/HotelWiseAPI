@@ -140,7 +140,7 @@ public class RoomAvailabilityValidator : AbstractValidator<RoomAvailability>
     /// <returns><c>true</c> se o quarto for encontrado.</returns>
     private async Task<bool> RoomExistsAsync(long roomId, CancellationToken cancellationToken)
     {
-        return await _roomRepository.ExistsAsync(r => r.Id == roomId);
+        return await _roomRepository.ExistsAsync(r => r.Id == roomId, cancellationToken);
     }
 
     /// <summary>

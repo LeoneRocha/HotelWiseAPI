@@ -13,7 +13,6 @@ public class HotelVectorStoreService : GenericVectorStoreServiceBase, IVectorSto
     private readonly IAIInferenceService _aIInferenceService;
     private readonly string nameCollection;
     private readonly InferenceAiAdapterType _eIAInferenceAdapterType;
-    private readonly IApplicationIAConfig _applicationIAConfig;
     private readonly IConfiguration? _configuration;
 
     /// <summary>
@@ -33,7 +32,6 @@ public class HotelVectorStoreService : GenericVectorStoreServiceBase, IVectorSto
         IAIInferenceService aIInferenceService,
         IConfiguration? configuration = null) : base(mapper, logger)
     {
-        _applicationIAConfig = applicationIAConfig;
         _configuration = configuration;
         _eIAInferenceAdapterType = applicationIAConfig.RagConfig.GetAInferenceAdapterType();
         _adapter = adapterFactory.CreateAdapter<HotelVector>();
