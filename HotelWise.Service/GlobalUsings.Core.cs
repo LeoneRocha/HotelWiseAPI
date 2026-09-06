@@ -8,6 +8,7 @@ global using SmartCoreHub.Core.SDK.Service.API.Helpers;
 global using SmartCoreHub.Core.SDK.Common.Security;
 global using SmartCoreHub.Core.SDK.Service.Validation;
 global using HotelWise.Service.Generic;
+global using HotelWise.Service.Logging;
 global using SmartCoreHub.Core.SDK.Infrastructure;
 global using SmartCoreHub.Core.SDK.Domain.AI.Abstractions;
 global using SmartCoreHub.Core.SDK.Infrastructure.AI.Adapters;

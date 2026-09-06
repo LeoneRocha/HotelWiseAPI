@@ -1,0 +1,21 @@
+<Project>
+  <!-- Troca PackageReference SmartCoreHub.Core.SDK por ProjectReference (somente projetos HotelWise que já usavam o pacote). -->
+  <PropertyGroup>
+    <_UseLocalSchProjectReference Condition="
+      '$(UseLocalSmartCoreHub)' == 'true'
+      And Exists('$(SmartCoreHubSdkProject)')
+      And (
+        '$(MSBuildProjectName)' == 'HotelWise.API'
+        Or '$(MSBuildProjectName)' == 'HotelWise.Service'
+        Or '$(MSBuildProjectName)' == 'HotelWise.Domain'
+        Or '$(MSBuildProjectName)' == 'HotelWise.Data'
+        Or '$(MSBuildProjectName)' == 'HotelWise.Core.SDK'
+        Or $(MSBuildProjectName.EndsWith('.Tests'))
+      )">true</_UseLocalSchProjectReference>
+  </PropertyGroup>
+
+  <ItemGroup Condition="'$(_UseLocalSchProjectReference)' == 'true'">
+    <PackageReference Remove="SmartCoreHub.Core.SDK" />
+    <ProjectReference Include="$(SmartCoreHubSdkProject)" />
+  </ItemGroup>
+</Project>

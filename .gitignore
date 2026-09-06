@@ -1,4 +1,4 @@
-﻿# Created by https://www.toptal.com/developers/gitignore/api/csharp,visualstudio
+# Created by https://www.toptal.com/developers/gitignore/api/csharp,visualstudio
 # Edit at https://www.toptal.com/developers/gitignore?templates=csharp,visualstudio
 
 ### Csharp ###
@@ -582,6 +582,8 @@ FodyWeavers.xsd
 
 # End of https://www.toptal.com/developers/gitignore/api/csharp,visualstudio
 /HotelWise.API/appsettings.Development.json
+*.backup.json
+appsettings.*.backup.json
 /QdrantDockerFile/qdrant_storage/collections/skhotels/0/segments
 /QdrantDockerFile/qdrant_storage
 /DOCUMENTACAO/API/DevOps-ApplicationIAConfig-Variaveis.md

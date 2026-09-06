@@ -90,6 +90,7 @@
     <PackageVersion Include="Microsoft.SemanticKernel.Agents.Core" Version="1.80.1" />
     <PackageVersion Include="Microsoft.SemanticKernel.Connectors.MistralAI" Version="1.80.1-alpha" />
     <PackageVersion Include="Microsoft.SemanticKernel.Connectors.Ollama" Version="1.80.1-alpha" />
+    <PackageVersion Include="Microsoft.SemanticKernel.Connectors.OpenAI" Version="1.80.1" />
     <PackageVersion Include="Microsoft.SemanticKernel.Plugins.Memory" Version="1.80.1-alpha" />
     <PackageVersion Include="CommunityToolkit.VectorData.InMemory" Version="1.0.1" />
     <PackageVersion Include="CommunityToolkit.VectorData.Qdrant" Version="1.0.0" />

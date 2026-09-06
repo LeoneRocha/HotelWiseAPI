@@ -5,58 +5,102 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.ChatCompletion;
 using Microsoft.SemanticKernel.Connectors.MistralAI;
+using Microsoft.SemanticKernel.Connectors.OpenAI;
 
 namespace HotelWise.ConsolePOC;
 
 /// <summary>
-/// POC para isolar chamadas à Mistral (HTTP direto + Semantic Kernel),
-/// útil para diagnosticar 429 / rate limit fora do HotelWise.API.
+/// POC para isolar chamadas Mistral / LM Studio (OpenAI-compatible).
 /// </summary>
 static class Program
 {
-    private const string DefaultModel = "mistral-medium-latest";
-    private const string ChatUrl = "https://api.mistral.ai/v1/chat/completions";
+    private const string DefaultMistralModel = "mistral-medium-latest";
+    private const string MistralChatUrl = "https://api.mistral.ai/v1/chat/completions";
 
     static async Task<int> Main(string[] args)
     {
         Console.OutputEncoding = Encoding.UTF8;
-        Console.WriteLine("=== HotelWise.ConsolePOC — Mistral diagnostic ===\n");
+        Console.WriteLine("=== HotelWise.ConsolePOC — AI diagnostic ===\n");
 
         var config = BuildConfiguration();
-        var apiKey = ResolveApiKey(config, args);
-        var modelId = config["ApplicationIAConfig:AIServices:MistralApi:ModelId"] ?? DefaultModel;
-
-        if (string.IsNullOrWhiteSpace(apiKey))
-        {
-            Console.WriteLine("API key não encontrada.");
-            Console.WriteLine("Informe via:");
-            Console.WriteLine("  - appsettings (ApplicationIAConfig:AIServices:MistralApi:ApiKey)");
-            Console.WriteLine("  - env MISTRAL_API_KEY");
-            Console.WriteLine("  - arg --api-key=<key>");
-            return 1;
-        }
-
-        Console.WriteLine($"Model : {modelId}");
-        Console.WriteLine($"ApiKey: {MaskKey(apiKey)}");
-        Console.WriteLine($"Prompt: \"Responda só com a palavra OK.\"\n");
-
+        var mode = ResolveMode(args, config);
         var prompt = args.FirstOrDefault(a => !a.StartsWith("--", StringComparison.Ordinal))
                      ?? "Responda só com a palavra OK.";
 
-        Console.WriteLine("--- 1) HTTP direto (api.mistral.ai) ---");
-        var httpOk = await RunRawHttpAsync(apiKey, modelId, prompt);
+        return mode switch
+        {
+            "lmstudio" or "openai" or "local" => await RunLmStudioAsync(config, args, prompt),
+            _ => await RunMistralAsync(config, args, prompt),
+        };
+    }
 
-        Console.WriteLine("\n--- 2) Semantic Kernel (AddMistralChatCompletion) ---");
-        var skOk = await RunSemanticKernelAsync(apiKey, modelId, prompt);
+    private static string ResolveMode(string[] args, IConfiguration config)
+    {
+        var fromArg = args.FirstOrDefault(a => a.StartsWith("--mode=", StringComparison.OrdinalIgnoreCase));
+        if (!string.IsNullOrWhiteSpace(fromArg))
+        {
+            return fromArg["--mode=".Length..].Trim().ToLowerInvariant();
+        }
+
+        var chatApi = config["ApplicationIAConfig:Rag:AIChatServiceApi"] ?? string.Empty;
+        return chatApi.Equals("OpenAI", StringComparison.OrdinalIgnoreCase) ? "lmstudio" : "mistral";
+    }
+
+    private static async Task<int> RunLmStudioAsync(IConfiguration config, string[] args, string prompt)
+    {
+        var endpoint = config["ApplicationIAConfig:AIServices:OpenAI:Endpoint"]
+                       ?? "http://192.168.15.21:1234/v1";
+        var modelId = config["ApplicationIAConfig:AIServices:OpenAI:ModelId"]
+                      ?? "shisa-v2-mistral-nemo-12b-abliterated-i1";
+        var apiKey = ResolveOpenAiKey(config, args);
+
+        Console.WriteLine("Mode  : LM Studio / OpenAI-compatible");
+        Console.WriteLine($"URL   : {endpoint}");
+        Console.WriteLine($"Model : {modelId}");
+        Console.WriteLine($"ApiKey: {MaskKey(apiKey)}");
+        Console.WriteLine($"Prompt: \"{prompt}\"\n");
+
+        Console.WriteLine("--- 1) HTTP direto (/v1/chat/completions) ---");
+        var chatUrl = endpoint.TrimEnd('/') + "/chat/completions";
+        var httpOk = await RunRawOpenAiCompatibleAsync(chatUrl, apiKey, modelId, prompt);
+
+        Console.WriteLine("\n--- 2) Semantic Kernel (AddOpenAIChatCompletion) ---");
+        var skOk = await RunSemanticKernelOpenAiAsync(endpoint, apiKey, modelId, prompt);
 
         Console.WriteLine("\n=== Resumo ===");
         Console.WriteLine($"HTTP direto     : {(httpOk ? "OK" : "FALHOU")}");
         Console.WriteLine($"Semantic Kernel : {(skOk ? "OK" : "FALHOU")}");
+        return httpOk && skOk ? 0 : 2;
+    }
 
+    private static async Task<int> RunMistralAsync(IConfiguration config, string[] args, string prompt)
+    {
+        var apiKey = ResolveMistralKey(config, args);
+        var modelId = config["ApplicationIAConfig:AIServices:MistralApi:ModelId"] ?? DefaultMistralModel;
+
+        if (string.IsNullOrWhiteSpace(apiKey))
+        {
+            Console.WriteLine("API key Mistral não encontrada. Use --mode=lmstudio para LM Studio local.");
+            return 1;
+        }
+
+        Console.WriteLine("Mode  : Mistral cloud");
+        Console.WriteLine($"Model : {modelId}");
+        Console.WriteLine($"ApiKey: {MaskKey(apiKey)}");
+        Console.WriteLine($"Prompt: \"{prompt}\"\n");
+
+        Console.WriteLine("--- 1) HTTP direto (api.mistral.ai) ---");
+        var httpOk = await RunRawOpenAiCompatibleAsync(MistralChatUrl, apiKey, modelId, prompt);
+
+        Console.WriteLine("\n--- 2) Semantic Kernel (AddMistralChatCompletion) ---");
+        var skOk = await RunSemanticKernelMistralAsync(apiKey, modelId, prompt);
+
+        Console.WriteLine("\n=== Resumo ===");
+        Console.WriteLine($"HTTP direto     : {(httpOk ? "OK" : "FALHOU")}");
+        Console.WriteLine($"Semantic Kernel : {(skOk ? "OK" : "FALHOU")}");
         if (!httpOk || !skOk)
         {
-            Console.WriteLine("\nSe ambos falham com 429, o problema é conta/quota/tier Mistral, não a lógica do HotelWise.");
-            Console.WriteLine("Cheque: https://admin.mistral.ai/plateforme/limits");
+            Console.WriteLine("\nSe 429: conta/quota Mistral. Alternativa: --mode=lmstudio");
             return 2;
         }
 
@@ -79,16 +123,11 @@ static class Program
             builder.AddJsonFile(apiDevSettings, optional: false, reloadOnChange: false);
             Console.WriteLine($"Config: {apiDevSettings}");
         }
-        else
-        {
-            Console.WriteLine($"AVISO: não achei appsettings da API em:\n  {apiDevSettings}");
-            Console.WriteLine("Usando só env / appsettings locais do POC.\n");
-        }
 
         return builder.Build();
     }
 
-    private static string ResolveApiKey(IConfiguration config, string[] args)
+    private static string ResolveMistralKey(IConfiguration config, string[] args)
     {
         var fromArg = args.FirstOrDefault(a => a.StartsWith("--api-key=", StringComparison.OrdinalIgnoreCase));
         if (!string.IsNullOrWhiteSpace(fromArg))
@@ -101,20 +140,31 @@ static class Program
                ?? string.Empty;
     }
 
-    private static async Task<bool> RunRawHttpAsync(string apiKey, string modelId, string prompt)
+    private static string ResolveOpenAiKey(IConfiguration config, string[] args)
     {
-        using var http = new HttpClient { Timeout = TimeSpan.FromSeconds(60) };
-        using var request = new HttpRequestMessage(HttpMethod.Post, ChatUrl);
+        var fromArg = args.FirstOrDefault(a => a.StartsWith("--api-key=", StringComparison.OrdinalIgnoreCase));
+        if (!string.IsNullOrWhiteSpace(fromArg))
+        {
+            return fromArg["--api-key=".Length..].Trim();
+        }
+
+        var key = config["ApplicationIAConfig:AIServices:OpenAI:ApiKey"]
+                  ?? Environment.GetEnvironmentVariable("OPENAI_API_KEY")
+                  ?? "lm-studio";
+        return string.IsNullOrWhiteSpace(key) ? "lm-studio" : key;
+    }
+
+    private static async Task<bool> RunRawOpenAiCompatibleAsync(string chatUrl, string apiKey, string modelId, string prompt)
+    {
+        using var http = new HttpClient { Timeout = TimeSpan.FromSeconds(120) };
+        using var request = new HttpRequestMessage(HttpMethod.Post, chatUrl);
         request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", apiKey);
         request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
         var payload = new
         {
             model = modelId,
-            messages = new[]
-            {
-                new { role = "user", content = prompt }
-            },
+            messages = new[] { new { role = "user", content = prompt } },
             max_tokens = 16,
             temperature = 0.0
         };
@@ -140,7 +190,37 @@ static class Program
         return false;
     }
 
-    private static async Task<bool> RunSemanticKernelAsync(string apiKey, string modelId, string prompt)
+    private static async Task<bool> RunSemanticKernelOpenAiAsync(string endpoint, string apiKey, string modelId, string prompt)
+    {
+        try
+        {
+#pragma warning disable SKEXP0010
+            var kernel = Kernel.CreateBuilder()
+                .AddOpenAIChatCompletion(modelId: modelId, endpoint: new Uri(endpoint), apiKey: apiKey)
+                .Build();
+#pragma warning restore SKEXP0010
+
+            var chat = kernel.GetRequiredService<IChatCompletionService>();
+            var history = new ChatHistory();
+            history.AddUserMessage(prompt);
+
+            var started = DateTimeOffset.Now;
+            var result = await chat.GetChatMessageContentAsync(history);
+            var elapsed = DateTimeOffset.Now - started;
+
+            Console.WriteLine($"Status : OK ({elapsed.TotalMilliseconds:0} ms)");
+            Console.WriteLine($"Reply  : {Truncate(result.Content ?? string.Empty, 500)}");
+            return true;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("Status : FALHOU");
+            Console.WriteLine($"Error  : {ex.GetType().Name}: {ex.Message}");
+            return false;
+        }
+    }
+
+    private static async Task<bool> RunSemanticKernelMistralAsync(string apiKey, string modelId, string prompt)
     {
         try
         {
@@ -162,7 +242,7 @@ static class Program
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Status : FALHOU");
+            Console.WriteLine("Status : FALHOU");
             Console.WriteLine($"Error  : {ex.GetType().Name}: {ex.Message}");
             if (ex.InnerException is not null)
             {

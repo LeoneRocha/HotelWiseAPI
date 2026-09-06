@@ -1,6 +1,6 @@
 #if NET8_0_OR_GREATER
 using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Logging;
+using SmartCoreHub.Core.SDK.Domain.Interfaces.Common;
 
 using SmartCoreHub.Core.SDK.Common.Attributes;
 
@@ -25,10 +25,10 @@ public class RequestLoggingMiddleware : SmartCoreHub.Core.SDK.Service.API.Middle
     /// Inicializa uma nova instância de <see cref="RequestLoggingMiddleware"/>.
     /// </summary>
     /// <param name="next">Próximo delegate na esteira HTTP.</param>
-    /// <param name="logger">Logger MS.Extensions para o middleware.</param>
+    /// <param name="logger">Logger canônico IAppLogger para o middleware.</param>
     public RequestLoggingMiddleware(
         RequestDelegate next,
-        ILogger<RequestLoggingMiddleware> logger)
+        IAppLogger<SmartCoreHub.Core.SDK.Service.API.Middleware.RequestLoggingMiddleware>? logger = null)
         : base(next, logger)
     {
     }
