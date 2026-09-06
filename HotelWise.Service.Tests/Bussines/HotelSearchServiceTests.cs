@@ -75,11 +75,7 @@ public class HotelSearchServiceTests
         _mapperMock.Setup(m => m.Map<HotelDto[]>(It.IsAny<Hotel[]>())).Returns(hotelDtos);
 
         _vectorStoreMock.Setup(v => v.VectorizedSearchAsync(criteria))
-            .ReturnsAsync(new ServiceResponse<HotelVector[]>
-            {
-                Success = true,
-                Data = hotelVectors
-            });
+            .ReturnsAsync(ServiceResponse<HotelVector[]>.Ok(hotelVectors));
 
         const string aiResponse = """
             Encontrei excelentes opções para sua estadia:
@@ -116,11 +112,7 @@ public class HotelSearchServiceTests
         _hotelRepoMock.Setup(r => r.GetTotalHotelsCountAsync()).ThrowsAsync(new Exception("Database connection failure"));
 
         _vectorStoreMock.Setup(v => v.VectorizedSearchAsync(criteria))
-            .ReturnsAsync(new ServiceResponse<HotelVector[]>
-            {
-                Success = true,
-                Data = []
-            });
+            .ReturnsAsync(ServiceResponse<HotelVector[]>.Ok([]));
 
         _inferenceMock.Setup(i => i.GenerateChatCompletionByAgentSimpleRagAsync(
                 It.IsAny<PromptMessageVO[]>(),

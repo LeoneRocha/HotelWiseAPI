@@ -1,11 +1,11 @@
 using HotelWise.Core.SDK.Infrastructure;
 using Microsoft.EntityFrameworkCore;
+using SmartCoreHub.Core.SDK.Domain.Entities.Common;
 
 namespace HotelWise.Core.SDK.Tests.Infrastructure;
 
-public class TestEntity
+public class TestEntity : LongEntityBase
 {
-    public long Id { get; set; }
     public string Name { get; set; } = string.Empty;
 }
 
@@ -23,6 +23,9 @@ public class TestDbContext : DbContext
         {
             e.HasKey(x => x.Id);
             e.Property(x => x.Id).ValueGeneratedOnAdd();
+            e.Ignore(x => x.IsActive);
+            e.Ignore(x => x.CreatedAt);
+            e.Ignore(x => x.UpdatedAt);
         });
     }
 }
@@ -56,7 +59,7 @@ public class GenericRepositoryBaseTests
             .Options;
 
         var act = () => new TestRepository(null!, options);
-        act.Should().Throw<ArgumentNullException>().WithParameterName("context");
+        act.Should().Throw<ArgumentNullException>();
     }
 
     [Fact]

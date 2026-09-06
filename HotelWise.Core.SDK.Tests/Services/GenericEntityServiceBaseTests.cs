@@ -5,12 +5,12 @@ using FluentValidation.Results;
 using HotelWise.Core.SDK.Abstractions;
 using HotelWise.Core.SDK.Security;
 using HotelWise.Core.SDK.Services;
+using SmartCoreHub.Core.SDK.Domain.Entities.Common;
 
 namespace HotelWise.Core.SDK.Tests.Services;
 
-public class SampleEntity
+public class SampleEntity : LongEntityBase
 {
-    public long Id { get; set; }
     public string Name { get; set; } = string.Empty;
 }
 
@@ -45,9 +45,9 @@ public class GenericEntityServiceBaseTests
     [Fact]
     public async Task GetAllAsync_Should_Map_Entities()
     {
-        var entities = new List<SampleEntity> { new() { Id = 1, Name = "A" } };
+        var entities = new[] { new SampleEntity { Id = 1, Name = "A" } };
         var dtos = new List<SampleDto> { new() { Id = 1, Name = "A" } };
-        _repo.Setup(r => r.GetAllAsync()).ReturnsAsync(entities);
+        _repo.Setup(r => r.GetAllAsync(It.IsAny<CancellationToken>())).ReturnsAsync(entities);
         _mapper.Setup(m => m.Map<List<SampleDto>>(entities)).Returns(dtos);
 
         var result = await CreateSut().GetAllAsync();
@@ -82,7 +82,7 @@ public class GenericEntityServiceBaseTests
         _mapper.Setup(m => m.Map<SampleEntity>(dto)).Returns(entity);
         _mapper.Setup(m => m.Map<SampleDto>(saved)).Returns(savedDto);
         _validator.Setup(v => v.ValidateAsync(entity, default)).ReturnsAsync(new ValidationResult());
-        _repo.Setup(r => r.AddAsync(entity)).ReturnsAsync(saved);
+        _repo.Setup(r => r.AddAsync(entity, It.IsAny<CancellationToken>())).ReturnsAsync(saved);
 
         var response = await CreateSut().CreateAsync(dto);
         response.Success.Should().BeTrue();
@@ -115,6 +115,7 @@ public class TokenServiceTests
         var service = new TokenService(config.Object);
         var refresh = service.GenerateRefreshToken();
         refresh.Should().NotBeNullOrWhiteSpace();
-        Convert.FromBase64String(refresh).Should().HaveCount(32);
+        // Canônico JwtAccessTokenService gera 16 bytes (não 32 do Ported legado).
+        Convert.FromBase64String(refresh).Should().HaveCount(16);
     }
 }

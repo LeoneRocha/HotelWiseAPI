@@ -309,9 +309,8 @@ public class ConsolidationCoverageGapsTests
         public DbSet<GapEntity> Items => Set<GapEntity>();
     }
 
-    private sealed class GapEntity
+    private sealed class GapEntity : SmartCoreHub.Core.SDK.Domain.Entities.Common.LongEntityBase
     {
-        public long Id { get; set; }
         public string Name { get; set; } = "";
     }
 

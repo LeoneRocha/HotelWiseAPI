@@ -205,19 +205,19 @@ public class ConsolidationCoverageTests
         var dto = new SampleDto2 { Id = 1, Name = "n" };
         mapper.Setup(m => m.Map<SampleEnt>(dto)).Returns(entity);
         mapper.Setup(m => m.Map<SampleDto2>(entity)).Returns(dto);
-        mapper.Setup(m => m.Map<List<SampleDto2>>(It.IsAny<List<SampleEnt>>())).Returns(new List<SampleDto2> { dto });
+        mapper.Setup(m => m.Map<List<SampleDto2>>(It.IsAny<SampleEnt[]>())).Returns(new List<SampleDto2> { dto });
         mapper.Setup(m => m.Map<Expression<Func<SampleEnt, bool>>>(It.IsAny<Expression<Func<SampleDto2, bool>>>()))
             .Returns((Expression<Func<SampleEnt, bool>>)(e => true));
         mapper.Setup(m => m.Map<IEnumerable<SampleEnt>>(It.IsAny<IEnumerable<SampleDto2>>())).Returns(new[] { entity });
 
-        repo.Setup(r => r.GetByIdAsync(1)).ReturnsAsync(entity);
-        repo.Setup(r => r.FindAsync(It.IsAny<Expression<Func<SampleEnt, bool>>>())).ReturnsAsync(new List<SampleEnt> { entity });
-        repo.Setup(r => r.UpdateAsync(entity)).ReturnsAsync(entity);
-        repo.Setup(r => r.FetchAsync(0, 1)).ReturnsAsync(new List<SampleEnt> { entity });
-        repo.Setup(r => r.DeleteAsync(1)).Returns(Task.CompletedTask);
-        repo.Setup(r => r.AddRangeAsync(It.IsAny<IEnumerable<SampleEnt>>())).Returns(Task.CompletedTask);
-        repo.Setup(r => r.UpdateRangeAsync(It.IsAny<IEnumerable<SampleEnt>>())).Returns(Task.CompletedTask);
-        repo.Setup(r => r.CountAsync()).ReturnsAsync(1);
+        repo.Setup(r => r.GetByIdAsync(1, It.IsAny<CancellationToken>())).ReturnsAsync(entity);
+        repo.Setup(r => r.FindAsync(It.IsAny<Expression<Func<SampleEnt, bool>>>(), It.IsAny<CancellationToken>())).ReturnsAsync(new[] { entity });
+        repo.Setup(r => r.UpdateAsync(entity, It.IsAny<CancellationToken>())).ReturnsAsync(entity);
+        repo.Setup(r => r.FetchAsync(0, 1, It.IsAny<CancellationToken>())).ReturnsAsync(new[] { entity });
+        repo.Setup(r => r.DeleteAsync(1, It.IsAny<CancellationToken>())).ReturnsAsync(true);
+        repo.Setup(r => r.AddRangeAsync(It.IsAny<IEnumerable<SampleEnt>>(), It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
+        repo.Setup(r => r.UpdateRangeAsync(It.IsAny<IEnumerable<SampleEnt>>(), It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
+        repo.Setup(r => r.CountAsync(It.IsAny<CancellationToken>())).ReturnsAsync(1);
 
         var sut = new SampleSvc(repo.Object, mapper.Object, logger.Object, validator.Object);
         sut.SetUserId(1);
@@ -231,7 +231,7 @@ public class ConsolidationCoverageTests
         (await sut.CountAsync()).Should().Be(1);
     }
 
-    public class SampleEnt { public long Id { get; set; } public string Name { get; set; } = ""; }
+    public class SampleEnt : SmartCoreHub.Core.SDK.Domain.Entities.Common.LongEntityBase { public string Name { get; set; } = ""; }
     public class SampleDto2 { public long Id { get; set; } public string Name { get; set; } = ""; }
     private sealed class SampleSvc : GenericEntityServiceBase<SampleEnt, SampleDto2>
     {
@@ -244,8 +244,7 @@ public class ConsolidationCoverageTests
     {
         var context = new DefaultHttpContext();
         context.Response.Body = new MemoryStream();
-        var logger = new Mock<Serilog.ILogger>();
-        logger.Setup(l => l.Information(It.IsAny<string>(), It.IsAny<object[]>()));
+        var logger = new Mock<Microsoft.Extensions.Logging.ILogger<SmartCoreHub.Core.SDK.Service.API.Middleware.RequestLoggingMiddleware>>();
         var invoked = false;
         var mw = new RequestLoggingMiddleware(_ => { invoked = true; return Task.CompletedTask; }, logger.Object);
         await mw.InvokeAsync(context);

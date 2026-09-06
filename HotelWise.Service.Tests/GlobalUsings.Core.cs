@@ -1,10 +1,10 @@
-global using SmartCoreHub.Core.SDK.Domain.Abstractions;
-global using SmartCoreHub.Core.SDK.Common;
+global using SmartCoreHub.Core.SDK.Domain.DTOs.Common;
 global using SmartCoreHub.Core.SDK.Common.Constants;
-global using SmartCoreHub.Core.SDK.Domain.Entities.Common.Ported;
+global using SmartCoreHub.Core.SDK.Domain.Entities.Common;
 global using SmartCoreHub.Core.SDK.Domain.AI.Abstractions;
 global using SmartCoreHub.Core.SDK.Domain.AI.Configuration;
 global using SmartCoreHub.Core.SDK.Domain.AI.DTO;
 global using SmartCoreHub.Core.SDK.Domain.AI.Enums;
 global using SmartCoreHub.Core.SDK.Service.AI.Services;
-global using SmartCoreHub.Core.SDK.Service.Security.Ported;
+global using SmartCoreHub.Core.SDK.Infrastructure.Repositories.Generic;
+global using HotelWise.Service.Generic;

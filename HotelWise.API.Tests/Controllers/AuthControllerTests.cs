@@ -21,11 +21,7 @@ public class AuthControllerTests
     {
         // Arrange
         var request = new UserLoginDto { Login = "admin", Password = "secret" };
-        var response = new ServiceResponse<GetUserAuthenticatedDto>
-        {
-            Success = true,
-            Data = new GetUserAuthenticatedDto { Name = "Admin" }
-        };
+        var response = ServiceResponse<GetUserAuthenticatedDto>.Ok(new GetUserAuthenticatedDto { Name = "Admin" });
         _userService.Setup(s => s.Login("admin", "secret")).ReturnsAsync(response);
 
         // Act
@@ -41,11 +37,9 @@ public class AuthControllerTests
     {
         // Arrange
         var request = new UserLoginDto { Login = "admin", Password = "wrong" };
-        var response = new ServiceResponse<GetUserAuthenticatedDto>
-        {
-            Success = false,
-            Message = "Invalid credentials"
-        };
+        var response = ServiceResponse<GetUserAuthenticatedDto>.Error(
+            [new ErrorResponse { Message = "Invalid credentials" }],
+            "Invalid credentials");
         _userService.Setup(s => s.Login("admin", "wrong")).ReturnsAsync(response);
 
         // Act
@@ -56,4 +50,3 @@ public class AuthControllerTests
         _userService.Verify(s => s.Login("admin", "wrong"), Times.Once);
     }
 }
-

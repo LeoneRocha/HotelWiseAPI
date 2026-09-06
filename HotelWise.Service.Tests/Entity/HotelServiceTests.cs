@@ -40,7 +40,7 @@ public class HotelServiceTests
     [Fact]
     public async Task GetAllHotelsAsync_Should_Return_Mapped_Hotels_Ordered_By_Name()
     {
-        var hotels = new List<Hotel>
+        var hotels = new Hotel[]
         {
             new() { HotelId = 2, HotelName = "Zulu" },
             new() { HotelId = 1, HotelName = "Alpha" }
@@ -51,7 +51,7 @@ public class HotelServiceTests
             new HotelDto { HotelId = 1, HotelName = "Alpha" }
         ];
 
-        _hotelRepository.Setup(r => r.GetAllAsync()).ReturnsAsync(hotels);
+        _hotelRepository.Setup(r => r.GetAllAsync(It.IsAny<CancellationToken>())).ReturnsAsync(hotels);
         _mapper.Setup(m => m.Map<HotelDto[]>(hotels)).Returns(dtos);
 
         var response = await CreateSut().GetAllHotelsAsync();

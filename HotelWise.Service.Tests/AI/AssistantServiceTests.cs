@@ -31,7 +31,7 @@ public class AssistantServiceTests
         _chatSession.Setup(s => s.GetByIdTokenAsync(It.IsAny<string>()))
             .ReturnsAsync((ChatSessionHistoryDto?)null);
         _chatSession.Setup(s => s.CreateAsync(It.IsAny<ChatSessionHistoryDto>()))
-            .ReturnsAsync(new ServiceResponse<ChatSessionHistoryDto> { Success = true });
+            .ReturnsAsync(new ServiceResponse<ChatSessionHistoryDto>());
 
         _inference.Setup(i => i.GenerateChatCompletionByAgentAsync(
                 It.IsAny<PromptMessageVO[]>(),
@@ -76,7 +76,7 @@ public class AssistantServiceTests
         _chatSession.Setup(s => s.GetByIdTokenAsync("session-token-2"))
             .ReturnsAsync(existingSession);
         _chatSession.Setup(s => s.UpdateAsync(It.IsAny<ChatSessionHistoryDto>()))
-            .ReturnsAsync(new ServiceResponse<ChatSessionHistoryDto> { Success = true });
+            .ReturnsAsync(new ServiceResponse<ChatSessionHistoryDto>());
 
         _mapper.Setup(m => m.Map<ChatSessionHistoryDto>(It.IsAny<ChatSessionHistory>()))
             .Returns(existingSession);

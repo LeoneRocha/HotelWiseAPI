@@ -194,7 +194,7 @@ public class RoomAvailabilityServiceTests
     {
         var existing = new RoomAvailability { Id = 5 };
         _availabilityRepository.Setup(r => r.GetByIdAsync(5)).ReturnsAsync(existing);
-        _availabilityRepository.Setup(r => r.DeleteAsync(5)).Returns(Task.CompletedTask);
+        _availabilityRepository.Setup(r => r.DeleteAsync(5, It.IsAny<CancellationToken>())).ReturnsAsync(true);
 
         var response = await CreateSut().DeleteAsync(5);
 

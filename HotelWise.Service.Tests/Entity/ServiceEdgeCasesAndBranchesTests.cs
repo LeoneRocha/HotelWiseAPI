@@ -235,7 +235,7 @@ public class ServiceEdgeCasesAndBranchesTests
         roomRepoMock.Setup(r => r.UpdateAsync(It.IsAny<Room>())).ReturnsAsync(room);
         roomRepoMock.Setup(r => r.GetByIdAsync(3)).ReturnsAsync(room);
         roomRepoMock.Setup(r => r.GetByIdAsync(999)).ReturnsAsync((Room?)null);
-        roomRepoMock.Setup(r => r.DeleteAsync(3)).Returns(Task.CompletedTask);
+        roomRepoMock.Setup(r => r.DeleteAsync(3, It.IsAny<CancellationToken>())).ReturnsAsync(true);
         roomRepoMock.Setup(r => r.GetRoomsByHotelIdAsync(1)).ReturnsAsync([room]);
         roomRepoMock.Setup(r => r.GetRoomsByHotelIdAsync(2)).ReturnsAsync([]);
 
@@ -332,7 +332,7 @@ public class ServiceEdgeCasesAndBranchesTests
         hotelRepoMock.Setup(r => r.GetAllTagsAsync(0, 10)).ReturnsAsync([["luxo", "centro"]]);
         hotelRepoMock.Setup(r => r.AddAsync(It.IsAny<Hotel>())).ReturnsAsync(hotel);
         hotelRepoMock.Setup(r => r.UpdateAsync(It.IsAny<Hotel>())).ReturnsAsync(hotel);
-        hotelRepoMock.Setup(r => r.DeleteAsync(1)).Returns(Task.CompletedTask);
+        hotelRepoMock.Setup(r => r.DeleteAsync(1, It.IsAny<CancellationToken>())).ReturnsAsync(true);
 
         generateMock.Setup(g => g.GetHotelAsync()).ReturnsAsync(hotel);
         vectorStoreMock.Setup(v => v.GetById(1)).ReturnsAsync(new HotelVector { DataKey = 1 });

@@ -2,9 +2,12 @@ using AutoMapper;
 using FluentValidation;
 using FluentValidation.Results;
 using HotelWise.Domain.Dto;
+using HotelWise.Domain.Helpers;
 using HotelWise.Domain.Interfaces.Entity;
 using HotelWise.Domain.Model;
 using HotelWise.Service.Entity;
+using SmartCoreHub.Core.SDK.Domain.DTOs.Entities;
+using SmartCoreHub.Core.SDK.Service.Security;
 
 namespace HotelWise.Service.Tests.Entity;
 
@@ -13,7 +16,7 @@ public class UserServiceTests
     private readonly Mock<IUserRepository> _userRepository = new();
     private readonly Mock<IMapper> _mapper = new();
     private readonly Mock<Serilog.ILogger> _logger = new();
-    private readonly Mock<ITokenService> _tokenService = new();
+    private readonly Mock<IJwtAccessTokenService> _tokenService = new();
     private readonly Mock<ITokenConfigurationDto> _tokenConfig = new();
     private readonly Mock<IValidator<User>> _validator = new();
 
@@ -40,7 +43,7 @@ public class UserServiceTests
     [Fact]
     public async Task Login_Should_Succeed_With_Valid_Credentials()
     {
-        SecurityHelper.CreatePasswordHash("secret", out var hash, out var salt);
+        PasswordHashHelper.CreatePasswordHash("secret", out var hash, out var salt);
         var user = new User
         {
             Id = 1,
@@ -78,7 +81,7 @@ public class UserServiceTests
     [Fact]
     public async Task Login_Should_Fail_When_Password_Is_Wrong()
     {
-        SecurityHelper.CreatePasswordHash("correct", out var hash, out var salt);
+        PasswordHashHelper.CreatePasswordHash("correct", out var hash, out var salt);
         var user = new User
         {
             Id = 1,
@@ -95,4 +98,3 @@ public class UserServiceTests
         response.Message.Should().Be("Wrong password.");
     }
 }
-

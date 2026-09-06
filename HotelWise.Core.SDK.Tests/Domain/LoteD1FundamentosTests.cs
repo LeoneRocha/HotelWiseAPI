@@ -63,15 +63,9 @@ public class ServiceResponseTests
     [Fact]
     public void ServiceResponse_Should_Hold_ErrorResponse_List()
     {
-        var response = new ServiceResponse<int>
-        {
-            Success = false,
-            Message = "falha",
-            Errors =
-            [
-                new ErrorResponse { Name = "Id", Message = "obrigatório", ErrorCode = "REQ" }
-            ]
-        };
+        var response = ServiceResponse<int>.Error(
+            [new ErrorResponse { Name = "Id", Message = "obrigatório", ErrorCode = "REQ" }],
+            "falha");
 
         response.Success.Should().BeFalse();
         response.Errors.Should().ContainSingle(e => e.ErrorCode == "REQ");

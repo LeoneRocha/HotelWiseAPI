@@ -57,7 +57,8 @@ public class LoteD4MiddlewareTests
         await middleware.InvokeAsync(context);
 
         context.Items[CorrelationIdMiddleware.ItemKey].Should().Be("abc123");
-        context.TraceIdentifier.Should().Be("abc123");
+        // Canônico SCH não sobrescreve TraceIdentifier — só Items + header/Activity.
+        context.Items[CorrelationIdMiddleware.HeaderName].Should().Be("abc123");
     }
 
     [Fact]
@@ -90,10 +91,7 @@ public class LoteD4MiddlewareTests
         context.Items[CorrelationIdMiddleware.ItemKey] = "corr-2";
         var called = false;
 
-        var logger = new Mock<Serilog.ILogger>();
-        logger.Setup(l => l.Information(
-            It.IsAny<string>(),
-            It.IsAny<object[]>()));
+        var logger = new Mock<Microsoft.Extensions.Logging.ILogger<SmartCoreHub.Core.SDK.Service.API.Middleware.RequestLoggingMiddleware>>();
 
         var middleware = new RequestLoggingMiddleware(_ =>
         {

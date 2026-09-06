@@ -25,11 +25,9 @@ public class ControllersDeepEdgeCasesTests
         var userServiceMock = new Mock<IUserService>();
         userServiceMock
             .Setup(s => s.Login("usuario_errado", "senha_errada"))
-            .ReturnsAsync(new ServiceResponse<GetUserAuthenticatedDto>
-            {
-                Success = false,
-                Message = "Credenciais inválidas."
-            });
+            .ReturnsAsync(ServiceResponse<GetUserAuthenticatedDto>.Error(
+                [new ErrorResponse { Message = "Credenciais inválidas." }],
+                "Credenciais inválidas."));
 
         var controller = new AuthController(userServiceMock.Object);
 
@@ -52,11 +50,8 @@ public class ControllersDeepEdgeCasesTests
         hotelServiceMock.Setup(s => s.GetHotelByIdAsync(999)).ReturnsAsync((ServiceResponse<HotelDto?>)null!);
 
         hotelSearchServiceMock.Setup(s => s.SemanticSearch(It.IsAny<SearchCriteria>()))
-            .ReturnsAsync(new ServiceResponse<HotelSemanticResult>
-            {
-                Success = true,
-                Data = new HotelSemanticResult { PromptResultContent = "Resultado da busca" }
-            });
+            .ReturnsAsync(ServiceResponse<HotelSemanticResult>.Ok(
+                new HotelSemanticResult { PromptResultContent = "Resultado da busca" }));
 
         var controller = new HotelsController(hotelServiceMock.Object, hotelSearchServiceMock.Object);
         ControllerTestHelper.SetAuthenticatedUser(controller);
