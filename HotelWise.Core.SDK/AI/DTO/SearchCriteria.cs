@@ -13,7 +13,7 @@ public class SearchCriteria : SmartCoreHub.Core.SDK.Domain.AI.DTO.SearchCriteria
     /// Fallback quando a requisição não informa limite e o appsettings também não.
     /// O valor operacional vem de <c>ApplicationIAConfig:Rag:SearchSettings:MaxRetrieve</c>.
     /// </summary>
-    public const int DefaultMaxRetrieve = 25;
+    public new const int DefaultMaxRetrieve = 25;
 
     /// <summary>
     /// Alias legado HW para MaxRetrieve.

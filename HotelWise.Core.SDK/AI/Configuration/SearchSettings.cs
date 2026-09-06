@@ -13,5 +13,5 @@ public class SearchSettings : SmartCoreHub.Core.SDK.Domain.AI.Configuration.Sear
     /// Limite máximo padrão de registros recuperados na busca vetorial quando não especificado na requisição
     /// (<c>ApplicationIAConfig:Rag:SearchSettings:MaxRetrieve</c>).
     /// </summary>
-    public int MaxRetrieve { get; set; } = 25;
+    public new int MaxRetrieve { get; set; } = 25;
 }
