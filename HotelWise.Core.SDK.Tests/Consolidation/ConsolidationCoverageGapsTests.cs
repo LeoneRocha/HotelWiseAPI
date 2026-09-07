@@ -103,8 +103,11 @@ public class ConsolidationCoverageGapsTests
     [Fact]
     public void VectorStoreAdapterFactory_Should_Create_Adapter()
     {
+        var appConfigMock = new Mock<IApplicationIAConfig>();
+        appConfigMock.SetupGet(c => c.RagConfig).Returns(new RagConfig { VectorStoreDimensions = 1536 });
+
         var factory = new VectorStoreAdapterFactory(
-            Mock.Of<IApplicationIAConfig>(),
+            appConfigMock.Object,
             Mock.Of<VectorStore>(),
             Kernel.CreateBuilder().Build(),
             Mock.Of<SmartCoreHub.Core.SDK.Domain.Interfaces.Common.IAppLogger>());
