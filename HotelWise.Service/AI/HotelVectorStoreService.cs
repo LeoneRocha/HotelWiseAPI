@@ -33,7 +33,42 @@ public class HotelVectorStoreService : GenericVectorStoreServiceBase, IVectorSto
         _aIInferenceService = aIInferenceService;
 
         // Prefixo + dimensão (opcional) via ApplicationIAConfig:Rag
-        nameCollection = applicationIAConfig.RagConfig.BuildCollectionName("skhotels");
+        nameCollection = ResolveCollectionName(applicationIAConfig.RagConfig, "skhotels");
+    }
+
+    /// <summary>
+    /// Resolve o nome da coleção vetorial respeitando o prefixo configurado e a inclusão
+    /// opcional do marcador de dimensões de embedding (ex.: skhotels, test_skhotels ou dev_d768_skhotels).
+    /// </summary>
+    public static string ResolveCollectionName(RagConfig? ragConfig, string entitySuffix)
+    {
+        if (string.IsNullOrWhiteSpace(entitySuffix))
+        {
+            throw new ArgumentException("Value cannot be null or whitespace.", nameof(entitySuffix));
+        }
+
+        if (ragConfig is null)
+        {
+            return entitySuffix;
+        }
+
+        if (ragConfig.VectorStoreDimensions <= 0)
+        {
+            throw new InvalidOperationException(
+                "ApplicationIAConfig:Rag:VectorStoreDimensions must be greater than zero.");
+        }
+
+        var prefix = ragConfig.VectorStoreCollectionPrefixName ?? string.Empty;
+        if (ragConfig.IncludeDimensionsInCollectionName)
+        {
+            var marker = $"d{ragConfig.VectorStoreDimensions}";
+            if (prefix.IndexOf(marker, StringComparison.OrdinalIgnoreCase) < 0)
+            {
+                prefix = $"{prefix}{marker}_";
+            }
+        }
+
+        return $"{prefix}{entitySuffix}";
     }
 
     /// <summary>

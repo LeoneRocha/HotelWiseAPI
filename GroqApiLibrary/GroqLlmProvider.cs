@@ -1,4 +1,4 @@
-﻿using System.Text.Json;
+using System.Text.Json;
 using System.Text.Json.Nodes;
 
 namespace GroqApiLibrary
@@ -13,6 +13,7 @@ namespace GroqApiLibrary
     {
         private readonly GroqApiClient _client;
         private readonly string _model;
+        private bool _disposed;
 
         public GroqLlmProvider(string apiKey, string model)
         {
@@ -35,9 +36,22 @@ namespace GroqApiLibrary
             return response?["choices"]?[0]?["message"]?["content"]?.GetValue<string>() ?? string.Empty;
         }
 
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!_disposed)
+            {
+                if (disposing)
+                {
+                    _client.Dispose();
+                }
+                _disposed = true;
+            }
+        }
+
         public void Dispose()
         {
-            _client.Dispose();
+            Dispose(true);
+            GC.SuppressFinalize(this);
         }
     }
 }

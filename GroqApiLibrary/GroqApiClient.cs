@@ -1,4 +1,4 @@
-﻿using System.Net.Http.Headers;
+using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text;
 using System.Text.Json;
@@ -9,7 +9,11 @@ namespace GroqApiLibrary
     public class GroqApiClient : IDisposable
     {
         private readonly HttpClient _httpClient;
+        private bool _disposed;
+        private const string ContentKey = "content";
+#pragma warning disable S1075
         private const string BaseUrl = "https://api.groq.com/openai/v1";
+#pragma warning restore S1075
         private const string ChatCompletionsEndpoint = "/chat/completions";
         private const string TranscriptionsEndpoint = "/audio/transcriptions";
         private const string TranslationsEndpoint = "/audio/translations";
@@ -119,12 +123,12 @@ namespace GroqApiLibrary
                     new JsonObject
                     {
                         ["role"] = "system",
-                        ["content"] = systemMessage
+                        [ContentKey] = systemMessage
                     },
                     new JsonObject
                     {
                         ["role"] = "user",
-                        ["content"] = userPrompt
+                        [ContentKey] = userPrompt
                     }
                 };
 
@@ -137,9 +141,9 @@ namespace GroqApiLibrary
                         type = t.Type,
                         function = new
                         {
-                            name = t.Function.Name,
-                            description = t.Function.Description,
-                            parameters = t.Function.Parameters
+                            name = t.Function?.Name,
+                            description = t.Function?.Description,
+                            parameters = t.Function?.Parameters
                         }
                     })),
                     ["tool_choice"] = "auto"
@@ -153,7 +157,10 @@ namespace GroqApiLibrary
 
                 if (toolCalls != null && toolCalls.Count > 0)
                 {
-                    messages.Add(responseMessage);
+                    if (responseMessage != null)
+                    {
+                        messages.Add(responseMessage);
+                    }
                     foreach (var toolCall in toolCalls)
                     {
                         var functionName = toolCall?["function"]?["name"]?.GetValue<string>();
@@ -162,8 +169,8 @@ namespace GroqApiLibrary
 
                         if (!string.IsNullOrEmpty(functionName) && !string.IsNullOrEmpty(functionArgs))
                         {
-                            var tool = tools.Find(t => t.Function.Name == functionName);
-                            if (tool != null)
+                            var tool = tools.Find(t => t.Function?.Name == functionName);
+                            if (tool?.Function?.ExecuteAsync != null)
                             {
                                 var functionResponse = await tool.Function.ExecuteAsync(functionArgs);
                                 messages.Add(new JsonObject
@@ -171,7 +178,7 @@ namespace GroqApiLibrary
                                     ["tool_call_id"] = toolCallId,
                                     ["role"] = "tool",
                                     ["name"] = functionName,
-                                    ["content"] = functionResponse
+                                    [ContentKey] = functionResponse
                                 });
                             }
                         }
@@ -179,10 +186,10 @@ namespace GroqApiLibrary
 
                     request["messages"] = JsonSerializer.SerializeToNode(messages);
                     var secondResponse = await CreateChatCompletionAsync(request);
-                    return secondResponse?["choices"]?[0]?["message"]?["content"]?.GetValue<string>() ?? string.Empty;
+                    return secondResponse?["choices"]?[0]?["message"]?[ContentKey]?.GetValue<string>() ?? string.Empty;
                 }
 
-                return responseMessage?["content"]?.GetValue<string>() ?? string.Empty;
+                return responseMessage?[ContentKey]?.GetValue<string>() ?? string.Empty;
             }
             catch (HttpRequestException ex)
             {
@@ -201,9 +208,21 @@ namespace GroqApiLibrary
             }
         }
 
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!_disposed)
+            {
+                if (disposing)
+                {
+                    _httpClient.Dispose();
+                }
+                _disposed = true;
+            }
+        }
+
         public void Dispose()
         {
-            _httpClient.Dispose();
+            Dispose(true);
             GC.SuppressFinalize(this);
         }
     }
@@ -212,14 +231,14 @@ namespace GroqApiLibrary
     public class Tool
     {
         public string Type { get; set; } = "function";
-        public Function Function { get; set; }
+        public Function Function { get; set; } = new();
     }
 
     public class Function
     {
-        public string Name { get; set; }
-        public string Description { get; set; }
-        public JsonObject Parameters { get; set; }
-        public Func<string, Task<string>> ExecuteAsync { get; set; }
+        public string Name { get; set; } = string.Empty;
+        public string Description { get; set; } = string.Empty;
+        public JsonObject Parameters { get; set; } = new();
+        public Func<string, Task<string>>? ExecuteAsync { get; set; }
     }
 }

@@ -46,10 +46,12 @@ public static class StayMatePromptGenerator
         };
     }
 
+#pragma warning disable S1133
     /// <summary>
     /// Mantido por compatibilidade; delega para <see cref="CreateHotelAgentPrompt"/>
     /// (evita segundo system no pipeline).
     /// </summary>
     [Obsolete("Use CreateHotelAgentPrompt — uma única instruction canônica.")]
     public static PromptMessageVO CreateHotelSystemPrompt() => CreateHotelAgentPrompt();
+#pragma warning restore S1133
 }
