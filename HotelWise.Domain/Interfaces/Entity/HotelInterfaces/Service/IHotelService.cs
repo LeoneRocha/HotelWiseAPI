@@ -61,4 +61,10 @@ public interface IHotelService : IGenericDtoService<HotelDto>
     /// </summary>
     /// <returns>Array contendo os nomes das tags encontradas.</returns>
     Task<string[]> GetAllTags();
+
+    /// <summary>
+    /// Sincroniza todos os hotéis cadastrados na base vetorial (Vector Store) em lote utilizando paralelismo.
+    /// </summary>
+    /// <returns>Resposta consolidada com total de hotéis, quantidade de sucessos, falhas e eventuais erros.</returns>
+    Task<ServiceResponse<HotelVectorSyncResultDto>> SyncAllHotelsToVectorStoreAsync();
 }

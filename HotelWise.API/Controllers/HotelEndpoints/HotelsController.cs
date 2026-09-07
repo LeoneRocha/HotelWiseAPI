@@ -106,6 +106,20 @@ public class HotelsController : ControllerBase
     }
 
     /// <summary>
+    /// Sincroniza todos os hotéis cadastrados na base vetorial (Vector Store) em lote utilizando processamento paralelo.
+    /// </summary>
+    /// <returns>Resultado com totais de hotéis processados, sincronizados e eventuais falhas.</returns>
+    [HttpPost("syncvectors")]
+    [HttpGet("syncvectors")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    public async Task<IActionResult> SyncAllToVectorStore()
+    {
+        setUserIdCurrent();
+        var result = await _hotelService.SyncAllHotelsToVectorStoreAsync();
+        return Ok(result);
+    }
+
+    /// <summary>
     /// Gera sinteticamente um hotel com descrições, tags e características usando IA.
     /// </summary>
     /// <returns>DTO contendo o hotel gerado.</returns>

@@ -76,17 +76,116 @@ public class HotelService : DtoEntityServiceBase<Hotel, HotelDto>, IHotelService
         try
         {
             var hotel = await _hotelRepository.GetByIdAsync(id);
+            if (hotel == null)
+            {
+                response.Data = false;
+                response.Errors.Add(new ErrorResponse() { Message = $"Hotel com ID {id} não foi encontrado." });
+                return response;
+            }
 
             var hotelDto = _mapper.Map<HotelDto>(hotel);
 
-            await addOrUpdateDataVector(hotelDto);
+            await _hotelVectorStoreService.UpsertDataAsync(convertHotelToVector(hotelDto));
             response.Data = true;
         }
         catch (Exception ex)
         {
             _logger.Error(ex, "InsertHotelInVectorStore: {Message} at: {Time}", ex.Message, DataHelper.GetDateTimeNowToLog());
+            response.Data = false;
             response.Errors.Add(new ErrorResponse() { Message = ex.Message });
         }
+        return response;
+    }
+
+    /// <summary>
+    /// Sincroniza todos os hotéis cadastrados na base vetorial (Vector Store) em lote utilizando paralelismo.
+    /// Executa o processo individual de inserção em loop com Parallel.ForEachAsync e consolida os resultados.
+    /// </summary>
+    /// <returns>Resposta consolidada com total de hotéis, quantidade de sucessos, falhas e eventuais erros.</returns>
+    public async Task<ServiceResponse<HotelVectorSyncResultDto>> SyncAllHotelsToVectorStoreAsync()
+    {
+        var response = new ServiceResponse<HotelVectorSyncResultDto>();
+        try
+        {
+            var hotels = (await _hotelRepository.GetAllAsync())?.ToArray() ?? Array.Empty<Hotel>();
+            var totalHotels = hotels.Length;
+
+            if (totalHotels == 0)
+            {
+                response.Data = new HotelVectorSyncResultDto
+                {
+                    TotalHotels = 0,
+                    SynchronizedCount = 0,
+                    FailedCount = 0,
+                    AllProcessed = true,
+                    Errors = new List<string>()
+                };
+                response.Message = "Nenhum hotel encontrado para sincronizar no vetor.";
+                return response;
+            }
+
+            var resultsBag = new ConcurrentBag<(long HotelId, string HotelName, bool Success, string? ErrorMessage)>();
+
+            var parallelOptions = new ParallelOptions
+            {
+                MaxDegreeOfParallelism = Environment.ProcessorCount > 1 ? Environment.ProcessorCount : 2
+            };
+
+            await Parallel.ForEachAsync(hotels, parallelOptions, async (hotel, ct) =>
+            {
+                try
+                {
+                    var singleResult = await InsertHotelInVectorStore(hotel.HotelId);
+                    var isSuccess = singleResult.Success && singleResult.Data && (singleResult.Errors == null || singleResult.Errors.Count == 0);
+                    var errorMsg = !isSuccess
+                        ? (singleResult.Errors?.FirstOrDefault()?.Message ?? singleResult.Message ?? "Falha na sincronização vetorial.")
+                        : null;
+
+                    resultsBag.Add((hotel.HotelId, hotel.HotelName, isSuccess, errorMsg));
+                }
+                catch (Exception ex)
+                {
+                    _logger.Error(ex, "SyncAllHotelsToVectorStoreAsync - HotelId {HotelId}: {Message}", hotel.HotelId, ex.Message);
+                    resultsBag.Add((hotel.HotelId, hotel.HotelName, false, ex.Message));
+                }
+            });
+
+            var successCount = resultsBag.Count(r => r.Success);
+            var failedItems = resultsBag.Where(r => !r.Success).ToList();
+            var allProcessed = resultsBag.Count == totalHotels;
+
+            var errorDetails = failedItems
+                .Select(f => $"Hotel #{f.HotelId} ({f.HotelName}): {f.ErrorMessage}")
+                .ToList();
+
+            var resultDto = new HotelVectorSyncResultDto
+            {
+                TotalHotels = totalHotels,
+                SynchronizedCount = successCount,
+                FailedCount = failedItems.Count,
+                AllProcessed = allProcessed,
+                Errors = errorDetails
+            };
+
+            response.Data = resultDto;
+            response.Message = failedItems.Count == 0
+                ? $"Todos os {totalHotels} hotéis foram sincronizados com sucesso no vetor."
+                : $"{successCount} de {totalHotels} hotéis foram sincronizados. {failedItems.Count} falharam.";
+
+            if (failedItems.Count > 0)
+            {
+                foreach (var err in errorDetails)
+                {
+                    response.Errors.Add(new ErrorResponse { Message = err });
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.Error(ex, "SyncAllHotelsToVectorStoreAsync: {Message} at: {Time}", ex.Message, DataHelper.GetDateTimeNowToLog());
+            response.Errors.Add(new ErrorResponse { Message = ex.Message });
+        }
+
         return response;
     }
 

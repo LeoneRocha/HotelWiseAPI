@@ -96,6 +96,30 @@ public class HotelsControllerTests
     }
 
     [Fact]
+    public async Task SyncAllToVectorStore_Should_Return_Ok()
+    {
+        // Arrange
+        var response = new ServiceResponse<HotelVectorSyncResultDto>
+        {
+            Data = new HotelVectorSyncResultDto
+            {
+                TotalHotels = 5,
+                SynchronizedCount = 5,
+                FailedCount = 0,
+                AllProcessed = true
+            }
+        };
+        _hotelService.Setup(s => s.SyncAllHotelsToVectorStoreAsync()).ReturnsAsync(response);
+
+        // Act
+        var result = await _controller.SyncAllToVectorStore();
+
+        // Assert
+        result.Should().BeOfType<OkObjectResult>();
+        _hotelService.Verify(s => s.SyncAllHotelsToVectorStoreAsync(), Times.Once);
+    }
+
+    [Fact]
     public async Task Generate_Should_Return_Ok()
     {
         // Arrange

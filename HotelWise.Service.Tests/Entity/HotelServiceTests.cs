@@ -73,5 +73,74 @@ public class HotelServiceTests
         response.Errors.Should().ContainSingle(e => e.Message == "db down");
         response.Data.Should().BeNull();
     }
+
+    [Fact]
+    public async Task SyncAllHotelsToVectorStoreAsync_When_No_Hotels_Should_Return_Success_With_Zero()
+    {
+        _hotelRepository.Setup(r => r.GetAllAsync(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(Array.Empty<Hotel>());
+
+        var response = await CreateSut().SyncAllHotelsToVectorStoreAsync();
+
+        response.Success.Should().BeTrue();
+        response.Data.Should().NotBeNull();
+        response.Data!.TotalHotels.Should().Be(0);
+        response.Data.SynchronizedCount.Should().Be(0);
+        response.Data.FailedCount.Should().Be(0);
+        response.Data.AllProcessed.Should().BeTrue();
+    }
+
+    [Fact]
+    public async Task SyncAllHotelsToVectorStoreAsync_Should_Process_All_Hotels_In_Parallel_And_Return_Success()
+    {
+        var hotels = new Hotel[]
+        {
+            new() { HotelId = 1, HotelName = "Alpha", Description = "Desc 1", Tags = ["t1"] },
+            new() { HotelId = 2, HotelName = "Beta", Description = "Desc 2", Tags = ["t2"] }
+        };
+
+        _hotelRepository.Setup(r => r.GetAllAsync(It.IsAny<CancellationToken>())).ReturnsAsync(hotels);
+        _hotelRepository.Setup(r => r.GetByIdAsync(1)).ReturnsAsync(hotels[0]);
+        _hotelRepository.Setup(r => r.GetByIdAsync(2)).ReturnsAsync(hotels[1]);
+        _mapper.Setup(m => m.Map<HotelDto>(hotels[0])).Returns(new HotelDto { HotelId = 1, HotelName = "Alpha", Description = "Desc 1", Tags = ["t1"] });
+        _mapper.Setup(m => m.Map<HotelDto>(hotels[1])).Returns(new HotelDto { HotelId = 2, HotelName = "Beta", Description = "Desc 2", Tags = ["t2"] });
+        _vectorStore.Setup(v => v.UpsertDataAsync(It.IsAny<HotelVector>())).Returns(Task.CompletedTask);
+
+        var response = await CreateSut().SyncAllHotelsToVectorStoreAsync();
+
+        response.Success.Should().BeTrue();
+        response.Data.Should().NotBeNull();
+        response.Data!.TotalHotels.Should().Be(2);
+        response.Data.SynchronizedCount.Should().Be(2);
+        response.Data.FailedCount.Should().Be(0);
+        response.Data.AllProcessed.Should().BeTrue();
+        _vectorStore.Verify(v => v.UpsertDataAsync(It.IsAny<HotelVector>()), Times.Exactly(2));
+    }
+
+    [Fact]
+    public async Task SyncAllHotelsToVectorStoreAsync_When_One_Fails_Should_Report_Failures()
+    {
+        var hotels = new Hotel[]
+        {
+            new() { HotelId = 1, HotelName = "Alpha", Description = "Desc 1", Tags = ["t1"] },
+            new() { HotelId = 2, HotelName = "Beta", Description = "Desc 2", Tags = ["t2"] }
+        };
+
+        _hotelRepository.Setup(r => r.GetAllAsync(It.IsAny<CancellationToken>())).ReturnsAsync(hotels);
+        _hotelRepository.Setup(r => r.GetByIdAsync(1)).ReturnsAsync(hotels[0]);
+        _hotelRepository.Setup(r => r.GetByIdAsync(2)).ThrowsAsync(new InvalidOperationException("Qdrant error"));
+        _mapper.Setup(m => m.Map<HotelDto>(hotels[0])).Returns(new HotelDto { HotelId = 1, HotelName = "Alpha", Description = "Desc 1", Tags = ["t1"] });
+        _vectorStore.Setup(v => v.UpsertDataAsync(It.Is<HotelVector>(x => x.DataKey == 1))).Returns(Task.CompletedTask);
+
+        var response = await CreateSut().SyncAllHotelsToVectorStoreAsync();
+
+        response.Success.Should().BeFalse();
+        response.Data.Should().NotBeNull();
+        response.Data!.TotalHotels.Should().Be(2);
+        response.Data.SynchronizedCount.Should().Be(1);
+        response.Data.FailedCount.Should().Be(1);
+        response.Data.AllProcessed.Should().BeTrue();
+        response.Data.Errors.Should().ContainSingle(e => e.Contains("Beta") && e.Contains("Qdrant error"));
+    }
 }
 
