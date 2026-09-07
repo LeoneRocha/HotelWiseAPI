@@ -84,13 +84,41 @@ public class HotelService : DtoEntityServiceBase<Hotel, HotelDto>, IHotelService
             }
 
             var hotelDto = _mapper.Map<HotelDto>(hotel);
+            return await InsertHotelInVectorStore(hotelDto);
+        }
+        catch (Exception ex)
+        {
+            _logger.Error(ex, "InsertHotelInVectorStore (Id {Id}): {Message} at: {Time}", id, ex.Message, DataHelper.GetDateTimeNowToLog());
+            response.Data = false;
+            response.Errors.Add(new ErrorResponse() { Message = ex.Message });
+            return response;
+        }
+    }
+
+    /// <summary>
+    /// Indexa ou atualiza o hotel correspondente na base vetorial (Vector Store) a partir do DTO já em memória.
+    /// Permite execução paralela concorrente sem invocar o DbContext concorrentemente.
+    /// </summary>
+    /// <param name="hotelDto">DTO do hotel a indexar.</param>
+    /// <returns>Resposta com indicador de sucesso.</returns>
+    public async Task<ServiceResponse<bool>> InsertHotelInVectorStore(HotelDto hotelDto)
+    {
+        ServiceResponse<bool> response = new ServiceResponse<bool>();
+        try
+        {
+            if (hotelDto == null)
+            {
+                response.Data = false;
+                response.Errors.Add(new ErrorResponse() { Message = "Dados do hotel não informados para sincronização vetorial." });
+                return response;
+            }
 
             await _hotelVectorStoreService.UpsertDataAsync(convertHotelToVector(hotelDto));
             response.Data = true;
         }
         catch (Exception ex)
         {
-            _logger.Error(ex, "InsertHotelInVectorStore: {Message} at: {Time}", ex.Message, DataHelper.GetDateTimeNowToLog());
+            _logger.Error(ex, "InsertHotelInVectorStore (HotelDto - Id {HotelId}): {Message} at: {Time}", hotelDto?.HotelId, ex.Message, DataHelper.GetDateTimeNowToLog());
             response.Data = false;
             response.Errors.Add(new ErrorResponse() { Message = ex.Message });
         }
@@ -124,6 +152,12 @@ public class HotelService : DtoEntityServiceBase<Hotel, HotelDto>, IHotelService
                 return response;
             }
 
+            // Mapeia para DTO previamente para não usar o DbContext concorrentemente dentro do loop paralelo
+            var hotelDtos = hotels
+                .Select(h => _mapper.Map<HotelDto>(h))
+                .Where(h => h != null)
+                .ToArray();
+
             var resultsBag = new ConcurrentBag<(long HotelId, string HotelName, bool Success, string? ErrorMessage)>();
 
             var parallelOptions = new ParallelOptions
@@ -131,22 +165,22 @@ public class HotelService : DtoEntityServiceBase<Hotel, HotelDto>, IHotelService
                 MaxDegreeOfParallelism = Environment.ProcessorCount > 1 ? Environment.ProcessorCount : 2
             };
 
-            await Parallel.ForEachAsync(hotels, parallelOptions, async (hotel, ct) =>
+            await Parallel.ForEachAsync(hotelDtos, parallelOptions, async (hotelDto, ct) =>
             {
                 try
                 {
-                    var singleResult = await InsertHotelInVectorStore(hotel.HotelId);
+                    var singleResult = await InsertHotelInVectorStore(hotelDto);
                     var isSuccess = singleResult.Success && singleResult.Data && (singleResult.Errors == null || singleResult.Errors.Count == 0);
                     var errorMsg = !isSuccess
                         ? (singleResult.Errors?.FirstOrDefault()?.Message ?? singleResult.Message ?? "Falha na sincronização vetorial.")
                         : null;
 
-                    resultsBag.Add((hotel.HotelId, hotel.HotelName, isSuccess, errorMsg));
+                    resultsBag.Add((hotelDto.HotelId, hotelDto.HotelName, isSuccess, errorMsg));
                 }
                 catch (Exception ex)
                 {
-                    _logger.Error(ex, "SyncAllHotelsToVectorStoreAsync - HotelId {HotelId}: {Message}", hotel.HotelId, ex.Message);
-                    resultsBag.Add((hotel.HotelId, hotel.HotelName, false, ex.Message));
+                    _logger.Error(ex, "SyncAllHotelsToVectorStoreAsync - HotelId {HotelId}: {Message}", hotelDto.HotelId, ex.Message);
+                    resultsBag.Add((hotelDto.HotelId, hotelDto.HotelName, false, ex.Message));
                 }
             });
 

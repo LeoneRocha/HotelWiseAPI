@@ -17,6 +17,13 @@ public interface IHotelService : IGenericDtoService<HotelDto>
     Task<ServiceResponse<bool>> InsertHotelInVectorStore(long id);
 
     /// <summary>
+    /// Indexa o hotel correspondente na base vetorial (Vector Store) para permitir busca por similaridade semântica a partir do DTO já carregado.
+    /// </summary>
+    /// <param name="hotelDto">Dados do hotel a indexar.</param>
+    /// <returns>Resposta indicando se a indexação vetorial foi concluída com sucesso.</returns>
+    Task<ServiceResponse<bool>> InsertHotelInVectorStore(HotelDto hotelDto);
+
+    /// <summary>
     /// Cadastra um novo hotel no sistema.
     /// </summary>
     /// <param name="hotelDto">Dados do hotel a ser adicionado.</param>

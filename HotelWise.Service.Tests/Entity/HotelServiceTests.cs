@@ -127,10 +127,10 @@ public class HotelServiceTests
         };
 
         _hotelRepository.Setup(r => r.GetAllAsync(It.IsAny<CancellationToken>())).ReturnsAsync(hotels);
-        _hotelRepository.Setup(r => r.GetByIdAsync(1)).ReturnsAsync(hotels[0]);
-        _hotelRepository.Setup(r => r.GetByIdAsync(2)).ThrowsAsync(new InvalidOperationException("Qdrant error"));
         _mapper.Setup(m => m.Map<HotelDto>(hotels[0])).Returns(new HotelDto { HotelId = 1, HotelName = "Alpha", Description = "Desc 1", Tags = ["t1"] });
+        _mapper.Setup(m => m.Map<HotelDto>(hotels[1])).Returns(new HotelDto { HotelId = 2, HotelName = "Beta", Description = "Desc 2", Tags = ["t2"] });
         _vectorStore.Setup(v => v.UpsertDataAsync(It.Is<HotelVector>(x => x.DataKey == 1))).Returns(Task.CompletedTask);
+        _vectorStore.Setup(v => v.UpsertDataAsync(It.Is<HotelVector>(x => x.DataKey == 2))).ThrowsAsync(new InvalidOperationException("Qdrant error"));
 
         var response = await CreateSut().SyncAllHotelsToVectorStoreAsync();
 
@@ -141,6 +141,19 @@ public class HotelServiceTests
         response.Data.FailedCount.Should().Be(1);
         response.Data.AllProcessed.Should().BeTrue();
         response.Data.Errors.Should().ContainSingle(e => e.Contains("Beta") && e.Contains("Qdrant error"));
+    }
+
+    [Fact]
+    public async Task InsertHotelInVectorStore_With_HotelDto_Should_Upsert_Directly()
+    {
+        var dto = new HotelDto { HotelId = 10, HotelName = "Grand Hotel", Description = "Luxury", Tags = ["luxury"] };
+        _vectorStore.Setup(v => v.UpsertDataAsync(It.IsAny<HotelVector>())).Returns(Task.CompletedTask);
+
+        var response = await CreateSut().InsertHotelInVectorStore(dto);
+
+        response.Success.Should().BeTrue();
+        response.Data.Should().BeTrue();
+        _vectorStore.Verify(v => v.UpsertDataAsync(It.Is<HotelVector>(x => x.DataKey == 10)), Times.Once);
     }
 }
 
