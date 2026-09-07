@@ -1,5 +1,5 @@
-using AutoMapper;
 using HotelWise.Domain.Dto.IA.SemanticKernel;
+using AutoMapper;
 using HotelWise.Service.AI;
 
 namespace HotelWise.Service.Tests.AI;
@@ -18,6 +18,7 @@ public class HotelVectorStoreServiceTests
         _appConfig.SetupGet(c => c.RagConfig).Returns(new RagConfig
         {
             VectorStoreCollectionPrefixName = "test_",
+            VectorStoreDimensions = 768,
             AIChatServiceAdapter = AIChatServiceType.SemanticKernel
         });
         _adapterFactory.Setup(f => f.CreateAdapter<HotelVector>()).Returns(_adapter.Object);
@@ -181,5 +182,24 @@ public class HotelVectorStoreServiceTests
 
         _adapter.Verify(a => a.DeleteAsync("test_skhotels", 50L), Times.Once);
     }
-}
 
+    [Fact]
+    public async Task CollectionName_Should_Include_Dimensions_When_Configured()
+    {
+        _appConfig.SetupGet(c => c.RagConfig).Returns(new RagConfig
+        {
+            VectorStoreCollectionPrefixName = "dev_",
+            VectorStoreDimensions = 768,
+            IncludeDimensionsInCollectionName = true,
+            AIChatServiceAdapter = AIChatServiceType.SemanticKernel
+        });
+
+        _adapter.Setup(a => a.GetByKey("dev_d768_skhotels", 1UL))
+            .ReturnsAsync(new HotelVector { DataKey = 1, HotelName = "Dim" });
+
+        var result = await CreateSut().GetById(1);
+
+        result.Should().NotBeNull();
+        result!.HotelName.Should().Be("Dim");
+    }
+}

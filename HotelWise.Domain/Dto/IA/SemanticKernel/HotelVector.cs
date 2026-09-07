@@ -4,6 +4,7 @@ namespace HotelWise.Domain.Dto.IA.SemanticKernel;
 
 /// <summary>
 /// Modelo de registro vetorial de Hotel para persistência e busca semântica em Vector Stores (Qdrant, Redis, etc.).
+/// A dimensão do embedding vem de <c>ApplicationIAConfig:Rag:VectorStoreDimensions</c> (SDK).
 /// </summary>
 public class HotelVector : DataVectorBase
 {

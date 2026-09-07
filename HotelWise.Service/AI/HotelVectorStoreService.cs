@@ -1,6 +1,7 @@
 using AutoMapper;
 using HotelWise.Domain.Dto.IA.SemanticKernel;
 using Microsoft.Extensions.Configuration;
+using SmartCoreHub.Core.SDK.Domain.AI.Configuration;
 
 namespace HotelWise.Service.AI;
 
@@ -18,12 +19,6 @@ public class HotelVectorStoreService : GenericVectorStoreServiceBase, IVectorSto
     /// <summary>
     /// Inicializa uma nova instância de <see cref="HotelVectorStoreService"/> com os adaptadores de inferência e de armazenamento vetorial.
     /// </summary>
-    /// <param name="logger">Logger estruturado.</param>
-    /// <param name="mapper">Mapeador de objetos AutoMapper.</param>
-    /// <param name="applicationIAConfig">Configuração de IA e Vector Store.</param>
-    /// <param name="adapterFactory">Fábrica de adaptadores de Vector Store.</param>
-    /// <param name="aIInferenceService">Serviço de inferência de IA.</param>
-    /// <param name="configuration">Configuração global da aplicação (IConfiguration).</param>
     public HotelVectorStoreService(
         Serilog.ILogger logger,
         IMapper mapper,
@@ -37,14 +32,13 @@ public class HotelVectorStoreService : GenericVectorStoreServiceBase, IVectorSto
         _adapter = adapterFactory.CreateAdapter<HotelVector>();
         _aIInferenceService = aIInferenceService;
 
-        nameCollection = $"{applicationIAConfig.RagConfig.VectorStoreCollectionPrefixName}skhotels";
+        // Prefixo + dimensão (opcional) via ApplicationIAConfig:Rag
+        nameCollection = applicationIAConfig.RagConfig.BuildCollectionName("skhotels");
     }
 
     /// <summary>
     /// Gera embeddings vetoriais para o texto informado.
     /// </summary>
-    /// <param name="text">Texto a ser vetorizado.</param>
-    /// <returns>Array de float com o vetor gerado, ou <c>null</c> em caso de erro.</returns>
     public async Task<float[]?> GenerateEmbeddingAsync(string text)
     {
         return await _aIInferenceService.GenerateEmbeddingAsync(text, _eIAInferenceAdapterType);
@@ -53,8 +47,6 @@ public class HotelVectorStoreService : GenericVectorStoreServiceBase, IVectorSto
     /// <summary>
     /// Obtém um registro vetorial de hotel a partir de sua chave identificadora.
     /// </summary>
-    /// <param name="dataKey">Chave do registro vetorial.</param>
-    /// <returns>Registro <see cref="HotelVector"/> ou <c>null</c> se não encontrado.</returns>
     public async Task<HotelVector?> GetById(long dataKey)
     {
         try
@@ -76,20 +68,16 @@ public class HotelVectorStoreService : GenericVectorStoreServiceBase, IVectorSto
     /// <summary>
     /// Insere ou atualiza um registro vetorial de hotel calculando automaticamente seu embedding.
     /// </summary>
-    /// <param name="entity">Registro vetorial a ser persistido.</param>
     public async Task UpsertDataAsync(HotelVector entity)
     {
         var embedding = await _aIInferenceService.GenerateEmbeddingAsync(entity.Description, _eIAInferenceAdapterType);
-
         entity.Embedding = EmbeddingHelper.ConvertToReadOnlyMemory(embedding);
-
         await _adapter.UpsertDataAsync(nameCollection, entity);
     }
 
     /// <summary>
     /// Insere ou atualiza múltiplos registros vetoriais de hotéis em lote.
     /// </summary>
-    /// <param name="listEntity">Coleção de vetores a persistir.</param>
     public async Task UpsertDatasAsync(HotelVector[] listEntity)
     {
         var hotelVectors = new List<HotelVector>();
@@ -99,9 +87,7 @@ public class HotelVectorStoreService : GenericVectorStoreServiceBase, IVectorSto
             if (!await _adapter.Exists(nameCollection, hotel.DataKey))
             {
                 var embedding = await _aIInferenceService.GenerateEmbeddingAsync(hotel.Description, _eIAInferenceAdapterType);
-
                 hotel.Embedding = EmbeddingHelper.ConvertToReadOnlyMemory(embedding);
-
                 hotelVectors.Add(hotel);
             }
         }
@@ -114,8 +100,6 @@ public class HotelVectorStoreService : GenericVectorStoreServiceBase, IVectorSto
     /// <summary>
     /// Executa uma busca vetorial baseada na similaridade de cossenos para os critérios especificados.
     /// </summary>
-    /// <param name="searchCriteria">Critérios contendo a consulta e limites.</param>
-    /// <returns>Resposta contendo o array de registros <see cref="HotelVector"/> encontrados.</returns>
     public async Task<SmartCoreHub.Core.SDK.Domain.DTOs.Common.ServiceResponse<HotelVector[]>> VectorizedSearchAsync(SearchCriteria searchCriteria)
     {
         try
@@ -123,13 +107,10 @@ public class HotelVectorStoreService : GenericVectorStoreServiceBase, IVectorSto
             if (searchCriteria.MaxRetrieve <= 0)
             {
                 var configuredMax = _configuration?.GetValue<int?>("ApplicationIAConfig:Rag:SearchSettings:MaxRetrieve") ?? 0;
-                // Fallback 25 alinhado a SearchCriteria.DefaultMaxRetrieve / appsettings
                 searchCriteria.MaxRetrieve = configuredMax > 0 ? configuredMax : 25;
             }
 
-            //Get semantic search 
             var embeddingSearchText = await _aIInferenceService.GenerateEmbeddingAsync(searchCriteria.SearchTextCriteria, _eIAInferenceAdapterType);
-
             var hotelsVector = await _adapter.VectorizedSearchAsync(nameCollection, embeddingSearchText, searchCriteria);
             return SmartCoreHub.Core.SDK.Domain.DTOs.Common.ServiceResponse<HotelVector[]>.Ok(hotelsVector);
         }
@@ -138,7 +119,6 @@ public class HotelVectorStoreService : GenericVectorStoreServiceBase, IVectorSto
             _logger.Error(ex, "An error occurred in VectorizedSearchAsync at: {Message} at: {Time}", ex.Message, DateTime.UtcNow);
 
 #pragma warning disable S6776
-            // NOSONAR
             return SmartCoreHub.Core.SDK.Domain.DTOs.Common.ServiceResponse<HotelVector[]>.Error(
                 [new SmartCoreHub.Core.SDK.Domain.DTOs.Common.ErrorResponse { Message = ex.Message }],
                 ex.Message);
@@ -149,17 +129,12 @@ public class HotelVectorStoreService : GenericVectorStoreServiceBase, IVectorSto
     /// <summary>
     /// Executa busca e análise combinada com plugins do Semantic Kernel para interpretação de intenção de busca.
     /// </summary>
-    /// <param name="searchText">Texto da consulta do usuário.</param>
-    /// <returns>Resposta contendo os registros vetoriais filtrados.</returns>
     public async Task<SmartCoreHub.Core.SDK.Domain.DTOs.Common.ServiceResponse<HotelVector[]>> SearchAndAnalyzePluginAsync(string searchText)
     {
         try
         {
-            //Get semantic search 
             var embeddingSearchText = await _aIInferenceService.GenerateEmbeddingAsync(searchText, _eIAInferenceAdapterType);
-
             var resultIA = await _adapter.SearchAndAnalyzePluginAsync(nameCollection, searchText, embeddingSearchText);
-
             return SmartCoreHub.Core.SDK.Domain.DTOs.Common.ServiceResponse<HotelVector[]>.Ok(resultIA);
         }
         catch (Exception ex)
@@ -167,7 +142,6 @@ public class HotelVectorStoreService : GenericVectorStoreServiceBase, IVectorSto
             _logger.Error(ex, "An error occurred in SearchAndAnalyzePluginAsync at: {Message} at: {Time}", ex.Message, DateTime.UtcNow);
 
 #pragma warning disable S6776
-            // NOSONAR
             return SmartCoreHub.Core.SDK.Domain.DTOs.Common.ServiceResponse<HotelVector[]>.Error(
                 [new SmartCoreHub.Core.SDK.Domain.DTOs.Common.ErrorResponse { Message = ex.Message }],
                 ex.Message);
@@ -178,7 +152,6 @@ public class HotelVectorStoreService : GenericVectorStoreServiceBase, IVectorSto
     /// <summary>
     /// Exclui um registro vetorial da coleção pelo seu identificador.
     /// </summary>
-    /// <param name="dataKey">Chave do registro a remover.</param>
     public async Task DeleteAsync(long dataKey)
     {
         await _adapter.DeleteAsync(nameCollection, dataKey);
