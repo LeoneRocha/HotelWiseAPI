@@ -1,4 +1,3 @@
-using HotelWise.Data.Context.Configure.Helper;
 using HotelWise.Domain.Model.AI;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -18,7 +17,8 @@ public class ChatSessionHistoryConfiguration : IEntityTypeConfiguration<ChatSess
     public void Configure(EntityTypeBuilder<ChatSessionHistory> builder)
     {
         builder.ToTable("ChatSessionHistory");
-        PomeloCharSetHelper.AddCharSet(builder);
+        // Gemini e outros LLMs retornam emoji (4 bytes); latin1 da base legada quebra no persist.
+        builder.HasCharSet("utf8mb4");
 
         // Definição de chave primária 
         builder.HasKey(e => e.Id);

@@ -69,7 +69,7 @@ namespace HotelWise.Data.Migrations.MySql
 
                     b.ToTable("ChatSessionHistory", (string)null);
 
-                    MySqlEntityTypeBuilderExtensions.HasCharSet(b, "latin1");
+                    MySqlEntityTypeBuilderExtensions.HasCharSet(b, "utf8mb4");
                 });
 
             modelBuilder.Entity("HotelWise.Domain.Model.HotelModels.Hotel", b =>
