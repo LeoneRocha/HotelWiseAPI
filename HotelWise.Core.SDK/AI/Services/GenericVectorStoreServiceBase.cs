@@ -1,7 +1,7 @@
 #if NET8_0_OR_GREATER
 using AutoMapper;
-
 using SmartCoreHub.Core.SDK.Common.Attributes;
+using SmartCoreHub.Core.SDK.Infrastructure.Logging;
 
 namespace HotelWise.Core.SDK.AI.Services;
 
@@ -15,9 +15,9 @@ public abstract class GenericVectorStoreServiceBase : SmartCoreHub.Core.SDK.Serv
     /// Inicializa uma nova instância de <see cref="GenericVectorStoreServiceBase"/>.
     /// </summary>
     /// <param name="mapper">Instância do AutoMapper.</param>
-    /// <param name="logger">Logger Serilog.</param>
+    /// <param name="logger">Logger Serilog (adaptado para IAppLogger no SCH).</param>
     protected GenericVectorStoreServiceBase(IMapper mapper, Serilog.ILogger logger)
-        : base(mapper, logger)
+        : base(mapper, new SerilogAdapter(logger))
     {
     }
 }

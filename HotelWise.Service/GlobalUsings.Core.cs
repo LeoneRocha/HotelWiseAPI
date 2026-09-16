@@ -1,5 +1,4 @@
 global using SmartCoreHub.Core.SDK.Domain.DTOs.Common;
-global using SmartCoreHub.Core.SDK.Common.Constants;
 global using SmartCoreHub.Core.SDK.Common.Exceptions;
 global using SmartCoreHub.Core.SDK.Domain.Entities.Common;
 global using SmartCoreHub.Core.SDK.Service.DependenciesCollection.Extensions;
@@ -7,6 +6,7 @@ global using SmartCoreHub.Core.SDK.Domain.Helpers;
 global using SmartCoreHub.Core.SDK.Service.API.Helpers;
 global using SmartCoreHub.Core.SDK.Common.Security;
 global using SmartCoreHub.Core.SDK.Service.Validation;
+global using SmartCoreHub.Core.SDK.Service.Configuration;
 global using HotelWise.Service.Generic;
 global using HotelWise.Service.Logging;
 global using SmartCoreHub.Core.SDK.Infrastructure;

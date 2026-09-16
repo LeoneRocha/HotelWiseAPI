@@ -1,5 +1,4 @@
 global using SmartCoreHub.Core.SDK.Domain.DTOs.Common;
-global using SmartCoreHub.Core.SDK.Common.Constants;
 global using SmartCoreHub.Core.SDK.Domain.Entities.Common;
 global using SmartCoreHub.Core.SDK.Domain.AI.Abstractions;
 global using SmartCoreHub.Core.SDK.Domain.AI.Configuration;

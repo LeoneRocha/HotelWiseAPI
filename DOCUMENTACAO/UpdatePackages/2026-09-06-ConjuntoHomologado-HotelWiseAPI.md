@@ -48,7 +48,7 @@
 | Microsoft.EntityFrameworkCore.* | 9.0.18 | Trava Pomelo 9 ↔ EF 9 |
 | Pomelo.EntityFrameworkCore.MySql | 9.0.0 | Sem release oficial 10.x |
 | Microsoft.AspNetCore.Authentication.JwtBearer (CPM) | 10.0.11 | Hosts e bibliotecas net10.0 alinhados; 0 avisos no Consolidate do VS |
-| SmartCoreHub.Core.SDK | 20260906.516.0 | Consumo NuGet; alinhado no latest |
+| SmartCoreHub.Core.SDK | 20260910.6.0 | Consumo NuGet; alinhado no latest |
 | Markdig / QuestPDF / Identity.Web / AutoMapper / Serilog | latest atual no CPM | Sem delta aplicável |
 
 ---

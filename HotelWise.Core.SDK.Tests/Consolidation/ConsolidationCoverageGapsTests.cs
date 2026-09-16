@@ -40,8 +40,8 @@ public class ConsolidationCoverageGapsTests
         var logger = new Mock<Serilog.ILogger>();
         LogAppHelper.LogException(logger.Object, new AppWarningException("warn"), "API");
         LogAppHelper.LogException(logger.Object, new InvalidOperationException("err"), "API");
-        logger.Verify(l => l.Warning(It.IsAny<string>()), Times.AtLeastOnce);
-        logger.Verify(l => l.Error(It.IsAny<Exception>(), It.IsAny<string>()), Times.AtLeastOnce);
+        logger.Verify(l => l.Warning(It.IsAny<string>(), It.IsAny<object[]>()), Times.AtLeastOnce);
+        logger.Verify(l => l.Error(It.IsAny<Exception>(), It.IsAny<string>(), It.IsAny<object[]>()), Times.AtLeastOnce);
 
         var info = LogAppHelper.GetInformationVersionProduct();
         info.Should().NotBeNull();

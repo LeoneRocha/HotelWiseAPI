@@ -2,6 +2,8 @@ using HotelWise.Data.Context;
 using HotelWise.Service.Configure;
 using Microsoft.EntityFrameworkCore;
 using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
+using SmartCoreHub.Core.SDK.Domain.Interfaces.Common;
+using SmartCoreHub.Core.SDK.Infrastructure.Logging;
 
 namespace HotelWise.API.Configure;
 
@@ -22,6 +24,7 @@ public static class ServiceCollectionAddAllDependencies
         {
             return _logger;
         });
+        services.AddSingleton<IAppLogger>(_ => new SerilogAdapter(_logger));
         addORM(services, configuration);
 
         ServiceCollectionConfigureServicesDomain.Configure(services, configuration);

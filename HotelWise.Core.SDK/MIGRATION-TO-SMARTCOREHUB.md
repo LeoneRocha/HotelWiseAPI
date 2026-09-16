@@ -12,9 +12,9 @@ Os tipos casca neste pacote estão marcados com `[SdkWrappedSource]`:
 | Campo | Valor |
 | :--- | :--- |
 | **PackageId canônico** | `SmartCoreHub.Core.SDK` |
-| **Versão Publicada / CPM** | `20260906.516.0` |
+| **Versão Publicada / CPM** | `20260910.6.0` |
 | **Feed NuGet Oficial** | [https://www.nuget.org/packages/SmartCoreHub.Core.SDK/](https://www.nuget.org/packages/SmartCoreHub.Core.SDK/) |
-| **Comando de Instalação** | `dotnet add package SmartCoreHub.Core.SDK --version 20260906.516.0` |
+| **Comando de Instalação** | `dotnet add package SmartCoreHub.Core.SDK --version 20260910.6.0` |
 | **Atributo de casca** | `SmartCoreHub.Core.SDK.Common.Attributes.SdkWrappedSourceAttribute` |
 | **Docs unificação** | `SmartCoreHub/Documentation/CoreFinal/implementacao-hotelwise-core-sdk.md` |
 
@@ -37,7 +37,7 @@ Os tipos casca neste pacote estão marcados com `[SdkWrappedSource]`:
 
 | Item | Status |
 | :--- | :--- |
-| CPM `SmartCoreHub.Core.SDK` | **`20260906.516.0`** |
+| CPM `SmartCoreHub.Core.SDK` | **`20260910.6.0`** |
 | Entidades | → `LongEntityBase` (+ aliases HW `Enable`/`CreatedDate`/`ModifyDate`) |
 | Repos | → `GenericRepository<T,TContext>` (casca `GenericRepositoryBase`) |
 | Serviços host | → `DtoEntityServiceBase` (façade DTO); casca `GenericEntityServiceBase` mantida p/ testes SDK |

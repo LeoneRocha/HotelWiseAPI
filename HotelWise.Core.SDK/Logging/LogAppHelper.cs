@@ -3,8 +3,8 @@ using System.Diagnostics;
 using HotelWise.Core.SDK.Common;
 using Microsoft.Extensions.Configuration;
 using Serilog;
-
 using SmartCoreHub.Core.SDK.Common.Attributes;
+using SmartCoreHub.Core.SDK.Infrastructure.Logging;
 
 namespace HotelWise.Core.SDK.Logging;
 
@@ -16,26 +16,18 @@ namespace HotelWise.Core.SDK.Logging;
 public static class LogAppHelper
 {
     /// <summary>Calcula e formata o tempo decorrido do Stopwatch.</summary>
-    /// <param name="stopwatch">Instância do Stopwatch.</param>
-    /// <returns>String com o tempo formatado.</returns>
     public static string GetDurationStopwatch(Stopwatch stopwatch) =>
         SmartCoreHub.Core.SDK.Service.API.Helpers.LogAppHelper.GetDurationStopwatch(stopwatch);
 
     /// <summary>Registra uma exceção no logger Serilog com categoria.</summary>
-    /// <param name="logger">Instância do logger Serilog.</param>
-    /// <param name="ex">Exceção a ser registrada.</param>
-    /// <param name="logType">Tipo ou contexto do log.</param>
     public static void LogException(ILogger logger, Exception ex, string logType) =>
-        SmartCoreHub.Core.SDK.Service.API.Helpers.LogAppHelper.LogException(logger, ex, logType);
+        SmartCoreHub.Core.SDK.Service.API.Helpers.LogAppHelper.LogException(new SerilogAdapter(logger), ex, logType);
 
     /// <summary>Cria uma instância configurada de Serilog Logger.</summary>
-    /// <param name="configuration">Configuração da aplicação.</param>
-    /// <returns>Instância do Logger Serilog.</returns>
     public static Serilog.Core.Logger CreateLogger(IConfiguration configuration) =>
         SmartCoreHub.Core.SDK.Service.API.Helpers.LogAppHelper.CreateLogger(configuration);
 
     /// <summary>Obtém metadados de versão e ambiente do produto.</summary>
-    /// <returns>DTO contendo as informações da aplicação.</returns>
     public static AppInformationVersionProductDto GetInformationVersionProduct()
     {
         var sch = SmartCoreHub.Core.SDK.Service.API.Helpers.LogAppHelper.GetInformationVersionProduct();
@@ -49,17 +41,14 @@ public static class LogAppHelper
     }
 
     /// <summary>Retorna a string formatada com os dados de versão e ambiente.</summary>
-    /// <returns>String descritiva do produto.</returns>
     public static string ShowInformationVersionProductString() =>
         SmartCoreHub.Core.SDK.Service.API.Helpers.LogAppHelper.ShowInformationVersionProductString();
 
     /// <summary>Imprime no log as informações de versão do produto.</summary>
-    /// <param name="logger">Instância do logger Serilog.</param>
     public static void PrintLogInformationVersionProduct(ILogger logger) =>
-        SmartCoreHub.Core.SDK.Service.API.Helpers.LogAppHelper.PrintLogInformationVersionProduct(logger);
+        SmartCoreHub.Core.SDK.Service.API.Helpers.LogAppHelper.PrintLogInformationVersionProduct(new SerilogAdapter(logger));
 
     /// <summary>Configura o valor da variável de ambiente ASPNETCORE_ENVIRONMENT.</summary>
-    /// <param name="configuration">Configuração da aplicação.</param>
     public static void Set_ASPNETCORE_ENVIRONMENT(IConfiguration configuration) =>
         SmartCoreHub.Core.SDK.Service.API.Helpers.LogAppHelper.Set_ASPNETCORE_ENVIRONMENT(configuration);
 }

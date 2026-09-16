@@ -6,8 +6,8 @@ using HotelWise.Core.SDK.Logging;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Hosting;
-
 using SmartCoreHub.Core.SDK.Common.Attributes;
+using SmartCoreHub.Core.SDK.Infrastructure.Logging;
 
 namespace HotelWise.Core.SDK.Infrastructure.Middleware;
 
@@ -29,10 +29,10 @@ public class GlobalExceptionMiddleware : SmartCoreHub.Core.SDK.Infrastructure.Mi
     /// Inicializa uma nova instância de <see cref="GlobalExceptionMiddleware"/>.
     /// </summary>
     /// <param name="next">Próximo delegate na esteira HTTP.</param>
-    /// <param name="logger">Instância do logger Serilog.</param>
+    /// <param name="logger">Instância do logger Serilog (adaptado para IAppLogger no SCH).</param>
     /// <param name="environment">Ambiente de hospedagem da aplicação.</param>
     public GlobalExceptionMiddleware(RequestDelegate next, Serilog.ILogger logger, IWebHostEnvironment environment)
-        : base(next, logger, environment)
+        : base(next, new SerilogAdapter(logger), environment)
     {
     }
 }

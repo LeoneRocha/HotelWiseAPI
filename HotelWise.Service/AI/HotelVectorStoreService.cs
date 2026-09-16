@@ -2,6 +2,7 @@ using AutoMapper;
 using HotelWise.Domain.Dto.IA.SemanticKernel;
 using Microsoft.Extensions.Configuration;
 using SmartCoreHub.Core.SDK.Domain.AI.Configuration;
+using SmartCoreHub.Core.SDK.Infrastructure.Logging;
 
 namespace HotelWise.Service.AI;
 
@@ -25,7 +26,7 @@ public class HotelVectorStoreService : GenericVectorStoreServiceBase, IVectorSto
         IApplicationIAConfig applicationIAConfig,
         IVectorStoreAdapterFactory adapterFactory,
         IAIInferenceService aIInferenceService,
-        IConfiguration? configuration = null) : base(mapper, logger)
+        IConfiguration? configuration = null) : base(mapper, new SerilogAdapter(logger))
     {
         _configuration = configuration;
         _eIAInferenceAdapterType = applicationIAConfig.RagConfig.GetAInferenceAdapterType();

@@ -37,7 +37,7 @@ public class GenericVectorStoreAdapter<TVector> : IVectorStoreAdapter<TVector>
         Kernel kernel)
     {
         _inner = new SchAdapters.GenericVectorStoreAdapter<TVector>(
-            logger,
+            new SmartCoreHub.Core.SDK.Infrastructure.Logging.SerilogAdapter(logger),
             applicationConfig,
             vectorStore,
             kernel);

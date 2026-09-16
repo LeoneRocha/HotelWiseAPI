@@ -1,5 +1,5 @@
 global using SmartCoreHub.Core.SDK.Domain.DTOs.Common;
-global using EntityTypeConfigurationConstants = SmartCoreHub.Core.SDK.Common.Constants.EntityTypeConfigurationConstants;
+global using EntityTypeConfigurationConstants = SmartCoreHub.Core.SDK.Infrastructure.Data.EntityTypeConfigurationConstants;
 global using ETypeDataBase = SmartCoreHub.Core.SDK.Common.ETypeDataBase;
 global using SmartCoreHub.Core.SDK.Domain.Entities.Common;
 global using SmartCoreHub.Core.SDK.EntityFrameworkCore.Repositories;

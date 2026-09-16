@@ -97,8 +97,8 @@ public class UserService : DtoEntityServiceBase<User, UserLoginDto>, IUserServic
 
         return new TokenVO(
             true,
-            createDate.ToString(AppConfigConstants.DATE_FORMAT2),
-            expirationDate.ToString(AppConfigConstants.DATE_FORMAT2),
+            createDate.ToString(AppConfigConstants.DateFormatIso),
+            expirationDate.ToString(AppConfigConstants.DateFormatIso),
             accessToken,
             refreshToken
         );

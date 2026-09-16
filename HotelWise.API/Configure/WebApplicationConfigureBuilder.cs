@@ -2,6 +2,7 @@ using HotelWise.Data.Context;
 using Microsoft.AspNetCore.Rewrite;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
+using SmartCoreHub.Core.SDK.Infrastructure.Logging;
 
 namespace HotelWise.API.Configure;
 
@@ -53,7 +54,7 @@ public static class WebApplicationConfigureBuilder
 
             Configure(app, builder.Environment, builder.Configuration);
 
-            LogAppHelper.PrintLogInformationVersionProduct(_logger);
+            LogAppHelper.PrintLogInformationVersionProduct(new SerilogAdapter(_logger));
 
             _logger.Information("Web API Loading at: {Time}", DateTime.UtcNow);
 
